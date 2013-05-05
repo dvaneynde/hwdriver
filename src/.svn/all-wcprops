@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/111/domotic/trunk/HwDriver/src
+END
+HwDriver.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/8/domotic/trunk/HwDriver/src/HwDriver.h
+END
+Opalmm.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/90/domotic/trunk/HwDriver/src/Opalmm.c
+END
+Dmmat.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/111/domotic/trunk/HwDriver/src/Dmmat.h
+END
+StringLines.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/8/domotic/trunk/HwDriver/src/StringLines.c
+END
+Opalmm.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/90/domotic/trunk/HwDriver/src/Opalmm.h
+END
+StringLines.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/8/domotic/trunk/HwDriver/src/StringLines.h
+END
+log.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/11/domotic/trunk/HwDriver/src/log.c
+END
+dscud_mock.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/111/domotic/trunk/HwDriver/src/dscud_mock.c
+END
+target.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/8/domotic/trunk/HwDriver/src/target.h
+END
+Dmmat.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/111/domotic/trunk/HwDriver/src/Dmmat.c
+END
+HwDriver.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/111/domotic/trunk/HwDriver/src/HwDriver.c
+END
+log.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/11/domotic/trunk/HwDriver/src/log.h
+END
