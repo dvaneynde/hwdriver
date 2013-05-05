@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig ../../../DomoticConfig.xsd ">
+	<switch channel="1" name="SchakLichtBadkamer0" desc="Licht badkamer gelijkvloers." />
+	<switch channel="2" name="SchakLichtWC0" desc="Licht badkamer boven." />
+	<switch channel="10" name="SchakFanBadkamer0" />
+	<switch channel="11" name="SchakFanWC0" />
+	<switch channel="5" name="AllOnOff" desc="Alle lichten aan/uit." />
+	<switch name="SchakKeukenScreenNeer" channel="6" />
+	<switch name="SchakKeukenScreenOp" channel="7" />
+	<lamp channel="3" name="LichtBadkamer0" />
+	<lamp channel="4" name="LichtWC0" />
+	<fan name="FanBadkamer0" channel="6" />
+	<fan name="FanWC0" channel="7" lamp="LichtWC0" desc="Ventilator WC gelijkvloers." />
+	<screen name="SchermKeuken" channelDown="23" channelUp="15" />
+	<switchboard name="sb" desc="Algemeen schakelbord">
+		<connection switch="SchakLichtBadkamer0" lamp="LichtBadkamer0" />
+		<connection switch="SchakLichtWC0" lamp="LichtBadkamer0" />
+		<allSwitch switch="AllOnOff" allOff="true" allOn="true" />
+	</switchboard>
+	<switchboardFans name="sbfans">
+		<connection switch="SchakFanWC0" fan="FanWC0" />
+		<connection switch="SchakFanBadkamer0" fan="FanBadkamer0" />
+	</switchboardFans>
+	<switchboardScreens name="sbscreens">
+		<connection screen="SchermKeuken" switchDown="SchakKeukenScreenNeer"
+			switchUp="SchakKeukenScreenOp" />
+	</switchboardScreens>
+</domotic>

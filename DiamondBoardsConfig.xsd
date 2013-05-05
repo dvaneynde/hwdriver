@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DiamondBoardsConfig"
+	xmlns:tns="http://dlvmechanografie.eu/DiamondBoardsConfig"
+	elementFormDefault="qualified">
+
+	<element name="boards">
+		<complexType>
+			<sequence minOccurs="1" maxOccurs="unbounded">
+				<choice>
+					<element name="opalmm" type="tns:opalmmType" />
+					<element name="dmmat" type="tns:dmmatType" />
+				</choice>
+			</sequence>
+		</complexType>
+	</element>
+	
+	<complexType name="boardStruct" abstract="true">
+		<attribute name="board" type="int" use="required" />
+		<attribute name="address" type="string" use="required" />
+		<attribute name="desc" type="string" />
+	</complexType>
+	<complexType name="boardChannelStruct">
+		<attribute name="channel" type="int" use="required" />
+		<attribute name="logical-id" type="int" use="required" />
+	</complexType>
+	<complexType name="channel1to8Struct">
+		<sequence minOccurs="1" maxOccurs="8">
+			<element name="channel" type="tns:boardChannelStruct" />
+		</sequence>
+	</complexType>
+	<complexType name="channel1to2Struct">
+		<sequence minOccurs="1" maxOccurs="2">
+			<element name="channel" type="tns:boardChannelStruct" />
+		</sequence>
+	</complexType>
+
+	<complexType name="opalmmType">
+		<complexContent>
+			<extension base="tns:boardStruct">
+				<sequence>
+					<element name="digital-input" type="tns:channel1to8Struct"
+						minOccurs="0" />
+					<element name="digital-output" type="tns:channel1to8Struct"
+						minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="dmmatType">
+		<complexContent>
+			<extension base="tns:boardStruct">
+				<sequence>
+					<element name="analog-input" type="tns:channel1to2Struct"
+						minOccurs="0" />
+					<element name="analog-output" type="tns:channel1to2Struct"
+						minOccurs="0" />
+					<element name="digital-input" type="tns:channel1to8Struct"
+						minOccurs="0" />
+					<element name="digital-output" type="tns:channel1to8Struct"
+						minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

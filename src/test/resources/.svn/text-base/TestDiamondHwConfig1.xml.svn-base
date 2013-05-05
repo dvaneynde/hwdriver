@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig /Users/dirk/Documents/workspace_helios/domotic/DiamondBoardsConfig.xsd ">
+	<opalmm address="0x380" board="0" desc="Een opalmm bordje.">
+		<digital-input>
+			<channel channel="5" logical-id="87" />
+		</digital-input>
+		<digital-output>
+			<channel channel="2" logical-id="13" />
+		</digital-output>
+	</opalmm>
+	<dmmat board="1" address="0x400" desc="First dmmatt board">
+		<analog-output>
+			<channel channel="0" logical-id="10" />
+		</analog-output>
+	</dmmat>
+
+</boards>

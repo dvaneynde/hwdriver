@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
+	<switch channel="3" name="SchakLichtWC0" desc="Licht badkamer boven." />
+	<lamp channel="4" name="LichtWC0" />
+</domotic>

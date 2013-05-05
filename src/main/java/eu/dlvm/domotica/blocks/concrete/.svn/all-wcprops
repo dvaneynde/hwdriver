@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/110/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete
+END
+LightSensor.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/112/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/LightSensor.java
+END
+SwitchBoardDimmers.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/SwitchBoardDimmers.java
+END
+FrequencyGauge.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/112/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/FrequencyGauge.java
+END
+Screen.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/Screen.java
+END
+DimmedLamp.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/104/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/DimmedLamp.java
+END
+Lamp.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/Lamp.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/69/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/package-info.java
+END
+SwitchBoardScreens.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/SwitchBoardScreens.java
+END
+Switch.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/Switch.java
+END
+DimmerSwitches.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/DimmerSwitches.java
+END
+Fan.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/Fan.java
+END
+SwitchBoardFans.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/SwitchBoardFans.java
+END
+SwitchBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/82/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/SwitchBoard.java
+END
+WindSensor.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/112/domotic/trunk/domotic/src/main/java/eu/dlvm/domotica/blocks/concrete/WindSensor.java
+END

@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/110/domotic/trunk/domotic
+END
+domotic-cfg.xml
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/47/domotic/trunk/domotic/domotic-cfg.xml
+END
+hw-diamond-cfg.xml
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/51/domotic/trunk/domotic/hw-diamond-cfg.xml
+END
+log4j.properties
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/104/domotic/trunk/domotic/log4j.properties
+END
+pom.xml
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/104/domotic/trunk/domotic/pom.xml
+END
+Adaptor_OnlyNotifyIfChanged.java.txt
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/4/domotic/trunk/domotic/Adaptor_OnlyNotifyIfChanged.java.txt
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/116/domotic/trunk/domotic/.project
+END
+DomoticConfig.xml
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/102/domotic/trunk/domotic/DomoticConfig.xml
+END
+DiamondBoardsConfig.xml
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/102/domotic/trunk/domotic/DiamondBoardsConfig.xml
+END
+DomoticConfig.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/86/domotic/trunk/domotic/DomoticConfig.xsd
+END
+DiamondBoardsConfig.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/59/domotic/trunk/domotic/DiamondBoardsConfig.xsd
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/116/domotic/trunk/domotic/.classpath
+END

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<description>Domotic system configuration file, describing the Blocks
+		such as Switches, Lamps, and their configuration.</description>
+	<import resource="hw-diamond-cfg.xml" />
+	<!-- bean id="HW" class="eu.dlvm.domotica.hw.diamondsys.HardwareIO"> <property 
+		name="loopInterval" value="100" /> </bean -->
+
+	<bean id="SwitchAllOff" class="eu.dlvm.domotica.blocks.concrete.Switch">
+		<constructor-arg value="AllOff" />
+		<constructor-arg value="Alles uit schakelaar." />
+		<constructor-arg value="0" />
+		<constructor-arg ref="HW" />
+		<property name="longClickEnabled" value="true"></property>
+		<property name="longClickTimeout" value="500"></property>
+		<property name="singleClickEnabled" value="false"></property>
+		<property name="doubleClickEnabled" value="false"></property>
+	</bean>
+	<bean id="SwitchWC0Lamp" class="eu.dlvm.domotica.blocks.concrete.Switch">
+		<constructor-arg value="WC0" />
+		<constructor-arg value="Drukknop licht WC gelijkvloers." />
+		<constructor-arg value="2" />
+		<constructor-arg ref="HW" />
+	</bean>
+	<bean id="LampWC0" class="eu.dlvm.domotica.blocks.concrete.Lamp">
+		<constructor-arg value="LampWC0" />
+		<constructor-arg value="Licht WC gelijkvloers." />
+		<constructor-arg value="7" />
+		<constructor-arg ref="HW" />
+	</bean>
+	<bean id="CfgLamp0" class="eu.dlvm.domotica.blocks.concrete.SwitchBoard$Config">
+		<constructor-arg ref="LampWC0" />
+		<constructor-arg value="false" />
+		<constructor-arg value="false" />
+	</bean>
+	<bean id="CfgLampAll" class="eu.dlvm.domotica.blocks.concrete.SwitchBoard$Config">
+		<constructor-arg>
+			<null />
+		</constructor-arg>
+		<constructor-arg value="true" />
+		<constructor-arg value="false" />
+	</bean>
+	<bean id="SwitchboardLamps" class="eu.dlvm.domotica.blocks.concrete.SwitchBoard">
+		<constructor-arg value="LampenAanUit" />
+		<constructor-arg value="Lampen aan/uit via
+		pushbutton switch." />
+		<property name="switch2ConfigMap">
+			<map>
+				<entry key-ref="SwitchWC0Lamp" value-ref="CfgLamp0"></entry>
+				<entry key-ref="SwitchAllOff" value-ref="CfgLampAll"></entry>
+			</map>
+		</property>
+	</bean>
+	<bean id="SwitchWC0Fan" class="eu.dlvm.domotica.blocks.concrete.Switch">
+		<constructor-arg value="FanWC0" />
+		<constructor-arg value="Drukknop ventilator WC gelijkvloers." />
+		<constructor-arg value="1" />
+		<constructor-arg ref="HW" />
+		<property name="longClickEnabled" value="true"></property>
+		<property name="longClickTimeout" value="1500"></property>
+	</bean>
+	<bean id="FanWC0" class="eu.dlvm.domotica.blocks.concrete.Fan">
+		<constructor-arg value="FanWC0" />
+		<constructor-arg value="Ventilator WC gelijkvloers." />
+		<constructor-arg ref="LampWC0" />
+		<constructor-arg value="6" />
+		<constructor-arg ref="HW" />
+		<property name="delayPeriodSec" value="120" />
+		<property name="runningPeriodSec" value="300" />
+	</bean>
+	<bean id="SwitchboardFans" class="eu.dlvm.domotica.blocks.concrete.SwitchBoardFans">
+		<constructor-arg value="SwitchBoardFans" />
+		<constructor-arg value="Schakelbord ventilatoren." />
+		<property name="switch2FanMap">
+			<map>
+				<entry key-ref="SwitchWC0Fan" value-ref="FanWC0"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SwitchDimmerTable" class="eu.dlvm.domotica.blocks.concrete.DimmerSwitches">
+		<constructor-arg value="DimSwitchCircante" />
+		<constructor-arg value="Dimmer Switches rond circante tafel." />
+		<constructor-arg value="4" />
+		<constructor-arg value="3" />
+		<constructor-arg ref="HW" />
+	</bean>
+	<bean id="DimmerTable" class="eu.dlvm.domotica.blocks.concrete.DimmedLamp">
+		<constructor-arg value="DimLampCircante" />
+		<constructor-arg value="Gedimde lichten rond circante tafel." />
+		<constructor-arg value="4095" />
+		<constructor-arg value="101" />
+		<constructor-arg ref="HW" />
+	</bean>
+	<bean id="SwitchBoardDimmers" class="eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers">
+		<constructor-arg value="Dimmers" />
+		<constructor-arg value="Switchboard Dimmers." />
+		<property name="mappings">
+			<map>
+				<entry key-ref="SwitchDimmerTable" value-ref="DimmerTable"></entry>
+			</map>
+		</property>
+		<property name="allOnOffs">
+			<list>
+				<bean
+					class="eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers$AllOnOffInfo">
+					<constructor-arg ref="SwitchAllOff" />
+					<constructor-arg value="true" />
+					<constructor-arg value="false" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="Domotic" class="eu.dlvm.domotica.blocks.DomoticConfiguration">
+		<property name="elements">
+			<set>
+				<ref local="SwitchAllOff" />
+				<ref local="SwitchWC0Lamp" />
+				<ref local="LampWC0" />
+				<ref local="SwitchWC0Fan" />
+				<ref local="FanWC0" />
+				<ref local="SwitchboardLamps" />
+				<ref local="SwitchboardFans" />
+				<ref local="SwitchDimmerTable" />
+				<ref local="DimmerTable" />
+				<ref local="SwitchBoardDimmers" />
+			</set>
+		</property>
+	</bean>
+</beans>

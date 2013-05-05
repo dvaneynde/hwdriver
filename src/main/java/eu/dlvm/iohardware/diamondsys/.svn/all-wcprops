@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/108/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys
+END
+DmmatBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/116/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/DmmatBoard.java
+END
+HardwareIO.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/108/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/HardwareIO.java
+END
+ChannelType.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/ChannelType.java
+END
+DigiIn.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/DigiIn.java
+END
+Opmm1616Board.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/116/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/Opmm1616Board.java
+END
+AnaInChannel.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/77/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/AnaInChannel.java
+END
+OpalmmBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/116/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/OpalmmBoard.java
+END
+AnaOutChannel.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/AnaOutChannel.java
+END
+ChannelMap.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/ChannelMap.java
+END
+DigiOut.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/87/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/DigiOut.java
+END
+Board.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/116/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/Board.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/package-info.java
+END
+FysCh.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/65/domotic/trunk/domotic/src/main/java/eu/dlvm/iohardware/diamondsys/FysCh.java
+END

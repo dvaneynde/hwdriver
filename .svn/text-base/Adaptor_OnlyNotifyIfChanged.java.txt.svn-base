@@ -1,0 +1,162 @@
+package eu.dlvm.domotica.hwabstraction.diamondsys;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import eu.dlvm.domotica.hwabstraction.IHardware;
+import eu.dlvm.domotica.hwabstraction.IDioHwListener;
+import eu.dlvm.domotica.hwabstraction.LogCh;
+import eu.dlvm.domotica.hwlistener.Cmd2Hw;
+import eu.dlvm.domotica.hwlistener.CmdFromHw;
+import eu.dlvm.domotica.hwlistener.CmdError;
+import eu.dlvm.domotica.hwlistener.IHwIOprocessor;
+import eu.dlvm.domotica.hwlistener.CmdInit;
+import eu.dlvm.domotica.hwlistener.PortValStruct;
+import eu.dlvm.domotica.hwlistener.CmdReqDi;
+import eu.dlvm.domotica.hwlistener.CmdSetDo;
+import eu.dlvm.domotica.hwlistener.CmdStartup;
+import eu.dlvm.domotica.hwlistener.CmdValDi;
+
+/**
+ * <p>TODO describe how input and output channels are mapped by default.
+ * <p>Note that input channels and output channels are different; so channel '0' can be used twice, once for input and once for output.
+ * @author dirk
+ *
+ */
+public class Adaptor_OnlyNotifyIfChanged implements IHardware, IHwIOprocessor {
+
+	static Logger log = Logger.getLogger(Adaptor_OnlyNotifyIfChanged.class);
+	
+	class BC {
+		int boardNr;
+		int boardChannelNr;
+	};
+
+	private List<OpalmmBoard> dioboards = new ArrayList<OpalmmBoard>();
+	private Map<Integer, IDioHwListener> listen = new HashMap<Integer, IDioHwListener>();
+
+	public Adaptor_OnlyNotifyIfChanged() {
+		// TODO Externalizeren, zodat dit alles via externe xml file kan gebeuren,
+		// en dit ding volledig generiek is.
+		dioboards.add(new OpalmmBoard(0x380, "First opalmm dio board."));
+	}
+
+//	//@Override
+//	public boolean isOn_Board(int a) throws IllegalArgumentException {
+//		BC bc = convertChannel(a);
+//		OpalmmBoard b = dioboards.get(bc.boardNr);
+//		return b.getInput((byte) bc.boardChannelNr);
+//	}
+
+	@Override
+	public void writeOutput(LogCh channel, boolean val)
+			throws IllegalArgumentException {
+		if (channel >= Byte.MAX_VALUE)
+			throw new IllegalArgumentException(
+					"A Channel must not be greather that a Byte.");
+		BC bc = convertChannel(channel);
+		OpalmmBoard b = dioboards.get(bc.boardNr);
+		b.setOutputForChannel(val, (byte) bc.boardChannelNr);
+	}
+
+	/**
+	 * Converts a channel number into a board number, and a board-specific channel number.
+	 * @param channel
+	 * @return
+	 */
+	BC convertChannel(int channel) {
+		BC bc = new BC();
+		bc.boardNr = channel / 8;
+		bc.boardChannelNr = channel % 8;
+		return bc;
+	}
+
+	@Override
+	public void register(int channel, IDioHwListener l) {
+		listen.put(channel, l);
+	}
+
+	/**
+	 * Notifies registered listeners if an input channel has changed.
+	 */
+	protected void notifyInputListeners() {
+		Set<Integer> channels = listen.keySet();
+		for (Integer ch : channels) {
+			BC bc = convertChannel(ch);
+			OpalmmBoard b = dioboards.get(bc.boardNr);
+			//if (b.inputHasChanged((byte)(bc.boardChannelNr))) {
+				IDioHwListener l = listen.get(ch);
+				l.update(ch,b.getInput((byte)bc.boardChannelNr));
+			//}
+		}
+	}
+
+	private OpalmmBoard findBoardByPort(int port) {
+		for (OpalmmBoard b : dioboards) {
+			if (b.getPort() == port)
+				return b;
+		}
+		throw new IllegalArgumentException("No dio board found with port="
+				+ port);
+	}
+
+	@Override
+	public List<Cmd2Hw> processInputAndGenerateOutput(List<CmdFromHw> fromHw) {
+		/*
+		 * Input - Errors: loggen - Values: juiste opalmm aanroepen; die geeft
+		 * terug of hij gewijzigd is; zoja, informListeners (onmiddellijk, of
+		 * queuen) Output - ??? INIT, REQ_DI, enkel 1 keer na setup? - SET_DO
+		 * vanuit getDigital etc., wat ge-update is indirect door listeners die
+		 * verbonden zijn met outputs die deze IAdaptor aangeroepen hebben.
+		 */
+		List<Cmd2Hw> ct = new ArrayList<Cmd2Hw>();
+		for (CmdFromHw cf : fromHw) {
+			if (cf instanceof CmdStartup) {
+				ct.add(new CmdInit(1000000L));
+
+				CmdReqDi rd = new CmdReqDi();
+				for (OpalmmBoard board : dioboards) {
+					rd.add(board.getPort());
+				}
+				ct.add(rd);
+			} else if (cf instanceof CmdValDi) {
+				for (PortValStruct pv : ((CmdValDi) cf).getParms()) {
+					OpalmmBoard board = findBoardByPort(pv.port);
+					board.updateInputFromBoard((byte) pv.value);
+				}
+			} else if (cf instanceof CmdError) {
+				log.warn("Ignoring ERROR command received from HW Driver. Not implemented yet. Error="+cf.toString());
+			} else { // must be ERROR
+				log.error("  Adaptor - Ignoring unknown command received from HW Driver. Command="+cf.toString());
+			}
+		}
+
+		notifyInputListeners();
+		for (OpalmmBoard board : dioboards) {
+			board.resetInputChangedDetection();
+		}
+
+		{
+			CmdSetDo sd = new CmdSetDo();
+			for (OpalmmBoard board : dioboards) {
+				if (board.outputStateHasChanged()) {
+					sd.add(new PortValStruct(board.getPort(), board
+							.getOutputstate()));
+					board.resetOutputChangedDetection();
+				}
+			}
+			if (sd.getPortVals().size() > 0)
+				ct.add(sd);
+		}
+		// TODO iets met stop-vlag, als die gezet is moet er een stop
+		// gestuurd.
+
+		return ct;
+	}
+
+}

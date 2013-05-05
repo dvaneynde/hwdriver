@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
+	elementFormDefault="qualified">
+	<element name="domotic">
+		<complexType>
+			<choice maxOccurs="unbounded">
+
+				<element name="switch" type="tns:blockWithChannelStruct"
+					minOccurs="0" maxOccurs="1" />
+				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
+					minOccurs="0" maxOccurs="1" />
+
+				<element name="lamp" type="tns:blockWithChannelStruct"
+					minOccurs="0" maxOccurs="1" />
+				<element name="fan" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockWithChannelStruct">
+								<attribute name="lamp" type="IDREF" use="optional" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+				<element name="dimmedLamp" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockWithChannelStruct">
+								<attribute name="fullOnHwOutput" type="int" use="required" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+				<element name="screen" type="tns:BlockWithChannelUpDownStruct"
+					minOccurs="0" maxOccurs="1" />
+
+
+				<element name="switchboard" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockStruct">
+								<sequence>
+									<element name="connection" maxOccurs="unbounded">
+										<complexType>
+											<attribute name="switch" type="IDREF" use="required" />
+											<attribute name="lamp" type="IDREF" use="required" />
+										</complexType>
+									</element>
+									<element name="allSwitch" type="tns:allSwitchStruct"
+										minOccurs="0" />
+								</sequence>
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+				<element name="switchboardDimmer" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockStruct">
+								<sequence>
+									<element name="connection" maxOccurs="unbounded">
+										<complexType>
+											<attribute name="dimmerSwitch" type="IDREF" use="required" />
+											<attribute name="dimmedLamp" type="IDREF" use="required" />
+										</complexType>
+									</element>
+									<element name="allSwitch" type="tns:allSwitchStruct"
+										minOccurs="0" />
+								</sequence>
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+				<element name="switchboardFans" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockStruct">
+								<sequence>
+									<element name="connection" maxOccurs="unbounded">
+										<complexType>
+											<attribute name="switch" type="IDREF" use="required" />
+											<attribute name="fan" type="IDREF" use="required" />
+										</complexType>
+									</element>
+								</sequence>
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+				<element name="switchboardScreens" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockStruct">
+								<sequence>
+									<element name="connection" maxOccurs="unbounded">
+										<complexType>
+											<attribute name="switchDown" type="IDREF" use="required" />
+											<attribute name="switchUp" type="IDREF" use="required" />
+											<attribute name="screen" type="IDREF" use="required" />
+										</complexType>
+									</element>
+									<element name="allUpDownSwitches" minOccurs="0">
+										<complexType>
+											<attribute name="allDownSwitch" type="IDREF" />
+											<attribute name="allUpSwitch" type="IDREF" />
+										</complexType>
+
+									</element>
+								</sequence>
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+			</choice>
+		</complexType>
+	</element>
+
+	<complexType name="allSwitchStruct">
+		<attribute name="switch" use="required" type="IDREF" />
+		<attribute name="allOff" default="true" type="boolean" />
+		<attribute name="allOn" default="false" type="boolean" />
+	</complexType>
+	<complexType name="blockStruct">
+		<attribute name="name" use="required" type="ID" />
+		<attribute name="desc" use="optional" type="string" />
+	</complexType>
+	<complexType name="blockWithChannelStruct">
+		<complexContent>
+			<extension base="tns:blockStruct">
+				<attribute name="channel" type="int" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="BlockWithChannelUpDownStruct">
+		<complexContent>
+			<extension base="tns:blockStruct">
+				<attribute name="channelDown" type="int" use="required" />
+				<attribute name="channelUp" type="int" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+</schema>
