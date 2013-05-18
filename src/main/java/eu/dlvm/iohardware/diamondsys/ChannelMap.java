@@ -2,10 +2,11 @@ package eu.dlvm.iohardware.diamondsys;
 
 import org.apache.log4j.Logger;
 
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * Mapping of FysCh onto LogCh.
+ * Mapping of FysCh to LogCh, and vice versa.
  * @author dirk
  *
  */

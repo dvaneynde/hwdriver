@@ -3,7 +3,7 @@ package eu.dlvm.iohardware.diamondsys;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.dlvm.iohardware.diamondsys.ChannelType;
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.FysCh;
 
 public class TestFysCh {

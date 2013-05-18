@@ -1,5 +1,7 @@
 package eu.dlvm.iohardware.diamondsys;
 
+import eu.dlvm.iohardware.ChannelType;
+
 public class FysCh {
 
 	private int boardNr;
@@ -34,23 +36,36 @@ public class FysCh {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (o == null)
-			return false;
-		if (!(o instanceof FysCh))
-			return false;
-		FysCh o2 = (FysCh) o;
-		return ((chType == o2.chType) && (boardNr == o2.boardNr) && (boardChannelNr == o2.boardChannelNr));
-	}
-
-	@Override
-	public int hashCode() {
-		return boardNr * 8 + boardChannelNr + chType.asNumber() * 100;
-	}
-
-	@Override
 	public String toString() {
 		return "FysCh boardNr=" + boardNr + ", channel=" + chType
 				+ ", channel on board=" + boardChannelNr;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + boardChannelNr;
+        result = prime * result + boardNr;
+        result = prime * result + ((chType == null) ? 0 : chType.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FysCh other = (FysCh) obj;
+        if (boardChannelNr != other.boardChannelNr)
+            return false;
+        if (boardNr != other.boardNr)
+            return false;
+        if (chType != other.chType)
+            return false;
+        return true;
+    }
 }

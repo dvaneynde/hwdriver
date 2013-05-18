@@ -9,11 +9,12 @@
 				<choice>
 					<element name="opalmm" type="tns:opalmmType" />
 					<element name="dmmat" type="tns:dmmatType" />
+					<element name="opmm1616" type="tns:opmm1616Type" />
 				</choice>
 			</sequence>
 		</complexType>
 	</element>
-	
+
 	<complexType name="boardStruct" abstract="true">
 		<attribute name="board" type="int" use="required" />
 		<attribute name="address" type="string" use="required" />
@@ -23,12 +24,17 @@
 		<attribute name="channel" type="int" use="required" />
 		<attribute name="logical-id" type="int" use="required" />
 	</complexType>
-	<complexType name="channel1to8Struct">
+	<complexType name="channel0to7Struct">
 		<sequence minOccurs="1" maxOccurs="8">
 			<element name="channel" type="tns:boardChannelStruct" />
 		</sequence>
 	</complexType>
-	<complexType name="channel1to2Struct">
+	<complexType name="channel0to15Struct">
+		<sequence minOccurs="1" maxOccurs="16">
+			<element name="channel" type="tns:boardChannelStruct" />
+		</sequence>
+	</complexType>
+	<complexType name="channel0to1Struct">
 		<sequence minOccurs="1" maxOccurs="2">
 			<element name="channel" type="tns:boardChannelStruct" />
 		</sequence>
@@ -38,9 +44,21 @@
 		<complexContent>
 			<extension base="tns:boardStruct">
 				<sequence>
-					<element name="digital-input" type="tns:channel1to8Struct"
+					<element name="digital-input" type="tns:channel0to7Struct"
 						minOccurs="0" />
-					<element name="digital-output" type="tns:channel1to8Struct"
+					<element name="digital-output" type="tns:channel0to7Struct"
+						minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="opmm1616Type">
+		<complexContent>
+			<extension base="tns:boardStruct">
+				<sequence>
+					<element name="digital-input" type="tns:channel0to15Struct"
+						minOccurs="0" />
+					<element name="digital-output" type="tns:channel0to15Struct"
 						minOccurs="0" />
 				</sequence>
 			</extension>
@@ -50,13 +68,13 @@
 		<complexContent>
 			<extension base="tns:boardStruct">
 				<sequence>
-					<element name="analog-input" type="tns:channel1to2Struct"
+					<element name="analog-input" type="tns:channel0to1Struct"
 						minOccurs="0" />
-					<element name="analog-output" type="tns:channel1to2Struct"
+					<element name="analog-output" type="tns:channel0to1Struct"
 						minOccurs="0" />
-					<element name="digital-input" type="tns:channel1to8Struct"
+					<element name="digital-input" type="tns:channel0to7Struct"
 						minOccurs="0" />
-					<element name="digital-output" type="tns:channel1to8Struct"
+					<element name="digital-output" type="tns:channel0to7Struct"
 						minOccurs="0" />
 				</sequence>
 			</extension>

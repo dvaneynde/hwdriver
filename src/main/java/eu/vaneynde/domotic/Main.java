@@ -17,8 +17,8 @@ import eu.dlvm.domotica.blocks.Domotic;
 import eu.dlvm.domotica.blocks.Oscillator;
 import eu.dlvm.domotica.factories.XmlDomoticConfigurator;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.diamondsys.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
+import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 
 /**

@@ -12,14 +12,14 @@ import eu.dlvm.domotica.blocks.Domotic;
 import eu.dlvm.domotica.blocks.concrete.Lamp;
 import eu.dlvm.domotica.blocks.concrete.Switch;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoard;
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
-import eu.dlvm.iohardware.diamondsys.ChannelType;
 import eu.dlvm.iohardware.diamondsys.FysCh;
-import eu.dlvm.iohardware.diamondsys.HardwareIO;
-import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
+import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
+import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
 
 public class TestEnd2EndSwitchLamp {
 	
@@ -57,7 +57,7 @@ public class TestEnd2EndSwitchLamp {
 	class TestConfigurator implements IBoardFactory {
 		@Override
 		public void configure(List<Board> boards, ChannelMap map) {
-			boards.add(new OpalmmBoard(0, 0x380, "First opalmm board."));
+			boards.add(new OpalmmBoardWithMsg(0, 0x380, "First opalmm board.",true,true));
 			map.add(IO.S_KEUKENLICHT.ch(), new FysCh(0, ChannelType.DigiIn, 0));
 			map.add(IO.L_KEUKEN.ch(), new FysCh(0, ChannelType.DigiOut, 0));
 		}

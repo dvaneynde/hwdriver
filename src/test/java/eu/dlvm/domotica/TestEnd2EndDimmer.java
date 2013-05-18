@@ -12,15 +12,15 @@ import eu.dlvm.domotica.blocks.Domotic;
 import eu.dlvm.domotica.blocks.concrete.DimmedLamp;
 import eu.dlvm.domotica.blocks.concrete.DimmerSwitches;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers;
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
-import eu.dlvm.iohardware.diamondsys.ChannelType;
-import eu.dlvm.iohardware.diamondsys.DmmatBoard;
 import eu.dlvm.iohardware.diamondsys.FysCh;
-import eu.dlvm.iohardware.diamondsys.HardwareIO;
-import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
+import eu.dlvm.iohardware.diamondsys.messaging.DmmatBoardWithMsg;
+import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
+import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
 
 public class TestEnd2EndDimmer {
 
@@ -30,6 +30,8 @@ public class TestEnd2EndDimmer {
 	public static final LogCh SW_UP_1 = new LogCh(1);
 	public static final LogCh DIMMER1 = new LogCh(100);
 
+	private static final boolean[] boolarraytrue = new boolean[] { true, true};
+	
 	HardwareIO hw;
 	HwDriverChannelMock drv;
 	private long current;
@@ -42,8 +44,8 @@ public class TestEnd2EndDimmer {
 	class TestConfigurator implements IBoardFactory {
 		@Override
 		public void configure(List<Board> boards, ChannelMap map) {
-			boards.add(new OpalmmBoard(0, 0x380, "Opalmm board, gebruikt voor Dimmer Switches."));
-			boards.add(new DmmatBoard(1, 0x300, "Dmmat board, gebruikt voor Analog Output."));
+			boards.add(new OpalmmBoardWithMsg(0, 0x380, "Opalmm board, gebruikt voor Dimmer Switches.",true,true));
+			boards.add(new DmmatBoardWithMsg(1, 0x300, "Dmmat board, gebruikt voor Analog Output.",true, true, boolarraytrue, boolarraytrue));
 			map.add(SW_DN_1, new FysCh(0, ChannelType.DigiOut, 0));
 			map.add(SW_UP_1, new FysCh(0, ChannelType.DigiIn, 1));
 			map.add(DIMMER1, new FysCh(1, ChannelType.AnlgOut, 0));

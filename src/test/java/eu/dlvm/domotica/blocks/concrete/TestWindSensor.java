@@ -1,16 +1,11 @@
 package eu.dlvm.domotica.blocks.concrete;
 
 import org.apache.log4j.BasicConfigurator;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
-import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
 import eu.dlvm.domotica.blocks.ISensorListener;
 import eu.dlvm.domotica.blocks.SensorEvent;
-import eu.dlvm.domotica.blocks.concrete.TestSwitch.Hardware;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -24,7 +19,6 @@ public class TestWindSensor {
 		}
 	};
 	private Hardware hw = new Hardware();
-	private IDomoContext ctx = new DomoContextMock(hw);
 	private long seq, cur;
 
 	public static final LogCh WINDSENSOR_CH = new LogCh(10);

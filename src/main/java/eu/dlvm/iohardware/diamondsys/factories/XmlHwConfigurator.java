@@ -9,17 +9,19 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
 
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
-import eu.dlvm.iohardware.diamondsys.ChannelType;
 import eu.dlvm.iohardware.diamondsys.DmmatBoard;
 import eu.dlvm.iohardware.diamondsys.FysCh;
-import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
+import eu.dlvm.iohardware.diamondsys.messaging.DmmatBoardWithMsg;
+import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
+import eu.dlvm.iohardware.diamondsys.messaging.Opmm1616BoardWithMsg;
 
 /**
  * 
@@ -59,7 +61,7 @@ public class XmlHwConfigurator implements IBoardFactory {
 						if (localName.equals("boards")) {
 							;
 						} else if (localName.equals("opalmm")
-								|| (localName.equals("dmmat"))) {
+								|| (localName.equals("dmmat")) || (localName.equals("opmm1616"))) {
 							parseBoardParams(atts);
 						} else if (localName.equals("digital-input")) {
 							chtype = ChannelType.DigiIn;
@@ -94,17 +96,23 @@ public class XmlHwConfigurator implements IBoardFactory {
 
 					log.debug("End Element '" + localName + "'");
 					if (localName.equals("opalmm")) {
-						OpalmmBoard board = new OpalmmBoard(boardNr, address,
+						Board board = new OpalmmBoardWithMsg(boardNr, address,
 								desc, digiIn, digiOut);
 						log.debug("Created board: "+board.toString());
 						boards.add(board);
 						reset();
 					} else if (localName.equals("dmmat")) {
-						DmmatBoard board = new DmmatBoard(boardNr, address,
+						Board board = new DmmatBoardWithMsg(boardNr, address,
 								desc, digiIn, digiOut, anaIns, anaOuts);
 						log.debug("Created board: "+board.toString());
 						boards.add(board);
 						reset();
+                    } else if (localName.equals("opmm1616")) {
+                        Board board = new Opmm1616BoardWithMsg(boardNr, address,
+                                desc, digiIn, digiOut);
+                        log.debug("Created board: "+board.toString());
+                        boards.add(board);
+                        reset();
 					}
 				}
 
