@@ -24,14 +24,14 @@ public class TestDmmatWithMsg {
 
     @Test
     public void testRequestInput1() {
-        IBoardMessaging b = new DmmatBoardWithMsg(0, 0x320, "test", false, false, new boolean[] { true, false }, new boolean[2]);
-        Assert.assertEquals("REQ_INP 0x320 D NYN\n", b.msgInputRequest());
+        IBoardMessaging b = new DmmatBoardWithMsg(0, 0x320, "test", false, false, true, false);
+        Assert.assertEquals("REQ_INP 0x320 D NYY\n", b.msgInputRequest());
     }
 
     @Test
     public void testRequestInput2() {
-        IBoardMessaging b = new DmmatBoardWithMsg(0, 0x330, "test", true, false, new boolean[] { false, true }, new boolean[2]);
-        Assert.assertEquals("REQ_INP 0x330 D YNY\n", b.msgInputRequest());
+        IBoardMessaging b = new DmmatBoardWithMsg(0, 0x330, "test", true, false, false, true);
+        Assert.assertEquals("REQ_INP 0x330 D YNN\n", b.msgInputRequest());
     }
 
     @Test
@@ -87,13 +87,13 @@ public class TestDmmatWithMsg {
 
     @Test
     public void testOutput0() {
-        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", true, false, new boolean[] { true, true }, new boolean[2]);
+        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", true, false, true, false);
         Assert.assertEquals("", b.msgOutputRequest());
     }
 
     @Test
     public void testOutput1() {
-        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", false, true, new boolean[2], new boolean[] { true, true });
+        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", false, true, false, true);
         b.init();
         Assert.assertEquals("SET_OUT 0x300 D 0 0 0\n", b.msgOutputRequest());
 
@@ -112,8 +112,8 @@ public class TestDmmatWithMsg {
 
     @Test
     public void testOutput2() {
-        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", false, false, new boolean[2], new boolean[] { true, false });
-        Assert.assertEquals("SET_OUT 0x300 D - 0 -\n", b.msgOutputRequest());
+        DmmatBoardWithMsg b = new DmmatBoardWithMsg(0, 0x300, "test", false, false, false, true);
+        Assert.assertEquals("SET_OUT 0x300 D - 0 0\n", b.msgOutputRequest());
     }
 
 }

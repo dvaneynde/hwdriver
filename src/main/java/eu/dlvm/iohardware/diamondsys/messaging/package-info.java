@@ -35,6 +35,5 @@
  * running - not sure it will survive that.
  */
 package eu.dlvm.iohardware.diamondsys.messaging;
-import eu.dlvm.iohardware.diamondsys.deprecated.Msg2InitBoard;import eu.dlvm.iohardware.diamondsys.deprecated.Msg2InitHardware;
-import eu.dlvm.iohardware.diamondsys.deprecated.MsgError;
+
 

@@ -228,6 +228,7 @@ public class Main {
 		String logcfgfile = null;
 		String blocksCfgFile = null;
 		String hwCfgFile = null;
+	    boolean consoleMode = false;
 		int i = 0;
 		while (i < args.length) {
 			if (args[i].equals("-t")) {
@@ -242,7 +243,7 @@ public class Main {
 				if (++i >= args.length)
 					usage();
 				logcfgfile = args[i++];
-			} else if (args[i].equals("-c")) {
+			} else if (args[i].equals("-b")) {
 				if (++i >= args.length)
 					usage();
 				blocksCfgFile = args[i++];
@@ -250,6 +251,8 @@ public class Main {
 				if (++i >= args.length)
 					usage();
 				hwCfgFile = args[i++];
+            } else if (args[i].equals("-c")) {
+                consoleMode = true;
 			} else
 				usage();
 		}
@@ -285,8 +288,14 @@ public class Main {
 		System.out
 				.println("Usage: "
 						+ Main.class.getName()
-						+ " [-d path2Driver] [-t looptime] [-l logconfigfile] -c blocks-config-file -h hardware-config-file\n\t-d path to driver, if it needs to be started and managed by this program\n\t-t time between loops, in ms\n\t-c spring configuration file for blocks; if not given a hardcoded variant is taken\n\t-l log4j configuration file\n\n");
-		System.exit(1);
+						+ " [-d path2Driver] [-t looptime] [-l logconfigfile] -b blocks-config-file -h hardware-config-file\n"
+						+"\t-d path to driver, if it needs to be started and managed by this program\n"
+						+"\t-c console mode"
+						+"\t-t time between loops, in ms\n"
+						+"\t-b domotic blocks xml configuration file\n"
+						+"\t-h hardware xml configuration file\n"
+						+"\t-l log4j configuration file\n");
+		System.exit(2);
 	}
 
 }

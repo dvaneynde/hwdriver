@@ -1,10 +1,9 @@
 package eu.dlvm.iohardware.diamondsys;
 
+import eu.dlvm.iohardware.ChannelType;
 
 /**
- * A OpalmmBoard abstracts any I/O board that this system can handle. It is
- * roughly based on Diamond System boards - but probably works for a lot of
- * other boards as well.
+ * A Board abstracts any Diamond Systems I/O board that this system can handle.
  * <p>
  * Here are some assumptions:
  * <ol>
@@ -81,6 +80,19 @@ public abstract class Board {
      * @return Value of input channel.
      */
     public abstract int readAnalogInput(int channel);
+
+    /**
+     * @param ChannelType
+     * @return true iff. board is enabled for given channel type
+     */
+    public abstract boolean isEnabled(ChannelType ct);
+
+    /**
+     * Returns number of individual channels for a given channeltype. If not {{@link #isEnabled(ChannelType)} then returns 0.
+     * @param ct ChannelType
+     * @return number
+     */
+    public abstract int nrOfChannels(ChannelType ct);
 
     /**
      * Outputs given analog value on given channel.

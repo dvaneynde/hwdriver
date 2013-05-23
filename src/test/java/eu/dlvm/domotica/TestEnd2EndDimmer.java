@@ -30,8 +30,6 @@ public class TestEnd2EndDimmer {
 	public static final LogCh SW_UP_1 = new LogCh(1);
 	public static final LogCh DIMMER1 = new LogCh(100);
 
-	private static final boolean[] boolarraytrue = new boolean[] { true, true};
-	
 	HardwareIO hw;
 	HwDriverChannelMock drv;
 	private long current;
@@ -44,8 +42,8 @@ public class TestEnd2EndDimmer {
 	class TestConfigurator implements IBoardFactory {
 		@Override
 		public void configure(List<Board> boards, ChannelMap map) {
-			boards.add(new OpalmmBoardWithMsg(0, 0x380, "Opalmm board, gebruikt voor Dimmer Switches.",true,true));
-			boards.add(new DmmatBoardWithMsg(1, 0x300, "Dmmat board, gebruikt voor Analog Output.",true, true, boolarraytrue, boolarraytrue));
+			boards.add(new OpalmmBoardWithMsg(0, 0x380, "Opalmm board, gebruikt voor Dimmer Switches."));
+			boards.add(new DmmatBoardWithMsg(1, 0x300, "Dmmat board, gebruikt voor Analog Output."));
 			map.add(SW_DN_1, new FysCh(0, ChannelType.DigiOut, 0));
 			map.add(SW_UP_1, new FysCh(0, ChannelType.DigiIn, 1));
 			map.add(DIMMER1, new FysCh(1, ChannelType.AnlgOut, 0));

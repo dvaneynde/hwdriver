@@ -20,7 +20,8 @@ public class Util {
 		return 0xFF & b;
 	}
 	
-	public static String CHANNEL_STATE_HEADER = "7 6 5 4 3 2 1 0";
+	public static String BYTE_HEADER = "7 6 5 4 3 2 1 0";
+    public static String WORD_HEADER = "F E D C B A 9 8 7 6 5 4 3 2 1 0";
 
 	/**
 	 * Pretty print of a byte.

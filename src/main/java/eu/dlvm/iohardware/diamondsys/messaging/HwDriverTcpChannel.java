@@ -11,8 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * Communicates via TCP with a Hardware Driver, where this is the listening
- * part.
+ * Communicates via TCP with a Hardware Driver.
  * 
  * @author dirk vaneynde
  * 
@@ -21,7 +20,9 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 
 	static Logger log = Logger.getLogger(HwDriverTcpChannel.class);
 
-	private String serverHostname;
+	public static final int DEFAULT_DRIVER_PORT=4444;
+    
+    private String serverHostname;
 	private int serverPort;
 	private Socket socket;
 

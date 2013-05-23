@@ -35,7 +35,7 @@ public class TestXmlHwConfigurator {
         Assert.assertTrue(boards.size() == 3);
 
         _checkOpalmm(boards.get(0), 0, 0x380, true, true);
-        _checkDmmat(boards.get(1), 1, 0x400, false, false, false, false, true, false);
+        _checkDmmat(boards.get(1), 1, 0x400, false, false, false, true);
         _checkOpmm1616(boards.get(2), 2, 0x410, true, true);
 
         FysCh f;
@@ -43,10 +43,10 @@ public class TestXmlHwConfigurator {
         Assert.assertEquals(f, map.fysCh(new LogCh(87)));
         f = new FysCh(0, ChannelType.DigiOut, 2);
         Assert.assertEquals(f, map.fysCh(new LogCh(13)));
-        
+
         f = new FysCh(1, ChannelType.AnlgOut, 0);
         Assert.assertEquals(f, map.fysCh(new LogCh(10)));
-        
+
         f = new FysCh(2, ChannelType.DigiIn, 15);
         Assert.assertEquals(f, map.fysCh(new LogCh(111)));
         f = new FysCh(2, ChannelType.DigiIn, 0);
@@ -55,7 +55,7 @@ public class TestXmlHwConfigurator {
         Assert.assertEquals(f, map.fysCh(new LogCh(100)));
         f = new FysCh(2, ChannelType.DigiOut, 2);
         Assert.assertEquals(f, map.fysCh(new LogCh(120)));
-   
+
     }
 
     @Test
@@ -69,9 +69,9 @@ public class TestXmlHwConfigurator {
 
         _checkOpalmm(boards.get(0), 0, 0x300, false, true);
         _checkOpalmm(boards.get(1), 1, 0x310, true, false);
-        _checkDmmat(boards.get(2), 2, 0x400, false, false, true, false, true, true);
-        _checkDmmat(boards.get(3), 3, 0x410, true, true, false, false, false, true);
-        _checkDmmat(boards.get(4), 4, 0x420, true, true, false, true, true, true);
+        _checkDmmat(boards.get(2), 2, 0x400, false, false, true, true);
+        _checkDmmat(boards.get(3), 3, 0x410, true, true, false, true);
+        _checkDmmat(boards.get(4), 4, 0x420, true, true, true, true);
 
         _checkMap(0, 0, ChannelType.DigiOut, 2, map);
         _checkMap(1, 1, ChannelType.DigiIn, 5, map);
@@ -114,18 +114,15 @@ public class TestXmlHwConfigurator {
         Assert.assertEquals(expDigiOut, ob.digiOut != null);
     }
 
-    private void _checkDmmat(Board b, int boardNr, int address, boolean expDigiIn, boolean expDigiOut, boolean expAnaIn0, boolean expAnaIn1,
-            boolean expAnaOut0, boolean expAnaOut1) {
+    private void _checkDmmat(Board b, int boardNr, int address, boolean expDigiIn, boolean expDigiOut, boolean expAnaIn, boolean expAnaOut) {
         Assert.assertEquals(boardNr, b.boardNumber);
         Assert.assertEquals(address, b.address);
         Assert.assertTrue("DMMAT board expected", b instanceof DmmatBoard);
         DmmatBoard db = (DmmatBoard) b;
         Assert.assertEquals(expDigiIn, db.digiIn != null);
         Assert.assertEquals(expDigiOut, db.digiOut != null);
-        Assert.assertEquals(expAnaIn0, db.anaIns[0] != null);
-        Assert.assertEquals(expAnaIn1, db.anaIns[1] != null);
-        Assert.assertEquals(expAnaOut0, db.anaOuts[0] != null);
-        Assert.assertEquals(expAnaOut1, db.anaOuts[1] != null);
+        Assert.assertEquals(expAnaIn, db.anaIns != null);
+        Assert.assertEquals(expAnaOut, db.anaOuts != null);
     }
 
     @Test
@@ -135,11 +132,11 @@ public class TestXmlHwConfigurator {
         XmlHwConfigurator xhc = new XmlHwConfigurator();
         xhc.setCfgFilepath("src/test/resources/TestDiamondHwConfig2.xml");
         IHardwareIO hw = new HardwareIO(xhc, drv);
-
-        drv.responseFromDriverToUse0 = "INP_O 0x310 127\nINP_D 0x400 - 0 -\nINP_D 0x410 46 - -\nINP_D 0x420 255 - 0";
+        
+        drv.responseFromDriverToUse0 = "INP_O 0x310 127\nINP_D 0x400 - 0 0\nINP_D 0x410 46 - -\nINP_D 0x420 255 0 0";
         hw.refreshInputs();
         log.info("testComplexConfigurationAndMessagesOfInputStates, input state messages:\n" + drv.sentToDriver0);
-        Assert.assertEquals("REQ_INP 0x310 O\nREQ_INP 0x400 D NYN\nREQ_INP 0x410 D YNN\nREQ_INP 0x420 D YNY\n\n", drv.sentToDriver0);
+        Assert.assertEquals("REQ_INP 0x310 O\nREQ_INP 0x400 D NYY\nREQ_INP 0x410 D YNN\nREQ_INP 0x420 D YYY\n\n", drv.sentToDriver0);
     }
 
     @Test
@@ -153,7 +150,7 @@ public class TestXmlHwConfigurator {
         drv.responseFromDriverToUse0 = "";
         hw.refreshOutputs();
         log.info("testComplexConfigurationAndOutputMessages, output messages:\n" + drv.sentToDriver0);
-        Assert.assertEquals("SET_OUT 0x300 O 0\nSET_OUT 0x400 D - 0 0\nSET_OUT 0x410 D 0 - 0\nSET_OUT 0x420 D 0 0 0\n\n", drv.sentToDriver0);
+        Assert.assertEquals("SET_OUT 0x300 O 0\nSET_OUT 0x400 D - 0 0\nSET_OUT 0x410 D 0 0 0\nSET_OUT 0x420 D 0 0 0\n\n", drv.sentToDriver0);
     }
 
 }

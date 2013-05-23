@@ -73,12 +73,4 @@ public class DigiOut {
         this.prevOutputState = this.outputState;
     }
 
-    /**
-     * Unit Test only. Sets output state as if coming from board. Limit yourself
-     * to one byte !
-     */
-    void unitTestOnly_setOutputState(int state) {
-        this.outputState = state;
-    }
-
 }

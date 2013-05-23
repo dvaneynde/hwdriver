@@ -171,7 +171,7 @@ public class HardwareIO implements IHardwareIO {
      *            to look for
      * @return board found, or <code>null</code>
      */
-    Board findBoardBy(int address) {
+    public Board findBoardBy(int address) {
         int lowdistance = Integer.MAX_VALUE;
         Board lowboard = null;
         for (Board b : boards) {
@@ -185,5 +185,17 @@ public class HardwareIO implements IHardwareIO {
             }
         }
         return lowboard;
+    }
+
+    public List<Board> getBoards() {
+        return boards;
+    }
+
+    public ChannelMap getChannelMap() {
+        return channelMap;
+    }
+
+    public IHwDriverChannel getDriverChannel() {
+        return driverChannel;
     }
 }

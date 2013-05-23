@@ -9,11 +9,9 @@ import org.junit.Test;
 
 public class TestDmmat {
 
-    private static final boolean[] boolarraytrue = new boolean[] { true, true };
-
     @Test
     public void testInit() {
-        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat init().", true, true, boolarraytrue, boolarraytrue);
+        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat init().", true, true, true, true);
         assertTrue(b.outputStateHasChanged());
         assertEquals(0, b.digiOut.getValue());
 
@@ -31,7 +29,7 @@ public class TestDmmat {
 
     @Test
     public void testOutput() {
-        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat output part.", true, true, boolarraytrue, boolarraytrue);
+        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat output part.", true, true, true, true);
         b.init();
         assertTrue(b.outputStateHasChanged());
         assertEquals(0, b.digiOut.getValue());
@@ -90,7 +88,7 @@ public class TestDmmat {
 
     @Test
     public void testInput() {
-        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat input part.", true, true, boolarraytrue, boolarraytrue);
+        DmmatBoard b = new DmmatBoard(0, 0x300, "Test dmmat input part.", true, true, true, true);
         int input = TestUtils.digitalInputAsByte(b);
         assertEquals(0, input);
         assertEquals(0, b.readAnalogInput((byte) 0));

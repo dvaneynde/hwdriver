@@ -1,5 +1,6 @@
 package eu.dlvm.iohardware.diamondsys;
 
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.Util;
 
 /**
@@ -17,12 +18,12 @@ public class DmmatBoard extends Board {
     /**
      * Number of analog output channels this board supports.
      */
-    public static final int ANALOG_OUT_CHANNELS = 2;
+    protected static final int NR_ANALOG_OUT_CHANNELS = 2;
 
     /**
      * Number of analog input channels this board supports.
      */
-    public static final int ANALOG_IN_CHANNELS = 2;
+    protected static final int NR_ANALOG_IN_CHANNELS = 2;
 
     /**
      * Resolution of each analog channel. Note that the range to use must be
@@ -32,8 +33,8 @@ public class DmmatBoard extends Board {
 
     protected DigiIn digiIn;
     protected DigiOut digiOut;
-    protected AnaInChannel[] anaIns = new AnaInChannel[ANALOG_IN_CHANNELS];
-    protected AnaOutChannel[] anaOuts = new AnaOutChannel[ANALOG_OUT_CHANNELS];
+    protected AnaInChannel[] anaIns;
+    protected AnaOutChannel[] anaOuts;
 
     /**
      * Constructor.
@@ -57,38 +58,42 @@ public class DmmatBoard extends Board {
      * @throws IllegalArgumentException
      *             anaOutEnabled is not of size 2.
      */
-    public DmmatBoard(int boardNr, int address, String description, boolean digiInEnabled, boolean digiOutEnabled, boolean[] anaInEnabled,
-            boolean[] anaOutEnabled) throws IllegalArgumentException {
+    public DmmatBoard(int boardNr, int address, String description, boolean digiInEnabled, boolean digiOutEnabled, boolean anaInEnabled, boolean anaOutEnabled)
+            throws IllegalArgumentException {
         super(boardNr, address, description);
         if (digiInEnabled)
             digiIn = new DigiIn();
         if (digiOutEnabled)
             digiOut = new DigiOut();
-        for (int i = 0; i < ANALOG_IN_CHANNELS; i++)
-            if (anaInEnabled[i])
-                this.anaIns[i] = new AnaInChannel();
-        for (int i = 0; i < ANALOG_OUT_CHANNELS; i++)
-            if (anaOutEnabled[i])
-                this.anaOuts[i] = new AnaOutChannel(ANALOG_RESOLUTION);
+        if (anaInEnabled) {
+            anaIns = new AnaInChannel[NR_ANALOG_IN_CHANNELS];
+            this.anaIns[0] = new AnaInChannel();
+            this.anaIns[1] = new AnaInChannel();
+        }
+        if (anaOutEnabled) {
+            anaOuts = new AnaOutChannel[NR_ANALOG_OUT_CHANNELS];
+            this.anaOuts[0] = new AnaOutChannel(ANALOG_RESOLUTION);
+            this.anaOuts[1] = new AnaOutChannel(ANALOG_RESOLUTION);
+        }
     }
 
     @Override
     public void init() {
         if (digiOut != null)
             digiOut.init();
-        for (int i = 0; i < ANALOG_OUT_CHANNELS; i++) {
-            if (anaOuts[i] != null)
+        if (anaOuts != null)
+            for (int i = 0; i < NR_ANALOG_OUT_CHANNELS; i++)
                 anaOuts[i].init();
-        }
     }
 
     @Override
     public boolean outputStateHasChanged() {
         if (digiOut != null && digiOut.outputStateHasChanged())
             return true;
-        for (int i = 0; i < ANALOG_OUT_CHANNELS; i++)
-            if (anaOuts[i] != null && anaOuts[i].outputStateHasChanged())
-                return true;
+        if (anaOuts != null)
+            for (int i = 0; i < NR_ANALOG_OUT_CHANNELS; i++)
+                if (anaOuts[i].outputStateHasChanged())
+                    return true;
         return false;
     }
 
@@ -96,17 +101,9 @@ public class DmmatBoard extends Board {
     public void resetOutputChangedDetection() {
         if (digiOut != null)
             digiOut.resetOutputChangedDetection();
-        for (int i = 0; i < ANALOG_OUT_CHANNELS; i++)
-            if (anaOuts[i] != null)
+        if (anaOuts != null)
+            for (int i = 0; i < NR_ANALOG_OUT_CHANNELS; i++)
                 anaOuts[i].resetOutputChangedDetection();
-    }
-
-    private String toStringAnaIn(int ch) {
-        return (anaIns[ch] == null) ? "DIS." : "" + anaIns[ch].getInput();
-    }
-
-    private String toStringAnaOut(int ch) {
-        return (anaOuts[ch] == null) ? "DIS." : "" + anaOuts[ch].getValue();
     }
 
     @Override
@@ -121,20 +118,61 @@ public class DmmatBoard extends Board {
 
     @Override
     public int readAnalogInput(int channel) {
-        return anaIns[channel].getInput();
+        return (anaIns != null ? anaIns[channel].getInput() : 0);
     }
 
     @Override
     public void writeAnalogOutput(int channel, int value) throws IllegalArgumentException {
-        anaOuts[channel].setOutput(value);
+        if (anaOuts != null)
+            anaOuts[channel].setOutput(value);
+    }
+
+    @Override
+    public boolean isEnabled(ChannelType ct) {
+        switch (ct) {
+        case DigiIn:
+            return digiIn != null;
+        case DigiOut:
+            return digiOut != null;
+        case AnlgIn:
+            return anaIns != null;
+        case AnlgOut:
+            return anaOuts != null;
+        default:
+            return false;
+        }
+    }
+
+    @Override
+    public int nrOfChannels(ChannelType ct) {
+        switch (ct) {
+        case DigiIn:
+            return (digiIn == null ? 0 : 8);
+        case DigiOut:
+            return (digiOut == null ? 0 : 8);
+        case AnlgIn:
+            return (anaIns == null ? 0 : 2);
+        case AnlgOut:
+            return (anaOuts == null ? 0 : 2);
+        default:
+            return 0;
+        }
     }
 
     @Override
     public String toString() {
-        return "DmmatBoard " + super.toString() + "\n       " + Util.CHANNEL_STATE_HEADER + "\n input="
+        return "DmmatBoard " + super.toString() + "\n       " + Util.BYTE_HEADER + "\n input="
                 + (digiIn != null ? Util.prettyByte(digiIn.getValue()) : "D I S A B L E D") + "\noutput="
                 + (digiOut != null ? Util.prettyByte(digiOut.getValue()) : "D I S A B L E D") + "\n anaIn [0]=" + toStringAnaIn(0) + "\t anaIn[1]="
                 + toStringAnaIn(1) + "\nanaOut [0]=" + toStringAnaOut(0) + "\tanaOut[1]=" + toStringAnaOut(1);
+    }
+
+    private String toStringAnaIn(int ch) {
+        return (anaIns == null) ? "DIS." : "" + anaIns[ch].getInput();
+    }
+
+    private String toStringAnaOut(int ch) {
+        return (anaOuts == null) ? "DIS." : "" + anaOuts[ch].getValue();
     }
 
 }

@@ -2,7 +2,15 @@
 <boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig DiamondBoardsConfig.xsd ">
-	<dmmat board="0" address="0x300" desc="Board 0, dmmatt.">
+	<opalmm board="0" address="0x300" desc="Board 0, opalmm.">
+		<digital-input>
+			<channel channel="0" logical-id="5" />
+		</digital-input>
+		<digital-output>
+			<channel channel="0" logical-id="6" />
+		</digital-output>
+	</opalmm>
+	<dmmat board="1" address="0x310" desc="Board 1, dmmatt.">
 		<analog-input>
 			<channel channel="0" logical-id="2" />
 		</analog-input>
@@ -17,4 +25,13 @@
 			<channel channel="0" logical-id="4" />
 		</digital-output>
 	</dmmat>
+	<opmm1616 address="0x320" board="2" desc="Board 2, opmm1616.">
+		<digital-input>
+			<channel channel="0" logical-id="7" />
+		</digital-input>
+		<digital-output>
+			<channel channel="1" logical-id="8" />
+		</digital-output>
+	</opmm1616>
+
 </boards>

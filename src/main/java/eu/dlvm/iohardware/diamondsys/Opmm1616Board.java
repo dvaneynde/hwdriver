@@ -1,5 +1,6 @@
 package eu.dlvm.iohardware.diamondsys;
 
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.Util;
 
 /**
@@ -114,19 +115,43 @@ public class Opmm1616Board extends Board {
     }
 
     @Override
+    public boolean isEnabled(ChannelType ct) {
+        switch (ct) {
+        case DigiIn:
+            return digiIn != null;
+        case DigiOut:
+            return digiOut != null;
+        default:
+            return false;
+        }
+    }
+
+    @Override
+    public int nrOfChannels(ChannelType ct) {
+        int nr = 0;
+        if ((ct == ChannelType.DigiOut) && (digiOut != null))
+            nr = 16;
+        else if ((ct == ChannelType.DigiIn) && (digiIn != null))
+            nr = 16;
+        return nr;
+    }
+
+    @Override
     public String toString() {
-        String s = "Opmm1616Board " + super.toString() + "\n       " + Util.CHANNEL_STATE_HEADER + "\ninput=\n";
+        String s = "Opmm1616Board " + super.toString() + "\n       " + Util.WORD_HEADER + "\n input=";
         if (digiIn == null)
             s += "DISABLED";
-        else
-            for (int i = 0; i < digiIn.length; i++)
-                s += Util.prettyByte(digiIn[i].getValue());
-        s += "\noutput=\n";
+        else {
+            s += Util.prettyByte(digiIn[1].getValue());
+            s += Util.prettyByte(digiIn[0].getValue());
+        }
+        s += "\noutput=";
         if (digiOut == null)
             s += "DISABLED";
-        else
-            for (int i = 0; i < digiOut.length; i++)
-                s += Util.prettyByte(digiOut[i].getValue());
+        else {
+            s += Util.prettyByte(digiOut[1].getValue());
+            s += Util.prettyByte(digiOut[0].getValue());
+        }
         return s;
     }
 }

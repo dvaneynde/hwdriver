@@ -39,19 +39,19 @@ public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
     /**
      * Constructor.
      * 
-     * @see DmmatBoard#DmmatBoard(int, int, String, boolean, boolean, boolean[], boolean[])
+     * @see DmmatBoard#DmmatBoard(int, int, String, boolean, boolean, boolean, boolean)
      */
     public DmmatBoardWithMsg(int boardNr, int address, String description) {
-        this(boardNr, address, description, true, true, new boolean[] { true, true }, new boolean[] { true, true });
+        this(boardNr, address, description, true, true, true, true);
     }
 
     /**
      * Constructor.
      * 
-     * @see DmmatBoard#DmmatBoard(int, int, String, boolean, boolean, boolean[], boolean[])
+     * @see DmmatBoard#DmmatBoard(int, int, String, boolean, boolean, boolean, boolean)
      */
     public DmmatBoardWithMsg(int boardNr, int address) {
-        this(boardNr, address, DEFAULT_DESCRIPTION, true, true, new boolean[] { true, true }, new boolean[] { true, true });
+        this(boardNr, address, DEFAULT_DESCRIPTION, true, true, true, true);
     }
 
     /**
@@ -59,8 +59,8 @@ public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
      * 
      * @see DmmatBoard#DmmatBoard(int, int, String, boolean, boolean, boolean[], boolean[])
      */
-    public DmmatBoardWithMsg(int boardNr, int address, String description, boolean digiInEnabled, boolean digiOutEnabled, boolean[] anaInEnabled,
-            boolean[] anaOutEnabled) throws IllegalArgumentException {
+    public DmmatBoardWithMsg(int boardNr, int address, String description, boolean digiInEnabled, boolean digiOutEnabled, boolean anaInEnabled,
+            boolean anaOutEnabled) throws IllegalArgumentException {
         super(boardNr, address, description, digiInEnabled, digiOutEnabled, anaInEnabled, anaOutEnabled);
     }
 
@@ -89,8 +89,8 @@ public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
             requestDetail[0] = 'Y';
             enabled = true;
         }
-        for (int i = 0; i < DmmatBoard.ANALOG_IN_CHANNELS; i++) {
-            if (anaIns[i] != null) {
+        if (anaIns != null) {
+            for (int i = 0; i < anaIns.length; i++) {
                 requestDetail[i + 1] = 'Y';
                 enabled = true;
             }
@@ -110,7 +110,7 @@ public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
         String s = st.nextToken();
         if (!s.equals("-"))
             digiIn.updateInputFromHardware(Integer.parseInt(s));
-        for (int i = 0; i < anaIns.length; i++) {
+        for (int i = 0; i < DmmatBoard.NR_ANALOG_IN_CHANNELS; i++) {
             s = st.nextToken();
             if (!s.equals("-"))
                 anaIns[i].updateInputFromHardware(Integer.parseInt(s));
@@ -150,12 +150,14 @@ public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
         } else {
             sb.append(" -");
         }
-        for (int i = 0; i < anaOuts.length; i++) {
-            if ((anaOuts[i] != null) && (anaOuts[i].outputStateHasChanged())) {
-                sb.append(' ').append(anaOuts[i].getValue());
-                outputEnabled = true;
-            } else {
-                sb.append(" -");
+        if (anaOuts != null) {
+            for (int i = 0; i < anaOuts.length; i++) {
+                if (anaOuts[i].outputStateHasChanged()) {
+                    sb.append(' ').append(anaOuts[i].getValue());
+                    outputEnabled = true;
+                } else {
+                    sb.append(" -");
+                }
             }
         }
 

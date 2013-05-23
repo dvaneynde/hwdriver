@@ -14,7 +14,7 @@ public class LogCh {
     /**
      * Possible numbers are in [0..MAX]
      */
-    public static final int MAX = 999;
+    public static final int MAX = 256;
 
     private int nbr;
 

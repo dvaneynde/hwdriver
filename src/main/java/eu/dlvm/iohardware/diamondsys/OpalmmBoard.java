@@ -1,5 +1,6 @@
 package eu.dlvm.iohardware.diamondsys;
 
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.Util;
 
 /**
@@ -86,8 +87,30 @@ public class OpalmmBoard extends Board {
     }
 
     @Override
+    public boolean isEnabled(ChannelType ct) {
+        switch (ct) {
+        case DigiIn:
+            return digiIn != null;
+        case DigiOut:
+            return digiOut != null;
+        default:
+            return false;
+        }
+    }
+
+    @Override
+    public int nrOfChannels(ChannelType ct) {
+        int nr = 0;
+        if ((ct == ChannelType.DigiOut) && (digiOut != null))
+            nr = 8;
+        else if ((ct == ChannelType.DigiIn) && (digiIn != null))
+            nr = 8;
+        return nr;
+    }
+
+    @Override
     public String toString() {
-        return "OpalmmBoard " + super.toString() + "\n       " + Util.CHANNEL_STATE_HEADER + "\n input="
+        return "OpalmmBoard " + super.toString() + "\n       " + Util.BYTE_HEADER + "\n input="
                 + (digiIn == null ? "DISABLED" : Util.prettyByte(digiIn.getValue())) + "\noutput="
                 + (digiOut == null ? "DISABLED" : Util.prettyByte(digiOut.getValue()));
     }
