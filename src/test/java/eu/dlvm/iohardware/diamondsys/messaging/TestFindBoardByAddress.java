@@ -29,7 +29,7 @@ public class TestFindBoardByAddress {
     }
 
     class BoardsFactory implements IBoardFactory {
-        List<Board> boards = new ArrayList<>();
+        List<Board> boards = new ArrayList<Board>();
         ChannelMap map = new ChannelMap();
 
         @Override

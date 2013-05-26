@@ -56,8 +56,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -73,7 +73,8 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<mainClass>eu.vaneynde.domotic.Main</mainClass>
+<!-- 							<mainClass>eu.vaneynde.domotic.Main</mainClass> -->
+							<mainClass>eu.dlvm.iohardware.HwConsole</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

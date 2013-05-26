@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -17,6 +18,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 import eu.vaneynde.domotic.Main;
 
+// TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
 public class HwConsole implements Runnable {
 
     static Logger log = Logger.getLogger(Main.class);
@@ -258,6 +260,7 @@ public class HwConsole implements Runnable {
         }
         if (logcfgfile == null) {
             BasicConfigurator.configure();
+            Logger.getRootLogger().setLevel(Level.INFO);
         } else {
             PropertyConfigurator.configure(logcfgfile);
         }
@@ -268,7 +271,7 @@ public class HwConsole implements Runnable {
     }
 
     private static void usage() {
-        System.out.println("Usage: " + Main.class.getName() + " -c config-file [-l logconfigfile] [-h hostname] [-p port]");
+        System.out.println("Usage: " + HwConsole.class.getName() + " -c config-file [-l logconfigfile] [-h hostname] [-p port]");
         System.out.println("\t-c hardware xml configuration file");
         System.out.println("\t-l log4j configuration file");
         System.out.println("\t-h hostname, default localhost");
