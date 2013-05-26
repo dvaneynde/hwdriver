@@ -59,9 +59,6 @@ char errormsg[1024];
 #define SET_OUT	4
 #define QUIT	6
 
-/*
- * Voor server alternatief
- */
 void setupAsServer() {
 
 	if ((hp = gethostbyname(hostname)) == 0) {
@@ -83,7 +80,8 @@ void setupAsServer() {
 	/* Mark the socket so it will listen for incoming connections */
 	if (listen(servSock, 5) < 0)
 		perror("listen() failed");
-	mylog(MYLOG_INFO, "Listening for clients using this driver.\n");
+	sprintf(logmsg, "Listening for commands, port=%d\n", PORT);
+	mylog(MYLOG_INFO, logmsg);
 }
 
 /*
@@ -94,8 +92,8 @@ void initDiamondDriver() {
 	mylog(MYLOG_DEBUG, ">>> Init Diamond Driver\n");
 	if (dscInit(DSC_VERSION) != DE_NONE) {
 		dscGetLastError(&errorParams);
-		sprintf(logmsg, "dscInit error: %s %s\n", dscGetErrorString(
-						errorParams.ErrCode), errorParams.errstring);
+		sprintf(logmsg, "dscInit error: %s %s\n",
+				dscGetErrorString(errorParams.ErrCode), errorParams.errstring);
 		mylog(MYLOG_FATAL, logmsg);
 	}
 	mylog(MYLOG_DEBUG, "<<< Init Diamond Driver\n");
@@ -131,8 +129,8 @@ void recvMsg(char* out, int maxlen) {
 		exit(1);
 	}
 	out[len] = '\0';
-	sprintf(logmsg, "recvMsg(), maxlen=%d, length=%d, text='%s'\n", maxlen,
-			len, out);
+	sprintf(logmsg, "recvMsg(), maxlen=%d, length=%d, text='%s'\n", maxlen, len,
+			out);
 	mylog(MYLOG_DEBUG, logmsg);
 }
 
@@ -164,7 +162,7 @@ int stringToCommand(char* sCmd) {
 int parseRecvdParams(char* text, char** parms) {
 	int parmsLen = 0;
 	char* parm;
-	while ((parm = strtok(text, " ")) != NULL) {
+	while ((parm = strtok(text, " ")) != NULL ) {
 		text = NULL;
 		parms[parmsLen] = malloc(strlen(parm) + 1);
 		strcpy(parms[parmsLen], parm);
@@ -184,8 +182,7 @@ void parseRecvdMsgLine(char* line) {
 	sCmd = strtok(line, " ");
 	sprintf(logmsg, "Command: \'%s\'", sCmd);
 	mylog(MYLOG_DEBUG, logmsg);
-	if ((sCmd == NULL) || (strlen(sCmd) == 0))
-		return;
+	if ((sCmd == NULL )|| (strlen(sCmd) == 0))return;
 	int cmd = stringToCommand(sCmd);
 
 	char* parms = strtok(NULL, "");
@@ -227,13 +224,13 @@ void parseRecvdMsgLine(char* line) {
 		type = lineParms[1][0];
 		if (type == 'O') {
 			int val = opalmmReadDigIn(address);
-			sprintf(msgOut, "%sINP_O 0x%x %d\n", msgOut, address,
-					val);
+			sprintf(msgOut, "%sINP_O 0x%x %d\n", msgOut, address, val);
 		} else if (type == 'D') {
 			dmmatReadInputs(address, lineParms, oneLine);
-			sprintf(msgOut,"%s%s\n",msgOut, oneLine);
+			sprintf(msgOut, "%s%s\n", msgOut, oneLine);
 		} else {
-			sprintf(msgOut, "%sERROR REQ_INPUTS not implemented for type %c\n", msgOut, type);
+			sprintf(msgOut, "%sERROR REQ_INPUTS not implemented for type %c\n",
+					msgOut, type);
 		}
 		break;
 	case SET_OUT:
@@ -242,7 +239,8 @@ void parseRecvdMsgLine(char* line) {
 		type = lineParms[1][0];
 		if (type == 'O') {
 			sscanf(lineParms[2], "%d", &bVal);
-			sprintf(logmsg, "SET_OUT command parsed, address(hex)=0x%x, type=%c, val(dec)=%d",
+			sprintf(logmsg,
+					"SET_OUT command parsed, address(hex)=0x%x, type=%c, val(dec)=%d",
 					address, type, bVal);
 			mylog(MYLOG_DEBUG, logmsg);
 			opalmmSetDigiOut(address, bVal);
@@ -264,7 +262,7 @@ void parseRecvdMsgLine(char* line) {
 
 /*
  * Kapt alle ontvangen commando's in een array van commando's.
- * EŽn ontvangen lijn is een commando.
+ * Een ontvangen lijn is een commando.
  */
 void parseRecvdMsg() {
 	char **lines = NULL;
@@ -307,7 +305,7 @@ void runAsServer() {
 		msgOut[0] = '\0';
 		parseRecvdMsg();
 		strcat(msgOut, "\n"); // Empty line, to indicate 'end-of reply'
-		sprintf(logmsg,"Answering with:\n%s-----",msgOut);
+		sprintf(logmsg, "Answering with:\n%s-----", msgOut);
 		mylog(MYLOG_DEBUG, logmsg);
 		sendMsg(msgOut);
 	}
@@ -338,7 +336,7 @@ int main(int argc, char *argv[]) {
 	int debug = 0; /* Value for the "-d" optional argument. */
 	if (argc < 2) {
 		printf(
-				"Usage: %s [-d] hostname\n\t-d: debug\n\thostname: ip or hostname containing Domotic program.\n\n",
+				"Usage: %s [-d] hostname\n\t-d: debug\n\thostname: ip or hostname (niet duidelijk waarom...).\n\n",
 				argv[0]);
 		exit(1);
 	}
@@ -355,7 +353,7 @@ int main(int argc, char *argv[]) {
 
 	writePidToFile();
 
-	mylog(MYLOG_INFO, "HwDriver started - v1931.");
+	mylog(MYLOG_INFO, "HwDriver started.");
 	runAsServer();
 	mylog(MYLOG_INFO, "HwDriver ended.");
 
