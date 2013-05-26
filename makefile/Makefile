@@ -11,18 +11,13 @@ INC=-I/usr/local/dscud5 -I/opt/dscud5
 
 MAIN=hwdriver
 
-TEST=testopalmm
-
 all: $(MAIN) 
 
 clean:
-	rm -f $(MAIN) $(TEST) *.o
+	rm -f $(MAIN) *.o
 
 $(MAIN):
 	( gcc -O2 -o $(MAIN) log.c StringLines.c Opalmm.c Dmmat.c HwDriver.c $(LIB) $(INC) )
 
 #	( gcc -static -O2 -o $(MAIN) log.c StringLines.c Opalmm.c Dmmat.c HwDriver.c $(LIB) $(INC) )
-
-$(TEST):
-	( gcc -O2 -v -o $(TEST) $(TEST).c $(LIB) $(INC) )
 

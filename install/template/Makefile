@@ -14,7 +14,7 @@ MAIN=hwdriver
 all: $(MAIN) 
 
 clean:
-	rm -f $(MAIN) $(TEST) *.o
+	rm -f $(MAIN) *.o
 
 $(MAIN):
 	( gcc -O2 -o $(MAIN) log.c StringLines.c Opalmm.c Dmmat.c HwDriver.c $(LIB) $(INC) )
