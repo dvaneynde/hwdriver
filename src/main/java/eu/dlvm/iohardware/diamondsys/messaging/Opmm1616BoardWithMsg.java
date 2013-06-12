@@ -124,8 +124,8 @@ public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessagi
         if (!outputStateHasChanged())
             return "";
         StringBuffer sb = new StringBuffer();
-        sb.append(String.format("SET_OUT 0x%x %c %d\n", address, BOARDTYPE_OPALMM, digiOut[0].getValue()));
-        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 1, BOARDTYPE_OPALMM, digiOut[1].getValue()));
+        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 2, BOARDTYPE_OPALMM, digiOut[0].getValue()));
+        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 3, BOARDTYPE_OPALMM, digiOut[1].getValue()));
         return sb.toString();
     }
 }

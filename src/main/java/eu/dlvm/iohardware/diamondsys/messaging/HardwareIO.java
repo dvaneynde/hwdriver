@@ -1,6 +1,5 @@
 package eu.dlvm.iohardware.diamondsys.messaging;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;

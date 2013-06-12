@@ -19,36 +19,40 @@ import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 import eu.vaneynde.domotic.Main;
 
 // TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
-public class HwConsole implements Runnable {
+public class HwConsole {
 
     static Logger log = Logger.getLogger(Main.class);
 
- 
     private HardwareIO hw;
 
     final static String ESC = "\033[";
-    private Thread thread;
     private Pattern patternINIT = Pattern.compile("i(?:nit)? *(\\d*+)", Pattern.CASE_INSENSITIVE);
     private Pattern patternSTATUS = Pattern.compile("s(?:tatus)? *(\\d*+)", Pattern.CASE_INSENSITIVE);
     private Pattern patternLISTEN = Pattern.compile("l(?:isten)? *(\\d++)", Pattern.CASE_INSENSITIVE);
     private Pattern patternOA = Pattern.compile("oa *(\\d++)\\.(\\d++) +(\\d++)", Pattern.CASE_INSENSITIVE);
     private Pattern patternOD = Pattern.compile("od *(\\d++)\\.(\\d++) +(t(?:rue)?|f(?:alse)?)", Pattern.CASE_INSENSITIVE);
-    private Pattern patternALLON = Pattern.compile("a(?:llon)? *(\\d*+)", Pattern.CASE_INSENSITIVE);
+    private Pattern patternALL = Pattern.compile("a(?:ll)? +(on|off) *(\\d*+)", Pattern.CASE_INSENSITIVE);
     private Pattern patternHELP = Pattern.compile("h(?:elp)?\\s*", Pattern.CASE_INSENSITIVE);
     private Pattern patternQUIT = Pattern.compile("q(?:uit)?\\s*", Pattern.CASE_INSENSITIVE);
 
     private void help() {
         System.out.println("help | quit: this help, or quit.");
-        System.out.println("i [boardnr]: initialise all/specific board(s)\t\t" + patternSTATUS);
-        System.out.println("s [boardnr]: status of all/specific board(s)\t\t" + patternSTATUS);
-        System.out.println("l [boardnr]: continuesly listen on a board status, or all boards\t\t" + patternSTATUS);
-        System.out.println("oa boardnr channel value: set analog out\t\t" + patternOA.toString());
-        System.out.println("od boardnr channel {true|false}: set digital out\t" + patternOD.toString());
-        System.out.println("a [boardnr]: set all on, or only boardnr\t" + patternALLON.toString());
+        System.out.println("i [boardnr]: initialise all/specific board(s)\t\t" + patternINIT.toString());
+        System.out.println("s [boardnr]: status of all/specific board(s)\t\t" + patternSTATUS.toString());
+        System.out.println("l [boardnr]:  listen on one/all board status\t\t" + patternLISTEN.toString());
+        System.out.println("oa boardnr.channel value: set analog out\t\t" + patternOA.toString());
+        System.out.println("od boardnr.channel {true|false}: set digital out\t" + patternOD.toString());
+        System.out.println("a {on|off} [boardnr]: set all on/off, or only boardnr\t" + patternALL.toString());
     }
 
-    public HwConsole(File cfgFile, String hostname, int port) {
-        thread = new Thread(this, "HwConsole");
+    public HwConsole(String cfgFilename, String hostname, int port) throws IllegalArgumentException {
+        if (cfgFilename == null)
+            throw new IllegalArgumentException("Hardware config file must be specified.");
+        File cfgFile = new File(cfgFilename);
+        if (!cfgFile.exists()) {
+            throw new IllegalArgumentException("Hardware cfg file does not exist.");
+        }
+
         XmlHwConfigurator cfgr = new XmlHwConfigurator();
         cfgr.setCfgFilepath(cfgFile.toString());
         // Om te testen, zonder hw: volgende twee lijnen vervangen door een pseudo mock IHardwareIO maken, met boards en channelMap.
@@ -57,12 +61,7 @@ public class HwConsole implements Runnable {
         hw.initialize();
     }
 
-    public void start() {
-        thread.start();
-    }
-
-    @Override
-    public void run() {
+    public void processCommands() {
         String line = ""; // Line read from standard in
 
         System.out.println("Enter a line of text (type 'quit' to exit): ");
@@ -74,16 +73,19 @@ public class HwConsole implements Runnable {
         while (!quit) {
             try {
                 line = in.readLine();
+                if (line.length() == 0)
+                    continue;
                 if ((m = patternHELP.matcher(line)).matches()) {
                     help();
                 } else if ((m = patternQUIT.matcher(line)).matches()) {
                     quit = true;
+                    hw.getDriverChannel().disconnect();
                 } else if ((m = patternOD.matcher(line)).matches()) {
                     outputDigital(m);
                 } else if ((m = patternOA.matcher(line)).matches()) {
                     outputAnalog(m);
-                } else if ((m = patternALLON.matcher(line)).matches()) {
-                    allon(m);
+                } else if ((m = patternALL.matcher(line)).matches()) {
+                    all(m);
                 } else if ((m = patternSTATUS.matcher(line)).matches()) {
                     status(m);
                 } else if ((m = patternLISTEN.matcher(line)).matches()) {
@@ -120,11 +122,13 @@ public class HwConsole implements Runnable {
             @Override
             public void run() {
                 try {
+                    int ctr = 0;
                     while (true) {
                         hw.refreshInputs();
                         System.out.println("\u001b[2J");
-                        System.out.println(b + "\n\nPress enter to stop...");
+                        System.out.println(b + "\n\n[" + ctr + "] Press enter to stop...");
                         Thread.sleep(1500);
+                        ctr++;
                     }
                 } catch (InterruptedException e) {
                 }
@@ -138,6 +142,7 @@ public class HwConsole implements Runnable {
         } catch (IOException e) {
         }
         t.interrupt();
+        System.out.println("Listen done.");
     }
 
     private void outputDigital(Matcher m) {
@@ -178,26 +183,27 @@ public class HwConsole implements Runnable {
         }
     }
 
-    private void allon(Matcher m) {
-        if (m.group(1).equals("")) {
+    private void all(Matcher m) {
+        boolean on = (m.group(1).equals("on"));
+        if (m.group(2).equals("")) {
             for (Board b : hw.getBoards())
-                boardAllOn(b);
+                boardAll(b, on);
         } else {
-            int boardnr = Integer.parseInt(m.group(1));
+            int boardnr = Integer.parseInt(m.group(2));
             Board b = findBoard(boardnr);
-            boardAllOn(b);
+            boardAll(b, on);
         }
         hw.refreshOutputs();
     }
 
-    private void boardAllOn(Board b) {
+    private void boardAll(Board b, boolean on) {
         if (b.isEnabled(ChannelType.DigiOut)) {
             for (int ch = 0; ch < b.nrOfChannels(ChannelType.DigiOut); ch++)
-                b.writeDigitalOutput(ch, true);
+                b.writeDigitalOutput(ch, on);
         }
         if (b.isEnabled(ChannelType.AnlgOut)) {
             for (int ch = 0; ch < b.nrOfChannels(ChannelType.AnlgOut); ch++)
-                b.writeAnalogOutput(ch, 1000);
+                b.writeAnalogOutput(ch, (on ? 1000 : 0));
         }
     }
 
@@ -248,16 +254,6 @@ public class HwConsole implements Runnable {
             } else
                 usage();
         }
-
-        if (hwCfgFile == null) {
-            System.err.println("Hardware config file must be specified.");
-            usage();
-        }
-        File cfgFile = new File(hwCfgFile);
-        if (!cfgFile.exists()) {
-            System.err.println("Hardware cfg file does not exist.");
-            usage();
-        }
         if (logcfgfile == null) {
             BasicConfigurator.configure();
             Logger.getRootLogger().setLevel(Level.INFO);
@@ -265,8 +261,13 @@ public class HwConsole implements Runnable {
             PropertyConfigurator.configure(logcfgfile);
         }
 
-        HwConsole c = new HwConsole(cfgFile, driverHostname, driverPort);
-        c.start(); // TODO, niet nodig; maar 1 thread nodig voor listen
+        try {
+            HwConsole c = new HwConsole(hwCfgFile, driverHostname, driverPort);
+            c.processCommands();
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            usage();
+        }
 
     }
 
