@@ -19,7 +19,7 @@ public class TestOpmm1616WithMsg {
     @Test
     public void testRequestInput0() {
         IBoardMessaging b = new Opmm1616BoardWithMsg(0, 0x310, "test");
-        Assert.assertEquals("REQ_INP 0x310 O\nREQ_INP 0x311 O\n", b.msgInputRequest());
+        Assert.assertEquals("REQ_INP 0x312 O\nREQ_INP 0x313 O\n", b.msgInputRequest());
     }
 
     @Test
@@ -34,20 +34,20 @@ public class TestOpmm1616WithMsg {
             Board b = new Opmm1616BoardWithMsg(0, 0x300);
             int state;
 
-            String line = "INP_O 0x300 200\n";
+            String line = "INP_O 0x302 200\n";
             int address = Utils.parseLine(line, (IBoardMessaging) b);
-            Assert.assertEquals(address, b.getAddress());
+            Assert.assertEquals(address, b.getAddress()+2);
             state = TestUtils.digitalInputAsByte(b);
-            Assert.assertEquals(~200 & 0xFF, state);
+            Assert.assertEquals(200, state);
             state = TestUtils.digitalInputAsByte(b, 8, 15);
             Assert.assertEquals(0, state);
 
-            line = "INP_O 0x301 127\n";
+            line = "INP_O 0x303 127\n";
             Utils.parseLine(line, (IBoardMessaging) b);
             state = TestUtils.digitalInputAsByte(b);
-            Assert.assertEquals(~200 & 0xFF, state);
+            Assert.assertEquals(200, state);
             state = TestUtils.digitalInputAsByte(b, 8, 15);
-            Assert.assertEquals(~127 & 0xff, state);
+            Assert.assertEquals(127, state);
 
         } catch (ParseException e) {
             Assert.fail(e.getMessage());

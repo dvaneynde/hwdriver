@@ -60,8 +60,8 @@ public class TestOpmm1616 {
         int input = TestUtils.digitalInputAsByte(b);
         assertEquals(0, input);
 
-        b.digiIn[0].updateInputFromHardware(255);
-        b.digiIn[1].updateInputFromHardware(~75 & 0xff);
+        b.digiIn[0].updateInputFromHardware(0);
+        b.digiIn[1].updateInputFromHardware(75 & 0xff);
         input = TestUtils.digitalInputAsByte(b, 0, 7);
         assertEquals(0, input);
         input = TestUtils.digitalInputAsByte(b, 8, 15);
