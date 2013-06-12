@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
 	int debug = 0; /* Value for the "-d" optional argument. */
 	if (argc < 2) {
 		printf(
-				"Usage: %s [-d] hostname\n\t-d: debug\n\thostname: ip or hostname (niet duidelijk waarom...).\n\n",
+				"Usage: %s [-d] hostname\n\t-d: debug\n\thostname: ip or hostname (caller must use same, e.g. 0.0.0.0).\n\n",
 				argv[0]);
 		exit(1);
 	}
