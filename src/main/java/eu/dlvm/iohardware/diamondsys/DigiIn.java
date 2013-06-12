@@ -13,8 +13,19 @@ public class DigiIn {
      * All states are ints, even if they are (unsigned) bytes. Java only has
      * signed bytes, so to avoid sign promotion we use ints.
      */
-    private int inputState = 0;
-    private int prevInputState = 0;
+    private int inputState;
+    private int prevInputState;
+    private boolean invertInputRead;
+
+    public DigiIn() {
+        this(true); // default to true for historical reasons (first one was opalmm 8)
+    }
+
+    public DigiIn(boolean invertInputRead) {
+        this.invertInputRead = invertInputRead;
+        this.inputState = 0;
+        this.prevInputState = 0;
+    }
 
     /**
      * Check whether given input channel is on.
@@ -81,7 +92,7 @@ public class DigiIn {
      */
     public void updateInputFromHardware(int inputstate) {
         this.prevInputState = this.inputState;
-        this.inputState = ~inputstate;
+        this.inputState = (invertInputRead ? ~inputstate : inputstate);
     }
 
 }

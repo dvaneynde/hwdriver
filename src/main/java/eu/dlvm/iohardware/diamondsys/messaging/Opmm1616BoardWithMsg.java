@@ -73,7 +73,7 @@ public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessagi
     public String msgInputRequest() {
         if (digiIn == null)
             return "";
-        return String.format("REQ_INP 0x%x O\nREQ_INP 0x%x O\n", address, address + 1);
+        return String.format("REQ_INP 0x%x O\nREQ_INP 0x%x O\n", address + 2, address + 3);
     }
 
     /**
@@ -101,7 +101,7 @@ public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessagi
         }
         String s = st.nextToken();
         int value = Integer.parseInt(s);
-        int channel = address - this.address;
+        int channel = address - this.address - 2;
         digiIn[channel].updateInputFromHardware(value);
     }
 
@@ -124,8 +124,8 @@ public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessagi
         if (!outputStateHasChanged())
             return "";
         StringBuffer sb = new StringBuffer();
-        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 2, BOARDTYPE_OPALMM, digiOut[0].getValue()));
-        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 3, BOARDTYPE_OPALMM, digiOut[1].getValue()));
+        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 0, BOARDTYPE_OPALMM, digiOut[0].getValue()));
+        sb.append(String.format("SET_OUT 0x%x %c %d\n", address + 1, BOARDTYPE_OPALMM, digiOut[1].getValue()));
         return sb.toString();
     }
 }

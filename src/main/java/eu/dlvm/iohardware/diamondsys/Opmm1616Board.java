@@ -40,11 +40,8 @@ public class Opmm1616Board extends Board {
         super(boardNumber, address, description);
         if (digiInEnabled) {
             digiIn = new DigiIn[2];
-            digiIn[0] = new DigiIn();
-            digiIn[1] = new DigiIn();
-            // TODO kan onderstaande update niet in init()? zoals digiOut?
-            digiIn[0].updateInputFromHardware(255);
-            digiIn[1].updateInputFromHardware(255);
+            digiIn[0] = new DigiIn(false);
+            digiIn[1] = new DigiIn(false);
         }
         if (digiOutEnabled) {
             digiOut = new DigiOut[2];
