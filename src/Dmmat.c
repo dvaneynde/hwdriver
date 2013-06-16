@@ -17,35 +17,54 @@
 #include "Dmmat.h"
 #include "log.h"
 
-BYTE result; // returned error code
-DSCB dscb; // handle used to refer to the board
-DSCCB dsccb; // structure containing board settings
-DSCDACS dscdacs; // structure containing DA conversion settings
 ERRPARAMS errorParams; // structure for returning error code and error string
 char logmsg[1024];
+
+struct address2dscbStruct {
+	unsigned short address;
+	DSCB dscb;
+};
+struct address2dscbStruct address2dscbs[10];
+int nrBoards = 0;
+
+DSCB findDSCBbyAddress(unsigned short address) {
+	int i;
+	for (i=0; i<nrBoards; i++)
+		if (address2dscbs[i].address == address)
+			return address2dscbs[i].dscb;
+	return -1;
+}
 
 /*
  * Initialize the DMM-AT board. This function passes the various
  * hardware parameters to the driver and resets the hardware.
  */
 void dmmatInit(unsigned short address) {
-	sprintf(logmsg, ">>> Registering Dmmat board, address=0x%x\n",address);
+	DSCCB dsccb; // structure containing board settings
+	DSCB dscb; // handle used to refer to the boards
+	sprintf(logmsg, ">>> Registering Dmmat board, address=0x%x\n", address);
 	mylog(MYLOG_DEBUG, logmsg);
 
+	// TODO als address2dscbs al een entry heeft voor dit adres, herbruiken; maar ik ga ervan uit dat we voorlopig maar 1 keer initialiseren.
 	dsccb.boardtype = DSC_DMMAT;
 	dsccb.base_address = address;
 	dsccb.int_level = 3;
 	if (dscInitBoard(DSC_DMMAT, &dsccb, &dscb) != DE_NONE) {
 		dscGetLastError(&errorParams);
-		sprintf(logmsg, "dscInitBoard error: %s %s\n", dscGetErrorString(
-						errorParams.ErrCode), errorParams.errstring);
-		mylog(MYLOG_DEBUG, logmsg);
+		sprintf(logmsg, "dscInitBoard error: %s %s\n",
+				dscGetErrorString(errorParams.ErrCode), errorParams.errstring);
+		mylog(MYLOG_ERROR, logmsg);
+	} else {
+		address2dscbs[nrBoards].address = address;
+		address2dscbs[nrBoards].dscb = dscb;
+		nrBoards++;
+		sprintf(logmsg, "    Registering ok, dscb=0x%x\n", dscb);
+		mylog(MYLOG_INFO, logmsg);
 	}
-	sprintf(logmsg,"    Registering ok, dscb=0x%x\n", dscb);
-	mylog(MYLOG_DEBUG, logmsg);
-	fflush(NULL);
+	fflush(NULL );
 
-	sprintf(logmsg, "<<< Registered Dmmat board, address=%x, dscb=%x\n", address, dscb);
+	sprintf(logmsg, "<<< Registered Dmmat board, address=%x, dscb=%x\n",
+			address, dscb);
 	mylog(MYLOG_DEBUG, logmsg);
 }
 
@@ -61,11 +80,19 @@ void dmmatInit(unsigned short address) {
  * so digital 6, analog channel 0 not read, analog channel 1 reads 240.
  */
 void dmmatReadInputs(int address, char** parms, char* result) {
+	DSCB dscb;
 	BYTE digi_b;
 	char digi[5], ana[2][5];
 	int i;
 
 	mylog(MYLOG_DEBUG, ">>> dmmatReadInputs");
+	dscb = findDSCBbyAddress(address);
+	if (dscb <0) {
+		sprintf(logmsg, "Board for address 0x%x not initialized? Command ignored.", address);
+		mylog(MYLOG_WARN, logmsg);
+		return;
+	}
+
 	if (parms[2][0] == 'Y') {
 		if (dscDIOInputByte(dscb, 0, &digi_b) != DE_NONE) {
 			dscGetLastError(&errorParams);
@@ -74,20 +101,23 @@ void dmmatReadInputs(int address, char** parms, char* result) {
 					errorParams.errstring);
 			mylog(MYLOG_ERROR, logmsg);
 		}
-		sprintf(logmsg, "    digi in address:0x%x read:%d\n", address, (int)digi_b);
+		sprintf(logmsg, "    digi in address:0x%x read:%d\n", address,
+				(int )digi_b);
 		mylog(MYLOG_DEBUG, logmsg);
-		sprintf(digi,"%d",(int)digi_b);
+		sprintf(digi, "%d", (int )digi_b);
 	} else {
-		strcpy(digi,"-");
+		strcpy(digi, "-");
 	}
 
 	for (i = 0; i < 2; i++) {
 		if (parms[2][i + 1] == 'Y') {
-			sprintf(logmsg, "    reading analog input not implemented, return '255' (all off), channel=%d", i);
+			sprintf(logmsg,
+					"    reading analog input not implemented, return '255' (all off), channel=%d",
+					i);
 			mylog(MYLOG_WARN, logmsg);
-			strcpy(ana[i],"255");
+			strcpy(ana[i], "255");
 		} else {
-			strcpy(ana[i],"-");
+			strcpy(ana[i], "-");
 		}
 	}
 
@@ -107,22 +137,33 @@ void dmmatReadInputs(int address, char** parms, char* result) {
  * Example message: SET_OUT 0x300 D - 1025 2056
  */
 void dmmatSetOutputs(int address, char** parms) {
+	DSCB dscb;
 	int channel, value;
+	DSCDACS dscdacs; // structure containing DA conversion settings
+	BYTE result; // returned error code
 
 	mylog(MYLOG_DEBUG, ">>> dmmatSetOutputs");
+	dscb = findDSCBbyAddress(address);
+	if (dscb <0) {
+		sprintf(logmsg, "Board for address 0x%x not initialized? Command ignored.", address);
+		mylog(MYLOG_WARN, logmsg);
+		return;
+	}
 
 	// Digital output channel
 	if (parms[2][0] != '-') {
 		sscanf(parms[2], "%d", &value);
-		sprintf(logmsg,"    dmmatSetOutputs() digital=%d", value);
+		sprintf(logmsg, "    dmmatSetOutputs() digital=%d", value);
 		mylog(MYLOG_DEBUG, logmsg);
 		if ((result = dscDIOOutputByte(dscb, 0, (BYTE) value)) != DE_NONE) {
 			dscGetLastError(&errorParams);
-			sprintf( logmsg, "dscDIOOutputByte error: %s %s\n", dscGetErrorString(errorParams.ErrCode), errorParams.errstring );
+			sprintf(logmsg, "dscDIOOutputByte error: %s %s\n",
+					dscGetErrorString(errorParams.ErrCode),
+					errorParams.errstring);
 			mylog(MYLOG_ERROR, logmsg);
 		}
 	} else {
-		sprintf(logmsg,"    dmmatSetOutputs() digital not requested.");
+		sprintf(logmsg, "    dmmatSetOutputs() digital not requested.");
 		mylog(MYLOG_DEBUG, logmsg);
 	}
 
@@ -138,13 +179,15 @@ void dmmatSetOutputs(int address, char** parms) {
 		}
 	}
 
-	sprintf(logmsg,"    dmmatSetOutputs() analog [0]=%ld [1]=%ld", (dscdacs.channel_enable[0]?dscdacs.output_codes[0]:-1),(dscdacs.channel_enable[1]?dscdacs.output_codes[1]:-1));
+	sprintf(logmsg, "    dmmatSetOutputs() analog [0]=%ld [1]=%ld",
+			(dscdacs.channel_enable[0] ? dscdacs.output_codes[0] : -1),
+			(dscdacs.channel_enable[1] ? dscdacs.output_codes[1] : -1));
 	mylog(MYLOG_DEBUG, logmsg);
 
 	if ((result = dscDAConvertScan(dscb, &dscdacs)) != DE_NONE) {
 		dscGetLastError(&errorParams);
-		sprintf(logmsg, "dscDAConvertScan error: %s %s\n", dscGetErrorString(
-						errorParams.ErrCode), errorParams.errstring);
+		sprintf(logmsg, "dscDAConvertScan error: %s %s\n",
+				dscGetErrorString(errorParams.ErrCode), errorParams.errstring);
 		mylog(MYLOG_ERROR, logmsg);
 		return;
 	}
