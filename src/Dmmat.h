@@ -30,12 +30,12 @@ void dmmatSetOutputs(int address, char** parms);
  * 	REQ_INP 0x300 D YYN
  * int address: address of boards
  * parms:
- * 	[0] is address, in text - ignored by this routine
+ * 	[0] is address, needed to find DSCB
  * 	[1]	type D - ignored by this routine
  * 	[2] whether digital in, analog channel 0 and analogy channel 1 need to be read.
  * result: returns string like <code>INP_D 0x300 6 - 240</code><br>
  * so digital 6, analog channel 0 not read, analog channel 1 reads 240.
  */
-void dmmatReadInputs(int address, char** parms, char* result);
+void dmmatReadInputs(unsigned short address, char** parms, char* result);
 
 #endif /* DMMAT_H_ */

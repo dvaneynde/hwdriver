@@ -89,14 +89,14 @@ void setupAsServer() {
  */
 void initDiamondDriver() {
 	ERRPARAMS errorParams; // structure for returning error code and error string
-	mylog(MYLOG_DEBUG, ">>> Init Diamond Driver\n");
+	mylog(MYLOG_DEBUG, ">>> Init Diamond Driver");
 	if (dscInit(DSC_VERSION) != DE_NONE) {
 		dscGetLastError(&errorParams);
-		sprintf(logmsg, "dscInit error: %s %s\n",
+		sprintf(logmsg, "dscInit error: %s %s",
 				dscGetErrorString(errorParams.ErrCode), errorParams.errstring);
 		mylog(MYLOG_FATAL, logmsg);
 	}
-	mylog(MYLOG_DEBUG, "<<< Init Diamond Driver\n");
+	mylog(MYLOG_DEBUG, "<<< Init Diamond Driver");
 }
 
 /*
