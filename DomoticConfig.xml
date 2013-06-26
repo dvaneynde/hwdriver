@@ -1,7 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
-	<switch channel="3" name="SchakLichtWC0" desc="Licht badkamer boven." />
+	<switch channel="0" name="SchakLichtGang" />
+	<lamp channel="1" name="LichtGang" />
+	<switch channel="3" name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
 	<lamp channel="4" name="LichtWC0" />
+	<switch name="SchakVentilatorWC0" channel="40"/>
+	<fan name="VentilatorWC0" channel="5" />
+	<switch name="SchakLichtGaragePoort" channel="6" />
+	<lamp name="LichtGaragePoort" channel="7" />
+	<switch name="SchakLichtGarageTuin" channel="8" />
+	<lamp name="LichtGarageTuin" channel="9" />
+	<dimmerSwitches name="SchakLichtKeuken" channelUp="10"
+		channelDown="11" />
+	<dimmedLamp name="LichtKeuken" fullOnHwOutput="4095" channel="12" />
+	<dimmerSwitches name="SchakLichtVeranda" channelUp="12"
+		channelDown="13" />
+		<!--  
+	badkamer beneden
+	ventilator badkamer -->
+	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" channel="14" />
+	<dimmerSwitches name="SchakLichtCircanteRondom" channelUp="15" channelDown="16"/>
+	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" channel="17"/>
+	<switch name="SchakLichtCircante" channel="18"/>
+	<lamp name="LichtCircante" channel="19"/>
+	<dimmerSwitches name="SchakLichtZithoek" channelUp="20" channelDown="21"/>
+	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" channel="22"/>
+	<switch name="SchakLichtBureau" channel="23"/>
+	<lamp name="LichtBureau" channel="24"/>
+	<switch name="SchakLichtTerras"	channel=25"/>
+	<lamp name="LichtTerras" channel="26"/>
+	<switch name="SchakLichtOpzij" channel="27"/><!-- 
+	gang boven
+	badkamer boven
+	tomas wand
+	tomas licht
+	dries wand
+	dries licht
+	roos wand
+	roos licht
+	nachtverlichting
+	screen tomas
+	screen tuin dries
+	screen opzij dries
+	screen opzij roos
+	screen straat roos
+	screen breed
+	screen lang
+	screen keuken
+	 -->
 </domotic>

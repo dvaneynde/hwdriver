@@ -62,7 +62,7 @@ public class DmmatBoard extends Board {
             throws IllegalArgumentException {
         super(boardNr, address, description);
         if (digiInEnabled)
-            digiIn = new DigiIn();
+            digiIn = new DigiIn(false);
         if (digiOutEnabled)
             digiOut = new DigiOut();
         if (anaInEnabled) {
