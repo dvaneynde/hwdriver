@@ -98,11 +98,11 @@ public class TestDmmat {
         b.anaIns[0].updateInputFromHardware(2000);
         b.anaIns[1].updateInputFromHardware(DmmatBoard.ANALOG_RESOLUTION - 1);
         input = TestUtils.digitalInputAsByte(b);
-        assertEquals(0, input);
+        assertEquals(255, input);
         assertEquals(2000, b.readAnalogInput((byte) 0));
         assertEquals(DmmatBoard.ANALOG_RESOLUTION - 1, b.readAnalogInput((byte) 1));
 
-        b.digiIn.updateInputFromHardware(~35 & 0xff);
+        b.digiIn.updateInputFromHardware(35);
         input = TestUtils.digitalInputAsByte(b);
         assertEquals(35, input);
         assertEquals(2000, b.readAnalogInput((byte) 0));

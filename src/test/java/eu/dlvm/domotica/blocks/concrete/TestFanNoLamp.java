@@ -22,7 +22,7 @@ public class TestFanNoLamp {
 
 		@Override
 		public void writeDigitalOutput(LogCh ch, boolean value) throws IllegalArgumentException {
-			if (ch.nr() == FAN_OUT.nr()) {
+			if (ch.id() == FAN_OUT.id()) {
 				fanStatus = value;
 			} else {
 				Assert.fail();

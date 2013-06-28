@@ -86,9 +86,9 @@ public class HardwareIO implements IHardwareIO {
                     Board b = findBoardBy(address);
                     ((IBoardMessaging) b).parseInputResult(cmd, address, st);
                 }
-            // TODO JDK 1.7 only } catch (NumberFormatException | ParseException e) {
+                // TODO JDK 1.7 only } catch (NumberFormatException | ParseException e) {
             } catch (Exception e) {
-                    log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
+                log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
             }
         }
     }
@@ -139,6 +139,7 @@ public class HardwareIO implements IHardwareIO {
     @Override
     public boolean readDigitalInput(LogCh lc) {
         FysCh fc = channelMap.fysCh(lc);
+        log.debug("readDigitalInput(), for LogCh=" + lc + ", got FysCh=" + fc);
         Board b = boards.get(fc.getBoardNr());
         return b.readDigitalInput((byte) fc.getBoardChannelNr());
     }

@@ -1,147 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig DiamondBoardsConfig.xsd ">
 	<dmmat board="0" address="0x330" desc="Board 0, dmmatt.">
 		<analog-input>
-			<channel channel="0" logical-id="0" />
-			<channel channel="1" logical-id="1" />
+			<channel channel="0" />
+			<channel channel="1" />
 		</analog-input>
 		<analog-output>
-			<channel channel="0" logical-id="10" />
-			<channel channel="1" logical-id="11" />
+			<channel channel="0" logical-id="LichtVeranda" />
+			<channel channel="1" logical-id="LichtCircanteRondom" />
 		</analog-output>
 		<digital-input>
-			<channel channel="0" logical-id="20" />
-			<channel channel="1" logical-id="21" />
-			<channel channel="2" logical-id="22" />
-			<channel channel="3" logical-id="23" />
-			<channel channel="4" logical-id="24" />
-			<channel channel="5" logical-id="25" />
-			<channel channel="6" logical-id="26" />
-			<channel channel="7" logical-id="27" />
+			<channel channel="0" logical-id="SchakLichtGang" />
+			<channel channel="1" logical-id="SchakLichtWC0" />
+			<channel channel="2" logical-id="SchakLichtGaragePoort" />
+			<channel channel="3" logical-id="SchakLichtGarageTuin" />
+			<channel channel="4" logical-id="SchakLichtKeuken" />
+			<channel channel="5" logical-id="SchakLichtBadk0" />
+			<channel channel="6" logical-id="SchakLichtCircante" />
+			<channel channel="7" logical-id="SchakLichtBureau" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="30" />
-			<channel channel="1" logical-id="31" />
-			<channel channel="2" logical-id="32" />
-			<channel channel="3" logical-id="33" />
-			<channel channel="4" logical-id="34" />
-			<channel channel="5" logical-id="35" />
-			<channel channel="6" logical-id="36" />
-			<channel channel="7" logical-id="37" />
+			<channel channel="0" logical-id="LichtGang" />
+			<channel channel="1" logical-id="LichtWC0" />
+			<channel channel="2" logical-id="LichtGaragePoort" />
+			<channel channel="3" logical-id="LichtGarageTuin" />
+			<channel channel="4" logical-id="LichtKeuken" />
+			<channel channel="5" logical-id="LichtBadk0" />
+			<channel channel="6" logical-id="LichtCircante" />
+			<channel channel="7" logical-id="LichtBureau" />
 		</digital-output>
 	</dmmat>
 	<dmmat board="1" address="0x300" desc="Board 1, dmmatt.">
-		<analog-input>
-			<channel channel="0" logical-id="40" />
-			<channel channel="1" logical-id="41" />
-		</analog-input>
 		<analog-output>
-			<channel channel="0" logical-id="50" />
-			<channel channel="1" logical-id="51" />
+			<channel channel="0" logical-id="LichtZithoek" />
+			<channel channel="1" />
 		</analog-output>
 		<digital-input>
-			<channel channel="0" logical-id="60" />
-			<channel channel="1" logical-id="61" />
-			<channel channel="2" logical-id="62" />
-			<channel channel="3" logical-id="63" />
-			<channel channel="4" logical-id="64" />
-			<channel channel="5" logical-id="65" />
-			<channel channel="6" logical-id="66" />
-			<channel channel="7" logical-id="67" />
+			<channel channel="0" logical-id="SchakLichtVerandaUp" />
+			<channel channel="1" logical-id="SchakLichtVerandaDown" />
+			<channel channel="2" logical-id="SchakLichtCircanteRondomUp" />
+			<channel channel="3" logical-id="SchakLichtCircanteRondomDown" />
+			<channel channel="4" logical-id="SchakLichtZithoekUp" />
+			<channel channel="5" logical-id="SchakLichtZithoekDown" />
+			<channel channel="6" />
+			<channel channel="7" />
 		</digital-input>
-		<digital-output>
-			<channel channel="0" logical-id="70" />
-			<channel channel="1" logical-id="71" />
-			<channel channel="2" logical-id="72" />
-			<channel channel="3" logical-id="73" />
-			<channel channel="4" logical-id="74" />
-			<channel channel="5" logical-id="75" />
-			<channel channel="6" logical-id="76" />
-			<channel channel="7" logical-id="77" />
-		</digital-output>
 	</dmmat>
 	<opmm1616 board="2" address="0x200" desc="Board 2, opmm1616.">
 		<digital-input>
-			<channel channel="0" logical-id="80" />
-			<channel channel="1" logical-id="81" />
-			<channel channel="2" logical-id="82" />
-			<channel channel="3" logical-id="83" />
-			<channel channel="4" logical-id="84" />
-			<channel channel="5" logical-id="85" />
-			<channel channel="6" logical-id="86" />
-			<channel channel="7" logical-id="87" />
-			<channel channel="0" logical-id="88" />
-			<channel channel="1" logical-id="89" />
-			<channel channel="2" logical-id="100" />
-			<channel channel="3" logical-id="101" />
-			<channel channel="4" logical-id="102" />
-			<channel channel="5" logical-id="103" />
-			<channel channel="6" logical-id="104" />
-			<channel channel="7" logical-id="105" />
+			<channel channel="0" logical-id="SchakVentilatorWC0" />
+			<channel channel="1" logical-id="SchakVentilatorBadk0" />
+			<channel channel="2" logical-id="SchakLichtGangBoven" />
+			<channel channel="3" logical-id="SchakLichtBadk1" />
+			<channel channel="4" logical-id="SchakLichtTomasWand" />
+			<channel channel="5" logical-id="SchakLichtTomas" />
+			<channel channel="6" logical-id="SchakLichtDriesWand" />
+			<channel channel="7" logical-id="SchakLichtDries" />
+			<channel channel="0" logical-id="SchakLichtRoosWand" />
+			<channel channel="1" logical-id="SchakLichtRoos" />
+			<channel channel="2" logical-id="SchakLichtTerras" />
+			<channel channel="3" logical-id="SchakLichtOpzij" />
+			<channel channel="4" />
+			<channel channel="5" />
+			<channel channel="6" />
+			<channel channel="7" logical-id="AllOff"/>
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="90" />
-			<channel channel="1" logical-id="91" />
-			<channel channel="2" logical-id="92" />
-			<channel channel="3" logical-id="93" />
-			<channel channel="4" logical-id="94" />
-			<channel channel="5" logical-id="95" />
-			<channel channel="6" logical-id="96" />
-			<channel channel="7" logical-id="97" />
-			<channel channel="0" logical-id="98" />
-			<channel channel="1" logical-id="99" />
-			<channel channel="2" logical-id="110" />
-			<channel channel="3" logical-id="111" />
-			<channel channel="4" logical-id="112" />
-			<channel channel="5" logical-id="113" />
-			<channel channel="6" logical-id="114" />
-			<channel channel="7" logical-id="115" />
+			<channel channel="0" logical-id="VentilatorWC0" />
+			<channel channel="1" logical-id="VentilatorBadk0" />
+			<channel channel="2" logical-id="LichtGangBoven" />
+			<channel channel="3" logical-id="LichtBadk1" />
+			<channel channel="4" logical-id="LichtTomasWand" />
+			<channel channel="5" logical-id="LichtTomas" />
+			<channel channel="6" logical-id="LichtDriesWand" />
+			<channel channel="7" logical-id="LichtDries" />
+			<channel channel="0" logical-id="LichtRoosWand" />
+			<channel channel="1" logical-id="LichtRoos" />
+			<channel channel="2" logical-id="LichtTerras" />
+			<channel channel="3" logical-id="LichtOpzij" />
+			<channel channel="4" />
+			<channel channel="5" />
+			<channel channel="6" />
+			<channel channel="7" logical-id="LichtNacht" />
 		</digital-output>
 	</opmm1616>
 	<opalmm board="3" address="0x240" desc="Board 3, opalmm 8.">
 		<digital-input>
-			<channel channel="0" logical-id="120" />
-			<channel channel="1" logical-id="121" />
-			<channel channel="2" logical-id="122" />
-			<channel channel="3" logical-id="123" />
-			<channel channel="4" logical-id="124" />
-			<channel channel="5" logical-id="125" />
-			<channel channel="6" logical-id="126" />
-			<channel channel="7" logical-id="127" />
+			<channel channel="0" logical-id="SchakScreenTomasUp" />
+			<channel channel="1" logical-id="SchakScreenTomasDown" />
+			<channel channel="2" logical-id="SchakScreenDriesTuinUp" />
+			<channel channel="3" logical-id="SchakScreenDriesTuinDown" />
+			<channel channel="4" logical-id="SchakScreenDriesOpzijUp" />
+			<channel channel="5" logical-id="SchakScreenDriesOpzijDown" />
+			<channel channel="6" logical-id="SchakScreenRoosUp" />
+			<channel channel="7" logical-id="SchakScreenRoosDown" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="130" />
-			<channel channel="1" logical-id="131" />
-			<channel channel="2" logical-id="132" />
-			<channel channel="3" logical-id="133" />
-			<channel channel="4" logical-id="134" />
-			<channel channel="5" logical-id="135" />
-			<channel channel="6" logical-id="136" />
-			<channel channel="7" logical-id="137" />
+			<channel channel="0" logical-id="ScreenTomasUp" />
+			<channel channel="1" logical-id="ScreenTomasDown" />
+			<channel channel="2" logical-id="ScreenDriesTuinUp" />
+			<channel channel="3" logical-id="ScreenDriesTuinDown" />
+			<channel channel="4" logical-id="ScreenDriesOpzijUp" />
+			<channel channel="5" logical-id="ScreenDriesOpzijDown" />
+			<channel channel="6" logical-id="ScreenRoosUp" />
+			<channel channel="7" logical-id="ScreenRoosDown" />
 		</digital-output>
 	</opalmm>
 	<opalmm board="4" address="0x280" desc="Board 3, opalmm 8.">
 		<digital-input>
-			<channel channel="0" logical-id="140" />
-			<channel channel="1" logical-id="141" />
-			<channel channel="2" logical-id="142" />
-			<channel channel="3" logical-id="143" />
-			<channel channel="4" logical-id="144" />
-			<channel channel="5" logical-id="145" />
-			<channel channel="6" logical-id="146" />
-			<channel channel="7" logical-id="147" />
+			<channel channel="0" logical-id="SchakScreenBreedUp" />
+			<channel channel="1" logical-id="SchakScreenBreedDown" />
+			<channel channel="2" logical-id="SchakScreenLangUp" />
+			<channel channel="3" logical-id="SchakScreenLangDown" />
+			<channel channel="4" logical-id="SchakScreenKeukenUp" />
+			<channel channel="5" logical-id="SchakScreenKeukenDown" />
+			<channel channel="6" logical-id="SchakScreenAllUp" />
+			<channel channel="7" logical-id="SchakScreenAllDown" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="150" />
-			<channel channel="1" logical-id="151" />
-			<channel channel="2" logical-id="152" />
-			<channel channel="3" logical-id="153" />
-			<channel channel="4" logical-id="154" />
-			<channel channel="5" logical-id="155" />
-			<channel channel="6" logical-id="156" />
-			<channel channel="7" logical-id="157" />
+			<channel channel="0" logical-id="ScreenBreedUp" />
+			<channel channel="1" logical-id="ScreenBreedDown" />
+			<channel channel="2" logical-id="ScreenLangUp" />
+			<channel channel="3" logical-id="ScreenLangDown" />
+			<channel channel="4" logical-id="ScreenKeukenUp" />
+			<channel channel="5" logical-id="ScreenKeukenDown" />
+			<channel channel="6" />
+			<channel channel="7" />
 		</digital-output>
 	</opalmm>
 </boards>

@@ -127,15 +127,15 @@
 	<complexType name="blockWithChannelStruct">
 		<complexContent>
 			<extension base="tns:blockStruct">
-				<attribute name="channel" type="int" use="required" />
+				<attribute name="channel" type="string" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>
 	<complexType name="BlockWithChannelUpDownStruct">
 		<complexContent>
 			<extension base="tns:blockStruct">
-				<attribute name="channelDown" type="int" use="required" />
-				<attribute name="channelUp" type="int" use="required" />
+				<attribute name="channelDown" type="string" use="optional" />
+				<attribute name="channelUp" type="string" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>

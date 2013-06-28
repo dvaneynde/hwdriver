@@ -43,7 +43,8 @@ public class TestDmmatWithMsg {
 
             Assert.assertEquals(address, b.getAddress());
             int digistate = TestUtils.digitalInputAsByte(b);
-            Assert.assertEquals(~176 & 0xFF, digistate);
+            //Assert.assertEquals(~176 & 0xFF, digistate);
+            Assert.assertEquals(176, digistate);
             Assert.assertEquals(1458, b.readAnalogInput((byte) 0));
             Assert.assertEquals(2000, b.readAnalogInput((byte) 1));
         } catch (ParseException e) {
@@ -60,7 +61,7 @@ public class TestDmmatWithMsg {
 
             Assert.assertEquals(address, b.getAddress());
             int digistate = TestUtils.digitalInputAsByte(b);
-            Assert.assertEquals(~176 & 0xFF, digistate);
+            Assert.assertEquals(176, digistate);
             Assert.assertEquals(0, b.readAnalogInput((byte) 0));
             Assert.assertEquals(0, b.readAnalogInput((byte) 1));
         } catch (ParseException e) {

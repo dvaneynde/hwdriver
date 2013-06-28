@@ -1,52 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
-	<switch channel="0" name="SchakLichtGang" />
-	<lamp channel="1" name="LichtGang" />
-	<switch channel="3" name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
-	<lamp channel="4" name="LichtWC0" />
-	<switch name="SchakVentilatorWC0" channel="40"/>
-	<fan name="VentilatorWC0" channel="5" />
-	<switch name="SchakLichtGaragePoort" channel="6" />
-	<lamp name="LichtGaragePoort" channel="7" />
-	<switch name="SchakLichtGarageTuin" channel="8" />
-	<lamp name="LichtGarageTuin" channel="9" />
-	<dimmerSwitches name="SchakLichtKeuken" channelUp="10"
-		channelDown="11" />
-	<dimmedLamp name="LichtKeuken" fullOnHwOutput="4095" channel="12" />
-	<dimmerSwitches name="SchakLichtVeranda" channelUp="12"
-		channelDown="13" />
-		<!--  
-	badkamer beneden
-	ventilator badkamer -->
-	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" channel="14" />
-	<dimmerSwitches name="SchakLichtCircanteRondom" channelUp="15" channelDown="16"/>
-	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" channel="17"/>
-	<switch name="SchakLichtCircante" channel="18"/>
-	<lamp name="LichtCircante" channel="19"/>
-	<dimmerSwitches name="SchakLichtZithoek" channelUp="20" channelDown="21"/>
-	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" channel="22"/>
-	<switch name="SchakLichtBureau" channel="23"/>
-	<lamp name="LichtBureau" channel="24"/>
-	<switch name="SchakLichtTerras"	channel=25"/>
-	<lamp name="LichtTerras" channel="26"/>
-	<switch name="SchakLichtOpzij" channel="27"/><!-- 
-	gang boven
-	badkamer boven
-	tomas wand
-	tomas licht
-	dries wand
-	dries licht
-	roos wand
-	roos licht
-	nachtverlichting
-	screen tomas
-	screen tuin dries
-	screen opzij dries
-	screen opzij roos
-	screen straat roos
-	screen breed
-	screen lang
-	screen keuken
-	 -->
+
+	<switch name="AllOff" />
+
+	<switch name="SchakLichtGang" />
+	<lamp name="LichtGang" />
+	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
+	<lamp name="LichtWC0" />
+	<switch name="SchakVentilatorWC0" />
+	<fan name="VentilatorWC0" lamp="LichtWC0" />
+	<switch name="SchakLichtGaragePoort" />
+	<lamp name="LichtGaragePoort" />
+	<switch name="SchakLichtGarageTuin" />
+	<lamp name="LichtGarageTuin" />
+	<switch name="SchakLichtKeuken" />
+	<lamp name="LichtKeuken"/>
+	<switch name="SchakLichtBadk0" />
+	<lamp name="LichtBadk0" />
+	<switch name="SchakVentilatorBadk0" />
+	<fan name="VentilatorBadk0" lamp="LichtBadk0" />
+	<dimmerSwitches name="SchakLichtVeranda" />
+	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" />
+	<dimmerSwitches name="SchakLichtCircanteRondom" />
+	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" />
+	<switch name="SchakLichtCircante" />
+	<lamp name="LichtCircante" />
+	<dimmerSwitches name="SchakLichtZithoek" />
+	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" />
+	<switch name="SchakLichtBureau" />
+	<lamp name="LichtBureau" />
+	<switchboard name="LampenBeneden">
+		<connection switch="SchakLichtGang" lamp="LichtGang" />
+		<connection switch="SchakLichtWC0" lamp="LichtWC0" />
+		<connection switch="SchakLichtGaragePoort" lamp="LichtGaragePoort" />
+		<connection switch="SchakLichtGarageTuin" lamp="LichtGarageTuin" />
+		<connection switch="SchakLichtKeuken" lamp="LichtKeuken" />
+		<connection switch="SchakLichtBadk0" lamp="LichtBadk0" />
+		<connection switch="SchakLichtCircante" lamp="LichtCircante" />
+		<connection switch="SchakLichtBureau" lamp="LichtBureau" />
+		<allSwitch switch="AllOff" allOff="true" />
+	</switchboard>
+	<switchboardFans name="Ventilatie">
+		<connection switch="SchakVentilatorWC0" fan="VentilatorWC0" />
+		<connection switch="SchakVentilatorBadk0" fan="VentilatorBadk0" />
+	</switchboardFans>
+	<switchboardDimmer name="Dimmers">
+		<connection dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
+		<connection dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
+		<connection dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
+		<allSwitch switch="AllOff" />
+	</switchboardDimmer>
+
+	<switch name="SchakLichtGangBoven" />
+	<lamp name="LichtGangBoven" />
+	<switch name="SchakLichtBadk1" />
+	<lamp name="LichtBadk1" />
+	<switch name="SchakLichtTomasWand" />
+	<lamp name="LichtTomasWand" />
+	<switch name="SchakLichtTomas" />
+	<lamp name="LichtTomas" />
+	<switch name="SchakLichtDriesWand" />
+	<lamp name="LichtDriesWand" />
+	<switch name="SchakLichtDries" />
+	<lamp name="LichtDries" />
+	<switch name="SchakLichtRoosWand" />
+	<lamp name="LichtRoosWand" />
+	<switch name="SchakLichtRoos" />
+	<lamp name="LichtRoos" />
+	<switchboard name="LampenBoven">
+		<connection switch="SchakLichtGangBoven" lamp="LichtGangBoven" />
+		<connection switch="SchakLichtBadk1" lamp="LichtBadk1" />
+		<connection switch="SchakLichtTomasWand" lamp="LichtTomasWand" />
+		<connection switch="SchakLichtTomas" lamp="LichtTomas" />
+		<connection switch="SchakLichtDriesWand" lamp="LichtDriesWand" />
+		<connection switch="SchakLichtDries" lamp="LichtDries" />
+		<connection switch="SchakLichtRoosWand" lamp="LichtRoosWand" />
+		<connection switch="SchakLichtRoos" lamp="LichtRoos" />
+	</switchboard>
+
+	<lamp name="LichtNacht" />
+	<switch name="SchakLichtTerras" />
+	<lamp name="LichtTerras" />
+	<switch name="SchakLichtOpzij" />
+	<lamp name="LichtOpzij" />
+
+	<screen name="ScreenTomas" />
+	<screen name="ScreenDriesTuin" />
+	<screen name="ScreenDriesOpzij" />
+	<screen name="ScreenRoos" />
+	<screen name="ScreenBreed" />
+	<screen name="ScreenLang" />
+	<screen name="ScreenKeuken" />
+	<switch name="SchakScreenTomasUp" />
+	<switch name="SchakScreenTomasDown" />
+	<switch name="SchakScreenDriesTuinUp" />
+	<switch name="SchakScreenDriesTuinDown" />
+	<switch name="SchakScreenDriesOpzijUp" />
+	<switch name="SchakScreenDriesOpzijDown" />
+	<switch name="SchakScreenRoosUp" />
+	<switch name="SchakScreenRoosDown" />
+	<switch name="SchakScreenBreedUp" />
+	<switch name="SchakScreenBreedDown" />
+	<switch name="SchakScreenLangUp" />
+	<switch name="SchakScreenLangDown" />
+	<switch name="SchakScreenKeukenUp" />
+	<switch name="SchakScreenKeukenDown" />
+	<switch name="SchakScreenAllUp" />
+	<switch name="SchakScreenAllDown" />
+	<switchboardScreens name="Screens">
+		<connection screen="ScreenTomas" switchUp="SchakScreenTomasUp"
+			switchDown="SchakScreenTomasDown" />
+		<connection screen="ScreenDriesTuin" switchUp="SchakScreenDriesTuinUp"
+			switchDown="SchakScreenDriesTuinDown" />
+		<connection screen="ScreenDriesOpzij" switchUp="SchakScreenDriesOpzijUp"
+			switchDown="SchakScreenDriesOpzijDown" />
+		<connection screen="ScreenRoos" switchUp="SchakScreenRoosUp" switchDown="SchakScreenRoosDown" />
+		<connection screen="ScreenBreed" switchUp="SchakScreenBreedUp"
+			switchDown="SchakScreenBreedDown" />
+		<connection screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" />
+		<connection screen="ScreenKeuken" switchUp="SchakScreenKeukenUp"
+			switchDown="SchakScreenKeukenDown" />
+		<!--  NOT SUPPORTED YET <allUpDownSwitches allDownSwitch="SchakScreenAllDown"
+			allUpSwitch="SchakScreenAllUp" />-->
+	</switchboardScreens>
 </domotic>

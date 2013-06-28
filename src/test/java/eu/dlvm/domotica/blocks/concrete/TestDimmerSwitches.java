@@ -20,7 +20,7 @@ public class TestDimmerSwitches {
 
 		@Override
 		public boolean readDigitalInput(LogCh channel) {
-			return (channel.nr() == 0 ? inLeft : inRight);
+			return (channel.id().equals("0") ? inLeft : inRight);
 		}
 	};
 

@@ -142,13 +142,14 @@ public class XmlHwConfigurator implements IBoardFactory {
         return address;
     }
 
-    private int configureChannel(Attributes atts, ChannelMap cm) {
+    private void configureChannel(Attributes atts, ChannelMap cm) {
         int ch = Integer.parseInt(atts.getValue("channel"));
-        int logch = Integer.parseInt(atts.getValue("logical-id"));
-        LogCh lc = new LogCh(logch);
-        FysCh fc = new FysCh(boardNr, chtype, ch);
-        cm.add(lc, fc);
-        return ch;
+        String logch = atts.getValue("logical-id");
+        if (logch != null) {
+            LogCh lc = new LogCh(logch);
+            FysCh fc = new FysCh(boardNr, chtype, ch);
+            cm.add(lc, fc);
+        }
     }
 
     // -------------------------------------------

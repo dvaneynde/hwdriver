@@ -20,7 +20,7 @@ public class TestScreens {
 
 		@Override
 		public void writeDigitalOutput(LogCh ch, boolean value) throws IllegalArgumentException {
-			if (ch.nr() == 0)
+			if (ch.id().equals("0"))
 				dnRelais = value;
 			else
 				upRelais = value;

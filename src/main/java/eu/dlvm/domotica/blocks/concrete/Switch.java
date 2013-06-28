@@ -48,10 +48,6 @@ public class Switch extends Sensor {
 		SINGLE, DOUBLE, LONG;
 	};
 
-	public Switch(String name, String description, int channel, IDomoContext ctx) {
-		this(name, description, new LogCh(channel), ctx);
-	}
-
 	public Switch(String name, String description, LogCh channel, IDomoContext ctx) {
 		super(name, description, channel, ctx);
 	}

@@ -8,7 +8,7 @@ import eu.dlvm.iohardware.LogCh;
 public class TestLogCh {
 	@Test
 	public void TestEquals() {
-		for (int i=0; i<LogCh.MAX; i++) {
+		for (int i=0; i<255; i++) {
 			LogCh c1 = new LogCh(i);
 			LogCh c2 = new LogCh(i);
 			Assert.assertEquals(c1, c2);
