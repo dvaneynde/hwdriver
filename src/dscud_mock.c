@@ -52,4 +52,22 @@ BYTE DSCUDAPICALL dscDIOInputByte(DSCB board, BYTE port, BYTE* digital_value) {
 	return DE_NONE;
 }
 
+BYTE DSCUDAPICALL dscADCodeToVoltage(DSCB board, DSCADSETTINGS adsettings,
+		DSCSAMPLE adcode, DFLOAT *voltage) {
+	printf("DIAMOND dscADCodeToVoltage called, return 5.\n");
+	(*voltage) = 5;
+	return DE_NONE;
+}
+
+BYTE DSCUDAPICALL dscADSample(DSCB board, DSCSAMPLE* sample) {
+	printf("DIAMOND dscADSample called, return 2048.\n");
+	(*sample) = 2048;
+	return DE_NONE;
+}
+
+BYTE DSCUDAPICALL dscADSetSettings(DSCB board, DSCADSETTINGS* settings) {
+	printf("DIAMOND dscADSetSettings called, NOP.\n");
+	return DE_NONE;
+}
+
 #endif
