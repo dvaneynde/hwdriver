@@ -107,7 +107,7 @@
 			<channel channel="7" logical-id="ScreenRoosDown" />
 		</digital-output>
 	</opalmm>
-	<opalmm board="4" address="0x280" desc="Board 3, opalmm 8.">
+	<opalmm board="4" address="0x280" desc="Board 4, opalmm 8.">
 		<digital-input>
 			<channel channel="0" logical-id="SchakScreenBreedUp" />
 			<channel channel="1" logical-id="SchakScreenBreedDown" />

@@ -336,7 +336,7 @@ public class Main {
 
     private static void usage() {
         System.out.println("Usage:\t" + Main.class.getSimpleName()
-                + " domo [-d path2Driver] [-t looptime] [-l logconfigfile] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
+                + " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
                 + " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n"
                 + "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms\n"
                 + "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n" + "\t-l log4j configuration file\n");
