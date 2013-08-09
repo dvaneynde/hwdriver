@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,14 +27,15 @@ public class HwConsole {
     private HardwareIO hw;
 
     final static String ESC = "\033[";
+    private Pattern patternHELP = Pattern.compile("h(?:elp)?\\s*", Pattern.CASE_INSENSITIVE);
+    private Pattern patternQUIT = Pattern.compile("q(?:uit)?\\s*", Pattern.CASE_INSENSITIVE);
     private Pattern patternINIT = Pattern.compile("i(?:nit)? *(\\d*+)", Pattern.CASE_INSENSITIVE);
     private Pattern patternSTATUS = Pattern.compile("s(?:tatus)? *(\\d*+)", Pattern.CASE_INSENSITIVE);
     private Pattern patternLISTEN = Pattern.compile("l(?:isten)? *(\\d++)", Pattern.CASE_INSENSITIVE);
     private Pattern patternOA = Pattern.compile("oa *(\\d++)\\.(\\d++) +(\\d++)", Pattern.CASE_INSENSITIVE);
     private Pattern patternOD = Pattern.compile("od *(\\d++)\\.(\\d++) +(t(?:rue)?|f(?:alse)?)", Pattern.CASE_INSENSITIVE);
     private Pattern patternALL = Pattern.compile("a(?:ll)? +(on|off) *(\\d*+)", Pattern.CASE_INSENSITIVE);
-    private Pattern patternHELP = Pattern.compile("h(?:elp)?\\s*", Pattern.CASE_INSENSITIVE);
-    private Pattern patternQUIT = Pattern.compile("q(?:uit)?\\s*", Pattern.CASE_INSENSITIVE);
+    private Pattern patternFUN = Pattern.compile("f(?:un)?\\s*(\\d++) +(\\d++)", Pattern.CASE_INSENSITIVE);
 
     private void help() {
         System.out.println("help | quit: this help, or quit.");
@@ -41,8 +43,9 @@ public class HwConsole {
         System.out.println("s [boardnr]: status of all/specific board(s)\t\t" + patternSTATUS.toString());
         System.out.println("l [boardnr]:  listen on one/all board status\t\t" + patternLISTEN.toString());
         System.out.println("oa boardnr.channel value: set analog out\t\t" + patternOA.toString());
-        System.out.println("od boardnr.channel {true|false}: set digital out\t" + patternOD.toString());
+        System.out.println("od boardnr.channel {t[rue]|f[alse]}: set digital out\t" + patternOD.toString());
         System.out.println("a {on|off} [boardnr]: set all on/off, or only boardnr\t" + patternALL.toString());
+        System.out.println("fun time runs: fun loop, 'time' ms between and 'runs' runs\t" + patternFUN.toString());
     }
 
     public HwConsole(String cfgFilename, String hostname, int port) throws IllegalArgumentException {
@@ -80,6 +83,8 @@ public class HwConsole {
                 } else if ((m = patternQUIT.matcher(line)).matches()) {
                     quit = true;
                     hw.getDriverChannel().disconnect();
+                } else if ((m = patternFUN.matcher(line)).matches()) {
+                    fun(m);
                 } else if ((m = patternOD.matcher(line)).matches()) {
                     outputDigital(m);
                 } else if ((m = patternOA.matcher(line)).matches()) {
@@ -93,11 +98,11 @@ public class HwConsole {
                 } else if ((m = patternINIT.matcher(line)).matches()) {
                     init(m);
                 } else {
-                    System.out.println("Unknown command.");
+                    System.err.println("Unknown command.");
                 }
             } catch (Exception e) {
                 log.warn("Exception caught, ignored.", e);
-                System.out.println("Exception: " + e.getMessage());
+                System.err.println("Exception: " + e.getMessage());
             }
         }
         System.out.println("Okay, I quit.");
@@ -145,6 +150,34 @@ public class HwConsole {
         System.out.println("Listen done.");
     }
 
+    private void fun(Matcher m) throws InterruptedException {
+        int time = Integer.parseInt(m.group(1));
+        int runs = Integer.parseInt(m.group(2));
+        if (time < 10)
+            time = 10;
+        int[] boardnrs = { 0, 2, 4, 2, 3 };
+        int[] start =    { 7, 8, 7, 0, 0 };
+        int[] step =     { -1, 1, -1, 1, 1 };
+        List<Board> boards = hw.getBoards();
+        boolean value = true;
+        for (int run = 0; run < runs; run++) {
+            System.out.println("Fun! run " + run + "...");
+            for (int idx = 0; idx < boardnrs.length; idx++) {
+                Board b = boards.get(boardnrs[idx]);
+                for (int channel = start[idx]; channel < (start[idx] + 8) && channel >= 0; channel += step[idx]) {
+                    if (channel == start[idx])
+                        System.out
+                                .println("Fun!\tboard=" + b.getBoardNumber() + " setting channels [" + start[idx] + ".." + (start[idx] + 8) + "[ to:" + value);
+                    //System.out.println("idx="+idx+", channel="+channel);
+                    b.writeDigitalOutput(channel, value);
+                    hw.refreshOutputs();
+                    Thread.sleep(time);
+                }
+            }
+            value = !value;
+        }
+    }
+
     private void outputDigital(Matcher m) {
         // Pattern "od (\\d++) (\\d++) (t(?:rue)|f(?:alse))"
         try {
@@ -153,14 +186,14 @@ public class HwConsole {
             boolean val = (m.group(3).charAt(0) == 't');
             Board b = findBoard(nr);
             if (b == null)
-                System.out.println("Unknown board number.");
+                System.err.println("Unknown board number.");
             else {
                 b.writeDigitalOutput(ch, val);
                 hw.refreshOutputs();
             }
             System.out.println("Output changed.");
         } catch (NumberFormatException e) {
-            System.out.println("Error in command. Please retry.");
+            System.err.println("Error in command. Please retry.");
         }
     }
 
@@ -172,14 +205,14 @@ public class HwConsole {
             int val = Integer.parseInt(m.group(3));
             Board b = findBoard(nr);
             if (b == null)
-                System.out.println("Unknown board number.");
+                System.err.println("Unknown board number.");
             else {
                 b.writeAnalogOutput(ch, val);
                 hw.refreshOutputs();
             }
             System.out.println("Output changed.");
         } catch (NumberFormatException e) {
-            System.out.println("Error in command. Please retry.");
+            System.err.println("Error in command. Please retry.");
         }
     }
 
