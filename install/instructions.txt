@@ -1,6 +1,7 @@
 PREPARE
 In domotic java project, doe 'mvn package' om jar aan te maken.
-In "install" directory, voer uit clean.sh, dan assemble.sh.
+
+In "install" directory, voer assemble.sh uit.
 
 INSTALLATIE
 Voer install.sh uit.

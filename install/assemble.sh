@@ -4,14 +4,17 @@
 # set -x
 
 echo clean up work directory and .tar file
-./clean.sh
+rm -f ./domotic.tar work/*
+rmdir work
+mkdir work
 
 echo copying files into work...
 cp ../../HwDriver/src/*.[ch] ./work/
 rm -f work/target.h
 rm -f work/*mock*
 cp template/* work/
-cp ../../domotic/domotic-cfg.xml work/
+cp ../../domotic/DomoticConfig* work/
+cp ../../domotic/DiamondBoardsConfig* work/
 cp ../../domotic/log4j.properties work/
 cp ../../domotic/target/domotic*dependencies.jar work/
 
