@@ -54,13 +54,13 @@ int opalmmReadDigIn(int port) {
  * e driver and resets the hardware.
  */
 void opalmmInit(unsigned short address) {
-	sprintf(logmsg, "Initializing Opalmm board, address=0x%x\n",address);
-	mylog(MYLOG_INFO, logmsg);
 	if (ioperm(address, 2, 1)) {
 		sprintf(logmsg, "Opening Opalmm port via ioperm: %s", strerror(errno));
 		mylog(MYLOG_FATAL,logmsg);
 		return;
 	}
+	sprintf(logmsg, "Initialized Opalmm board, address=0x%x\n",address);
+	mylog(MYLOG_INFO, logmsg);
 }
 
 void opalmmClose(unsigned short address) {

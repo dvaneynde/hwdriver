@@ -89,14 +89,13 @@ void setupAsServer() {
  */
 void initDiamondDriver() {
 	ERRPARAMS errorParams; // structure for returning error code and error string
-	mylog(MYLOG_DEBUG, ">>> Init Diamond Driver");
 	if (dscInit(DSC_VERSION) != DE_NONE) {
 		dscGetLastError(&errorParams);
 		sprintf(logmsg, "dscInit error: %s %s",
 				dscGetErrorString(errorParams.ErrCode), errorParams.errstring);
 		mylog(MYLOG_FATAL, logmsg);
 	}
-	mylog(MYLOG_DEBUG, "<<< Init Diamond Driver");
+	mylog(MYLOG_INFO, "Diamond Driver initialized.");
 }
 
 /*
@@ -269,8 +268,8 @@ void parseRecvdMsg() {
 	int nrLines, parmsLen, j;
 
 	nrLines = parseStringbyLines(msgIn, &lines);
-	if (!nrLines) {
-		mylog(MYLOG_ERROR, "Parsing failed.\n");
+	if (nrLines==0) {
+		mylog(MYLOG_DEBUG, "Empty line received, nothing to do.\n");
 		return;
 	}
 
