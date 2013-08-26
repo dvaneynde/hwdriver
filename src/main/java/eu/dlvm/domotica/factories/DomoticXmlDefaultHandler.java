@@ -102,6 +102,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
             }
         } else if (localName.equals("allSwitch")) {
             parseAllSwitch(block, atts);
+        } else if (localName.equals("allUpDownSwitches")) {
+            parseAllUpDownSwitch(block, atts);
         } else {
             throw new RuntimeException("Block " + qqName + " not supported.");
         }
@@ -124,6 +126,23 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
             ((SwitchBoard) sb).add((Switch) blocks.get(switchName), allOff, allOn);
         else if (sb instanceof SwitchBoardDimmers)
             ((SwitchBoardDimmers) sb).add((Switch) blocks.get(switchName), allOff, allOn);
+    }
+
+    private void parseAllUpDownSwitch(Block sb, Attributes atts) {
+        String allDownSwitchName = atts.getValue("allDownSwitch");
+        String allUpSwitchName = atts.getValue("allUpSwitch");
+
+        if (!blocks.containsKey(allDownSwitchName)) {
+            throw new ConfigurationException("SwitchBoard " + sb.getName() + " needs a Switch named " + allDownSwitchName
+                    + ", which it did not encounter in configuration file.");
+        }
+        if (!blocks.containsKey(allUpSwitchName)) {
+            throw new ConfigurationException("SwitchBoard " + sb.getName() + " needs a Switch named " + allUpSwitchName
+                    + ", which it did not encounter in configuration file.");
+        }
+
+        SwitchBoardScreens sbs = (SwitchBoardScreens) sb;
+        sbs.setAllUpDownWithSeparateSwitch((Switch) blocks.get(allDownSwitchName), (Switch) blocks.get(allUpSwitchName));
     }
 
     private void parseConnection(SwitchBoard sb, Attributes atts) {

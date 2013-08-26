@@ -140,6 +140,8 @@ public class HardwareIO implements IHardwareIO {
     public boolean readDigitalInput(LogCh lc) {
         FysCh fc = channelMap.fysCh(lc);
         log.debug("readDigitalInput(), for LogCh=" + lc + ", got FysCh=" + fc);
+        if (fc == null)
+            return false; // TODO correct oplossen...
         Board b = boards.get(fc.getBoardNr());
         return b.readDigitalInput((byte) fc.getBoardChannelNr());
     }
@@ -147,6 +149,8 @@ public class HardwareIO implements IHardwareIO {
     @Override
     public void writeDigitalOutput(LogCh lc, boolean val) {
         FysCh fc = channelMap.fysCh(lc);
+        if (fc == null)
+            return; // TODO correct oplossen...
         Board b = boards.get(fc.getBoardNr());
         b.writeDigitalOutput((byte) fc.getBoardChannelNr(), val);
     }
@@ -154,6 +158,8 @@ public class HardwareIO implements IHardwareIO {
     @Override
     public int readAnalogInput(LogCh lc) {
         FysCh fc = channelMap.fysCh(lc);
+        if (fc == null)
+            return 0; // TODO correct oplossen...
         Board b = boards.get(fc.getBoardNr());
         return b.readAnalogInput((byte) fc.getBoardChannelNr());
     }
@@ -161,6 +167,8 @@ public class HardwareIO implements IHardwareIO {
     @Override
     public void writeAnalogOutput(LogCh lc, int value) {
         FysCh fc = channelMap.fysCh(lc);
+        if (fc == null)
+            return; // TODO correct oplossen...
         Board b = boards.get(fc.getBoardNr());
         b.writeAnalogOutput((byte) fc.getBoardChannelNr(), value);
     }

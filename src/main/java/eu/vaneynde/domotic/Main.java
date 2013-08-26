@@ -45,76 +45,11 @@ public class Main {
     public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
         Domotic d = new Domotic();
         XmlDomoticConfigurator cf = new XmlDomoticConfigurator();
-        cf.setCfgFilepath("DomoticConfig.xml");
+        cf.setCfgFilepath(cfgFilename);
         cf.configure(d);
         d.setHw(hw);
         return d;
     }
-
-    /*
-     * public Domotic setupHardcodedDiamondsys(int msLooptime) {
-     * log.info("Domotica CONFIGURE.");
-     * 
-     * // Setup Hardware
-     * HardwareIO hw = new HardwareIO();
-     * hw.setLoopInterval(msLooptime);
-     * 
-     * // Setup Channel for Hardware Driver
-     * // s = new HwDriverTcpChannel(hw);
-     * 
-     * // Setup Domotic
-     * Domotic dom = new Domotic();
-     * dom.setHw(hw);
-     * 
-     * // Setup Blocks Layer, the blocks themselves
-     * Switch sAll = new Switch("AllOff", "Alles uit schakelaars.", new LogCh(
-     * 0), dom);
-     * sAll.setLongClickEnabled(true);
-     * sAll.setLongClickTimeout(1500);
-     * sAll.setSingleClickEnabled(false);
-     * sAll.setDoubleClickEnabled(false);
-     * dom.addSensor(sAll);
-     * 
-     * // Setup lamp WC
-     * Switch sWC = new Switch("SwitchWC0",
-     * "Schakelaar Licht WC Gelijkvloers", new LogCh(2), dom);
-     * Lamp lamp = new Lamp("LampWC0", "Licht WC Gelijkvloers", new LogCh(7),
-     * dom);
-     * SwitchBoard ssb = new SwitchBoard("LampenAanUit",
-     * "Lampen aan/uit via pushbutton switch.");
-     * ssb.add(sWC, lamp);
-     * ssb.add(sAll, null, true, false);
-     * dom.addSensor(sWC);
-     * dom.addActuator(lamp);
-     * 
-     * // Setup Ventilator
-     * Switch sFan = new Switch("S_FanWC0",
-     * "Schakelaar ventilator WC gelijkvloers.", new LogCh(1), dom);
-     * Fan fan = new Fan("Fan_WC0", "Ventilator WC Gelijkvloers", lamp, 6, dom);
-     * fan.setDelayPeriodSec(2 * 60); // 2 minutes
-     * fan.setRunningPeriodSec(5 * 60); // 10 minutes
-     * SwitchBoardFans sbf = new SwitchBoardFans("SwitchBoardFans",
-     * "Schakelbord ventilatoren.");
-     * sbf.add(sFan, fan);
-     * dom.addSensor(sFan);
-     * dom.addActuator(fan);
-     * 
-     * // Setup Dimmer
-     * DimmerSwitches dsw1 = new DimmerSwitches("DimSwitchCircante",
-     * "Dimmer Switches rond circante tafel.", 4, 3, dom);
-     * DimmedLamp dl1 = new DimmedLamp("DimLampCircante",
-     * "Gedimde lichten rond circante tafel",
-     * DmmatBoard.ANALOG_RESOLUTION - 1, 101, dom);
-     * SwitchBoardDimmers sbd = new SwitchBoardDimmers("Dimmers",
-     * "Switchboard Dimmers");
-     * sbd.add(dsw1, dl1);
-     * sbd.add(sAll, true, false);
-     * dom.addSensor(dsw1);
-     * dom.addActuator(dl1);
-     * 
-     * return dom;
-     * }
-     */
 
     /**
      * Runs it.
@@ -148,9 +83,10 @@ public class Main {
             // TODO dan kan driver start ook herbruikt voor HwConsole
             Thread t = new Thread(r, "Domotic Blocks Execution.");
             try {
-                log.info("Start HwDriver.");
+                log.info("Start HwDriver, and wait 5 seconds...");
                 ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
                 Process process = pb.start();
+                Thread.sleep(5000);
                 log.info("Initialize domotic and its hardware.");
                 dom.initialize();
                 log.info("Start Domotic looping in separate thread 'Domotic Blocks Execution'.");
@@ -161,6 +97,8 @@ public class Main {
                     logDriver.info(line);
                 }
             } catch (IOException e) {
+                log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
+            } catch (InterruptedException e) {
                 log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
             } finally {
                 stopThread(t);
@@ -219,9 +157,10 @@ public class Main {
             };
             Thread t = new Thread(r, "HwConsole");
             try {
-                log.info("Start HwDriver.");
+                log.info("Start HwDriver, wait for 5 seconds...");
                 ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
                 Process process = pb.start();
+                Thread.sleep(5000);
                 t.start();
                 BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
@@ -229,6 +168,8 @@ public class Main {
                     logDriver.info(line);
                 }
             } catch (IOException e) {
+                log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
+            } catch (InterruptedException e) {
                 log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
             } finally {
                 stopThread(t);
@@ -251,7 +192,7 @@ public class Main {
      */
     public static void main(String[] args) {
         int looptime = 100; // 100 ms default
-        String driver2Path = null;
+        String path2Driver = null;
         String logcfgfile = null;
         String blocksCfgFile = null;
         String hwCfgFile = null;
@@ -262,9 +203,9 @@ public class Main {
             usage();
         }
         boolean domotic = false;
-        if (args[0].toLowerCase().startsWith("d"))
+        if (args[0].equalsIgnoreCase("domo"))
             domotic = true;
-        else if (!args[0].toLowerCase().startsWith("h"))
+        else if (!args[0].equalsIgnoreCase("hw"))
             usage();
         int i = 1;
         while (i < args.length) {
@@ -275,7 +216,7 @@ public class Main {
             } else if (args[i].equals("-d")) {
                 if (++i >= args.length)
                     usage();
-                driver2Path = args[i++];
+                path2Driver = args[i++];
             } else if (args[i].equals("-l")) {
                 if (++i >= args.length)
                     usage();
@@ -319,16 +260,16 @@ public class Main {
 
         Main main = new Main();
         if (domotic) {
-            log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + driver2Path + "\n\tlooptime:\t" + looptime + "ms\n\tlog-config:\t" + logcfgfile
+            log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\tlog-config:\t" + logcfgfile
                     + "\n\thardware cfg:\t" + hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + main.getPid());
 
             main.storePid();
             IHardwareIO hw = main.setupHardware(hwCfgFile, hostname, port);
             Domotic dom = main.setupBlocksConfig(blocksCfgFile, hw);
             Oscillator osc = new Oscillator(dom, looptime);
-            main.runDomotic(dom, osc, driver2Path);
+            main.runDomotic(dom, osc, path2Driver);
         } else {
-            main.runHwConsole(hwCfgFile, hostname, port, null);
+            main.runHwConsole(hwCfgFile, hostname, port, path2Driver);
         }
 
         log.info("ENDED normally Domotic system.");
@@ -336,8 +277,8 @@ public class Main {
 
     private static void usage() {
         System.out.println("Usage:\t" + Main.class.getSimpleName()
-                + " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
-                + " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n"
+                + " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t"
+                + Main.class.getSimpleName() + " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n"
                 + "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms\n"
                 + "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n" + "\t-l log4j configuration file\n");
         System.exit(2);

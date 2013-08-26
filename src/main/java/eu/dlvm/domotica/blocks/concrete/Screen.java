@@ -10,7 +10,7 @@ import eu.dlvm.iohardware.LogCh;
  * being activated together.
  * <p>
  * If a screen is going up and one presses the down button a Screen will stop
- * the up motor, <strong>wait 500ms</strong> and then start the down motor. This
+ * the up motor, <strong>wait {@link #MOTOR_SWITCH_DELAY_PROTECTION}</strong> and then start the down motor. This
  * is to be sure that not both motors are active.
  * 
  * @author Dirk Vaneynde
@@ -24,7 +24,7 @@ public class Screen extends Actuator {
 	/**
 	 * Time in ms that a motor is maximally on - if user does not do anything.
 	 */
-	public static long MAX_MOTOR_ON_PERIOD = 10000;
+	public static long MAX_MOTOR_ON_PERIOD = 30000;
 
 	private LogCh chUp;
 	private long timeStateStart;

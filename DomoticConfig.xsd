@@ -44,6 +44,7 @@
 										<complexType>
 											<attribute name="switch" type="IDREF" use="required" />
 											<attribute name="lamp" type="IDREF" use="required" />
+											<attribute name="allOff" type="boolean" default="false" />
 										</complexType>
 									</element>
 									<element name="allSwitch" type="tns:allSwitchStruct"

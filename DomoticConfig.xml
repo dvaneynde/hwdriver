@@ -2,10 +2,8 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
-	<switch name="AllOff" />
-
-	<switch name="SchakLichtGang" />
-	<lamp name="LichtGang" />
+	<switch name="SchakLichtInkom" />
+	<lamp name="LichtInkom" />
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
 	<lamp name="LichtWC0" />
 	<switch name="SchakVentilatorWC0" />
@@ -31,7 +29,7 @@
 	<switch name="SchakLichtBureau" />
 	<lamp name="LichtBureau" />
 	<switchboard name="LampenBeneden">
-		<connection switch="SchakLichtGang" lamp="LichtGang" />
+		<connection switch="SchakLichtInkom" lamp="LichtInkom" allOff="true"/>
 		<connection switch="SchakLichtWC0" lamp="LichtWC0" />
 		<connection switch="SchakLichtGaragePoort" lamp="LichtGaragePoort" />
 		<connection switch="SchakLichtGarageTuin" lamp="LichtGarageTuin" />
@@ -39,7 +37,6 @@
 		<connection switch="SchakLichtBadk0" lamp="LichtBadk0" />
 		<connection switch="SchakLichtCircante" lamp="LichtCircante" />
 		<connection switch="SchakLichtBureau" lamp="LichtBureau" />
-		<allSwitch switch="AllOff" allOff="true" />
 	</switchboard>
 	<switchboardFans name="Ventilatie">
 		<connection switch="SchakVentilatorWC0" fan="VentilatorWC0" />
@@ -49,7 +46,7 @@
 		<connection dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
 		<connection dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
 		<connection dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
-		<allSwitch switch="AllOff" />
+		<!-- <allSwitch switch="AllOff" />  -->
 	</switchboardDimmer>
 
 	<switch name="SchakLichtGangBoven" />
@@ -58,8 +55,8 @@
 	<lamp name="LichtBadk1" />
 	<switch name="SchakLichtTomasWand" />
 	<lamp name="LichtTomasWand" />
-	<switch name="SchakLichtTomas" />
-	<lamp name="LichtTomas" />
+	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
+	<lamp name="LichtTomasSpots" /><!-- TODO nakijken of klopt met relais -->
 	<switch name="SchakLichtDriesWand" />
 	<lamp name="LichtDriesWand" />
 	<switch name="SchakLichtDries" />
@@ -72,7 +69,7 @@
 		<connection switch="SchakLichtGangBoven" lamp="LichtGangBoven" />
 		<connection switch="SchakLichtBadk1" lamp="LichtBadk1" />
 		<connection switch="SchakLichtTomasWand" lamp="LichtTomasWand" />
-		<connection switch="SchakLichtTomas" lamp="LichtTomas" />
+		<connection switch="SchakLichtTomasSpots" lamp="LichtTomasSpots" />
 		<connection switch="SchakLichtDriesWand" lamp="LichtDriesWand" />
 		<connection switch="SchakLichtDries" lamp="LichtDries" />
 		<connection switch="SchakLichtRoosWand" lamp="LichtRoosWand" />
@@ -121,7 +118,7 @@
 		<connection screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" />
 		<connection screen="ScreenKeuken" switchUp="SchakScreenKeukenUp"
 			switchDown="SchakScreenKeukenDown" />
-		<!--  NOT SUPPORTED YET <allUpDownSwitches allDownSwitch="SchakScreenAllDown"
-			allUpSwitch="SchakScreenAllUp" />-->
+		<allUpDownSwitches allDownSwitch="SchakScreenAllDown"
+			allUpSwitch="SchakScreenAllUp" />
 	</switchboardScreens>
 </domotic>

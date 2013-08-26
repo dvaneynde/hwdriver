@@ -67,18 +67,15 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-
 					<archive>
 						<index>true</index>
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-<!-- 							<mainClass>eu.vaneynde.domotic.Main</mainClass> -->
-							<mainClass>eu.dlvm.iohardware.HwConsole</mainClass>
+							<mainClass>eu.vaneynde.domotic.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
-
 				<executions>
 					<execution>
 						<id>make-assembly</id>

@@ -11,24 +11,24 @@
 			<channel channel="1" logical-id="LichtCircanteRondom" />
 		</analog-output>
 		<digital-input>
-			<channel channel="0" logical-id="SchakLichtGang" />
-			<channel channel="1" logical-id="SchakLichtWC0" />
-			<channel channel="2" logical-id="SchakLichtGaragePoort" />
-			<channel channel="3" logical-id="SchakLichtGarageTuin" />
-			<channel channel="4" logical-id="SchakLichtKeuken" />
-			<channel channel="5" logical-id="SchakLichtBadk0" />
-			<channel channel="6" logical-id="SchakLichtCircante" />
-			<channel channel="7" logical-id="SchakLichtBureau" />
+			<channel channel="0" logical-id="SchakLichtKeuken" />
+			<channel channel="1" logical-id="SchakScreenKeukenDown" />
+			<channel channel="2" logical-id="SchakScreenKeukenUp" />
+			<channel channel="3" logical-id="SchakLichtBadk0" />
+			<channel channel="4" logical-id="SchakVentilatorBadk0" />
+			<channel channel="5" logical-id="SchakScreenTomasDown" />
+			<channel channel="6" logical-id="SchakScreenTomasUp" />
+			<channel channel="7" logical-id="SchakLichtTomasWand" /><!-- TODO Was SchakLichtTomas, bedoeld spots, maar bleek andersom -->
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="LichtGang" />
-			<channel channel="1" logical-id="LichtWC0" />
-			<channel channel="2" logical-id="LichtGaragePoort" />
-			<channel channel="3" logical-id="LichtGarageTuin" />
-			<channel channel="4" logical-id="LichtKeuken" />
-			<channel channel="5" logical-id="LichtBadk0" />
-			<channel channel="6" logical-id="LichtCircante" />
-			<channel channel="7" logical-id="LichtBureau" />
+			<channel channel="0" logical-id="LichtBureau" />
+			<channel channel="1" logical-id="LichtCircante" />
+			<channel channel="2" logical-id="LichtInkom" />
+			<channel channel="3" logical-id="VentilatorWC0" />
+			<channel channel="4" logical-id="LichtWC0" />
+			<channel channel="5" logical-id="VentilatorBadk0" />
+			<channel channel="6" logical-id="LichtBadk1" />
+			<channel channel="7" logical-id="LichtBadk0" />
 		</digital-output>
 	</dmmat>
 	<dmmat board="1" address="0x300" desc="Board 1, dmmatt.">
@@ -36,97 +36,87 @@
 			<channel channel="0" logical-id="LichtZithoek" />
 			<channel channel="1" />
 		</analog-output>
-		<digital-input>
-			<channel channel="0" logical-id="SchakLichtVerandaUp" />
-			<channel channel="1" logical-id="SchakLichtVerandaDown" />
-			<channel channel="2" logical-id="SchakLichtCircanteRondomUp" />
-			<channel channel="3" logical-id="SchakLichtCircanteRondomDown" />
-			<channel channel="4" logical-id="SchakLichtZithoekUp" />
-			<channel channel="5" logical-id="SchakLichtZithoekDown" />
-			<channel channel="6" />
-			<channel channel="7" />
-		</digital-input>
 	</dmmat>
 	<opmm1616 board="2" address="0x200" desc="Board 2, opmm1616.">
 		<digital-input>
-			<channel channel="0" logical-id="SchakVentilatorWC0" />
-			<channel channel="1" logical-id="SchakVentilatorBadk0" />
-			<channel channel="2" logical-id="SchakLichtGangBoven" />
-			<channel channel="3" logical-id="SchakLichtBadk1" />
-			<channel channel="4" logical-id="SchakLichtTomasWand" />
-			<channel channel="5" logical-id="SchakLichtTomas" />
-			<channel channel="6" logical-id="SchakLichtDriesWand" />
-			<channel channel="7" logical-id="SchakLichtDries" />
-			<channel channel="0" logical-id="SchakLichtRoosWand" />
-			<channel channel="1" logical-id="SchakLichtRoos" />
-			<channel channel="2" logical-id="SchakLichtTerras" />
-			<channel channel="3" logical-id="SchakLichtOpzij" />
-			<channel channel="4" />
-			<channel channel="5" />
-			<channel channel="6" />
-			<channel channel="7" logical-id="AllOff"/>
+			<channel channel="0" logical-id="SchakLichtVerandaDown" />
+			<channel channel="1" logical-id="SchakLichtVerandaUp" />
+			<channel channel="2" logical-id="SchakScreenLangDown" />
+			<channel channel="3" logical-id="SchakScreenLangUp" />
+			<channel channel="4" logical-id="SchakScreenBreedDown" />
+			<channel channel="5" logical-id="SchakScreenBreedUp" />
+			<channel channel="6" logical-id="SchakScreenAllDown" />
+			<channel channel="7" logical-id="SchakScreenAllUp" />
+			<channel channel="8" logical-id="SchakVentilatorWC0" />
+			<channel channel="9" logical-id="SchakLichtBureau" />
+			<channel channel="10" logical-id="SchakLichtZithoekDown" />
+			<channel channel="11" logical-id="SchakLichtZithoekUp" />
+			<channel channel="12" logical-id="SchakLichtCircanteRondomDown" />
+			<channel channel="13" logical-id="SchakLichtCircanteRondomUp" />
+			<channel channel="14" logical-id="SchakLichtCircante" />
+			<channel channel="15" logical-id="SchakLichtInkom" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="VentilatorWC0" />
-			<channel channel="1" logical-id="VentilatorBadk0" />
-			<channel channel="2" logical-id="LichtGangBoven" />
-			<channel channel="3" logical-id="LichtBadk1" />
-			<channel channel="4" logical-id="LichtTomasWand" />
-			<channel channel="5" logical-id="LichtTomas" />
-			<channel channel="6" logical-id="LichtDriesWand" />
-			<channel channel="7" logical-id="LichtDries" />
-			<channel channel="0" logical-id="LichtRoosWand" />
-			<channel channel="1" logical-id="LichtRoos" />
-			<channel channel="2" logical-id="LichtTerras" />
-			<channel channel="3" logical-id="LichtOpzij" />
-			<channel channel="4" />
-			<channel channel="5" />
-			<channel channel="6" />
-			<channel channel="7" logical-id="LichtNacht" />
+			<channel channel="0" logical-id="ScreenRoosDown" />
+			<channel channel="1" logical-id="LichtGangBoven" />
+			<channel channel="2" logical-id="LichtTomasSpots" />
+			<channel channel="3" logical-id="LichtTomasWand" />
+			<channel channel="4" logical-id="LichtDries" />
+			<channel channel="5" logical-id="LichtDriesWand" />
+			<channel channel="6" logical-id="LichtRoos" />
+			<channel channel="7" logical-id="LichtRoosWand" />
+			<channel channel="8" logical-id="LichtKeuken" />
+			<channel channel="9" logical-id="LichtGaragePoort" />
+			<channel channel="10" logical-id="LichtGarageTuin" />
+			<channel channel="11" logical-id="ScreenLangUp" />
+			<channel channel="12" logical-id="ScreenLangDown" />
+			<channel channel="13" logical-id="ScreenBreedUp" />
+			<channel channel="14" logical-id="ScreenBreedDown" />
+			<channel channel="15" logical-id="ScreenKeukenDown" />
 		</digital-output>
 	</opmm1616>
 	<opalmm board="3" address="0x240" desc="Board 3, opalmm 8.">
 		<digital-input>
-			<channel channel="0" logical-id="SchakScreenTomasUp" />
-			<channel channel="1" logical-id="SchakScreenTomasDown" />
-			<channel channel="2" logical-id="SchakScreenDriesTuinUp" />
-			<channel channel="3" logical-id="SchakScreenDriesTuinDown" />
-			<channel channel="4" logical-id="SchakScreenDriesOpzijUp" />
-			<channel channel="5" logical-id="SchakScreenDriesOpzijDown" />
-			<channel channel="6" logical-id="SchakScreenRoosUp" />
-			<channel channel="7" logical-id="SchakScreenRoosDown" />
+			<channel channel="0" logical-id="SchakScreenDriesTuinDown" />
+			<channel channel="1" logical-id="SchakScreenDriesTuinUp" />
+			<channel channel="2" logical-id="SchakScreenDriesOpzijDown" />
+			<channel channel="3" logical-id="SchakScreenDriesOpzijUp" />
+			<channel channel="4" logical-id="SchakScreenRoosDown" />
+			<channel channel="5" logical-id="SchakScreenRoosUp" />
+			<channel channel="6" logical-id="SchakLichtTomasSpots" /><!-- TODO Was: SchakLichtTomasWand; check kabel -->
+			<channel channel="7" logical-id="SchakLichtWC0" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="ScreenTomasUp" />
-			<channel channel="1" logical-id="ScreenTomasDown" />
-			<channel channel="2" logical-id="ScreenDriesTuinUp" />
-			<channel channel="3" logical-id="ScreenDriesTuinDown" />
-			<channel channel="4" logical-id="ScreenDriesOpzijUp" />
-			<channel channel="5" logical-id="ScreenDriesOpzijDown" />
-			<channel channel="6" logical-id="ScreenRoosUp" />
-			<channel channel="7" logical-id="ScreenRoosDown" />
+			<channel channel="0" logical-id="LichtNacht" />
+			<channel channel="1" logical-id="LichtNacht" /><!-- indicator nacht -->
+			<channel channel="2" logical-id="LichtOpzij" />
+			<channel channel="3" logical-id="LichtNacht" /><!-- tobe indicator screen-automaat aan/uit -->
+			<channel channel="4" logical-id="LichtTerras" />
+			<channel channel="5" logical-id="LichtNacht" /><!-- tobe indicator zon(aan) / teveel-wind(knipperen) bij automaat aan -->
+			<channel channel="6" logical-id="StopcontactCarport" />
+			<channel channel="7" logical-id="" /><!-- TODO domotica functioneert, lampje in kast -->
 		</digital-output>
 	</opalmm>
 	<opalmm board="4" address="0x280" desc="Board 4, opalmm 8.">
 		<digital-input>
-			<channel channel="0" logical-id="SchakScreenBreedUp" />
-			<channel channel="1" logical-id="SchakScreenBreedDown" />
-			<channel channel="2" logical-id="SchakScreenLangUp" />
-			<channel channel="3" logical-id="SchakScreenLangDown" />
-			<channel channel="4" logical-id="SchakScreenKeukenUp" />
-			<channel channel="5" logical-id="SchakScreenKeukenDown" />
-			<channel channel="6" logical-id="SchakScreenAllUp" />
-			<channel channel="7" logical-id="SchakScreenAllDown" />
+			<channel channel="0" logical-id="SchakLichtGaragePoort" />
+			<channel channel="1" logical-id="SchakLichtGarageTuin" />
+			<channel channel="2" logical-id="SchakLichtBadk1" />
+			<channel channel="3" logical-id="SchakLichtDries" />
+			<channel channel="4" logical-id="SchakLichtDriesWand" />
+			<channel channel="5" logical-id="SchakLichtGangBoven" />
+			<channel channel="6" logical-id="SchakLichtRoosWand" />
+			<channel channel="7" logical-id="SchakLichtRoos" />
 		</digital-input>
 		<digital-output>
-			<channel channel="0" logical-id="ScreenBreedUp" />
-			<channel channel="1" logical-id="ScreenBreedDown" />
-			<channel channel="2" logical-id="ScreenLangUp" />
-			<channel channel="3" logical-id="ScreenLangDown" />
-			<channel channel="4" logical-id="ScreenKeukenUp" />
-			<channel channel="5" logical-id="ScreenKeukenDown" />
-			<channel channel="6" />
-			<channel channel="7" />
+			<channel channel="0" logical-id="ScreenRoosUp" />
+			<channel channel="1" logical-id="ScreenDriesOpzijDown" />
+			<channel channel="2" logical-id="ScreenDriesOpzijUp" />
+			<channel channel="3" logical-id="ScreenDriesTuinUp" />
+			<channel channel="4" logical-id="ScreenDriesTuinDown" />
+			<channel channel="5" logical-id="ScreenTomasDown" />
+			<channel channel="6" logical-id="ScreenTomasUp" />
+			<channel channel="7" logical-id="ScreenKeukenUp" />
 		</digital-output>
 	</opalmm>
 </boards>

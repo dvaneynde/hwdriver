@@ -167,7 +167,7 @@ public class HwConsole {
                 for (int channel = start[idx]; channel < (start[idx] + 8) && channel >= 0; channel += step[idx]) {
                     if (channel == start[idx])
                         System.out
-                                .println("Fun!\tboard=" + b.getBoardNumber() + " setting channels [" + start[idx] + ".." + (start[idx] + 8) + "[ to:" + value);
+                                .println("Fun!\tboard=" + b.getBoardNumber() + " setting channels [" + start[idx] + ".." + (start[idx] + step[idx]*7) + "] to:" + value);
                     //System.out.println("idx="+idx+", channel="+channel);
                     b.writeDigitalOutput(channel, value);
                     hw.refreshOutputs();
