@@ -9,7 +9,7 @@
 
 #set -x
 
-DOMDIR=/home/dirk/domotica
+DOMDIR=/home/dirk/domotic
 BOOTLOG=$DOMDIR/boot.log
 echo Boot Domotica >$BOOTLOG
 date >>$BOOTLOG
