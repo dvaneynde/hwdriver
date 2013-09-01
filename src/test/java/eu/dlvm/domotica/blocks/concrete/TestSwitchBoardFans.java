@@ -112,8 +112,7 @@ public class TestSwitchBoardFans {
 		hw.in(1, true);
 		dom.loopOnce(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur+=(sw2.getDoubleClickTimeout()+10));
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur+=10);
 		Assert.assertEquals(true, hw.out(FAN1_OUT));
 		Assert.assertEquals(true, hw.out(FAN2_OUT));
 	}

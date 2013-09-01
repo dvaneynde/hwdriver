@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
-	elementFormDefault="qualified">
+	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
 
-				<element name="switch" type="tns:blockWithChannelStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="switch" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockWithChannelStruct">
+								<attribute name="singleClick" type="boolean" default="true"/>
+								<attribute name="longClick" type="boolean" default="false" />
+								<attribute name="doubleClick" type="boolean" default="false" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
 					minOccurs="0" maxOccurs="1" />
 
-				<element name="lamp" type="tns:blockWithChannelStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0"
+					maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -47,8 +55,7 @@
 											<attribute name="allOff" type="boolean" default="false" />
 										</complexType>
 									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct"
-										minOccurs="0" />
+									<element name="allSwitch" type="tns:allSwitchStruct" minOccurs="0" />
 								</sequence>
 							</extension>
 						</complexContent>
@@ -65,8 +72,7 @@
 											<attribute name="dimmedLamp" type="IDREF" use="required" />
 										</complexType>
 									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct"
-										minOccurs="0" />
+									<element name="allSwitch" type="tns:allSwitchStruct" minOccurs="0" />
 								</sequence>
 							</extension>
 						</complexContent>
@@ -128,6 +134,11 @@
 	<complexType name="blockWithChannelStruct">
 		<complexContent>
 			<extension base="tns:blockStruct">
+				<annotation>
+					<documentation>Default channel naam is name attribute, kan overridden door
+						channel attribuut.
+					</documentation>
+				</annotation>
 				<attribute name="channel" type="string" use="optional" />
 			</extension>
 		</complexContent>
@@ -135,6 +146,11 @@
 	<complexType name="BlockWithChannelUpDownStruct">
 		<complexContent>
 			<extension base="tns:blockStruct">
+				<annotation>
+					<documentation>Default channel naam is name attribute, kan overridden door
+						channel attribuut.
+					</documentation>
+				</annotation>
 				<attribute name="channelDown" type="string" use="optional" />
 				<attribute name="channelUp" type="string" use="optional" />
 			</extension>

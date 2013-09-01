@@ -310,9 +310,9 @@ public class TestSwitch {
 	public void singleAndDoubleAndLong() throws InterruptedException {
 		sw.setSingleClickEnabled(true);
 		sw.setDoubleClickEnabled(true);
+		sw.setDoubleClickTimeout(50);
 		sw.setLongClickEnabled(true);
 		sw.setLongClickTimeout(100);
-		sw.setDoubleClickTimeout(50);
 		Assert.assertTrue(sw.isSingleClickEnabled()
 				&& sw.isDoubleClickEnabled() && sw.isLongClickEnabled());
 

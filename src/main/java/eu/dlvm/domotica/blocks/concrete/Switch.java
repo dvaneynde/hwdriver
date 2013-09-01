@@ -26,13 +26,17 @@ import eu.dlvm.iohardware.LogCh;
 public class Switch extends Sensor {
 
 	static Logger log = Logger.getLogger(Switch.class);
+
+	public static long DEFAULT_LONG_TIMEOUT = 2000L;
+	public static long DEFAULT_DOUBLE_TIMEOUT = 200L;
+
 	private long leftRESTtime = 0L;
 
 	private boolean singleClickEnabled = true;
 	private boolean doubleClickEnabled = false;
-	private long doubleClickTimeout;
+	private long doubleClickTimeout = DEFAULT_DOUBLE_TIMEOUT;
 	private boolean longClickEnabled = false;
-	private long longClickTimeout;
+	private long longClickTimeout = DEFAULT_LONG_TIMEOUT;
 
 	public enum States {
 		REST, FIRST_PRESS, WAIT_2ND_PRESS, WAIT_RELEASE
@@ -48,8 +52,19 @@ public class Switch extends Sensor {
 		SINGLE, DOUBLE, LONG;
 	};
 
-	public Switch(String name, String description, LogCh channel, IDomoContext ctx) {
+	public Switch(String name, String description, LogCh channel,
+			IDomoContext ctx) {
 		super(name, description, channel, ctx);
+	}
+
+	public Switch(String name, String description, LogCh channel,
+			boolean singleClickEnabled, boolean longClickEnabled,
+			boolean doubleClickEnabled, IDomoContext ctx) {
+		super(name, description, channel, ctx);
+		this.singleClickEnabled = singleClickEnabled;
+		this.longClickEnabled = longClickEnabled;
+		this.doubleClickEnabled = doubleClickEnabled;
+		// TODO aparte validatie functie, voor zowel alles-disabled, en timings double-long ?
 	}
 
 	public String toString() {
@@ -94,8 +109,7 @@ public class Switch extends Sensor {
 					log.info("Switch '" + getName()
 							+ "' notifies SINGLE click event (seq=" + sequence
 							+ ").");
-					notifyListeners(new SensorEvent(this,
-							ClickType.SINGLE));
+					notifyListeners(new SensorEvent(this, ClickType.SINGLE));
 					state = States.REST;
 				} else if (isLongClickEnabled()) {
 					state = States.REST; // Did not press long enough
@@ -113,8 +127,7 @@ public class Switch extends Sensor {
 					log.info("Switch '" + getName()
 							+ "' notifies SINGLE click event (seq=" + sequence
 							+ ").");
-					notifyListeners(new SensorEvent(this,
-							ClickType.SINGLE));
+					notifyListeners(new SensorEvent(this, ClickType.SINGLE));
 				}
 				state = States.REST;
 			} else if (newInputState) {
@@ -191,8 +204,10 @@ public class Switch extends Sensor {
 	}
 
 	private boolean allDisabled() {
-		return !isSingleClickEnabled() && !isDoubleClickEnabled()
-				&& !isLongClickEnabled();
+		return false; // TODO beetje overdreven; waarom nodig? en waarom geen
+						// constructor?
+		// return !isSingleClickEnabled() && !isDoubleClickEnabled()
+		// && !isLongClickEnabled();
 	}
 
 	private boolean longClickLongerThanDoubleClick(long longClickTimeout,

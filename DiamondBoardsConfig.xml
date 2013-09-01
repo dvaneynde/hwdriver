@@ -36,6 +36,16 @@
 			<channel channel="0" logical-id="LichtZithoek" />
 			<channel channel="1" />
 		</analog-output>
+		<digital-input>
+			<channel channel="0" />
+			<channel channel="1" />
+			<channel channel="2" />
+			<channel channel="3" />
+			<channel channel="4" />
+			<channel channel="5" />
+			<channel channel="6" />
+			<channel channel="7" logical-id="SchakBuitenTuin" />
+		</digital-input>
 	</dmmat>
 	<opmm1616 board="2" address="0x200" desc="Board 2, opmm1616.">
 		<digital-input>
@@ -88,13 +98,13 @@
 		</digital-input>
 		<digital-output>
 			<channel channel="0" logical-id="LichtNacht" />
-			<channel channel="1" logical-id="LichtNacht" /><!-- indicator nacht -->
-			<channel channel="2" logical-id="LichtOpzij" />
-			<channel channel="3" logical-id="LichtNacht" /><!-- tobe indicator screen-automaat aan/uit -->
-			<channel channel="4" logical-id="LichtTerras" />
-			<channel channel="5" logical-id="LichtNacht" /><!-- tobe indicator zon(aan) / teveel-wind(knipperen) bij automaat aan -->
-			<channel channel="6" logical-id="StopcontactCarport" />
-			<channel channel="7" logical-id="" /><!-- TODO domotica functioneert, lampje in kast -->
+			<channel channel="1" logical-id="IndicLichtNacht" /><!-- indicator licht nacht -->
+			<channel channel="2" logical-id="LichtTerras" />
+			<channel channel="3" logical-id="IndicScreenAuto" /><!-- tobe indicator screen-automaat aan/uit -->
+			<channel channel="4" logical-id="StopkBuiten" />
+			<channel channel="5" logical-id="IndicWindZon" /><!-- tobe indicator zon(aan) / teveel-wind(knipperen) bij automaat aan -->
+			<channel channel="6" logical-id="StopkCarport" />
+			<channel channel="7" /><!-- TODO domotica functioneert, lampje in kast -->
 		</digital-output>
 	</opalmm>
 	<opalmm board="4" address="0x280" desc="Board 4, opalmm 8.">

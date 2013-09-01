@@ -2,7 +2,7 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
-	<switch name="SchakLichtInkom" />
+	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" />
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
 	<lamp name="LichtWC0" />
@@ -13,7 +13,7 @@
 	<switch name="SchakLichtGarageTuin" />
 	<lamp name="LichtGarageTuin" />
 	<switch name="SchakLichtKeuken" />
-	<lamp name="LichtKeuken"/>
+	<lamp name="LichtKeuken" />
 	<switch name="SchakLichtBadk0" />
 	<lamp name="LichtBadk0" />
 	<switch name="SchakVentilatorBadk0" />
@@ -29,7 +29,7 @@
 	<switch name="SchakLichtBureau" />
 	<lamp name="LichtBureau" />
 	<switchboard name="LampenBeneden">
-		<connection switch="SchakLichtInkom" lamp="LichtInkom" allOff="true"/>
+		<connection switch="SchakLichtInkom" lamp="LichtInkom" allOff="true" />
 		<connection switch="SchakLichtWC0" lamp="LichtWC0" />
 		<connection switch="SchakLichtGaragePoort" lamp="LichtGaragePoort" />
 		<connection switch="SchakLichtGarageTuin" lamp="LichtGarageTuin" />
@@ -46,7 +46,7 @@
 		<connection dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
 		<connection dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
 		<connection dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
-		<!-- <allSwitch switch="AllOff" />  -->
+		<allSwitch switch="SchakLichtInkom" allOff="true" />
 	</switchboardDimmer>
 
 	<switch name="SchakLichtGangBoven" />
@@ -74,13 +74,21 @@
 		<connection switch="SchakLichtDries" lamp="LichtDries" />
 		<connection switch="SchakLichtRoosWand" lamp="LichtRoosWand" />
 		<connection switch="SchakLichtRoos" lamp="LichtRoos" />
+		<allSwitch switch="SchakLichtInkom" allOff="true" />
 	</switchboard>
 
 	<lamp name="LichtNacht" />
-	<switch name="SchakLichtTerras" />
+	<switch name="SchakBuitenTuin" />
 	<lamp name="LichtTerras" />
-	<switch name="SchakLichtOpzij" />
-	<lamp name="LichtOpzij" />
+	<switchboard name="Buiten1">
+		<connection switch="SchakBuitenTuin" lamp="LichtTerras" />
+	</switchboard>
+	
+	<!-- TODO Hieronder correct doen. Hack, om te zorgen dat 1 schakelaar twee relais aanstuurt. -->
+	<lamp name="StopkBuiten"/>
+	<switchboard name="Buiten2">
+		<connection switch="SchakBuitenTuin" lamp="StopkBuiten" />
+	</switchboard>
 
 	<screen name="ScreenTomas" />
 	<screen name="ScreenDriesTuin" />
@@ -112,10 +120,12 @@
 			switchDown="SchakScreenDriesTuinDown" />
 		<connection screen="ScreenDriesOpzij" switchUp="SchakScreenDriesOpzijUp"
 			switchDown="SchakScreenDriesOpzijDown" />
-		<connection screen="ScreenRoos" switchUp="SchakScreenRoosUp" switchDown="SchakScreenRoosDown" />
+		<connection screen="ScreenRoos" switchUp="SchakScreenRoosUp"
+			switchDown="SchakScreenRoosDown" />
 		<connection screen="ScreenBreed" switchUp="SchakScreenBreedUp"
 			switchDown="SchakScreenBreedDown" />
-		<connection screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" />
+		<connection screen="ScreenLang" switchUp="SchakScreenLangUp"
+			switchDown="SchakScreenLangDown" />
 		<connection screen="ScreenKeuken" switchUp="SchakScreenKeukenUp"
 			switchDown="SchakScreenKeukenDown" />
 		<allUpDownSwitches allDownSwitch="SchakScreenAllDown"

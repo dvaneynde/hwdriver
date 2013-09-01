@@ -33,13 +33,13 @@ public class XmlDomoticConfigurator {
 			DefaultHandler2 h = new DomoticXmlDefaultHandler(domoCtx);
 			p.parse(getCfgFilepath(), h);
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			log.error("Configuration Failed: ",e);
 			throw new ConfigurationException(e.getMessage());
 		} catch (SAXException e) {
-			e.printStackTrace();
+			log.error("Configuration Failed: ",e);
 			throw new ConfigurationException(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Configuration Failed: ",e);
 			throw new ConfigurationException(e.getMessage());
 		}
 
