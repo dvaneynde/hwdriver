@@ -81,8 +81,8 @@
 			<channel channel="1" logical-id="SchakScreenDriesTuinUp" />
 			<channel channel="2" logical-id="SchakScreenDriesOpzijDown" />
 			<channel channel="3" logical-id="SchakScreenDriesOpzijUp" />
-			<channel channel="4" logical-id="SchakScreenRoosDown" />
-			<channel channel="5" logical-id="SchakScreenRoosUp" />
+			<channel channel="4" logical-id="SchakLichtRoosWand" />
+			<channel channel="5" logical-id="SchakLichtRoos" />
 			<channel channel="6" logical-id="SchakLichtTomasSpots" /><!-- TODO Was: SchakLichtTomasWand; check kabel -->
 			<channel channel="7" logical-id="SchakLichtWC0" />
 		</digital-input>
@@ -105,8 +105,8 @@
 			<channel channel="3" logical-id="SchakLichtDries" />
 			<channel channel="4" logical-id="SchakLichtDriesWand" />
 			<channel channel="5" logical-id="SchakLichtGangBoven" />
-			<channel channel="6" logical-id="SchakLichtRoosWand" />
-			<channel channel="7" logical-id="SchakLichtRoos" />
+			<channel channel="6" logical-id="SchakScreenRoosDown" />
+			<channel channel="7" logical-id="SchakScreenRoosUp" />
 		</digital-input>
 		<digital-output>
 			<channel channel="0" logical-id="ScreenRoosUp" />
