@@ -1,9 +1,12 @@
 package eu.dlvm.domotica.blocks.concrete;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,12 +76,12 @@ public class TestSwitchBoard {
 		ssb = new SwitchBoard("ssb", "ssb");
 		ssb.add(sw1, o1);
 		ssb.add(sw2, o2, true, true);
-
-		dom.initialize();
 	}
 
 	@Test
 	public void singleClick() throws InterruptedException {
+		dom.initialize();
+		
 		//sw2.setSingleClickEnabled(true);
 		sw2.setDoubleClickEnabled(true);
 		sw2.setDoubleClickTimeout(50);
@@ -112,6 +115,8 @@ public class TestSwitchBoard {
 
 	@Test
 	public void allOff() throws InterruptedException {
+		dom.initialize();
+
 		sw2.setDoubleClickEnabled(true);
 		sw2.setDoubleClickTimeout(50);
 		sw2.setLongClickEnabled(true);
@@ -139,6 +144,8 @@ public class TestSwitchBoard {
 
 	@Test
 	public void allOn() throws InterruptedException {
+		dom.initialize();
+
 		sw2.setDoubleClickEnabled(true);
 		sw2.setDoubleClickTimeout(50);
 		sw2.setLongClickEnabled(true);
@@ -154,4 +161,37 @@ public class TestSwitchBoard {
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 	}
+	
+	@Test
+	public void testTimer() {
+		Timer t = new Timer("timer","timer",null,dom);
+		t.setOnTime(22, 0);
+		t.setOffTime(7, 30);
+
+		ssb.add(t, o1);
+		dom.initialize();
+
+		assertFalse(t.getStatus());
+		assertFalse(o1.isOn());
+		assertFalse(hw.out(10));
+		assertFalse(hw.out(11));
+	
+		Calendar c = GregorianCalendar.getInstance();
+		c.set(2013, 8, 2, 0, 0);	// 2 september 2013, toen geschreven ;-)
+		t.loop(c.getTimeInMillis(), 0);
+		assertTrue(t.getStatus());
+		assertTrue(hw.out(10));
+		
+		c.set(Calendar.HOUR_OF_DAY, 8);
+		c.set(Calendar.MINUTE,0);
+		t.loop(c.getTimeInMillis(),0);
+		assertFalse(t.getStatus());
+		assertFalse(hw.out(10));
+
+		c.set(Calendar.HOUR_OF_DAY, 22);
+		c.set(Calendar.MINUTE,30);
+		t.loop(c.getTimeInMillis(),0);
+		assertTrue(t.getStatus());
+		assertTrue(hw.out(10));
+}
 }

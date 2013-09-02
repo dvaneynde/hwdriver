@@ -1,17 +1,19 @@
 package eu.dlvm.domotica.blocks.concrete;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Block;
 import eu.dlvm.domotica.blocks.ISensorListener;
+import eu.dlvm.domotica.blocks.Sensor;
 import eu.dlvm.domotica.blocks.SensorEvent;
 
 /**
- * Switch board, connecting pushbutton switches to lamps.
+ * TODO uitleg te complex...
+ * Switch board, connecting pushbutton switches to
+ * lamps.
  * <p>
  * A {@link Switch} can toggle one lamp only, a lamp can be toggled by multiple
  * switches <br/>
@@ -54,15 +56,28 @@ public class SwitchBoard extends Block implements ISensorListener {
 		public Lamp lamp;
 		public boolean allOffSwitch;
 		public boolean allOnSwitch;
+		public boolean isTimer;
 
 		public Config(Lamp lamp, boolean allOffSwitch, boolean allOnSwitch) {
 			this.lamp = lamp;
 			this.allOffSwitch = allOffSwitch;
 			this.allOnSwitch = allOnSwitch;
 		}
+
+		public Config(Lamp lamp, Timer timer) {
+			this.lamp = lamp;
+			isTimer = true;
+		}
+
+		@Override
+		public String toString() {
+			return "Config [lamp=" + lamp + ", allOffSwitch=" + allOffSwitch
+					+ ", allOnSwitch=" + allOnSwitch + ", isTimer=" + isTimer
+					+ "]";
+		}
 	}
 
-	private Map<Switch, Config> switches = new HashMap<Switch, Config>();
+	private Map<Sensor, Config> sensors = new HashMap<Sensor, Config>();
 
 	public SwitchBoard(String name, String description) {
 		super(name, description);
@@ -96,13 +111,25 @@ public class SwitchBoard extends Block implements ISensorListener {
 		addConfig(s, null, isAllOffSwitch, isAllOnSwitch);
 	}
 
+	public void add(Timer timer, Lamp lamp) {
+		if (sensors.containsKey(timer))
+			log.warn("Configuring, already contains given timer, will be overwritten. New timer="
+					+ timer.getName() + ", switchboard=" + getName());
+		Config c = new Config(lamp, timer);
+		sensors.put(timer, c);
+		timer.registerListener(this);
+		if (log.isDebugEnabled())
+			log.debug("addConfig(), timer=" + timer.getName() + ", sb="
+					+ getName() + ", lamp=" + lamp);
+	}
+
 	private void addConfig(Switch s, Lamp o, boolean isAllOffSwitch,
 			boolean isAllOnSwitch) {
-		if (switches.containsKey(s))
+		if (sensors.containsKey(s))
 			log.warn("Configuring, already contains given switch, will be overwritten. New switch="
 					+ s.getName() + ", switchboard=" + getName());
 		Config i = new Config(o, isAllOffSwitch, isAllOnSwitch);
-		switches.put(s, i);
+		sensors.put(s, i);
 		s.registerListener(this);
 		if (log.isDebugEnabled())
 			log.debug("addConfig(), s=" + s.getName() + ", sb=" + getName()
@@ -112,29 +139,29 @@ public class SwitchBoard extends Block implements ISensorListener {
 
 	@Override
 	public void notify(SensorEvent e) {
-		if (!(e.getSource() instanceof Switch)) {
-			log.warn("Received event from something unexpected: "
-					+ e.toString());
-			return;
-		}
-		Config cfg = switches.get(e.getSource());
-		switch ((Switch.ClickType) (e.getEvent())) {
-		case SINGLE:
-			if (cfg.lamp != null)
-				cfg.lamp.toggle();
-			break;
-		case LONG:
-			if (cfg.allOffSwitch)
-				for (Config i2 : switches.values())
-					if (i2.lamp != null)
-						i2.lamp.setOn(false);
-			break;
-		case DOUBLE:
-			if (cfg.allOnSwitch)
-				for (Config i2 : switches.values())
-					if (cfg.lamp != null)
-						i2.lamp.setOn(true);
-			break;
+		Config cfg = sensors.get(e.getSource());
+		if (cfg.isTimer) {
+			boolean status = (Boolean) e.getEvent();
+			cfg.lamp.setOn(status);
+		} else {
+			switch ((Switch.ClickType) (e.getEvent())) {
+			case SINGLE:
+				if (cfg.lamp != null)
+					cfg.lamp.toggle();
+				break;
+			case LONG:
+				if (cfg.allOffSwitch)
+					for (Config i2 : sensors.values())
+						if (i2.lamp != null)
+							i2.lamp.setOn(false);
+				break;
+			case DOUBLE:
+				if (cfg.allOnSwitch)
+					for (Config i2 : sensors.values())
+						if (cfg.lamp != null)
+							i2.lamp.setOn(true);
+				break;
+			}
 		}
 	}
 
@@ -142,17 +169,10 @@ public class SwitchBoard extends Block implements ISensorListener {
 	public String toString() {
 		StringBuffer sb = new StringBuffer("SwitchBoard (" + super.toString()
 				+ ")");
-		for (Iterator<Switch> iterator = switches.keySet().iterator(); iterator
-				.hasNext();) {
-			Switch sw = (Switch) iterator.next();
-			Config config = switches.get(sw);
-			sb.append(" [switch=")
-					.append(sw.getName())
-					.append("-->lamp=")
-					.append(config.lamp == null ? "null" : config.lamp
-							.getName()).append(" allOn/Off=")
-					.append(config.allOnSwitch).append('/')
-					.append(config.allOffSwitch).append(']');
+		for (Sensor sensor : sensors.keySet()) {
+			Config config = sensors.get(sensor);
+			sb.append("\n\tsensor=").append(sensor.getName()).append(" --> ")
+					.append(config).append(']');
 		}
 		return sb.toString();
 	}

@@ -77,15 +77,20 @@
 		<allSwitch switch="SchakLichtInkom" allOff="true" />
 	</switchboard>
 
+	<timer name="TimerNacht">
+		<on hour="20" minute="30" />
+		<off hour="6" minute="0" />
+	</timer>
 	<lamp name="LichtNacht" />
 	<switch name="SchakBuitenTuin" />
 	<lamp name="LichtTerras" />
 	<switchboard name="Buiten1">
 		<connection switch="SchakBuitenTuin" lamp="LichtTerras" />
+		<c-timer timer="TimerNacht" lamp="LichtNacht"/>
 	</switchboard>
 	
 	<!-- TODO Hieronder correct doen. Hack, om te zorgen dat 1 schakelaar twee relais aanstuurt. -->
-	<lamp name="StopkBuiten"/>
+	<lamp name="StopkBuiten" />
 	<switchboard name="Buiten2">
 		<connection switch="SchakBuitenTuin" lamp="StopkBuiten" />
 	</switchboard>

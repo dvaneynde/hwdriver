@@ -19,6 +19,7 @@ import eu.dlvm.domotica.blocks.concrete.SwitchBoard;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardFans;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardScreens;
+import eu.dlvm.domotica.blocks.concrete.Timer;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
@@ -48,6 +49,14 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			block = new Switch(name, desc, channel, singleClick, longClick,
 					doubleClick, ctx);
 			blocks.put(block.getName(), block);
+		} else if (localName.equals("timer")) {
+			parseBaseBlock(atts);
+			block = new Timer(name, desc, channel, ctx);
+			blocks.put(block.getName(), block);
+		} else if (localName.equals("on")) {
+			((Timer)block).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
+		} else if (localName.equals("off")) {
+			((Timer)block).setOffTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
 		} else if (localName.equals("dimmerSwitches")) {
 			parseBaseBlock(atts);
 			String s = atts.getValue("channelDown");
@@ -115,6 +124,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 				throw new ConfigurationException(
 						"Connection found in unknown Block.");
 			}
+		} else if (localName.equals("c-timer")) {
+			parseConnectionTimer((SwitchBoard) block, atts);
 		} else if (localName.equals("allSwitch")) {
 			parseAllSwitch(block, atts);
 		} else if (localName.equals("allUpDownSwitches")) {
@@ -184,6 +195,22 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		sb.add((Switch) blocks.get(switchName), (Lamp) blocks.get(lampName),
 				parseBoolAttribute("allOff", false, atts),
 				parseBoolAttribute("allOn", false, atts));
+	}
+
+	private void parseConnectionTimer(SwitchBoard sb, Attributes atts) {
+		String sensorName = atts.getValue("timer");
+		String lampName = atts.getValue("lamp");
+		if (!blocks.containsKey(sensorName)) {
+			throw new ConfigurationException("SwitchBoard " + sb.getName()
+					+ " needs a Sensor named " + sensorName
+					+ ", which it did not encounter in configuration file.");
+		}
+		if (!blocks.containsKey(lampName)) {
+			throw new ConfigurationException("SwitchBoard " + sb.getName()
+					+ " needs a Lamp named " + lampName
+					+ ", which it did not encounter in configuration file.");
+		}
+		sb.add((Timer) blocks.get(sensorName), (Lamp) blocks.get(lampName));
 	}
 
 	private void parseConnection(SwitchBoardFans sb, Attributes atts) {
