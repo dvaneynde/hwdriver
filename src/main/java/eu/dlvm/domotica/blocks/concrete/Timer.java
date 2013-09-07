@@ -13,34 +13,51 @@ public class Timer extends Sensor {
 
 	static Logger log = Logger.getLogger(Timer.class);
 
-	private long onTime, offTime;
+	private int onTime, offTime;
 	private boolean state;
 
 	public Timer(String name, String description, LogCh channel,
 			IDomoContext ctx) {
 		super(name, description, channel, ctx);
 		state = false;
-		onTime = offTime = 0L;
+		onTime = offTime = 0;
 	}
 
-	private static int timeInDay(long time) {
+	public static int timeInDay(long time) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
-		int timeInDay = timeInDay(c.get(Calendar.HOUR_OF_DAY),
+		int timeInDay = timeInDayMillis(c.get(Calendar.HOUR_OF_DAY),
 				c.get(Calendar.MINUTE));
 		return timeInDay;
 	}
 
-	private static int timeInDay(int hour, int minute) {
+	public static int timeInDayMillis(int hour, int minute) {
 		return ((hour * 60) + minute) * 60000;
 	}
 
+	public static int[] hourMinute(long time) {
+		time /= 60000;
+		int minute = (int) time % 60;
+		int hour = (int) time / 60;
+		return new int[] { hour, minute };
+	}
+
 	public void setOnTime(int hour, int minute) {
-		onTime = timeInDay(hour, minute);
+		onTime = timeInDayMillis(hour, minute);
 	}
 
 	public void setOffTime(int hour, int minute) {
-		offTime = timeInDay(hour, minute);
+		offTime = timeInDayMillis(hour, minute);
+	}
+
+	public String getOnTimeAsString() {
+		int[] times = hourMinute(onTime);
+		return String.format("%02d:%02d", times[0], times[1]);
+	}
+
+	public String getOffTimeAsString() {
+		int[] times = hourMinute(offTime);
+		return String.format("%02d:%02d", times[0], times[1]);
 	}
 
 	public boolean getStatus() {

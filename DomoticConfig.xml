@@ -17,7 +17,7 @@
 	<switch name="SchakLichtBadk0" />
 	<lamp name="LichtBadk0" />
 	<switch name="SchakVentilatorBadk0" />
-	<fan name="VentilatorBadk0" lamp="LichtBadk0" />
+	<fan name="VentilatorBadk0" />
 	<dimmerSwitches name="SchakLichtVeranda" />
 	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" />
 	<dimmerSwitches name="SchakLichtCircanteRondom" />
@@ -77,16 +77,16 @@
 		<allSwitch switch="SchakLichtInkom" allOff="true" />
 	</switchboard>
 
-	<timer name="TimerNacht">
+	<timerDayNight name="TimerNacht">
 		<on hour="20" minute="30" />
 		<off hour="6" minute="0" />
-	</timer>
+	</timerDayNight>
 	<lamp name="LichtNacht" />
 	<switch name="SchakBuitenTuin" />
 	<lamp name="LichtTerras" />
 	<switchboard name="Buiten1">
 		<connection switch="SchakBuitenTuin" lamp="LichtTerras" />
-		<c-timer timer="TimerNacht" lamp="LichtNacht"/>
+		<c-timer timer="TimerNacht" lamp="LichtNacht" />
 	</switchboard>
 	
 	<!-- TODO Hieronder correct doen. Hack, om te zorgen dat 1 schakelaar twee relais aanstuurt. -->

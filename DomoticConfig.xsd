@@ -18,28 +18,8 @@
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
 					minOccurs="0" maxOccurs="1" />
-				<element name="timer">
-					<complexType>
-						<complexContent>
-							<extension base="tns:blockStruct">
-								<sequence>
-									<element name="on">
-										<complexType>
-											<attribute name="hour" type="int" use="required" />
-											<attribute name="minute" type="int" use="required" />
-										</complexType>
-									</element>
-									<element name="off">
-										<complexType>
-											<attribute name="hour" type="int" use="required" />
-											<attribute name="minute" type="int" use="required" />
-										</complexType>
-									</element>
-								</sequence>
-							</extension>
-						</complexContent>
-					</complexType>
-				</element>
+				<element name="timer" type="tns:timerType"/>
+				<element name="timerDayNight" type="tns:timerType"/>
 				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0"
 					maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
@@ -148,6 +128,27 @@
 			</choice>
 		</complexType>
 	</element>
+
+	<complexType name="timerType">
+		<complexContent>
+			<extension base="tns:blockStruct">
+				<sequence>
+					<element name="on">
+						<complexType>
+							<attribute name="hour" type="int" use="required" />
+							<attribute name="minute" type="int" use="required" />
+						</complexType>
+					</element>
+					<element name="off">
+						<complexType>
+							<attribute name="hour" type="int" use="required" />
+							<attribute name="minute" type="int" use="required" />
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
 
 	<complexType name="allSwitchStruct">
 		<attribute name="switch" use="required" type="IDREF" />

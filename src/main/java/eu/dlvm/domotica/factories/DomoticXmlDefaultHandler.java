@@ -20,6 +20,7 @@ import eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardFans;
 import eu.dlvm.domotica.blocks.concrete.SwitchBoardScreens;
 import eu.dlvm.domotica.blocks.concrete.Timer;
+import eu.dlvm.domotica.blocks.concrete.TimerDayNight;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
@@ -49,9 +50,13 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			block = new Switch(name, desc, channel, singleClick, longClick,
 					doubleClick, ctx);
 			blocks.put(block.getName(), block);
-		} else if (localName.equals("timer")) {
+		} else if (localName.equals("timer") ) {
 			parseBaseBlock(atts);
 			block = new Timer(name, desc, channel, ctx);
+			blocks.put(block.getName(), block);
+		} else if (localName.equals("timerDayNight")) {
+			parseBaseBlock(atts);
+			block = new TimerDayNight(name, desc, channel, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("on")) {
 			((Timer)block).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
