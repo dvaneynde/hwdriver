@@ -50,7 +50,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			block = new Switch(name, desc, channel, singleClick, longClick,
 					doubleClick, ctx);
 			blocks.put(block.getName(), block);
-		} else if (localName.equals("timer") ) {
+		} else if (localName.equals("timer")) {
 			parseBaseBlock(atts);
 			block = new Timer(name, desc, channel, ctx);
 			blocks.put(block.getName(), block);
@@ -59,9 +59,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			block = new TimerDayNight(name, desc, channel, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("on")) {
-			((Timer)block).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
+			((Timer) block).setOnTime(Integer.parseInt(atts.getValue("hour")),
+					Integer.parseInt(atts.getValue("minute")));
 		} else if (localName.equals("off")) {
-			((Timer)block).setOffTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
+			((Timer) block).setOffTime(Integer.parseInt(atts.getValue("hour")),
+					Integer.parseInt(atts.getValue("minute")));
 		} else if (localName.equals("dimmerSwitches")) {
 			parseBaseBlock(atts);
 			String s = atts.getValue("channelDown");
@@ -96,6 +98,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			LogCh channelUp = (s == null ? new LogCh(name + "Up")
 					: new LogCh(s));
 			block = new Screen(name, desc, channelDown, channelUp, ctx);
+			if (atts.getValue("motor-on-time") != null) {
+				((Screen) block).setMotorOnPeriod(Integer.parseInt(atts
+						.getValue("motor-on-time")));
+			}
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switchboard")) {
 			parseBaseBlock(atts);

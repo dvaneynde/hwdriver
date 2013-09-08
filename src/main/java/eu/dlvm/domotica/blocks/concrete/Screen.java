@@ -20,13 +20,15 @@ public class Screen extends Actuator {
 	 * Delay in ms between switching motors, i.e. periode that both motors are
 	 * off after one was on and before the other goes on.
 	 */
-	public static long MOTOR_SWITCH_DELAY_PROTECTION = 500;
+	public static final long MOTOR_SWITCH_DELAY_PROTECTION = 500;
 	/**
 	 * Time in ms that a motor is maximally on - if user does not do anything.
 	 */
-	public static long MAX_MOTOR_ON_PERIOD = 30000;
+	private static long DEFAULT_MOTOR_ON_PERIOD = 30000;
 
 	private LogCh chUp;
+	private long motorOnPeriod = DEFAULT_MOTOR_ON_PERIOD;
+	
 	private long timeStateStart;
 	private boolean gotUp, gotDown;
 
@@ -76,7 +78,7 @@ public class Screen extends Actuator {
 			} else if (gotUp) {
 				exitDown(current);
 				state = States.SWITCH_DOWN_2_UP;
-			} else if ((current - timeStateStart) > MAX_MOTOR_ON_PERIOD) {
+			} else if ((current - timeStateStart) > getMotorOnPeriod()) {
 				exitDown(current);
 				state = States.REST;
 			}
@@ -88,7 +90,7 @@ public class Screen extends Actuator {
 			} else if (gotUp) {
 				exitUp(current);
 				state = States.REST;
-			} else if ((current - timeStateStart) > MAX_MOTOR_ON_PERIOD) {
+			} else if ((current - timeStateStart) > getMotorOnPeriod()) {
 				exitUp(current);
 				state = States.REST;
 			}
@@ -139,6 +141,14 @@ public class Screen extends Actuator {
 		hw().writeDigitalOutput(getChannel(), false);
 	}
 
+	public long getMotorOnPeriod() {
+		return motorOnPeriod;
+	}
+
+	public void setMotorOnPeriod(long motorOnPeriod) {
+		this.motorOnPeriod = motorOnPeriod;
+	}
+	
 	@Override
 	public String toString() {
 		return "Screen (" + super.toString() + ") state=" + getState().name();
