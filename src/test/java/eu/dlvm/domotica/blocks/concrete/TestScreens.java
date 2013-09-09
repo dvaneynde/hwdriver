@@ -48,9 +48,9 @@ public class TestScreens {
 	public void init() {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
-		sr = new Screen("TestScreens", "TestScreens", new LogCh(DN),
-				new LogCh(UP), ctx);
-		sr.setMotorOnPeriod(300);
+		sr = new Screen("TestScreens", "TestScreens", new LogCh(DN), new LogCh(
+				UP), ctx);
+		sr.setMotorOnPeriod(30);
 		seq = cur = 0L;
 	}
 
@@ -66,18 +66,19 @@ public class TestScreens {
 
 	@Test
 	public void downLongTime() {
-		sr.setMotorOnPeriod(3000);
+		sr.setMotorOnPeriod(30);
 		clickAndFullPeriod(true);
 	}
 
 	private void clickAndFullPeriod(boolean down) {
+		// rest state
 		loop();
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
-		loop();
 
+		// click
 		if (down)
 			sr.down();
 		else
@@ -89,8 +90,8 @@ public class TestScreens {
 		Assert.assertTrue(hw.upRelais == !down);
 		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
 				&& hw.upRelais);
-		loop();
-		loop(sr.getMotorOnPeriod());
+
+		loop(sr.getMotorOnPeriod() * 1000L + 10);
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
@@ -126,7 +127,7 @@ public class TestScreens {
 		Assert.assertTrue(hw.upRelais == !down);
 		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
 				&& hw.upRelais);
-		loop(sr.getMotorOnPeriod() / 2);
+		loop(sr.getMotorOnPeriod() * 1000L / 2);
 		loop();
 		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
 				sr.getState());
@@ -165,6 +166,7 @@ public class TestScreens {
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 		loop();
 
+		// switch pressed, going
 		if (firstDown)
 			sr.down();
 		else
@@ -178,8 +180,8 @@ public class TestScreens {
 		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
 				: !hw.dnRelais && hw.upRelais);
 
-		loop(sr.getMotorOnPeriod() / 2);
-		loop();
+		// test halfway
+		loop(sr.getMotorOnPeriod() * 1000L / 2);
 		Assert.assertEquals(
 				(firstDown ? Screen.States.DOWN : Screen.States.UP),
 				sr.getState());
@@ -188,6 +190,7 @@ public class TestScreens {
 		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
 				: !hw.dnRelais && hw.upRelais);
 
+		// halfway, press other key
 		if (firstDown)
 			sr.up();
 		else
@@ -199,6 +202,7 @@ public class TestScreens {
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
+		// check motor switch delay protection, must still not have changed direction
 		loop(Screen.MOTOR_SWITCH_DELAY_PROTECTION - 20);
 		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP
 				: Screen.States.SWITCH_UP_2_DOWN), sr.getState());
@@ -206,6 +210,7 @@ public class TestScreens {
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
+		// after motor delay protection, must go in other direction
 		loop(40);
 		Assert.assertEquals(
 				(firstDown ? Screen.States.UP : Screen.States.DOWN),

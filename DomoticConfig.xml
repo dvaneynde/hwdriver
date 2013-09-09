@@ -100,7 +100,7 @@
 	<screen name="ScreenDriesOpzij" motor-on-time="30"/>
 	<screen name="ScreenRoos" motor-on-time="30"/>
 	<screen name="ScreenBreed" motor-on-time="60"/>
-	<screen name="ScreenLang" motor-on-time="120"/>
+	<screen name="ScreenLang" motor-on-time="100"/>
 	<screen name="ScreenKeuken" motor-on-time="30"/>
 	<switch name="SchakScreenTomasUp" />
 	<switch name="SchakScreenTomasDown" />
