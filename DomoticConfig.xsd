@@ -18,8 +18,8 @@
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
 					minOccurs="0" maxOccurs="1" />
-				<element name="timer" type="tns:timerType"/>
-				<element name="timerDayNight" type="tns:timerType"/>
+				<element name="timer" type="tns:timerType" />
+				<element name="timerDayNight" type="tns:timerType" />
 				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0"
 					maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
@@ -40,8 +40,15 @@
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="screen" type="tns:BlockWithChannelUpDownStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="screen" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:BlockWithChannelUpDownStruct">
+								<attribute name="motor-on-time" type="int" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
 
 
 				<element name="switchboard" minOccurs="0" maxOccurs="1">

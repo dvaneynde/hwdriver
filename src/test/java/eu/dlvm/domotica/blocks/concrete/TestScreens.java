@@ -19,7 +19,8 @@ public class TestScreens {
 		public boolean upRelais;
 
 		@Override
-		public void writeDigitalOutput(LogCh ch, boolean value) throws IllegalArgumentException {
+		public void writeDigitalOutput(LogCh ch, boolean value)
+				throws IllegalArgumentException {
 			if (ch.id().equals("0"))
 				dnRelais = value;
 			else
@@ -47,8 +48,9 @@ public class TestScreens {
 	public void init() {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
-		sr = new Screen("TestScreens", "TestScreens", new LogCh(DN), new LogCh(UP), ctx);
-		Screen.MAX_MOTOR_ON_PERIOD = 300;
+		sr = new Screen("TestScreens", "TestScreens", new LogCh(DN), new LogCh(
+				UP), ctx);
+		sr.setMotorOnPeriod(30);
 		seq = cur = 0L;
 	}
 
@@ -64,29 +66,32 @@ public class TestScreens {
 
 	@Test
 	public void downLongTime() {
-		Screen.MAX_MOTOR_ON_PERIOD = 3000;
+		sr.setMotorOnPeriod(30);
 		clickAndFullPeriod(true);
 	}
-	
+
 	private void clickAndFullPeriod(boolean down) {
+		// rest state
 		loop();
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
-		loop();
 
+		// click
 		if (down)
 			sr.down();
 		else
 			sr.up();
 		loop();
-		Assert.assertEquals((down?Screen.States.DOWN:Screen.States.UP), sr.getState());
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
+				sr.getState());
 		Assert.assertTrue(hw.dnRelais == down);
 		Assert.assertTrue(hw.upRelais == !down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
-		loop();
-		loop(Screen.MAX_MOTOR_ON_PERIOD);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
+				&& hw.upRelais);
+
+		loop(sr.getMotorOnPeriod() * 1000L+10);
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
@@ -110,22 +115,26 @@ public class TestScreens {
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 		loop();
-		
+
 		if (down)
 			sr.down();
 		else
 			sr.up();
 		loop();
-		Assert.assertEquals((down?Screen.States.DOWN:Screen.States.UP), sr.getState());
-		Assert.assertTrue(hw.dnRelais==down);
-		Assert.assertTrue(hw.upRelais==!down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
-		loop(Screen.MAX_MOTOR_ON_PERIOD / 2);
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
+				sr.getState());
+		Assert.assertTrue(hw.dnRelais == down);
+		Assert.assertTrue(hw.upRelais == !down);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
+				&& hw.upRelais);
+		loop(sr.getMotorOnPeriod()*1000L / 2);
 		loop();
-		Assert.assertEquals((down?Screen.States.DOWN:Screen.States.UP), sr.getState());
-		Assert.assertTrue(hw.dnRelais==down);
-		Assert.assertTrue(hw.upRelais==!down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
+				sr.getState());
+		Assert.assertTrue(hw.dnRelais == down);
+		Assert.assertTrue(hw.upRelais == !down);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
+				&& hw.upRelais);
 
 		if (down)
 			sr.down();
@@ -157,46 +166,59 @@ public class TestScreens {
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 		loop();
 
+		// switch pressed, going
 		if (firstDown)
 			sr.down();
 		else
 			sr.up();
 		loop();
-		Assert.assertEquals((firstDown?Screen.States.DOWN:Screen.States.UP), sr.getState());
+		Assert.assertEquals(
+				(firstDown ? Screen.States.DOWN : Screen.States.UP),
+				sr.getState());
 		Assert.assertTrue(hw.dnRelais == firstDown);
 		Assert.assertTrue(hw.upRelais == !firstDown);
-		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
+		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
+				: !hw.dnRelais && hw.upRelais);
 
-		loop(Screen.MAX_MOTOR_ON_PERIOD / 2);
-		loop();
-		Assert.assertEquals((firstDown?Screen.States.DOWN:Screen.States.UP), sr.getState());
+		// test halfway
+		loop(sr.getMotorOnPeriod()*1000L / 2);
+		Assert.assertEquals(
+				(firstDown ? Screen.States.DOWN : Screen.States.UP),
+				sr.getState());
 		Assert.assertTrue(hw.dnRelais == firstDown);
 		Assert.assertTrue(hw.upRelais == !firstDown);
-		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
+		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
+				: !hw.dnRelais && hw.upRelais);
 
+		// halfway, press other key
 		if (firstDown)
 			sr.up();
 		else
 			sr.down();
 		loop();
-		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP : Screen.States.SWITCH_UP_2_DOWN), sr
-				.getState());
+		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP
+				: Screen.States.SWITCH_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
+		// check motor switch delay protection, must still not have changed direction
 		loop(Screen.MOTOR_SWITCH_DELAY_PROTECTION - 20);
-		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP : Screen.States.SWITCH_UP_2_DOWN), sr
-				.getState());
+		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP
+				: Screen.States.SWITCH_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
+		// after motor delay protection, must go in other direction
 		loop(40);
-		Assert.assertEquals((firstDown ? Screen.States.UP : Screen.States.DOWN), sr.getState());
+		Assert.assertEquals(
+				(firstDown ? Screen.States.UP : Screen.States.DOWN),
+				sr.getState());
 		Assert.assertTrue(hw.dnRelais == !firstDown);
 		Assert.assertTrue(hw.upRelais == firstDown);
-		Assert.assertTrue(firstDown ? !hw.dnRelais && hw.upRelais : hw.dnRelais && !hw.upRelais);
+		Assert.assertTrue(firstDown ? !hw.dnRelais && hw.upRelais : hw.dnRelais
+				&& !hw.upRelais);
 
 		if (firstDown)
 			sr.up();

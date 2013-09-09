@@ -5,7 +5,9 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
@@ -31,9 +33,10 @@ public class TestSwitchBoardScreens {
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
 		private Map<LogCh, Boolean> inputs = new HashMap<LogCh, Boolean>();
 		private Map<LogCh, Boolean> outputs = new HashMap<LogCh, Boolean>();
-		
+
 		@Override
-		public void writeDigitalOutput(LogCh channel, boolean value) throws IllegalArgumentException {
+		public void writeDigitalOutput(LogCh channel, boolean value)
+				throws IllegalArgumentException {
 			outputs.put(channel, value);
 		}
 
@@ -80,12 +83,18 @@ public class TestSwitchBoardScreens {
 		hw.out(REL_UP_2, false);
 
 		dom = new Domotic(hw);
-		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", new LogCh(SW_DN_1), dom);
-		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen", new LogCh(SW_UP_1), dom);
-		sr1 = new Screen("Screen1", "Screen Kitchen", new LogCh(REL_DN_1), new LogCh(REL_UP_1), dom);
-		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", new LogCh(SW_DN_2), dom);
-		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", new LogCh(SW_UP_2), dom);
-		sr2 = new Screen("Screen2", "Screen Bathroom", new LogCh(REL_DN_2), new LogCh(REL_UP_2), dom);
+		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", new LogCh(
+				SW_DN_1), dom);
+		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen",
+				new LogCh(SW_UP_1), dom);
+		sr1 = new Screen("Screen1", "Screen Kitchen", new LogCh(REL_DN_1),
+				new LogCh(REL_UP_1), dom);
+		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", new LogCh(
+				SW_DN_2), dom);
+		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", new LogCh(
+				SW_UP_2), dom);
+		sr2 = new Screen("Screen2", "Screen Bathroom", new LogCh(REL_DN_2),
+				new LogCh(REL_UP_2), dom);
 		sbs = new SwitchBoardScreens("sbs", "SwitchBoard Screens");
 		sbs.addScreen(swDn1, swUp1, sr1, true);
 		sbs.addScreen(swDn2, swUp2, sr2, false);
@@ -94,9 +103,11 @@ public class TestSwitchBoardScreens {
 		swDn1.setLongClickTimeout(LONGCLICKTIMEOUT);
 		swUp1.setLongClickEnabled(true);
 		swUp1.setLongClickTimeout(LONGCLICKTIMEOUT);
-		
+
 		cur = 0L;
 		dom.initialize();
+
+		BasicConfigurator.configure();
 	}
 
 	@Test
@@ -121,15 +132,19 @@ public class TestSwitchBoardScreens {
 
 	/**
 	 * Single click on a screen switch, either up or down.
-	 * @param switchCh Up or Down switch channel.
-	 * @param relChOfSwitch If switchCh is up switch then this must be the up relay, and vice versa
-	 * @param relChOther This must be the other relay, for the other direction, which must remain false
+	 * 
+	 * @param switchCh
+	 *            Up or Down switch channel.
+	 * @param relChOfSwitch
+	 *            If switchCh is up switch then this must be the up relay, and vice versa
+	 * @param relChOther
+	 *            This must be the other relay, for the other direction, which must remain false
 	 */
 	private void activateOne(int switchCh, int relChOfSwitch, int relChOther) {
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
 		Assert.assertEquals(false, hw.out(relChOfSwitch));
 		Assert.assertEquals(false, hw.out(relChOther));
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
 
 		click(switchCh);
 		Assert.assertEquals(true, hw.out(relChOfSwitch));
@@ -142,50 +157,67 @@ public class TestSwitchBoardScreens {
 
 	private void click(int switchChannel) {
 		hw.in(switchChannel, true);
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
 		hw.in(switchChannel, false);
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
 	}
 
 	@Test
 	public void AllDown() {
-		dom.loopOnce(cur+=1);
-		Assert.assertTrue(!hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&!hw.out(REL_UP_2));
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
+		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1)
+				&& !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		dom.loopOnce(cur += 1);
 
 		longClick(SW_DN_1);
-		Assert.assertTrue(hw.out(REL_DN_1) && !hw.out(REL_UP_1) && hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		Assert.assertTrue(hw.out(REL_DN_1) && !hw.out(REL_UP_1)
+				&& hw.out(REL_DN_2) && !hw.out(REL_UP_2));
 	}
-	
+
 	@Test
 	public void AllUp() {
-		dom.loopOnce(cur+=1);
-		Assert.assertTrue(!hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&!hw.out(REL_UP_2));
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
+		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1)
+				&& !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		dom.loopOnce(cur += 1);
 
 		longClick(SW_UP_1);
-		Assert.assertTrue(!hw.out(REL_DN_1)&&hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&hw.out(REL_UP_2));
+		Assert.assertTrue(!hw.out(REL_DN_1) && hw.out(REL_UP_1)
+				&& !hw.out(REL_DN_2) && hw.out(REL_UP_2));
 	}
-	
+
 	@Test
 	public void AllDownOneUp() {
-		dom.loopOnce(cur+=1);
-		Assert.assertTrue(!hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&!hw.out(REL_UP_2));
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 10);
+		Assert.assertFalse(hw.out(REL_DN_1));
+		Assert.assertFalse(hw.out(REL_UP_1));
+		Assert.assertFalse(hw.out(REL_DN_2));
+		Assert.assertFalse(hw.out(REL_UP_2));
 
 		longClick(SW_DN_1);
-		Assert.assertTrue(hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& hw.out(REL_DN_2)&&!hw.out(REL_UP_2));
-		
+		dom.loopOnce(cur += 10);
+		Assert.assertTrue(hw.out(REL_DN_1));
+		Assert.assertFalse(hw.out(REL_UP_1));
+		Assert.assertTrue(hw.out(REL_DN_2));
+		Assert.assertFalse(hw.out(REL_UP_2));
+
 		click(SW_UP_2);
-		Assert.assertTrue(hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&!hw.out(REL_UP_2));
-		dom.loopOnce(cur+=(Screen.MOTOR_SWITCH_DELAY_PROTECTION+1));
-		Assert.assertTrue(hw.out(REL_DN_1)&&!hw.out(REL_UP_1)&& !hw.out(REL_DN_2)&&hw.out(REL_UP_2));
+		Assert.assertTrue(hw.out(REL_DN_1));
+		Assert.assertFalse(hw.out(REL_UP_1));
+		Assert.assertFalse(hw.out(REL_DN_2));
+		Assert.assertFalse(hw.out(REL_UP_2));
+
+		dom.loopOnce(cur += (Screen.MOTOR_SWITCH_DELAY_PROTECTION + 10));
+		Assert.assertTrue(hw.out(REL_DN_1));
+		Assert.assertFalse(hw.out(REL_UP_1));
+		Assert.assertFalse(hw.out(REL_DN_2));
+		Assert.assertTrue(hw.out(REL_UP_2));
 	}
-	
+
 	private void longClick(int switchChannel) {
 		hw.in(switchChannel, true);
-		dom.loopOnce(cur+=1);
+		dom.loopOnce(cur += 1);
 		hw.in(switchChannel, false);
-		dom.loopOnce(cur+=(LONGCLICKTIMEOUT+1));
+		dom.loopOnce(cur += (LONGCLICKTIMEOUT + 1));
 	}
 }
