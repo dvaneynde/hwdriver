@@ -8,6 +8,13 @@ import eu.dlvm.domotica.blocks.IDomoContext;
 import eu.dlvm.domotica.utils.OpenWeatherMap;
 import eu.dlvm.iohardware.LogCh;
 
+/**
+ * Checks via {@link OpenWeatherMap} the sunrise and sunset times, and uses
+ * these for setting lamps off and on respectively. <br/>
+ * 30 minutes is subtracted or added to account for shimmer.
+ * 
+ * @author dirkv
+ */
 public class TimerDayNight extends Timer {
 
 	static Logger LOG = Logger.getLogger(TimerDayNight.class);
@@ -65,11 +72,11 @@ public class TimerDayNight extends Timer {
 
 	private void setOnOffTimes(OpenWeatherMap.Info info) {
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(info.sunset_sec * 1000L);
+		c.setTimeInMillis((info.sunset_sec + 30 * 60) * 1000L);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		setOnTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-		c.setTimeInMillis(info.sunrise_sec * 1000L);
+		c.setTimeInMillis((info.sunrise_sec - 30 * 60) * 1000L);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		setOffTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));

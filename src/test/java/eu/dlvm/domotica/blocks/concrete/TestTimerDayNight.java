@@ -104,23 +104,23 @@ public class TestTimerDayNight {
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.getStatus());
-		assertEquals("07:54", t.getOffTimeAsString());
-		assertEquals("17:38", t.getOnTimeAsString());
+		assertEquals("07:24", t.getOffTimeAsString());
+		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 10, 0),
 				seq++);
 		assertFalse(t.getStatus());
-		assertEquals("07:54", t.getOffTimeAsString());
-		assertEquals("17:38", t.getOnTimeAsString());
+		assertEquals("07:24", t.getOffTimeAsString());
+		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
 
-		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 18, 0),
+		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 18, 9),
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.getStatus());
-		assertEquals("07:54", t.getOffTimeAsString());
-		assertEquals("17:38", t.getOnTimeAsString());
+		assertEquals("07:24", t.getOffTimeAsString());
+		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
 
 		// simulate next day, and internet provider gives no result yet
@@ -131,16 +131,16 @@ public class TestTimerDayNight {
 				seq++);
 		assertFalse(t.isTimesUpdatedForToday());
 		assertTrue(t.getStatus());
-		assertEquals("07:54", t.getOffTimeAsString());
-		assertEquals("17:38", t.getOnTimeAsString());
+		assertEquals("07:24", t.getOffTimeAsString());
+		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(4, owmt.seq);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 5),
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.getStatus());
-		assertEquals("07:56", t.getOffTimeAsString());
-		assertEquals("17:35", t.getOnTimeAsString());
+		assertEquals("07:26", t.getOffTimeAsString());
+		assertEquals("18:05", t.getOnTimeAsString());
 		assertEquals(5, owmt.seq);
 	}
 }
