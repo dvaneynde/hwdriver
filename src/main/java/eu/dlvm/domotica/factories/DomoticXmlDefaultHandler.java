@@ -9,6 +9,8 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import eu.dlvm.domotica.blocks.Block;
 import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IMsg2Op;
+import eu.dlvm.domotica.blocks.Sprayer;
 import eu.dlvm.domotica.blocks.concrete.DimmedLamp;
 import eu.dlvm.domotica.blocks.concrete.DimmerSwitches;
 import eu.dlvm.domotica.blocks.concrete.Fan;
@@ -36,10 +38,31 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		this.ctx = ctx;
 	}
 
+	// TODO <group> wordt Block subclass, Sprayer, die inkomend event naar meerdere targets doorgeeft - simpel
+	
 	public void startElement(String uri, String localName, String qqName,
 			Attributes atts) throws SAXException {
 		if (localName.equals("domotic")) {
 			;
+		} else if (localName.equals("group")) {
+			parseBaseBlock(atts);
+			block = new Sprayer(name, desc);
+		} else if (localName.equals("group-ref")) {
+			name = atts.getValue("name");
+			Sprayer group2add = (Sprayer)blocks.get(name);
+			((Sprayer)block).getTargets().add(group2add);
+		} else if (localName.equals("block")) {
+			name = atts.getValue("name");
+			Block block2add = blocks.get(name);
+			((Sprayer)block).getTargets().add((IMsg2Op)block2add);
+		} else if (localName.equals("connect")) {
+			String srcName = atts.getValue("src");
+			String srcEvent = atts.getValue("src-event");
+			String targetName=atts.getValue("target");
+			String event=atts.getValue("event");
+			Switch s = (Switch)blocks.get(srcName);
+			IMsg2Op t = (IMsg2Op)blocks.get(targetName);
+			s.getOpEx().register(srcEvent, t, event);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
 			// TODO default attribute values, werkt dat niet?

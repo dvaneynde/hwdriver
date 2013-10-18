@@ -68,7 +68,7 @@ public class TestSwitchBoard {
 		hw.out(10, false);
 		hw.out(11, false);
 
-		dom = new Domotic(hw);
+		dom = Domotic.s(hw);
 		sw1 = new Switch("Switch1", "Switch1", new LogCh(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", new LogCh(1), dom);
 		o1 = new Lamp("Lamp1", "Lamp1", new LogCh(10), dom);

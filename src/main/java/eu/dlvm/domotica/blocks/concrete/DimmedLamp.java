@@ -4,11 +4,14 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
 import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
  * Dimmed Lamp.
- * <p>When going up from level 0, at the first loop() output is still 0.
+ * <p>
+ * When going up from level 0, at the first loop() output is still 0.
+ * 
  * @author dirk
  */
 public class DimmedLamp extends Actuator {
@@ -24,7 +27,8 @@ public class DimmedLamp extends Actuator {
 	private int msTimeFullDim = DEFAULT_FULL_DIMTIME_MS;
 	private long lastUpDnLoopTime;
 	private States state;
-//	private boolean newLevelToWrite;
+
+	// private boolean newLevelToWrite;
 
 	public enum States {
 		OFF, ON, UP, DOWN
@@ -138,8 +142,9 @@ public class DimmedLamp extends Actuator {
 	 */
 	public void on() {
 		level = prevOnLevel;
-		// TODO waarom mag ik hier niet ineens de output aansturen? er was een reden, maar is die nog geldig...
-		//newLevelToWrite = true;
+		// TODO waarom mag ik hier niet ineens de output aansturen? er was een
+		// reden, maar is die nog geldig...
+		// newLevelToWrite = true;
 		state = States.ON;
 		writeAnalogOutput();
 		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
@@ -158,8 +163,9 @@ public class DimmedLamp extends Actuator {
 			return;
 		}
 		level = newLevel;
-		//newLevelToWrite = true;
-		// TODO waarom mag ik hier niet ineens de output aansturen? er was een reden, maar is die nog geldig...
+		// newLevelToWrite = true;
+		// TODO waarom mag ik hier niet ineens de output aansturen? er was een
+		// reden, maar is die nog geldig...
 		state = States.ON;
 		writeAnalogOutput();
 		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
@@ -173,7 +179,8 @@ public class DimmedLamp extends Actuator {
 			prevOnLevel = level;
 			level = 0;
 			// newLevelToWrite = true;
-			// TODO waarom mag ik hier niet ineens de output aansturen? er was een reden, maar is die nog geldig...
+			// TODO waarom mag ik hier niet ineens de output aansturen? er was
+			// een reden, maar is die nog geldig...
 			state = States.OFF;
 			writeAnalogOutput();
 			log.info("DimmedLamp '" + getName() + "' set to OFF (remembered level: " + prevOnLevel + "%)");
@@ -281,6 +288,12 @@ public class DimmedLamp extends Actuator {
 	}
 
 	@Override
+	public void execute(String op) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("execute(): not implemented yet.");
+	}
+
+	@Override
 	public void loop(long current, long sequence) {
 		switch (state) {
 		case OFF:
@@ -306,13 +319,22 @@ public class DimmedLamp extends Actuator {
 					}
 				}
 			}
-			// also write if first time up or down, since if the lamp was OFF we first have to put it to ON.
-			writeAnalogOutput();	
+			// also write if first time up or down, since if the lamp was OFF we
+			// first have to put it to ON.
+			writeAnalogOutput();
 			lastUpDnLoopTime = current;
 			break;
 		default:
 			throw new RuntimeException();
 		}
+	}
+
+	@Override
+	public BlockInfo getActuatorInfo() {
+		BlockInfo bi = new BlockInfo(getName(), this.getClass().getSimpleName(), getDescription());
+		bi.addParm("state", getState().toString().toLowerCase());
+		bi.addParm("level", Integer.toString(getLevel()));
+		return bi;
 	}
 
 	@Override
@@ -323,4 +345,5 @@ public class DimmedLamp extends Actuator {
 	private void writeAnalogOutput() {
 		hw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
 	}
+
 }

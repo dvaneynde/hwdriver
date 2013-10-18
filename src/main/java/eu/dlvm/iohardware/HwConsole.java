@@ -13,11 +13,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import eu.dlvm.domotica.Main;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
-import eu.vaneynde.domotic.Main;
 
 // TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
 public class HwConsole {

@@ -30,7 +30,7 @@ public class TestSwitchBoardDedicatedAllOff {
         hw.in(1, false);
         hw.out(10, false);
 
-        dom = new Domotic(hw);
+        dom = Domotic.s(hw);
         swLamp = new Switch("SwitchLamp", "Switch Lamp", new LogCh(0), dom);
         swAllOff = new Switch("SwitchAllOff", "Switch All Off", new LogCh(1), dom);
         lamp = new Lamp("Lamp1", "Lamp1", new LogCh(10), dom);

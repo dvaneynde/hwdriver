@@ -1,5 +1,6 @@
 package eu.dlvm.domotica.blocks;
 
+import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 
@@ -23,7 +24,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends BlockWithContext {
+public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 
 	private LogCh channel;
 
@@ -73,4 +74,6 @@ public abstract class Actuator extends BlockWithContext {
 	 *            being called twice - which is forbidden.
 	 */
 	public abstract void loop(long currentTime, long sequence);
+	
+	public abstract BlockInfo getActuatorInfo();
 }

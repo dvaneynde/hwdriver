@@ -14,14 +14,19 @@ public class LogCh {
     private String id;
 
     /**
-     * @deprecated
+     * Preferred constructor. 
+     * @param id Unique id.
+     */
+    public LogCh(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Alternative constructor. See {{@link #LogCh(String)} for the preferred one.
+     * @param nbr Unique number.
      */
     public LogCh(int nbr) {
         id = Integer.toString(nbr);
-    }
-
-    public LogCh(String id) {
-        this.id = id;
     }
 
     public String id() {

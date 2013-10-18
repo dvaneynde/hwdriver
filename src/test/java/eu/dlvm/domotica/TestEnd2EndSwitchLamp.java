@@ -71,7 +71,7 @@ public class TestEnd2EndSwitchLamp {
 		drv = new HwDriverChannelMock();
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
-		dom = new Domotic(hw);
+		dom = Domotic.s(hw);
 		s = new Switch(IO.S_KEUKENLICHT.name(), IO.S_KEUKENLICHT.desc(),
 				IO.S_KEUKENLICHT.ch(), dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), IO.L_KEUKEN.ch(),

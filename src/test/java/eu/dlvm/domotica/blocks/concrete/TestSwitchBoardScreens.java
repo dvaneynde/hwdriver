@@ -82,7 +82,7 @@ public class TestSwitchBoardScreens {
 		hw.out(REL_DN_2, false);
 		hw.out(REL_UP_2, false);
 
-		dom = new Domotic(hw);
+		dom = Domotic.s(hw);
 		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", new LogCh(
 				SW_DN_1), dom);
 		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen",

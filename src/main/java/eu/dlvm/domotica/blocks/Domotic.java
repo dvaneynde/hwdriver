@@ -20,6 +20,7 @@ public class Domotic implements IDomoContext {
 
 	static Logger log = Logger.getLogger(Domotic.class);
 
+	private static Domotic singleton;
 	// protected access for test cases only
 	protected IHardwareIO hw = null;
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
@@ -27,13 +28,23 @@ public class Domotic implements IDomoContext {
 	protected long loopSequence = -1L;
 	protected boolean ready = false;
 
-	public Domotic() {
-		super();
+	public static synchronized  Domotic s() {
+		if (singleton == null) {
+			singleton = new Domotic();
+		}
+		return singleton;
 	}
 
-	public Domotic(IHardwareIO hw) {
+	public static synchronized Domotic s(IHardwareIO hw) {
+		if (singleton == null) {
+			singleton = new Domotic();
+			singleton.setHw(hw);
+		}
+		return singleton;
+	}
+
+	private Domotic() {
 		super();
-		setHw(hw);
 	}
 
 	/**
@@ -145,5 +156,23 @@ public class Domotic implements IDomoContext {
 		}
 		actuators.add(a);
 		log.info("Added actuator " + a.getName());
+	}
+
+	public static Logger getLog() {
+		return log;
+	}
+
+	public List<Sensor> getSensors() {
+		// TODO copy of list?
+		return sensors;
+	}
+
+	public List<Actuator> getActuators() {
+		// TODO copy of list?
+		return actuators;
+	}
+
+	public boolean isReady() {
+		return ready;
 	}
 }

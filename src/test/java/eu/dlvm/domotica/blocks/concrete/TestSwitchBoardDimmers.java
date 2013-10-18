@@ -75,7 +75,7 @@ public class TestSwitchBoardDimmers {
 		hw.outputs.put(DIMMER1, 0);
 		hw.outputs.put(DIMMER2, 0);
 
-		dom = new Domotic(hw);
+		dom = Domotic.s(hw);
 		dsw1 = new DimmerSwitches("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);

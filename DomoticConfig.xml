@@ -1,43 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" />
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
-	<lamp name="LichtWC0" />
+	<lamp name="LichtWC0" desc="WC inkom" />
 	<switch name="SchakVentilatorWC0" />
-	<fan name="VentilatorWC0" lamp="LichtWC0" />
+	<fan name="VentilatorWC0" lamp="LichtWC0" desc="WC" />
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" />
+	<lamp name="LichtGaragePoort" desc="Garage Poort"/>
 	<switch name="SchakLichtGarageTuin" />
-	<lamp name="LichtGarageTuin" />
+	<lamp name="LichtGarageTuin" desc="Garage Tuin"/>
 	<switch name="SchakLichtKeuken" />
-	<lamp name="LichtKeuken" />
+	<lamp name="LichtKeuken" desc="Keuken"/>
 	<switch name="SchakLichtBadk0" />
-	<lamp name="LichtBadk0" />
+	<lamp name="LichtBadk0" desc="Badkamer +0"/>
 	<switch name="SchakVentilatorBadk0" />
-	<fan name="VentilatorBadk0" />
+	<fan name="VentilatorBadk0" desc="Badkamer"/>
 	<dimmerSwitches name="SchakLichtVeranda" />
-	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" />
+	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda"/>
 	<dimmerSwitches name="SchakLichtCircanteRondom" />
-	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" />
+	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" desc="Eetkamer"/>
 	<switch name="SchakLichtCircante" />
-	<lamp name="LichtCircante" />
+	<lamp name="LichtCircante" desc="Circante Tafel"/>
 	<dimmerSwitches name="SchakLichtZithoek" />
-	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" />
+	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" />
 	<switch name="SchakLichtBureau" />
-	<lamp name="LichtBureau" />
-	<switchboard name="LampenBeneden">
-		<connection switch="SchakLichtInkom" lamp="LichtInkom" allOff="true" />
-		<connection switch="SchakLichtWC0" lamp="LichtWC0" />
-		<connection switch="SchakLichtGaragePoort" lamp="LichtGaragePoort" />
-		<connection switch="SchakLichtGarageTuin" lamp="LichtGarageTuin" />
-		<connection switch="SchakLichtKeuken" lamp="LichtKeuken" />
-		<connection switch="SchakLichtBadk0" lamp="LichtBadk0" />
-		<connection switch="SchakLichtCircante" lamp="LichtCircante" />
-		<connection switch="SchakLichtBureau" lamp="LichtBureau" />
+	<lamp name="LichtBureau" desc="Bureau"/>
+
+	<group name="LichtBeneden">
+		<block name="LichtInkom" />
+		<block name="LichtWC0" />
+		<block name="LichtGaragePoort" />
+		<block name="LichtGarageTuin" />
+		<block name="LichtKeuken" />
+		<block name="LichtBadk0" />
+		<block name="LichtCircante" />
+		<block name="LichtBureau" />
+	</group>
+
+
+	<switch name="SchakLichtGangBoven" />
+	<lamp name="LichtGangBoven" desc="Gang"/>
+	<switch name="SchakLichtBadk1" />
+	<lamp name="LichtBadk1" desc="Badkamer +1"/>
+	<switch name="SchakLichtTomasWand" />
+	<lamp name="LichtTomasWand" desc="Tomas Wand"/>
+	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt 
+		met bedrading -->
+	<lamp name="LichtTomasSpots" desc="Tomas"/><!-- TODO nakijken of klopt met relais -->
+	<switch name="SchakLichtDriesWand" />
+	<lamp name="LichtDriesWand" desc="Dries Wand"/>
+	<switch name="SchakLichtDries" />
+	<lamp name="LichtDries" desc="Dries"/>
+	<switch name="SchakLichtRoosWand" />
+	<lamp name="LichtRoosWand" desc="Roos Wand"/>
+	<switch name="SchakLichtRoos" />
+	<lamp name="LichtRoos" desc="Roos"/>
+	<group name="LichtBoven">
+		<block name="LichtGangBoven" />
+		<block name="LichtBadk1" />
+		<block name="LichtTomasWand" />
+		<block name="LichtTomasSpots" />
+		<block name="LichtDriesWand" />
+		<block name="LichtDries" />
+		<block name="LichtRoosWand" />
+		<block name="LichtRoos" />
+	</group>
+
+
+	<group name="AlleLichten">
+		<group-ref name="LichtBeneden" />
+		<group-ref name="LichtBoven" />
+	</group>
+
+
+	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten"
+		event="off" />
+	<connect src="SchakLichtInkom" src-event="single" target="LichtInkom"
+		event="toggle" />
+	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0"
+		event="toggle" />
+	<connect src="SchakLichtGaragePoort" src-event="single"
+		target="LichtGaragePoort" event="toggle" />
+	<connect src="SchakLichtGarageTuin" src-event="single"
+		target="LichtGarageTuin" event="toggle" />
+	<connect src="SchakLichtKeuken" src-event="single" target="LichtKeuken"
+		event="toggle" />
+	<connect src="SchakLichtBadk0" src-event="single" target="LichtBadk0"
+		event="toggle" />
+	<connect src="SchakLichtCircante" src-event="single" target="LichtCircante"
+		event="toggle" />
+	<connect src="SchakLichtBureau" src-event="single" target="LichtBureau"
+		event="toggle" />
+
+
+	<connect src="SchakLichtGangBoven" src-event="single" target="LichtGangBoven"
+		event="toggle" />
+	<connect src="SchakLichtBadk1" src-event="single" target="LichtBadk1"
+		event="toggle" />
+	<connect src="SchakLichtTomasWand" src-event="single" target="LichtTomasWand"
+		event="toggle" />
+	<connect src="SchakLichtTomasSpots" src-event="single"
+		target="LichtTomasSpots" event="toggle" />
+	<connect src="SchakLichtDriesWand" src-event="single" target="LichtDriesWand"
+		event="toggle" />
+	<connect src="SchakLichtDries" src-event="single" target="LichtDries"
+		event="toggle" />
+	<connect src="SchakLichtRoosWand" src-event="single" target="LichtRoosWand"
+		event="toggle" />
+	<connect src="SchakLichtRoos" src-event="single" target="LichtRoos"
+		event="toggle" />
+
+
+	<timerDayNight name="TimerNacht">
+		<on hour="20" minute="30" />
+		<off hour="6" minute="0" />
+	</timerDayNight>
+	<lamp name="LichtNacht" desc="Nachtlichten" />
+	<switch name="SchakBuitenTuin" />
+	<lamp name="LichtTerras" desc="Terras"/>
+	<switchboard name="Buiten1">
+		<connection switch="SchakBuitenTuin" lamp="LichtTerras" />
+		<c-timer timer="TimerNacht" lamp="LichtNacht" />
 	</switchboard>
+
+
 	<switchboardFans name="Ventilatie">
 		<connection switch="SchakVentilatorWC0" fan="VentilatorWC0" />
 		<connection switch="SchakVentilatorBadk0" fan="VentilatorBadk0" />
@@ -49,59 +139,21 @@
 		<allSwitch switch="SchakLichtInkom" allOff="true" />
 	</switchboardDimmer>
 
-	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" />
-	<switch name="SchakLichtBadk1" />
-	<lamp name="LichtBadk1" />
-	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" />
-	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
-	<lamp name="LichtTomasSpots" /><!-- TODO nakijken of klopt met relais -->
-	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" />
-	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" />
-	<switch name="SchakLichtRoosWand" />
-	<lamp name="LichtRoosWand" />
-	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" />
-	<switchboard name="LampenBoven">
-		<connection switch="SchakLichtGangBoven" lamp="LichtGangBoven" />
-		<connection switch="SchakLichtBadk1" lamp="LichtBadk1" />
-		<connection switch="SchakLichtTomasWand" lamp="LichtTomasWand" />
-		<connection switch="SchakLichtTomasSpots" lamp="LichtTomasSpots" />
-		<connection switch="SchakLichtDriesWand" lamp="LichtDriesWand" />
-		<connection switch="SchakLichtDries" lamp="LichtDries" />
-		<connection switch="SchakLichtRoosWand" lamp="LichtRoosWand" />
-		<connection switch="SchakLichtRoos" lamp="LichtRoos" />
-		<allSwitch switch="SchakLichtInkom" allOff="true" />
-	</switchboard>
 
-	<timerDayNight name="TimerNacht">
-		<on hour="20" minute="30" />
-		<off hour="6" minute="0" />
-	</timerDayNight>
-	<lamp name="LichtNacht" />
-	<switch name="SchakBuitenTuin" />
-	<lamp name="LichtTerras" />
-	<switchboard name="Buiten1">
-		<connection switch="SchakBuitenTuin" lamp="LichtTerras" />
-		<c-timer timer="TimerNacht" lamp="LichtNacht" />
-	</switchboard>
-	
-	<!-- TODO Hieronder correct doen. Hack, om te zorgen dat 1 schakelaar twee relais aanstuurt. -->
-	<lamp name="StopkBuiten" />
+	<!-- TODO Hieronder correct doen. Hack, om te zorgen dat 1 schakelaar twee 
+		relais aanstuurt. -->
+	<lamp name="StopkBuiten" desc="Buiten"/>
 	<switchboard name="Buiten2">
 		<connection switch="SchakBuitenTuin" lamp="StopkBuiten" />
 	</switchboard>
 
 	<screen name="ScreenTomas" motor-on-time="30" />
 	<screen name="ScreenDriesTuin" motor-on-time="30" />
-	<screen name="ScreenDriesOpzij" motor-on-time="30"/>
-	<screen name="ScreenRoos" motor-on-time="30"/>
-	<screen name="ScreenBreed" motor-on-time="60"/>
-	<screen name="ScreenLang" motor-on-time="100"/>
-	<screen name="ScreenKeuken" motor-on-time="30"/>
+	<screen name="ScreenDriesOpzij" motor-on-time="30" />
+	<screen name="ScreenRoos" motor-on-time="30" />
+	<screen name="ScreenBreed" motor-on-time="60" />
+	<screen name="ScreenLang" motor-on-time="100" />
+	<screen name="ScreenKeuken" motor-on-time="30" />
 	<switch name="SchakScreenTomasUp" />
 	<switch name="SchakScreenTomasDown" />
 	<switch name="SchakScreenDriesTuinUp" />

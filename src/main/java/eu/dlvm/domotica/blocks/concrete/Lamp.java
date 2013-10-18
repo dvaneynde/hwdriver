@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
 import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 public class Lamp extends Actuator {
@@ -64,6 +65,23 @@ public class Lamp extends Actuator {
 	}
 
 	@Override
+	public void execute(String op) {
+		switch (op) {
+		case "on":
+			setOn(true);
+			break;
+		case "off":
+			setOn(false);
+			break;
+		case "toggle":
+			toggle();
+			break;
+		default:
+			log.warn("execute() ignored unknown event: " + op);
+		}
+	}
+
+	@Override
 	public void loop(long currentTime, long sequence) {
 		// Nothing to do.
 		// log.warn("Called loop(), should not be the case.");
@@ -72,6 +90,13 @@ public class Lamp extends Actuator {
 	@Override
 	public String toString() {
 		return "Lamp (" + super.toString() + ") on=" + isOn();
+	}
+
+	@Override
+	public BlockInfo getActuatorInfo() {
+		BlockInfo ai = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
+		ai.addParm("on", isOn() ? "1" : "0");
+		return ai;
 	}
 
 }

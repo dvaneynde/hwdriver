@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
 import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -64,8 +65,8 @@ public class Fan extends Actuator {
 
 	/**
 	 */
-	public Fan(String name, String description, Lamp lamp, LogCh channel
-			, IDomoContext ctx) {
+	public Fan(String name, String description, Lamp lamp, LogCh channel,
+			IDomoContext ctx) {
 		this(name, description, channel, ctx);
 		this.lamp = lamp;
 		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
@@ -91,8 +92,8 @@ public class Fan extends Actuator {
 	 *            Logical output channel of fan.
 	 * @param ctrl
 	 */
-	public Fan(String name, String description, Lamp lamp, int logicalChannel
-			, IDomoContext ctx) {
+	public Fan(String name, String description, Lamp lamp, int logicalChannel,
+			IDomoContext ctx) {
 		super(name, description, new LogCh(logicalChannel), ctx);
 		this.state = States.REST;
 		this.lamp = lamp;
@@ -207,6 +208,12 @@ public class Fan extends Actuator {
 	}
 
 	@Override
+	public void execute(String op) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("execute(): not implemented yet.");
+	}
+
+	@Override
 	public void loop(long current, long sequence) {
 		if (resetTimeStateEntered) {
 			// If some toggle occurred, that always changes state, so we reset
@@ -289,6 +296,15 @@ public class Fan extends Actuator {
 		}
 	}
 
+	@Override
+	public BlockInfo getActuatorInfo() {
+		BlockInfo bi = new BlockInfo(this.getName(), this.getClass()
+				.getSimpleName(), this.getDescription());
+		bi.addParm("on", isRunning() ? "1" : "0");
+		// TODO time still running, if running
+		return bi;
+	}
+
 	private void writeOutput(boolean val) {
 		hw().writeDigitalOutput(getChannel(), val);
 	}
@@ -300,5 +316,4 @@ public class Fan extends Actuator {
 				+ getDelayPeriodSec() + "s runperiod=" + getRunningPeriodSec()
 				+ "s.";
 	}
-
 }

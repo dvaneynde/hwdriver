@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
+	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
+	elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
-
+				<element name="group" type="tns:groupType" />
+				<element name="connect">
+					<complexType>
+						<attribute name="src" type="IDREF" />
+						<attribute name="src-event" type="string" />
+						<attribute name="target" type="IDREF" />
+						<attribute name="event" type="string" />
+					</complexType>
+				</element>
 				<element name="switch" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -20,8 +29,8 @@
 					minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
-				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0"
-					maxOccurs="1" />
+				<element name="lamp" type="tns:blockWithChannelStruct"
+					minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -50,7 +59,6 @@
 					</complexType>
 				</element>
 
-
 				<element name="switchboard" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -69,7 +77,8 @@
 											<attribute name="lamp" type="IDREF" use="required" />
 										</complexType>
 									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct" minOccurs="0" />
+									<element name="allSwitch" type="tns:allSwitchStruct"
+										minOccurs="0" />
 								</sequence>
 							</extension>
 						</complexContent>
@@ -86,7 +95,8 @@
 											<attribute name="dimmedLamp" type="IDREF" use="required" />
 										</complexType>
 									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct" minOccurs="0" />
+									<element name="allSwitch" type="tns:allSwitchStruct"
+										minOccurs="0" />
 								</sequence>
 							</extension>
 						</complexContent>
@@ -136,6 +146,40 @@
 		</complexType>
 	</element>
 
+
+	<complexType name="groupType">
+		<choice maxOccurs="unbounded">
+			<!-- <element name="group" type="tns:groupType" /> not supported, would 
+				complicate parser and is probably not needed -->
+			<element name="group-ref">
+				<complexType>
+					<attribute name="name" type="IDREF" />
+				</complexType>
+			</element>
+			<element name="block">
+				<complexType>
+					<attribute name="name" type="IDREF" />
+				</complexType>
+			</element>
+		</choice>
+		<attribute name="name" type="ID" use="required" />
+		<attribute name="desc" use="optional" type="string" />
+	</complexType>
+	<simpleType name="switchEventType">
+		<restriction base="string">
+			<enumeration value="single" />
+			<enumeration value="double" />
+			<enumeration value="long" />
+		</restriction>
+	</simpleType>
+	<simpleType name="targetEventType">
+		<restriction base="string">
+			<enumeration value="on" />
+			<enumeration value="off" />
+			<enumeration value="toggle" />
+		</restriction>
+	</simpleType>
+
 	<complexType name="timerType">
 		<complexContent>
 			<extension base="tns:blockStruct">
@@ -170,7 +214,8 @@
 		<complexContent>
 			<extension base="tns:blockStruct">
 				<annotation>
-					<documentation>Default channel naam is name attribute, kan overridden door
+					<documentation>Default channel naam is name attribute, kan
+						overridden door
 						channel attribuut.
 					</documentation>
 				</annotation>
@@ -182,7 +227,8 @@
 		<complexContent>
 			<extension base="tns:blockStruct">
 				<annotation>
-					<documentation>Default channel naam is name attribute, kan overridden door
+					<documentation>Default channel naam is name attribute, kan
+						overridden door
 						channel attribuut.
 					</documentation>
 				</annotation>

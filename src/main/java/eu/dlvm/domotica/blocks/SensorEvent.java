@@ -1,5 +1,6 @@
 package eu.dlvm.domotica.blocks;
 
+
 /**
  * An event in some {@link Sensor}, typically as a consequence of an input state
  * change. However, events are higher level abstractions than a mere input
@@ -11,10 +12,12 @@ package eu.dlvm.domotica.blocks;
 public class SensorEvent {
 	private Sensor source;
 	private Object event;
+	private String eventName;
 
 	public SensorEvent(Sensor source, Object event) {
 		this.source = source;
 		this.event = event;
+		this.eventName = event.toString();
 	}
 
 	public Sensor getSource() {
@@ -25,9 +28,14 @@ public class SensorEvent {
 		return event;
 	}
 
+	public String getEventName() {
+		return eventName;
+	}
+
 	@Override
 	public String toString() {
-		return "SensorEvent event=" + event + " switch=" + source.getName();
+		return "SensorEvent [source=" + source + ", event=" + event
+				+ ", eventName=" + eventName + "]";
 	}
 
 }

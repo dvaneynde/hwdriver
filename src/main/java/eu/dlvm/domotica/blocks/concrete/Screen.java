@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
 import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -41,6 +42,7 @@ public class Screen extends Actuator {
 		this.chUp = chUp;
 	}
 
+	// TODO see bug 80
 	public enum States {
 		REST, UP, SWITCH_DOWN_2_UP, SWITCH_UP_2_DOWN, DOWN
 	};
@@ -62,6 +64,12 @@ public class Screen extends Actuator {
 
 	public void down() {
 		gotDown = true;
+	}
+
+	@Override
+	public void execute(String op) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("execute(): not implemented yet.");
 	}
 
 	@Override
@@ -188,6 +196,11 @@ public class Screen extends Actuator {
 	public String toString() {
 		return "Screen " + super.toString() + ", motorOnPeriod="
 				+ motorOnPeriodMs + ", state=" + state + "]";
+	}
+
+	@Override
+	public BlockInfo getActuatorInfo() {
+		return new BlockInfo(this.getName(),this.getClass().getSimpleName(), getDescription());
 	}
 
 }

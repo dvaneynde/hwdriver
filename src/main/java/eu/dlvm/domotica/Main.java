@@ -1,4 +1,4 @@
-package eu.vaneynde.domotic;
+package eu.dlvm.domotica;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,11 +16,14 @@ import org.apache.log4j.PropertyConfigurator;
 import eu.dlvm.domotica.blocks.Domotic;
 import eu.dlvm.domotica.blocks.Oscillator;
 import eu.dlvm.domotica.factories.XmlDomoticConfigurator;
+import eu.dlvm.domotica.service.ServiceServer;
 import eu.dlvm.iohardware.HwConsole;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
+import eu.dlvm.iohardware.diamondsys.messaging.HwDriverChannelSimulator;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
+import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
 
 /**
  * Domotic system main entry point.
@@ -37,14 +40,22 @@ public class Main {
 	public IHardwareIO setupHardware(String cfgFile, String host, int port) {
 		XmlHwConfigurator xcf = new XmlHwConfigurator();
 		xcf.setCfgFilepath(cfgFile);
-		HwDriverTcpChannel hdtc = new HwDriverTcpChannel(host, port);
-		HardwareIO hw = new HardwareIO(xcf, hdtc);
+		IHwDriverChannel hdc = new HwDriverTcpChannel(host, port);
+		HardwareIO hw = new HardwareIO(xcf, hdc);
+		return hw;
+	}
+
+	public IHardwareIO setupSimulatedHardware(String cfgFile) {
+		XmlHwConfigurator xcf = new XmlHwConfigurator();
+		xcf.setCfgFilepath(cfgFile);
+		IHwDriverChannel hdc = new HwDriverChannelSimulator();
+		HardwareIO hw = new HardwareIO(xcf, hdc);
 		return hw;
 	}
 
 	public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
 		try {
-			Domotic d = new Domotic();
+			Domotic d = Domotic.s();
 			XmlDomoticConfigurator cf = new XmlDomoticConfigurator();
 			cf.setCfgFilepath(cfgFilename);
 			cf.configure(d);
@@ -224,6 +235,7 @@ public class Main {
 			usage();
 		}
 		boolean domotic = false;
+		boolean simulation = false;
 		if (args[0].equalsIgnoreCase("domo"))
 			domotic = true;
 		else if (!args[0].equalsIgnoreCase("hw"))
@@ -238,6 +250,9 @@ public class Main {
 				if (++i >= args.length)
 					usage();
 				path2Driver = args[i++];
+			} else if (args[i].equals("-s")) {
+				i++;
+				simulation = true;
 			} else if (args[i].equals("-l")) {
 				if (++i >= args.length)
 					usage();
@@ -289,8 +304,16 @@ public class Main {
 					+ blocksCfgFile + "\n\tprocess pid:\t" + main.getPid());
 
 			main.storePid();
-			IHardwareIO hw = main.setupHardware(hwCfgFile, hostname, port);
+			IHardwareIO hw;
+			if (simulation)
+				hw = main.setupSimulatedHardware(hwCfgFile);
+			else
+				hw = main.setupHardware(hwCfgFile, hostname, port);
 			Domotic dom = main.setupBlocksConfig(blocksCfgFile, hw);
+
+			ServiceServer server = new ServiceServer();
+			server.start();
+
 			Oscillator osc = new Oscillator(dom, looptime);
 			main.runDomotic(dom, osc, path2Driver);
 		} else {

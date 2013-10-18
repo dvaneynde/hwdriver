@@ -64,7 +64,8 @@ public class Switch extends Sensor {
 		this.singleClickEnabled = singleClickEnabled;
 		this.longClickEnabled = longClickEnabled;
 		this.doubleClickEnabled = doubleClickEnabled;
-		// TODO aparte validatie functie, voor zowel alles-disabled, en timings double-long ?
+		// TODO aparte validatie functie, voor zowel alles-disabled, en timings
+		// double-long ?
 	}
 
 	public String toString() {
@@ -147,10 +148,6 @@ public class Switch extends Sensor {
 
 	public void setDoubleClickEnabled(boolean doubleClickEnabled) {
 		this.doubleClickEnabled = doubleClickEnabled;
-		if (allDisabled()) {
-			throw new PreconditionViolated(
-					"Not all Switch EventTypes can be disabled.");
-		}
 	}
 
 	public long getDoubleClickTimeout() {
@@ -172,10 +169,6 @@ public class Switch extends Sensor {
 
 	public void setLongClickEnabled(boolean longClickEnabled) {
 		this.longClickEnabled = longClickEnabled;
-		if (allDisabled()) {
-			throw new PreconditionViolated(
-					"Not all Switch EventTypes can be disabled.");
-		}
 	}
 
 	public long getLongClickTimeout() {
@@ -197,17 +190,6 @@ public class Switch extends Sensor {
 
 	public void setSingleClickEnabled(boolean singleClickEnabled) {
 		this.singleClickEnabled = singleClickEnabled;
-		if (allDisabled()) {
-			throw new PreconditionViolated(
-					"Not all Switch EventTypes can be disabled.");
-		}
-	}
-
-	private boolean allDisabled() {
-		return false; // TODO beetje overdreven; waarom nodig? en waarom geen
-						// constructor?
-		// return !isSingleClickEnabled() && !isDoubleClickEnabled()
-		// && !isLongClickEnabled();
 	}
 
 	private boolean longClickLongerThanDoubleClick(long longClickTimeout,

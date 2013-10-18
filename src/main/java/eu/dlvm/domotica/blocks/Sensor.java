@@ -7,8 +7,6 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.iohardware.LogCh;
 
-
-
 /**
  * Sensors sense input.
  * <p>
@@ -25,7 +23,7 @@ public abstract class Sensor extends BlockWithContext {
 
 	private LogCh channel;
 	protected Set<ISensorListener> listeners = new HashSet<ISensorListener>();
-
+	protected OperationExecutor opex = new OperationExecutor();
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
 	 * 
@@ -53,12 +51,17 @@ public abstract class Sensor extends BlockWithContext {
 	public void registerListener(ISensorListener l) {
 		listeners.add(l);
 	}
+	
+	public OperationExecutor getOpEx() {
+		return opex;
+	}
 
 	protected void notifyListeners(SensorEvent e) {
 		for (ISensorListener l : listeners) {
 			log.debug("notify switch listener, event=" + e + ", listener=" + l);
 			l.notify(e);
 		}
+		opex.send(e.getEventName(), getName());
 	}
 
 	/**

@@ -48,6 +48,7 @@ import eu.dlvm.domotica.blocks.SensorEvent;
  * switchboard.
  * 
  * @author dirk vaneynde
+ * @deprecated
  */
 public class SwitchBoard extends Block implements ISensorListener {
 	static Logger log = Logger.getLogger(SwitchBoard.class);
