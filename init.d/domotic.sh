@@ -36,7 +36,7 @@ d_start() {
 		exit 0
 	fi
 	cd $DOMDIR
-	nohup /opt/jdk/bin/java -jar domotica.jar -l log4j.properties -c ./domotic-cfg.xml -d ./hwdriver >/dev/null 2>&1 &
+    nohup /usr/bin/java -jar domotic.jar domo -l log4j.properties -b DomoticConfig.xml -c DiamondBoardsConfig.xml -d hwdriver >domotic.out 2>&1 &
 	echo "Domotic started."
 }
 
