@@ -146,4 +146,9 @@ public class Domotic implements IDomoContext {
 		actuators.add(a);
 		log.info("Added actuator " + a.getName());
 	}
+
+	@Override
+	public long getLoopSequence() {
+		return loopSequence;
+	}
 }

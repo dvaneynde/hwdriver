@@ -44,4 +44,9 @@ public class DomoContextMock implements IDomoContext {
 		}
 		actuators.add(a);
 	}
+
+	@Override
+	public long getLoopSequence() {
+		return 0;
+	}
 }

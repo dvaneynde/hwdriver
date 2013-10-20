@@ -25,15 +25,18 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
     private String serverHostname;
 	private int serverPort;
 	private Socket socket;
+	private int readTimeout;
 
 	/**
 	 * 
-	 * @param processor
-	 * @param sleepMilliSecsIfNothingReceived
+	 * @param serverHostname
+	 * @param serverPort
+	 * @param readTimeout
 	 */
-	public HwDriverTcpChannel(String serverHostname, int serverPort) {
+	public HwDriverTcpChannel(String serverHostname, int serverPort, int readTimeout) {
 		this.serverHostname = serverHostname;
 		this.serverPort = serverPort;
+		this.readTimeout = readTimeout;
 	}
 
 	/* (non-Javadoc)
@@ -43,6 +46,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 	public void connect() {
 		try {
 			socket = new Socket(serverHostname, serverPort);
+			socket.setSoTimeout(readTimeout);
 			log.debug("HwDriver socket to communicate with is: "
 					+ socket.toString());
 		} catch (IOException e) {
@@ -64,7 +68,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 			if (log.isDebugEnabled())
 				log.debug("  Write to HW Driver:\n[" + stringToSend + "]");
 			out.print(stringToSend);
-			out.flush(); // TEST TODO
+			out.flush(); // TODO nodig?
 			// Now receive any results, skipping empty last line
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
@@ -80,7 +84,6 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		} catch (IOException e) {
 			log.fatal("Error communicating with Hardware Driver.", e);
 			throw new RuntimeException(e);
-
 		}
 	}
 

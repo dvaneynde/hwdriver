@@ -14,7 +14,7 @@ public interface IDomoContext {
 	public IHardwareIO getHw();
 	
 	/**
-	 * Add Sensor to loop set (see {@link #loopOnce()}.
+	 * Add Sensor to domotic system.
 	 * 
 	 * @param s
 	 *            Added, if not already present. Each Sensor can be present no
@@ -23,12 +23,17 @@ public interface IDomoContext {
 	public void addSensor(Sensor s);
 
 	/**
-	 * Add Actuator to loop set (see {@link #loopOnce()}.
+	 * Add Actuator to domotic system.
 	 * 
 	 * @param s
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
 	public void addActuator(Actuator a);
+
+	/**
+	 * @return Number incremented with each  {@link Block#loopOnce()}.
+	 */
+	public long getLoopSequence();
 
 }
