@@ -81,7 +81,7 @@ public class Main {
 				@Override
 				public void run() {
 					try {
-						log.info("Domotic starts looping now, in separate thread. Logger DRIVER gives more information. Main thread watches driver.");
+						log.info("Oscillator oscillates...");
 						osc.go();
 						log.fatal("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
 					} catch (Exception e) {
@@ -96,10 +96,11 @@ public class Main {
 				final Process process = pb.start();
 				Thread.sleep(5000); // TODO replace later by
 									// prStdout.isDriverReady()
-				log.info("Initialize domotic and its hardware.");
+				log.info("Initialize domotic system.");
 				dom.initialize();
-				log.info("Start Domotic looping in separate thread 'Domotic Blocks Execution'.");
+				log.info("Start Domotic thread 'Domotic Blocks Execution'.");
 				domoticThread.start();
+				log.info("Start watchdogs, on hwdriver and on blocks execution.");
 				// dan pas domotic starten
 				ProcessWatch prWatch = new ProcessWatch(process, "Driver Process Watch");
 				ProcessReader prStdout = new ProcessReader(process.getInputStream(), "Driver STDOUT Reader");
@@ -107,7 +108,7 @@ public class Main {
 				prWatch.startWatching();
 				prStdout.startReading();
 				prStderr.startReading();
-
+				log.info("Everything started, now watching...");
 				long lastLoopSequence = -1;
 				while (true) {
 					Thread.sleep(5000);
@@ -291,8 +292,10 @@ public class Main {
 		}
 
 		if (logcfgfile == null) {
+			System.out.println("Logging starts, using log4j default configuration.");
 			BasicConfigurator.configure();
 		} else {
+			System.out.println("Logging starts, using log4j configuration from '"+logcfgfile+"'.");
 			PropertyConfigurator.configure(logcfgfile);
 		}
 
