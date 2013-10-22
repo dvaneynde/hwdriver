@@ -121,7 +121,7 @@ public class Main {
 					// TODO dump state to disk...
 					// TODO extra test: loopcounter moet verhoogd zijn...
 					if (prWatch.isRunning() && prStdout.isRunning() && prStderr.isRunning()) {
-						log.info("Checked driver sub-process, seems OK.");
+						log.debug("Checked driver sub-process, seems OK.");
 					} else {
 						log.error("Something is wrong with driver subprocess. I'll just continue, recovery not yet implemented, but below is report:");
 						log.error("\tprocess watch: " + prWatch.toString());
