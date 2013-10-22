@@ -39,7 +39,7 @@ d_start() {
 	fi
 	cd $DOMDIR
 	/usr/bin/java -jar $DOMDIR/domotic.jar domo -l $DOMDIR/log4j.properties -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver >>$BOOTLOG 2>&1 &
-	echo "Domotic started." >>$BOOTLOG 2>&1
+	echo "Domotic started." | tee -a $BOOTLOG
 }
 
 #
