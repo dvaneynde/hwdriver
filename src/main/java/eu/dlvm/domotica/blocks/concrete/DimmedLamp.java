@@ -295,6 +295,7 @@ public class DimmedLamp extends Actuator {
 
 	@Override
 	public void loop(long current, long sequence) {
+		checkLoopSequence(sequence);
 		switch (state) {
 		case OFF:
 		case ON:

@@ -215,6 +215,7 @@ public class Fan extends Actuator {
 
 	@Override
 	public void loop(long current, long sequence) {
+		checkLoopSequence(sequence);
 		if (resetTimeStateEntered) {
 			// If some toggle occurred, that always changes state, so we reset
 			// timeStateEntered.

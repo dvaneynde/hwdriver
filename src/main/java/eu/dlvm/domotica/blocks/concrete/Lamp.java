@@ -83,8 +83,7 @@ public class Lamp extends Actuator {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		// Nothing to do.
-		// log.warn("Called loop(), should not be the case.");
+		checkLoopSequence(sequence);
 	}
 
 	@Override

@@ -1,5 +1,8 @@
 package eu.dlvm.domotica.blocks;
 
+import org.apache.log4j.Logger;
+
+import eu.dlvm.domotica.blocks.concrete.Lamp;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
@@ -26,7 +29,10 @@ import eu.dlvm.iohardware.LogCh;
  */
 public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 
+	static Logger log = Logger.getLogger(Lamp.class);
+
 	private LogCh channel;
+	private long previousLoopSequence = -1L;
 
 	/**
 	 * Create Actuator Block, i.e. a Block that abstracts output devices like
@@ -65,7 +71,6 @@ public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 	 * <p>
 	 * To be enabled this Actuator must first have been registered with
 	 * {@link Domotic#addActuator(Actuator)}.
-	 * 
 	 * @param currentTime
 	 *            Timestamp at which this loop is called. The same for each
 	 *            loop.
@@ -76,4 +81,15 @@ public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 	public abstract void loop(long currentTime, long sequence);
 	
 	public abstract BlockInfo getActuatorInfo();
+	/**
+	 * To be called from {{@link #loop(long, long)} implementations, to stop program if a loop is looped (should be graph).
+	 * @param currentLoopSequence
+	 */
+	protected void checkLoopSequence(long currentLoopSequence) {
+		if (currentLoopSequence <= previousLoopSequence) {
+			log.error("Current loop sequence equal to, or before last recorded. Abort program. current="+currentLoopSequence+", previous="+previousLoopSequence);
+			throw new RuntimeException("Current loop sequence equal to, or before last recorded. Abort program.");
+		}
+		previousLoopSequence = currentLoopSequence;
+	}
 }
