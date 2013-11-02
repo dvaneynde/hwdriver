@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.dlvm.domotica.HwDriverChannelMock;
+import eu.dlvm.domotics.HwDriverChannelMock;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;

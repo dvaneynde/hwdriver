@@ -13,7 +13,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import eu.dlvm.domotica.Main;
+import eu.dlvm.domotics.Main;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
