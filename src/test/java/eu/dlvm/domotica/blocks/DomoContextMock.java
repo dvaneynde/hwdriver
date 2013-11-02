@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.dlvm.domotica.blocks.Actuator;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.Sensor;
 import eu.dlvm.iohardware.IHardwareIO;
 
-public class DomoContextMock implements IDomoContext {
+public class DomoContextMock implements IHardwareAccess {
 
 	public IHardwareIO hw;
 	public List<Sensor> sensors = new ArrayList<Sensor>(64);

@@ -2,7 +2,7 @@ package eu.dlvm.domotica.blocks.concrete;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.IllegalConfigurationException;
 import eu.dlvm.domotica.blocks.Sensor;
 import eu.dlvm.domotica.blocks.SensorEvent;
@@ -49,7 +49,7 @@ public class LightSensor extends Sensor {
 	 * @param high2lowWaitTime
 	 * @throws IllegalConfigurationException
 	 */
-	public LightSensor(String name, String description, LogCh channel, IDomoContext ctx, int lowThreshold, int highThreshold,
+	public LightSensor(String name, String description, LogCh channel, IHardwareAccess ctx, int lowThreshold, int highThreshold,
 			long low2highWaitTime, long high2lowWaitTime) throws IllegalConfigurationException {
 		super(name, description, channel, ctx);
 		timeOfLastSample = 0L;
@@ -70,7 +70,7 @@ public class LightSensor extends Sensor {
 		if ((currentTime - timeOfLastSample) < sampleIntervalTimeMs)
 			return;
 
-		int newInput = hw().readAnalogInput(getChannel());
+		int newInput = getHw().readAnalogInput(getChannel());
 		timeOfLastSample = currentTime;
 
 		switch (state) {
@@ -89,7 +89,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh="
 						+ getHighThreshold());
-				notifyListeners(new SensorEvent(this, States.HIGH));
+				notifyListenersDeprecated(new SensorEvent(this, States.HIGH));
 			}
 			break;
 		case HIGH:
@@ -107,7 +107,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow="
 						+ getLowThreshold());
-				notifyListeners(new SensorEvent(this, States.LOW));
+				notifyListenersDeprecated(new SensorEvent(this, States.LOW));
 			}
 			break;
 		default:

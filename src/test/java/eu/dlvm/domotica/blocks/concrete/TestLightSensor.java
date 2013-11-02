@@ -9,11 +9,10 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.ISensorListener;
 import eu.dlvm.domotica.blocks.IllegalConfigurationException;
 import eu.dlvm.domotica.blocks.SensorEvent;
-import eu.dlvm.domotica.blocks.concrete.LightSensor;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -31,7 +30,7 @@ public class TestLightSensor {
 
 	private static final LogCh LIGHTSENSOR_CH = new LogCh(10);
 	private Hardware hw = new Hardware();
-	private IDomoContext ctx = new DomoContextMock(hw);
+	private IHardwareAccess ctx = new DomoContextMock(hw);
 	private long seq, cur;
 
 	private ISensorListener sensorListener = new ISensorListener() {
@@ -74,7 +73,7 @@ public class TestLightSensor {
 		try {
 			LightSensor ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 500, 1000, 300,
 					300);
-			ls.registerListener(sensorListener);
+			ls.registerListenerDeprecated(sensorListener);
 			seq = cur = 0L;
 			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
 			

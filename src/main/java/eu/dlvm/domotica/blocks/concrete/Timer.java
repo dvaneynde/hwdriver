@@ -1,12 +1,14 @@
 package eu.dlvm.domotica.blocks.concrete;
 
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.Sensor;
-import eu.dlvm.domotica.blocks.SensorEvent;
+import eu.dlvm.domotica.blocks.concrete.IOnOffToggleListener.ActionType;
 import eu.dlvm.iohardware.LogCh;
 
 public class Timer extends Sensor {
@@ -16,18 +18,27 @@ public class Timer extends Sensor {
 	private int onTime, offTime;
 	private boolean state;
 
-	public Timer(String name, String description, LogCh channel,
-			IDomoContext ctx) {
+	private Set<IOnOffToggleListener> listeners = new HashSet<>();
+
+	public Timer(String name, String description, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, channel, ctx);
 		state = false;
 		onTime = offTime = 0;
 	}
 
+	public void register(IOnOffToggleListener listener) {
+		listeners.add(listener);
+	}
+
+	public void notifyListeners(IOnOffToggleListener.ActionType action) {
+		for (IOnOffToggleListener l : listeners)
+			l.onEvent(this, action);
+	}
+
 	public static int timeInDay(long time) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
-		int timeInDay = timeInDayMillis(c.get(Calendar.HOUR_OF_DAY),
-				c.get(Calendar.MINUTE));
+		int timeInDay = timeInDayMillis(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
 		return timeInDay;
 	}
 
@@ -60,7 +71,7 @@ public class Timer extends Sensor {
 		return String.format("%02d:%02d", times[0], times[1]);
 	}
 
-	public boolean getStatus() {
+	public boolean isOn() {
 		return state;
 	}
 
@@ -75,9 +86,8 @@ public class Timer extends Sensor {
 		}
 		if (state2 != state) {
 			state = state2;
-			log.info("Timer '" + getName() + "' sends event '"
-					+ (state ? "ON" : "OFF") + "'");
-			notifyListeners(new SensorEvent(this, getStatus()));
+			log.info("Timer '" + getName() + "' sends event '" + (state ? "ON" : "OFF") + "'");
+			notifyListeners(state ? ActionType.ON : ActionType.OFF);
 		}
 	}
 }

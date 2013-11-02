@@ -8,7 +8,7 @@ import org.junit.Test;
 import junit.framework.Assert;
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.concrete.Fan;
 import eu.dlvm.domotica.blocks.concrete.Lamp;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -37,7 +37,7 @@ public class TestFanWithLamp {
 	private Fan fan;
 	private Lamp lamp;
 	private Hardware hw;
-	private IDomoContext ctx;
+	private IHardwareAccess ctx;
 	private long current, seq;
 
 	@BeforeClass
@@ -58,37 +58,37 @@ public class TestFanWithLamp {
 
 	private void assertRest() {
 		Assert.assertEquals(Fan.States.REST, fan.getState());
-		Assert.assertFalse(fan.isRunning());
+		Assert.assertFalse(fan.isOn());
 		Assert.assertTrue(!hw.fanStatus);
 	}
 
 	private void assertRun() {
 		Assert.assertEquals(Fan.States.RUN, fan.getState());
-		Assert.assertTrue(fan.isRunning());
+		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.fanStatus);
 	}
 
 	private void assertDelayedRun() {
 		Assert.assertEquals(Fan.States.DELAYED_LAMP_ON, fan.getState());
-		Assert.assertFalse(fan.isRunning());
+		Assert.assertFalse(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && !hw.fanStatus);
 	}
 
 	private void assertRunLampOn() {
 		Assert.assertEquals(Fan.States.RUN_LAMP_ON, fan.getState());
-		Assert.assertTrue(fan.isRunning());
+		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && hw.fanStatus);
 	}
 
 	private void assertRunLampOff() {
 		Assert.assertEquals(Fan.States.RUN_LAMP_OFF, fan.getState());
-		Assert.assertTrue(fan.isRunning());
+		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(!hw.lampStatus && hw.fanStatus);
 	}
 
 	private void assertWaitLampOff() {
 		Assert.assertEquals(Fan.States.WAIT_LAMP_OFF, fan.getState());
-		Assert.assertTrue(!fan.isRunning());
+		Assert.assertTrue(!fan.isOn());
 		Assert.assertTrue(hw.lampStatus && !hw.fanStatus);
 	}
 

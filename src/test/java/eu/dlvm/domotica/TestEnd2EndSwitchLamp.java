@@ -11,7 +11,7 @@ import org.junit.Test;
 import eu.dlvm.domotica.blocks.Domotic;
 import eu.dlvm.domotica.blocks.concrete.Lamp;
 import eu.dlvm.domotica.blocks.concrete.Switch;
-import eu.dlvm.domotica.blocks.concrete.SwitchBoard;
+import eu.dlvm.domotica.blocks.concrete.SwitchClick2Toggle;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
@@ -52,7 +52,6 @@ public class TestEnd2EndSwitchLamp {
 	Domotic dom;
 	Switch s;
 	Lamp o;
-	SwitchBoard ssb;
 
 	class TestConfigurator implements IBoardFactory {
 		@Override
@@ -71,13 +70,15 @@ public class TestEnd2EndSwitchLamp {
 		drv = new HwDriverChannelMock();
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
-		dom = Domotic.s(hw);
+		Domotic.resetSingleton();
+		dom = Domotic.singleton(hw);
 		s = new Switch(IO.S_KEUKENLICHT.name(), IO.S_KEUKENLICHT.desc(),
 				IO.S_KEUKENLICHT.ch(), dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), IO.L_KEUKEN.ch(),
 				dom);
-		ssb = new SwitchBoard("SSB", "Lampen aan/uit");
-		ssb.add(s, o);
+		SwitchClick2Toggle sct = new SwitchClick2Toggle("switch2lamp", "");
+		s.registerListener(sct);
+		sct.registerListener(o);
 	}
 
 	@Test

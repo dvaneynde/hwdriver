@@ -13,10 +13,8 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.Domotic;
-import eu.dlvm.domotica.blocks.concrete.DimmedLamp;
-import eu.dlvm.domotica.blocks.concrete.DimmerSwitches;
-import eu.dlvm.domotica.blocks.concrete.Switch;
-import eu.dlvm.domotica.blocks.concrete.SwitchBoardDimmers;
+import eu.dlvm.domotica.blocks.concrete.IOnOffToggleListener.ActionType;
+import eu.dlvm.domotica.blocks.concrete.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -75,7 +73,8 @@ public class TestSwitchBoardDimmers {
 		hw.outputs.put(DIMMER1, 0);
 		hw.outputs.put(DIMMER2, 0);
 
-		dom = Domotic.s(hw);
+		Domotic.resetSingleton();
+		dom = Domotic.singleton(hw);
 		dsw1 = new DimmerSwitches("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);
@@ -88,7 +87,10 @@ public class TestSwitchBoardDimmers {
 		swAllOnOff.setLongClickEnabled(true);
 		swAllOnOff.setLongClickTimeout(1000L);
 		swAllOnOff.setSingleClickEnabled(false);
-		sbd.add(swAllOnOff, true, true);
+		Switch2OnOffToggle swtch2AllOff = new Switch2OnOffToggle("allOff", "allOff");
+		swtch2AllOff.map(ClickType.LONG, ActionType.OFF);
+		swAllOnOff.registerListener(swtch2AllOff);
+		swtch2AllOff.registerListener(dl1);
 	}
 
 	@Test

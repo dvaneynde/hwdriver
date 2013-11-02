@@ -27,7 +27,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends BlockWithContext implements IMsg2Op {
+public abstract class Actuator extends BlockWithHardwareAccess {
 
 	static Logger log = Logger.getLogger(Lamp.class);
 
@@ -41,7 +41,7 @@ public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, LogCh channel, IDomoContext ctx) {
+	public Actuator(String name, String description, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, ctx);
 		this.channel = channel;
 		ctx.addActuator(this);
@@ -81,6 +81,7 @@ public abstract class Actuator extends BlockWithContext implements IMsg2Op {
 	public abstract void loop(long currentTime, long sequence);
 	
 	public abstract BlockInfo getActuatorInfo();
+	
 	/**
 	 * To be called from {{@link #loop(long, long)} implementations, to stop program if a loop is looped (should be graph).
 	 * @param currentLoopSequence

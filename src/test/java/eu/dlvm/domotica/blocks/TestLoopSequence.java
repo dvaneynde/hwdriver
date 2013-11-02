@@ -21,10 +21,6 @@ public class TestLoopSequence {
 			}
 
 			@Override
-			public void execute(String op) {
-			}
-
-			@Override
 			public BlockInfo getActuatorInfo() {
 				return null;
 			}

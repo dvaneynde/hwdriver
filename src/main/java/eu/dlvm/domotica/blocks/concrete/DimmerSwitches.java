@@ -2,7 +2,7 @@ package eu.dlvm.domotica.blocks.concrete;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.Sensor;
 import eu.dlvm.domotica.blocks.SensorEvent;
 import eu.dlvm.iohardware.LogCh;
@@ -55,7 +55,7 @@ public class DimmerSwitches extends Sensor {
 	};
 
 	/**  */
-	public DimmerSwitches(String name, String description, LogCh channelLeft, LogCh channelRight, IDomoContext ctx) {
+	public DimmerSwitches(String name, String description, LogCh channelLeft, LogCh channelRight, IHardwareAccess ctx) {
 		super(name, description, channelLeft, ctx);
 		this.channelR = channelRight;
 	}
@@ -68,7 +68,7 @@ public class DimmerSwitches extends Sensor {
 	 * @param channelRight
 	 * @param hw
 	 */
-	public DimmerSwitches(String name, String description, int channelLeft, int channelRight, IDomoContext ctx) {
+	public DimmerSwitches(String name, String description, int channelLeft, int channelRight, IHardwareAccess ctx) {
 		this(name, description, new LogCh(channelLeft), new LogCh(channelRight), ctx);
 	}
 
@@ -87,8 +87,8 @@ public class DimmerSwitches extends Sensor {
 	 */
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInputLeft = hw().readDigitalInput(getChannel());
-		boolean newInputRight = hw().readDigitalInput(getChannelRight());
+		boolean newInputLeft = getHw().readDigitalInput(getChannel());
+		boolean newInputRight = getHw().readDigitalInput(getChannelRight());
 
 		switch (state) {
 		case REST:
@@ -106,19 +106,19 @@ public class DimmerSwitches extends Sensor {
 			if ((currentTime - leftRESTtime) >= getClickedTimeoutMS()) {
 				ClickType ct = (firstPressedLeft ? ClickType.LEFT_HOLD_DOWN : ClickType.RIGHT_HOLD_DOWN);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
-				notifyListeners(new SensorEvent(this, ct));
+				notifyListenersDeprecated(new SensorEvent(this, ct));
 				state = States.DOWN_LONG;
 				break;
 			} else if ((firstPressedLeft && !newInputLeft) || (!firstPressedLeft && !newInputRight)) {
 				ClickType ct = (firstPressedLeft ? ClickType.LEFT_CLICK : ClickType.RIGHT_CLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
-				notifyListeners(new SensorEvent(this, ct));
+				notifyListenersDeprecated(new SensorEvent(this, ct));
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
 				ClickType ct = (firstPressedLeft ? ClickType.LEFT_WITH_RIGHTCLICK : ClickType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
-				notifyListeners(new SensorEvent(this, ct));
+				notifyListenersDeprecated(new SensorEvent(this, ct));
 				state = States.BOTH_DOWN;
 			}
 			break;
@@ -127,13 +127,13 @@ public class DimmerSwitches extends Sensor {
 				// Released the key being hold
 				ClickType ct = (firstPressedLeft ? ClickType.LEFT_RELEASED : ClickType.RIGHT_RELEASED);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
-				notifyListeners(new SensorEvent(this, ct));
+				notifyListenersDeprecated(new SensorEvent(this, ct));
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
 				ClickType ct = (firstPressedLeft ? ClickType.LEFT_WITH_RIGHTCLICK : ClickType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
-				notifyListeners(new SensorEvent(this, ct));
+				notifyListenersDeprecated(new SensorEvent(this, ct));
 				state = States.BOTH_DOWN;
 			}
 			break;

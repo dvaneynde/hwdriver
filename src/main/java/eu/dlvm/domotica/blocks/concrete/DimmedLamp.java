@@ -3,7 +3,8 @@ package eu.dlvm.domotica.blocks.concrete;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.Block;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
@@ -14,7 +15,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author dirk
  */
-public class DimmedLamp extends Actuator {
+public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	/**
 	 * Time in ms to dim from off to fully on.
 	 */
@@ -48,7 +49,7 @@ public class DimmedLamp extends Actuator {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IDomoContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
@@ -70,7 +71,7 @@ public class DimmedLamp extends Actuator {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IHardwareAccess ctx) {
 		this(name, description, outputValueHardwareIfFull, new LogCh(channel), ctx);
 	}
 
@@ -288,9 +289,18 @@ public class DimmedLamp extends Actuator {
 	}
 
 	@Override
-	public void execute(String op) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("execute(): not implemented yet.");
+	public void onEvent(Block source, ActionType action) {
+		switch (action) {
+		case ON:
+			on();
+			break;
+		case OFF:
+			off();
+			break;
+		case TOGGLE:
+			toggle();
+			break;
+		}
 	}
 
 	@Override
@@ -344,7 +354,7 @@ public class DimmedLamp extends Actuator {
 	}
 
 	private void writeAnalogOutput() {
-		hw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
+		getHw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
 	}
 
 }

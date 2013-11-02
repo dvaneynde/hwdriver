@@ -11,10 +11,6 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.Domotic;
-import eu.dlvm.domotica.blocks.concrete.Fan;
-import eu.dlvm.domotica.blocks.concrete.Lamp;
-import eu.dlvm.domotica.blocks.concrete.Switch;
-import eu.dlvm.domotica.blocks.concrete.SwitchBoardFans;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -59,7 +55,6 @@ public class TestSwitchBoardFans {
 	private Switch sw1, sw2;
 	private Lamp l1, l2;
 	private Fan f1, f2;
-	private SwitchBoardFans sbf;
 	private long cur;
 
 	@Before
@@ -71,16 +66,22 @@ public class TestSwitchBoardFans {
 		hw.in(0, false);
 		hw.in(1, false);
 		
-		dom = Domotic.s(hw);
+		Domotic.resetSingleton();
+		dom = Domotic.singleton(hw);
 		sw1 = new Switch("Switch1", "Switch1", new LogCh(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", new LogCh(1), dom);
 		l1 = new Lamp("Lamp1", "Lamp1", new LogCh(LAMP1_OUT), dom);
 		l2 = new Lamp("Lamp2", "Lamp2", new LogCh(LAMP2_OUT), dom);
 		f1 = new Fan("Fan1", "Fan1", l1, new LogCh(FAN1_OUT), dom);
 		f2 = new Fan("Fan2", "Fan2", l2, new LogCh(FAN2_OUT), dom);
-		sbf = new SwitchBoardFans("sbf","Switchboard Fans");
-		sbf.add(sw1, f1);
-		sbf.add(sw2, f2);
+		
+		Switch2Fan s2f1 = new Switch2Fan("s2f1", "s2f1");
+		sw1.registerListener(s2f1);
+		s2f1.registerListener(f1);
+
+		Switch2Fan s2f2 = new Switch2Fan("s2f2", "s2f2");
+		sw2.registerListener(s2f2);
+		s2f2.registerListener(f2);
 
 		dom.initialize();
 	}

@@ -3,16 +3,16 @@ package eu.dlvm.domotica.blocks.concrete;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.Block;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.service.BlockInfo;
-import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
 /**
  * A Fan that runs for a {@link #getRunningPeriodSec()} seconds when toggled on.
- * Optionally it can be connected to a {@link Lamp}, so that if the lamp goes on
- * after {@link #getDelayPeriodSec()} the lamp will run for
- * {@link #getRunningPeriodSec()} seconds.
+ * Optionally it can be connected to a {@link Lamp}:  if the lamp goes on then
+ * after {@link #getDelayPeriodSec()} the fan will run until the lamp goes off again plus the same
+ * {@link #getRunningPeriodSec()} seconds while the lamp is off.
  * <p>
  * The state diagram below shows all possibilities.
  * <p>
@@ -28,7 +28,7 @@ import eu.dlvm.iohardware.LogCh;
  * @author Dirk Vaneynde
  */
 
-public class Fan extends Actuator {
+public class Fan extends Actuator implements IOnOffToggleListener {
 
 	static Logger log = Logger.getLogger(Fan.class);
 
@@ -52,32 +52,19 @@ public class Fan extends Actuator {
 	public enum States {
 		REST, RUN, DELAYED_LAMP_ON, RUN_LAMP_ON, RUN_LAMP_OFF, WAIT_LAMP_OFF
 	};
-
 	private States state;
 
 	/**
+	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, LogCh, IHardwareAccess)} for details.
 	 */
-	public Fan(String name, String description, LogCh channel, IDomoContext ctx) {
+	public Fan(String name, String description, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, channel, ctx);
 		this.state = States.REST;
 		this.runningPeriodMs = 1000 * DEFAULT_RUN_PERIOD_SEC;
 	}
 
 	/**
-	 */
-	public Fan(String name, String description, Lamp lamp, LogCh channel,
-			IDomoContext ctx) {
-		this(name, description, channel, ctx);
-		this.lamp = lamp;
-		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
-	}
-
-	/**
-	 * Constructor. Output is set to false, and transferred to hardware.
-	 * <p>
-	 * Note if this Fan is connected to a lamp for automatically going on and
-	 * out, see {@link #Fan(String, String, Lamp, LogCh, IHardwareIO)}.
-	 * 
+	 * Constructor.
 	 * @param name
 	 *            See superclass
 	 *            {@link Actuator#Actuator(String, String, LogCh)}.
@@ -90,10 +77,15 @@ public class Fan extends Actuator {
 	 *            {@link #getRunningPeriodSec()} the fan stops running.
 	 * @param logicalChannel
 	 *            Logical output channel of fan.
-	 * @param ctrl
+	 * @param ctx
 	 */
-	public Fan(String name, String description, Lamp lamp, int logicalChannel,
-			IDomoContext ctx) {
+	public Fan(String name, String description, Lamp lamp, LogCh channel, IHardwareAccess ctx) {
+		this(name, description, channel, ctx);
+		this.lamp = lamp;
+		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
+	}
+
+	public Fan(String name, String description, Lamp lamp, int logicalChannel, IHardwareAccess ctx) {
 		super(name, description, new LogCh(logicalChannel), ctx);
 		this.state = States.REST;
 		this.lamp = lamp;
@@ -133,44 +125,33 @@ public class Fan extends Actuator {
 		writeOutput(false);
 	}
 
-	/**
-	 * @return true iff. fan is running.
-	 */
-	public boolean isRunning() {
+	public void setOn(boolean outval) {
+		if (outval) {
+			if (!isOn())
+				toggle();
+		} else {
+			turnOffUntilLampOff();
+		}
+	}
+
+	public boolean isOn() {
 		return (state == States.RUN || state == States.RUN_LAMP_ON || state == States.RUN_LAMP_OFF);
-	}
-
-	/**
-	 * @return State of fan. See {@link States}.
-	 */
-	public States getState() {
-		return state;
-	}
-
-	/* To be used outside {@link #loop()}. */
-	private void changeState(States target) {
-		state = target;
-		resetTimeStateEntered = true;
 	}
 
 	/**
 	 * Toggle between immediately turning and stopping. If started, it runs for
 	 * {@link #getDelayPeriodSec()} seconds.
-	 * <p>
-	 * TODO could set a flag, which is treated in loop(). Perhaps cleaner,
-	 * because only one thing can happen, i.e. stuff is easier to keep
-	 * consistent?
 	 */
-	public void toggle() {
+	public boolean toggle() {
+		boolean running;
 		switch (state) {
 		case REST:
 		case WAIT_LAMP_OFF:
 		case DELAYED_LAMP_ON:
 			changeState(States.RUN);
 			writeOutput(true);
-			log.info("Fan '" + getName() + "' goes ON for "
-					+ getRunningPeriodSec()
-					+ " sec. or until switched off (state=" + getState() + ").");
+			running = true;
+			log.info("Fan '" + getName() + "' goes ON for " + getRunningPeriodSec() + " sec. or until switched off (state=" + getState() + ").");
 			break;
 		case RUN:
 		case RUN_LAMP_ON:
@@ -178,13 +159,15 @@ public class Fan extends Actuator {
 		default:
 			changeState(States.REST);
 			writeOutput(false);
+			running = false;
 			log.info("Fan '" + getName() + "' goes OFF because toggled.");
 			break;
 		}
+		return running;
 	}
 
 	/**
-	 * Only effective when in state WAIT_LAMP_OFF, otherwise ignored.
+	 * Only effective when in state RUN_LAMP_ON, otherwise ignored.
 	 * <p>
 	 * Turns off fan, and fan will remain off until lamp is off.
 	 * <p>
@@ -196,10 +179,7 @@ public class Fan extends Actuator {
 		case RUN_LAMP_ON:
 			changeState(States.WAIT_LAMP_OFF);
 			writeOutput(false);
-			log.info("Fan '"
-					+ getName()
-					+ "' goes OFF, and will not turn on again because lamp is still ON (state="
-					+ getState() + ").");
+			log.info("Fan '" + getName() + "' goes OFF, and will not turn on again because lamp is still ON (state=" + getState() + ").");
 			break;
 		default:
 			// ignored;
@@ -207,10 +187,39 @@ public class Fan extends Actuator {
 		}
 	}
 
+	/* To be used outside {@link #loop()}. */
+	private void changeState(States target) {
+		state = target;
+		resetTimeStateEntered = true;
+	}
+
+	/**
+	 * @return State of fan. See {@link States}.
+	 */
+	public States getState() {
+		return state;
+	}
+
+	/**
+	 * Reacts on {@see IOnOffToggle.ActionType} events, with some pecularities:
+	 * <ul><li>ON: if off, behaves like {@link #toggle()}, otherwise no effect</li>
+	 * <li>OFF: if on, behaves as {@link #turnOffUntilLampOff()}</li>
+	 * <li>TOGGLE: see {@link #toggle()}</li>
+	 * </ul>
+	 */
 	@Override
-	public void execute(String op) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("execute(): not implemented yet.");
+	public void onEvent(Block source, ActionType action) {
+		switch (action) {
+		case ON:
+			setOn(true);
+			break;
+		case OFF:
+			setOn(true);
+			break;
+		case TOGGLE:
+			toggle();
+			break;
+		}
 	}
 
 	@Override
@@ -229,9 +238,7 @@ public class Fan extends Actuator {
 			if ((lamp != null) && (lamp.isOn())) {
 				state = States.DELAYED_LAMP_ON;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' watches lamp '"
-						+ lamp.getName() + "' for " + getDelayPeriodSec()
-						+ " sec. before going ON (seq=" + sequence + ").");
+				log.info("Fan '" + getName() + "' watches lamp '" + lamp.getName() + "' for " + getDelayPeriodSec() + " sec. before going ON (seq=" + sequence + ").");
 			}
 			break;
 		case RUN:
@@ -239,10 +246,7 @@ public class Fan extends Actuator {
 				writeOutput(false);
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '" + getName()
-						+ "' goes off because it has run for "
-						+ getRunningPeriodSec() + " sec (seq=" + sequence
-						+ ").");
+				log.info("Fan '" + getName() + "' goes off because it has run for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case DELAYED_LAMP_ON:
@@ -254,19 +258,14 @@ public class Fan extends Actuator {
 				writeOutput(true);
 				state = States.RUN_LAMP_ON;
 				timeStateEntered = current;
-				log.info("Fan '" + getName()
-						+ "' stays ON  for as long as lamp '" + lamp.getName()
-						+ "' is ON (seq=" + sequence + ").");
+				log.info("Fan '" + getName() + "' stays ON  for as long as lamp '" + lamp.getName() + "' is ON (seq=" + sequence + ").");
 			}
 			break;
 		case RUN_LAMP_ON:
 			if (!lamp.isOn()) {
 				state = States.RUN_LAMP_OFF;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "', lamp '" + lamp.getName()
-						+ "'has gone out, keep running for "
-						+ getRunningPeriodSec() + " sec (seq=" + sequence
-						+ ").");
+				log.info("Fan '" + getName() + "', lamp '" + lamp.getName() + "'has gone out, keep running for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case RUN_LAMP_OFF:
@@ -274,22 +273,14 @@ public class Fan extends Actuator {
 				writeOutput(false);
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' goes off because lamp '"
-						+ lamp.getName() + " has been OFF for "
-						+ getRunningPeriodSec() + " sec (seq=" + sequence
-						+ ").");
+				log.info("Fan '" + getName() + "' goes off because lamp '" + lamp.getName() + " has been OFF for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case WAIT_LAMP_OFF:
 			if (!lamp.isOn()) {
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '"
-						+ getName()
-						+ "', lamp '"
-						+ lamp.getName()
-						+ "'has gone off, which I was waiting for to go to REST (seq="
-						+ sequence + ").");
+				log.info("Fan '" + getName() + "', lamp '" + lamp.getName() + "'has gone off, which I was waiting for to go to REST (seq=" + sequence + ").");
 			}
 			break;
 		default:
@@ -299,22 +290,19 @@ public class Fan extends Actuator {
 
 	@Override
 	public BlockInfo getActuatorInfo() {
-		BlockInfo bi = new BlockInfo(this.getName(), this.getClass()
-				.getSimpleName(), this.getDescription());
-		bi.addParm("on", isRunning() ? "1" : "0");
+		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
+		bi.addParm("on", isOn() ? "1" : "0");
 		// TODO time still running, if running
 		return bi;
 	}
 
 	private void writeOutput(boolean val) {
-		hw().writeDigitalOutput(getChannel(), val);
+		getHw().writeDigitalOutput(getChannel(), val);
 	}
 
 	@Override
 	public String toString() {
-		return "Fan (" + super.toString() + ") running=" + isRunning()
-				+ " state=" + getState().name() + " delay="
-				+ getDelayPeriodSec() + "s runperiod=" + getRunningPeriodSec()
-				+ "s.";
+		return "Fan (" + super.toString() + ") running=" + isOn() + " state=" + getState().name() + " delay=" + getDelayPeriodSec() + "s runperiod=" + getRunningPeriodSec() + "s.";
 	}
+
 }

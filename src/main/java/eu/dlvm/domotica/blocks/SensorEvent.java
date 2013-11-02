@@ -7,7 +7,7 @@ package eu.dlvm.domotica.blocks;
  * channel state change.
  * 
  * @author dirk vaneynde
- * 
+ * @deprecated
  */
 public class SensorEvent {
 	private Sensor source;

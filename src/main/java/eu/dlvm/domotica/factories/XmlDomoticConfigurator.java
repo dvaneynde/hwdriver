@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 
 public class XmlDomoticConfigurator {
 	static Logger log = Logger.getLogger(XmlDomoticConfigurator.class);
@@ -24,7 +24,7 @@ public class XmlDomoticConfigurator {
 		this.cfgFilepath = cfgFilepath;
 	}
 
-	public void configure(IDomoContext domoCtx) {
+	public void configure(IHardwareAccess domoCtx) {
 		try {
 			SAXParserFactory f = SAXParserFactory.newInstance();
 			f.setValidating(true);

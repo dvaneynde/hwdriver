@@ -14,15 +14,17 @@
 	<fan name="FanBadkamer0" channel="6" />
 	<fan name="FanWC0" channel="7" lamp="LichtWC0" desc="Ventilator WC gelijkvloers." />
 	<screen name="SchermKeuken" channelDown="23" channelUp="15" />
-	<switchboard name="sb" desc="Algemeen schakelbord">
-		<connection switch="SchakLichtBadkamer0" lamp="LichtBadkamer0" />
-		<connection switch="SchakLichtWC0" lamp="LichtBadkamer0" />
-		<allSwitch switch="AllOnOff" allOff="true" allOn="true" />
-	</switchboard>
-	<switchboardFans name="sbfans">
-		<connection switch="SchakFanWC0" fan="FanWC0" />
-		<connection switch="SchakFanBadkamer0" fan="FanBadkamer0" />
-	</switchboardFans>
+	<group name="Lampen">
+		<block name="LichtBadkamer0" />
+		<block name="LichtWC0" />
+	</group>
+	<connect src="SchakLichtBadkamer0" src-event="single" target="LichtBadkamer0" event="toggle"/>
+	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle"/>
+	<connect src="AllOnOff" src-event="long" target="Lampen" event="off"/>
+	<connect src="SchakFanWC0" src-event="single" target="FanWC0" event="toggle"/>
+	<connect src="SchakFanWC0" src-event="long" target="FanWC0" event="off"/>
+	<connect src="SchakFanBadkamer0" src-event="single" target="FanBadkamer0" event="toggle"/>
+	<connect src="SchakFanBadkamer0" src-event="long" target="FanBadkamer0" event="off"/>
 	<switchboardScreens name="sbscreens">
 		<connection screen="SchermKeuken" switchDown="SchakKeukenScreenNeer"
 			switchUp="SchakKeukenScreenOp" />

@@ -55,7 +55,7 @@ public class Main {
 
 	public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
 		try {
-			Domotic d = Domotic.s();
+			Domotic d = Domotic.singleton();
 			XmlDomoticConfigurator cf = new XmlDomoticConfigurator();
 			cf.setCfgFilepath(cfgFilename);
 			cf.configure(d);

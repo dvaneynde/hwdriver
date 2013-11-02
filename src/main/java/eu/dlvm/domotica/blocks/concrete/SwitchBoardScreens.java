@@ -50,16 +50,16 @@ public class SwitchBoardScreens extends Block implements ISensorListener {
 
     public void addScreen(Switch downSwitch, Switch upSwitch, Screen screen, boolean allEnabled) {
         switch2ScreenInfo.put(downSwitch, new Info(screen, false, allEnabled));
-        downSwitch.registerListener(this);
+        downSwitch.registerListenerDeprecated(this);
         switch2ScreenInfo.put(upSwitch, new Info(screen, true, allEnabled));
-        upSwitch.registerListener(this);
+        upSwitch.registerListenerDeprecated(this);
     }
 
     public void setAllUpDownWithSeparateSwitch(Switch downSwitch, Switch upSwitch) {
         switch2ScreenInfo.put(downSwitch, new Info(null, false, true));
-        downSwitch.registerListener(this);
+        downSwitch.registerListenerDeprecated(this);
         switch2ScreenInfo.put(upSwitch, new Info(null, true, true));
-        upSwitch.registerListener(this);
+        upSwitch.registerListenerDeprecated(this);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class SwitchBoardScreens extends Block implements ISensorListener {
             return;
         }
 
-        switch ((Switch.ClickType) (e.getEvent())) {
+        switch ((ISwitchListener.ClickType) (e.getEvent())) {
         case SINGLE:
             if ((i.screen == null) && (i.allEnabled)) {
                 doAll(i.isUp);

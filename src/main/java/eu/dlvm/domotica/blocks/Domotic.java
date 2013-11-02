@@ -16,7 +16,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  * @author dirk vaneynde
  * 
  */
-public class Domotic implements IDomoContext {
+public class Domotic implements IHardwareAccess {
 
 	static Logger log = Logger.getLogger(Domotic.class);
 
@@ -28,14 +28,14 @@ public class Domotic implements IDomoContext {
 	protected long loopSequence = -1L;
 	protected boolean ready = false;
 
-	public static synchronized  Domotic s() {
+	public static synchronized  Domotic singleton() {
 		if (singleton == null) {
 			singleton = new Domotic();
 		}
 		return singleton;
 	}
 
-	public static synchronized Domotic s(IHardwareIO hw) {
+	public static synchronized Domotic singleton(IHardwareIO hw) {
 		if (singleton == null) {
 			singleton = new Domotic();
 			singleton.setHw(hw);
@@ -43,6 +43,10 @@ public class Domotic implements IDomoContext {
 		return singleton;
 	}
 
+	public static synchronized void resetSingleton() {
+		singleton = null;
+	}
+	
 	private Domotic() {
 		super();
 	}

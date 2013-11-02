@@ -58,7 +58,8 @@ public class TestEnd2EndDimmer {
 		drv = new HwDriverChannelMock();
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
-		dom = Domotic.s(hw);
+		Domotic.resetSingleton();
+		dom = Domotic.singleton(hw);
 		dsw1 = new DimmerSwitches("dsw1", "Dimmer Switches 1", SW_DN_1,
 				SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, dom);

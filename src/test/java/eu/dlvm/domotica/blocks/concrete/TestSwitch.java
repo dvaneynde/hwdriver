@@ -9,7 +9,6 @@ import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
 import eu.dlvm.domotica.blocks.ISensorListener;
 import eu.dlvm.domotica.blocks.SensorEvent;
-import eu.dlvm.domotica.blocks.concrete.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -48,7 +47,7 @@ public class TestSwitch {
 	@Before
 	public void init() {
 		sw = new Switch("TestSwitch", "Unit Test Switch", new LogCh(0), ctx);
-		sw.registerListener(sensorListener);
+		sw.registerListenerDeprecated(sensorListener);
 		cur = (seq = 0L);
 	}
 
@@ -67,7 +66,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.SINGLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.SINGLE, lastSwitchEvent
 						.getEvent());
 	}
 
@@ -99,7 +98,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.DOUBLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.DOUBLE, lastSwitchEvent
 						.getEvent());
 
 		hw.inval = false;
@@ -155,7 +154,7 @@ public class TestSwitch {
 		loop(60);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
-		Assert.assertEquals(Switch.ClickType.LONG, lastSwitchEvent.getEvent());
+		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastSwitchEvent.getEvent());
 		lastSwitchEvent = null;
 		
 		loop();
@@ -224,7 +223,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.SINGLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.SINGLE, lastSwitchEvent
 						.getEvent());
 		lastSwitchEvent = null;
 
@@ -246,7 +245,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.DOUBLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.DOUBLE, lastSwitchEvent
 						.getEvent());
 
 		hw.inval = false;
@@ -278,7 +277,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.SINGLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.SINGLE, lastSwitchEvent
 						.getEvent());
 		lastSwitchEvent = null;
 
@@ -291,7 +290,7 @@ public class TestSwitch {
 		loop(60);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
-		Assert.assertEquals(Switch.ClickType.LONG, lastSwitchEvent.getEvent());
+		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastSwitchEvent.getEvent());
 		lastSwitchEvent = null;
 		
 		loop();
@@ -333,7 +332,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.SINGLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.SINGLE, lastSwitchEvent
 						.getEvent());
 		lastSwitchEvent = null;
 
@@ -346,7 +345,7 @@ public class TestSwitch {
 		loop(110);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
-		Assert.assertEquals(Switch.ClickType.LONG, lastSwitchEvent.getEvent());
+		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastSwitchEvent.getEvent());
 		lastSwitchEvent = null;
 
 		loop();
@@ -376,7 +375,7 @@ public class TestSwitch {
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastSwitchEvent);
 		Assert
-				.assertEquals(Switch.ClickType.DOUBLE, lastSwitchEvent
+				.assertEquals(ISwitchListener.ClickType.DOUBLE, lastSwitchEvent
 						.getEvent());
 
 		hw.inval = false;

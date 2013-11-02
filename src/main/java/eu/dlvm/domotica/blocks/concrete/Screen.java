@@ -3,7 +3,7 @@ package eu.dlvm.domotica.blocks.concrete;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.blocks.Actuator;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
@@ -37,7 +37,7 @@ public class Screen extends Actuator {
 	private boolean gotUp, gotDown;
 
 	public Screen(String name, String description, LogCh chDown, LogCh chUp,
-			IDomoContext ctx) {
+			IHardwareAccess ctx) {
 		super(name, description, chDown, ctx);
 		this.chUp = chUp;
 	}
@@ -64,12 +64,6 @@ public class Screen extends Actuator {
 
 	public void down() {
 		gotDown = true;
-	}
-
-	@Override
-	public void execute(String op) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("execute(): not implemented yet.");
 	}
 
 	@Override
@@ -160,23 +154,23 @@ public class Screen extends Actuator {
 	private void setStateAndEntryUp(long current) {
 		timeStateStart = current;
 		state = States.UP;
-		hw().writeDigitalOutput(chUp, true);
+		getHw().writeDigitalOutput(chUp, true);
 	}
 
 	private void exitUp(long current) {
 		timeStateStart = current;
-		hw().writeDigitalOutput(chUp, false);
+		getHw().writeDigitalOutput(chUp, false);
 	}
 
 	private void setStateAndEntryDown(long current) {
 		timeStateStart = current;
 		state = States.DOWN;
-		hw().writeDigitalOutput(getChannel(), true);
+		getHw().writeDigitalOutput(getChannel(), true);
 	}
 
 	private void exitDown(long current) {
 		timeStateStart = current;
-		hw().writeDigitalOutput(getChannel(), false);
+		getHw().writeDigitalOutput(getChannel(), false);
 	}
 
 	/**

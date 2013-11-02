@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.concrete.Fan;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -33,7 +33,7 @@ public class TestFanNoLamp {
 	private static final LogCh FAN_OUT = new LogCh(10);
 	private Fan fan;
 	private Hardware hw;
-	private IDomoContext ctx;
+	private IHardwareAccess ctx;
 	private long current, seq;
 
 	@BeforeClass
@@ -54,27 +54,27 @@ public class TestFanNoLamp {
 	private void assertRest() {
 		Assert.assertTrue(!hw.lampStatus && !hw.fanStatus);
 		Assert.assertEquals(Fan.States.REST, fan.getState());
-		Assert.assertFalse(fan.isRunning());
+		Assert.assertFalse(fan.isOn());
 	}
 
 	private void assertRunNoLamp() {
 		Assert.assertTrue(!hw.lampStatus && hw.fanStatus);
 		Assert.assertEquals(Fan.States.RUN, fan.getState());
-		Assert.assertTrue(fan.isRunning());
+		Assert.assertTrue(fan.isOn());
 	}
 	
 	@SuppressWarnings("unused")
 	private void assertRunWithLamp() {
 		Assert.assertTrue(hw.fanStatus);
 		Assert.assertEquals(Fan.States.RUN, fan.getState());
-		Assert.assertTrue(fan.isRunning());
+		Assert.assertTrue(fan.isOn());
 	}
 	
 	@SuppressWarnings("unused")
 	private void assertDelayedRun() {
 		Assert.assertTrue(hw.lampStatus && !hw.fanStatus);
 		Assert.assertEquals(Fan.States.DELAYED_LAMP_ON, fan.getState());
-		Assert.assertFalse(fan.isRunning());
+		Assert.assertFalse(fan.isOn());
 	}
 
 	@Ignore("Not implemented yet.")

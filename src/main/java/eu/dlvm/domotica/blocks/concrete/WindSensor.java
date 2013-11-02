@@ -2,7 +2,7 @@ package eu.dlvm.domotica.blocks.concrete;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.Sensor;
 import eu.dlvm.domotica.blocks.SensorEvent;
 import eu.dlvm.iohardware.LogCh;
@@ -45,7 +45,7 @@ public class WindSensor extends Sensor {
 	 * @param lowTimeToResetAlert
 	 *            Unit is milliseconds.
 	 */
-	public WindSensor(String name, String description, LogCh channel, IDomoContext ctx, int highSpeedThreshold,
+	public WindSensor(String name, String description, LogCh channel, IHardwareAccess ctx, int highSpeedThreshold,
 			int lowSpeedThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		super(name, description, channel, ctx);
 		if (highSpeedThreshold < lowSpeedThreshold)
@@ -62,7 +62,7 @@ public class WindSensor extends Sensor {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInput = hw().readDigitalInput(getChannel());
+		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		double freq = gauge.getFrequency();
 
@@ -87,7 +87,7 @@ public class WindSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies ALARM event: freq=" + freq + " > thresholdHigh="
 						+ getHighSpeedThreshold());
-				notifyListeners(new SensorEvent(this, States.ALARM));
+				notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
 			}
 			break;
 		case ALARM:
@@ -105,7 +105,7 @@ public class WindSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow="
 						+ getLowSpeedThreshold());
-				notifyListeners(new SensorEvent(this, States.ALARM));
+				notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
 			}
 			break;
 		default:

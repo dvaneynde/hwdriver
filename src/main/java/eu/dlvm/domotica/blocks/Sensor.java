@@ -17,13 +17,12 @@ import eu.dlvm.iohardware.LogCh;
  * @author Dirk Vaneynde
  * 
  */
-public abstract class Sensor extends BlockWithContext {
+public abstract class Sensor extends BlockWithHardwareAccess {
 
 	static Logger log = Logger.getLogger(Sensor.class);
 
 	private LogCh channel;
 	protected Set<ISensorListener> listeners = new HashSet<ISensorListener>();
-	protected OperationExecutor opex = new OperationExecutor();
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
 	 * 
@@ -31,7 +30,7 @@ public abstract class Sensor extends BlockWithContext {
 	 * @param name
 	 * @param description
 	 */
-	public Sensor(String name, String description, LogCh channel, IDomoContext ctx) {
+	public Sensor(String name, String description, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, ctx);
 		this.channel = channel;
 		ctx.addSensor(this);
@@ -48,20 +47,15 @@ public abstract class Sensor extends BlockWithContext {
 	 * Blocks that are interested in Sensor events. See also {@link ISensorListener#notify(SensorEvent)}.
 	 * @param l Object to be notified.
 	 */
-	public void registerListener(ISensorListener l) {
+	public void registerListenerDeprecated(ISensorListener l) {
 		listeners.add(l);
 	}
 	
-	public OperationExecutor getOpEx() {
-		return opex;
-	}
-
-	protected void notifyListeners(SensorEvent e) {
+	protected void notifyListenersDeprecated(SensorEvent e) {
 		for (ISensorListener l : listeners) {
 			log.debug("notify switch listener, event=" + e + ", listener=" + l);
 			l.notify(e);
 		}
-		opex.send(e.getEventName(), getName());
 	}
 
 	/**

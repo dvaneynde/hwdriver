@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.ISensorListener;
 import eu.dlvm.domotica.blocks.SensorEvent;
 import eu.dlvm.domotica.blocks.concrete.DimmerSwitches;
@@ -25,7 +25,7 @@ public class TestDimmerSwitches {
 	};
 
 	private Hardware hw = new Hardware();
-	private IDomoContext ctx = new DomoContextMock(hw);
+	private IHardwareAccess ctx = new DomoContextMock(hw);
 	private long seq, cur;
 	private DimmerSwitches sw;
 	private SensorEvent lastEvent;
@@ -39,7 +39,7 @@ public class TestDimmerSwitches {
 	@Before
 	public void init() {
 		sw = new DimmerSwitches("TestDimmerSwitches", "Unit Test DimmerSwitches", new LogCh(0), new LogCh(1), ctx);
-		sw.registerListener(sensorListener);
+		sw.registerListenerDeprecated(sensorListener);
 		seq = (cur = 0L);
 	}
 

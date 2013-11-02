@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.blocks.BaseHardwareMock;
 import eu.dlvm.domotica.blocks.DomoContextMock;
-import eu.dlvm.domotica.blocks.IDomoContext;
+import eu.dlvm.domotica.blocks.IHardwareAccess;
 import eu.dlvm.domotica.blocks.concrete.DimmedLamp;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -31,7 +31,7 @@ public class TestDimmedLamp {
 	private static final LogCh LAMP_CH = new LogCh(10);
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
-	private IDomoContext ctx = new DomoContextMock(hw);
+	private IHardwareAccess ctx = new DomoContextMock(hw);
 	private long seq;
 
 	@BeforeClass

@@ -66,7 +66,7 @@ public class TestTimerDayNight {
 		t.setOpenWeatherMap(owmt);
 		t.setOffTime(8, 0);
 		t.setOnTime(6, 30);
-		assertFalse(t.getStatus());
+		assertFalse(t.isOn());
 		assertFalse(t.isTimesUpdatedForToday());
 		assertEquals("08:00", t.getOffTimeAsString());
 		assertEquals("06:30", t.getOnTimeAsString());
@@ -76,7 +76,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 4, 0),
 				seq++);
 		assertFalse(t.isTimesUpdatedForToday());
-		assertFalse(t.getStatus());
+		assertFalse(t.isOn());
 		assertEquals("08:00", t.getOffTimeAsString());
 		assertEquals("06:30", t.getOnTimeAsString());
 		assertEquals(1, owmt.seq);
@@ -85,7 +85,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 4, 4),
 				seq++);
 		assertFalse(t.isTimesUpdatedForToday());
-		assertFalse(t.getStatus());
+		assertFalse(t.isOn());
 		assertEquals("08:00", t.getOffTimeAsString());
 		assertEquals("06:30", t.getOnTimeAsString());
 		assertEquals(1, owmt.seq);
@@ -94,7 +94,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 4, 5),
 				seq++);
 		assertFalse(t.isTimesUpdatedForToday());
-		assertFalse(t.getStatus());
+		assertFalse(t.isOn());
 		assertEquals("08:00", t.getOffTimeAsString());
 		assertEquals("06:30", t.getOnTimeAsString());
 		assertEquals(2, owmt.seq);
@@ -103,14 +103,14 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 4, 10),
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
-		assertTrue(t.getStatus());
+		assertTrue(t.isOn());
 		assertEquals("07:24", t.getOffTimeAsString());
 		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 10, 0),
 				seq++);
-		assertFalse(t.getStatus());
+		assertFalse(t.isOn());
 		assertEquals("07:24", t.getOffTimeAsString());
 		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
@@ -118,7 +118,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 18, 9),
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
-		assertTrue(t.getStatus());
+		assertTrue(t.isOn());
 		assertEquals("07:24", t.getOffTimeAsString());
 		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(3, owmt.seq);
@@ -130,7 +130,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 0),
 				seq++);
 		assertFalse(t.isTimesUpdatedForToday());
-		assertTrue(t.getStatus());
+		assertTrue(t.isOn());
 		assertEquals("07:24", t.getOffTimeAsString());
 		assertEquals("18:08", t.getOnTimeAsString());
 		assertEquals(4, owmt.seq);
@@ -138,7 +138,7 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 5),
 				seq++);
 		assertTrue(t.isTimesUpdatedForToday());
-		assertTrue(t.getStatus());
+		assertTrue(t.isOn());
 		assertEquals("07:26", t.getOffTimeAsString());
 		assertEquals("18:05", t.getOnTimeAsString());
 		assertEquals(5, owmt.seq);

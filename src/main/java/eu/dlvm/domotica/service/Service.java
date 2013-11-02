@@ -20,7 +20,7 @@ public class Service implements IDomoticSvc {
 //	@Produces(MediaType.TEXT_PLAIN)
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
-		for (Actuator a : Domotic.s().getActuators())
+		for (Actuator a : Domotic.singleton().getActuators())
 			sb.append(a.getName()).append('\n');
 		return sb.toString();
 	}
@@ -30,7 +30,7 @@ public class Service implements IDomoticSvc {
 //	@GET
 	public List<BlockInfo> listActuators() {
 		List<BlockInfo> list = new ArrayList<>();
-		for (Actuator a : Domotic.s().getActuators()) {
+		for (Actuator a : Domotic.singleton().getActuators()) {
 			BlockInfo aj = a.getActuatorInfo();
 			list.add(aj);
 		}

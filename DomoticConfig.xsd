@@ -59,31 +59,6 @@
 					</complexType>
 				</element>
 
-				<element name="switchboard" minOccurs="0" maxOccurs="1">
-					<complexType>
-						<complexContent>
-							<extension base="tns:blockStruct">
-								<sequence>
-									<element name="connection" maxOccurs="unbounded">
-										<complexType>
-											<attribute name="switch" type="IDREF" use="required" />
-											<attribute name="lamp" type="IDREF" use="required" />
-											<attribute name="allOff" type="boolean" default="false" />
-										</complexType>
-									</element>
-									<element name="c-timer" minOccurs="0" maxOccurs="unbounded">
-										<complexType>
-											<attribute name="timer" type="IDREF" use="required" />
-											<attribute name="lamp" type="IDREF" use="required" />
-										</complexType>
-									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct"
-										minOccurs="0" />
-								</sequence>
-							</extension>
-						</complexContent>
-					</complexType>
-				</element>
 				<element name="switchboardDimmer" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -95,29 +70,12 @@
 											<attribute name="dimmedLamp" type="IDREF" use="required" />
 										</complexType>
 									</element>
-									<element name="allSwitch" type="tns:allSwitchStruct"
-										minOccurs="0" />
 								</sequence>
 							</extension>
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="switchboardFans" minOccurs="0" maxOccurs="1">
-					<complexType>
-						<complexContent>
-							<extension base="tns:blockStruct">
-								<sequence>
-									<element name="connection" maxOccurs="unbounded">
-										<complexType>
-											<attribute name="switch" type="IDREF" use="required" />
-											<attribute name="fan" type="IDREF" use="required" />
-										</complexType>
-									</element>
-								</sequence>
-							</extension>
-						</complexContent>
-					</complexType>
-				</element>
+
 				<element name="switchboardScreens" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
