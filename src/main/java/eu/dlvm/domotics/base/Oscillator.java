@@ -1,7 +1,11 @@
 package eu.dlvm.domotics.base;
 
+import org.apache.log4j.Logger;
+
 public class Oscillator {
 
+	static Logger log = Logger.getLogger(Oscillator.class);
+	
 	private Domotic dom;
 	private long tickTimeMs;
 	private boolean goOn;
@@ -23,8 +27,6 @@ public class Oscillator {
 			try {
 				Thread.sleep(tickTimeMs);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			synchronized (this) {
 				localGoOn = goOn;

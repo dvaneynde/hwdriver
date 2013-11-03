@@ -94,9 +94,9 @@ public class Main {
 					try {
 						log.info("Oscillator oscillates...");
 						osc.go();
-						log.fatal("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
+						log.error("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
 					} catch (Exception e) {
-						log.fatal("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
+						log.error("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
 					}
 				}
 			};
