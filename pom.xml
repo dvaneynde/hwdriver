@@ -141,7 +141,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<mainClass>eu.dlvm.domotica.Main</mainClass>
+							<mainClass>eu.dlvm.domotics.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
