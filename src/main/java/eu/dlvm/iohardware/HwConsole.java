@@ -59,7 +59,7 @@ public class HwConsole {
         XmlHwConfigurator cfgr = new XmlHwConfigurator();
         cfgr.setCfgFilepath(cfgFile.toString());
         // Om te testen, zonder hw: volgende twee lijnen vervangen door een pseudo mock IHardwareIO maken, met boards en channelMap.
-        HwDriverTcpChannel hdtc = new HwDriverTcpChannel(hostname, port);
+        HwDriverTcpChannel hdtc = new HwDriverTcpChannel(hostname, port, 1000);
         hw = new HardwareIO(cfgr, hdtc);
         hw.initialize();
     }

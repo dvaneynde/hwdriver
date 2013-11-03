@@ -37,10 +37,10 @@ public class Main {
 	static Logger logDriver = Logger.getLogger("DRIVER");
 	private String pid;
 
-	public IHardwareIO setupHardware(String cfgFile, String host, int port) {
+	public IHardwareIO setupHardware(String cfgFile, String host, int port, int readTimeout) {
 		XmlHwConfigurator xcf = new XmlHwConfigurator();
 		xcf.setCfgFilepath(cfgFile);
-		IHwDriverChannel hdc = new HwDriverTcpChannel(host, port);
+		IHwDriverChannel hdc = new HwDriverTcpChannel(host, port, readTimeout);
 		HardwareIO hw = new HardwareIO(xcf, hdc);
 		return hw;
 	}
@@ -62,8 +62,7 @@ public class Main {
 			d.setHw(hw);
 			return d;
 		} catch (Exception e) {
-			log.error("Cannot configure system, abort. Reason:"
-					+ e.getMessage());
+			log.error("Cannot configure system, abort. Reason:" + e.getMessage());
 			throw new RuntimeException("Abort. Cannot configure system.");
 		}
 	}
@@ -80,52 +79,77 @@ public class Main {
 	 *            driver should be started separately, after this one shows
 	 *            "START" in the log.
 	 */
-	public void runDomotic(final Domotic dom, final Oscillator osc,
-			String pathToDriver) {
+	public void runDomotic(final Domotic dom, final Oscillator osc, String pathToDriver) {
 		if (pathToDriver == null) {
 			log.info("Initializing domotic.");
 			dom.initialize();
 			log.info("Domotic starts looping now, in main thread.");
 			osc.go();
 		} else {
-			// see
+			// TODO see
 			// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
-			Runnable r = new Runnable() {
+			Runnable domoticRunner = new Runnable() {
 				@Override
 				public void run() {
-					log.info("Domotic starts looping now, in separate thread. Logger DRIVER gives more information. Main thread watches driver.");
-					osc.go();
+					try {
+						log.info("Oscillator oscillates...");
+						osc.go();
+						log.fatal("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
+					} catch (Exception e) {
+						log.fatal("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
+					}
 				}
 			};
-			// TODO driver in aparte thread, main loop doet osc.go() en kijkt of
-			// alles nog draait - driver en domotic; zoniet herstart of exit;
-			// TODO dan kan driver start ook herbruikt voor HwConsole
-			Thread t = new Thread(r, "Domotic Blocks Execution.");
+			Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
 			try {
 				log.info("Start HwDriver, and wait 5 seconds...");
-				ProcessBuilder pb = new ProcessBuilder(pathToDriver,
-						"localhost");
-				Process process = pb.start();
-				Thread.sleep(5000);
-				log.info("Initialize domotic and its hardware.");
+				ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
+				final Process process = pb.start();
+				Thread.sleep(5000); // TODO replace later by
+									// prStdout.isDriverReady()
+				log.info("Initialize domotic system.");
 				dom.initialize();
-				log.info("Start Domotic looping in separate thread 'Domotic Blocks Execution'.");
-				t.start(); // TODO wacht op klaar lijn in driver log hieronder,
-							// dan pas domotic starten
-				BufferedReader br = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
-				String line;
-				while ((line = br.readLine()) != null) {
-					logDriver.info(line);
+				log.info("Start Domotic thread 'Domotic Blocks Execution'.");
+				domoticThread.start();
+				log.info("Start watchdogs, on hwdriver and on blocks execution.");
+				// dan pas domotic starten
+				ProcessWatch prWatch = new ProcessWatch(process, "Driver Process Watch");
+				ProcessReader prStdout = new ProcessReader(process.getInputStream(), "Driver STDOUT Reader");
+				ProcessReader prStderr = new ProcessReader(process.getErrorStream(), "Driver STDERR Reader");
+				prWatch.startWatching();
+				prStdout.startReading();
+				prStderr.startReading();
+				log.info("Everything started, now watching...");
+				long lastLoopSequence = -1;
+				while (true) {
+					Thread.sleep(5000);
+					{
+						long currentLoopSequence = dom.getLoopSequence();
+						if (currentLoopSequence <= lastLoopSequence)
+							log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current=" + currentLoopSequence);
+						lastLoopSequence = currentLoopSequence;
+					}
+					// TODO dump state to disk...
+					// TODO extra test: loopcounter moet verhoogd zijn...
+					if (prWatch.isRunning() && prStdout.isRunning() && prStderr.isRunning()) {
+						log.debug("Checked driver sub-process, seems OK.");
+					} else {
+						log.error("Something is wrong with driver subprocess. I'll just continue, recovery not yet implemented, but below is report:");
+						log.error("\tprocess watch: " + prWatch.toString());
+						log.error("\tprocess stdout: " + prStdout.toString());
+						log.error("\tprocess stderr: " + prStderr.toString());
+						// TODO misschien best non-zero exit code geven, en
+						// soort wrapper herstart het volledige domotica, dat
+						// ook eerst laatst weggeschreven status leest
+					}
 				}
+
 			} catch (IOException e) {
-				log.fatal("Problem starting or running HwDriver program '"
-						+ pathToDriver + "'.", e);
+				log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
 			} catch (InterruptedException e) {
-				log.fatal("Problem starting or running HwDriver program '"
-						+ pathToDriver + "'.", e);
+				log.fatal("Got interrupted, could be Thread.sleep() stuff; put in try-catch-repeat.", e);
 			} finally {
-				stopThread(t);
+				stopThread(domoticThread);
 			}
 		}
 		log.info("Domotica stopped looping.");
@@ -133,8 +157,7 @@ public class Main {
 
 	@SuppressWarnings("deprecation")
 	private void stopThread(Thread t) {
-		t.stop(new CancellationException(
-				"Stop requested, due to error starting HwDriver as subprocess."));
+		t.stop(new CancellationException("Stop requested, due to error starting HwDriver as subprocess."));
 	}
 
 	public String getPid() {
@@ -168,8 +191,7 @@ public class Main {
 		log.info("domotic pid=" + pid + ", written to domotic.pid file.");
 	}
 
-	public void runHwConsole(final String cfgFilename, final String hostname,
-			final int port, String pathToDriver) {
+	public void runHwConsole(final String cfgFilename, final String hostname, final int port, String pathToDriver) {
 		if (pathToDriver == null) {
 			HwConsole hc = new HwConsole(cfgFilename, hostname, port);
 			hc.processCommands();
@@ -184,23 +206,19 @@ public class Main {
 			Thread t = new Thread(r, "HwConsole");
 			try {
 				log.info("Start HwDriver, wait for 5 seconds...");
-				ProcessBuilder pb = new ProcessBuilder(pathToDriver,
-						"localhost");
+				ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
 				Process process = pb.start();
 				Thread.sleep(5000);
 				t.start();
-				BufferedReader br = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
+				BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				String line;
 				while ((line = br.readLine()) != null) {
 					logDriver.info(line);
 				}
 			} catch (IOException e) {
-				log.fatal("Problem starting or running HwDriver program '"
-						+ pathToDriver + "'.", e);
+				log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
 			} catch (InterruptedException e) {
-				log.fatal("Problem starting or running HwDriver program '"
-						+ pathToDriver + "'.", e);
+				log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
 			} finally {
 				stopThread(t);
 			}
@@ -284,31 +302,29 @@ public class Main {
 			usage();
 		}
 		if (domotic && (blocksCfgFile == null)) {
-			System.err
-					.println("Both blocks-config-file and hardware-config-file must be specified for domotic system.");
+			System.err.println("Both blocks-config-file and hardware-config-file must be specified for domotic system.");
 			usage();
 		}
 
 		if (logcfgfile == null) {
+			System.out.println("Logging starts, using log4j default configuration.");
 			BasicConfigurator.configure();
 		} else {
+			System.out.println("Logging starts, using log4j configuration from '"+logcfgfile+"'.");
 			PropertyConfigurator.configure(logcfgfile);
 		}
 
 		Main main = new Main();
 		if (domotic) {
-			log.info("STARTING Domotic system. Configuration:\n\tdriver:\t"
-					+ path2Driver + "\n\tlooptime:\t" + looptime
-					+ "ms\n\tlog-config:\t" + logcfgfile
-					+ "\n\thardware cfg:\t" + hwCfgFile + "\n\tblocks cfg:\t"
-					+ blocksCfgFile + "\n\tprocess pid:\t" + main.getPid());
+			log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\tlog-config:\t" + logcfgfile + "\n\thardware cfg:\t"
+					+ hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + main.getPid());
 
 			main.storePid();
 			IHardwareIO hw;
 			if (simulation)
 				hw = main.setupSimulatedHardware(hwCfgFile);
 			else
-				hw = main.setupHardware(hwCfgFile, hostname, port);
+				hw = main.setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10);
 			Domotic dom = main.setupBlocksConfig(blocksCfgFile, hw);
 
 			ServiceServer server = new ServiceServer();
@@ -324,18 +340,10 @@ public class Main {
 	}
 
 	private static void usage() {
-		System.out
-				.println("Usage:\t"
-						+ Main.class.getSimpleName()
-						+ " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n"
-						+ "\t"
-						+ Main.class.getSimpleName()
-						+ " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n"
-						+ "\t-d path to driver, if it needs to be started and managed by this program\n"
-						+ "\t-t time between loops, in ms\n"
-						+ "\t-b domotic blocks xml configuration file\n"
-						+ "\t-c hardware xml configuration file\n"
-						+ "\t-l log4j configuration file\n");
+		System.out.println("Usage:\t" + Main.class.getSimpleName()
+				+ " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
+				+ " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n" + "\t-d path to driver, if it needs to be started and managed by this program\n"
+				+ "\t-t time between loops, in ms\n" + "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n" + "\t-l log4j configuration file\n");
 		System.exit(2);
 	}
 

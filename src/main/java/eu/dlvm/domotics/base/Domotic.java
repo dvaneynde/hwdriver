@@ -179,4 +179,9 @@ public class Domotic implements IHardwareAccess {
 	public boolean isReady() {
 		return ready;
 	}
+
+	public long getLoopSequence() {
+		return loopSequence;
+	}
+
 }

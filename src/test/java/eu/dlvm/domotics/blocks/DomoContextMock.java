@@ -44,4 +44,8 @@ public class DomoContextMock implements IHardwareAccess {
 		}
 		actuators.add(a);
 	}
+
+	public long getLoopSequence() {
+		return 0;
+	}
 }
