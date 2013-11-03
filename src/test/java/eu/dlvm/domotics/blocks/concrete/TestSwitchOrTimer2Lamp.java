@@ -25,7 +25,7 @@ import eu.dlvm.domotics.sensors.Timer;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
-public class TestSwitchBoard {
+public class TestSwitchOrTimer2Lamp {
 	public static class Hardware extends BaseHardwareMock implements IHardwareIO {
 		private Map<LogCh, Boolean> inputs = new HashMap<LogCh, Boolean>();
 		private Map<LogCh, Boolean> outputs = new HashMap<LogCh, Boolean>();

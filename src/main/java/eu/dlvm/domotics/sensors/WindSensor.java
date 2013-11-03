@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.base.SensorEvent;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -87,7 +86,7 @@ public class WindSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies ALARM event: freq=" + freq + " > thresholdHigh="
 						+ getHighSpeedThreshold());
-				notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
+				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
 			}
 			break;
 		case ALARM:
@@ -105,7 +104,7 @@ public class WindSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow="
 						+ getLowSpeedThreshold());
-				notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
+				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
 			}
 			break;
 		default:

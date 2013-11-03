@@ -25,8 +25,7 @@
 	<connect src="SchakFanWC0" src-event="long" target="FanWC0" event="off"/>
 	<connect src="SchakFanBadkamer0" src-event="single" target="FanBadkamer0" event="toggle"/>
 	<connect src="SchakFanBadkamer0" src-event="long" target="FanBadkamer0" event="off"/>
-	<switchboardScreens name="sbscreens">
-		<connection screen="SchermKeuken" switchDown="SchakKeukenScreenNeer"
-			switchUp="SchakKeukenScreenOp" />
-	</switchboardScreens>
+
+	<connect-screen  screen="SchermKeuken" switchDown="SchakKeukenScreenNeer"
+			switchUp="SchakKeukenScreenOp" click="single"/>
 </domotic>

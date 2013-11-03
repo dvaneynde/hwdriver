@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.base.SensorEvent;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.LogCh;
 
@@ -107,7 +106,6 @@ public class Switch extends Sensor {
 							+ "' notifies LONG click event (seq=" + sequence
 							+ ").");
 					notifyListeners(ISwitchListener.ClickType.LONG);
-					notifyListenersDeprecated(new SensorEvent(this, ISwitchListener.ClickType.LONG));
 					state = States.WAIT_RELEASE;
 					break;
 				}
@@ -120,7 +118,6 @@ public class Switch extends Sensor {
 							+ "' notifies SINGLE click event (seq=" + sequence
 							+ ").");
 					notifyListeners(ISwitchListener.ClickType.SINGLE);
-					notifyListenersDeprecated(new SensorEvent(this, ISwitchListener.ClickType.SINGLE));
 					state = States.REST;
 				} else if (isLongClickEnabled()) {
 					state = States.REST; // Did not press long enough
@@ -139,7 +136,6 @@ public class Switch extends Sensor {
 							+ "' notifies SINGLE click event (seq=" + sequence
 							+ ").");
 					notifyListeners(ISwitchListener.ClickType.SINGLE);
-					notifyListenersDeprecated(new SensorEvent(this, ISwitchListener.ClickType.SINGLE));
 				}
 				state = States.REST;
 			} else if (newInputState) {
@@ -147,7 +143,6 @@ public class Switch extends Sensor {
 						+ "' notifies DOUBLE click event (seq=" + sequence
 						+ ").");
 				notifyListeners(ISwitchListener.ClickType.DOUBLE);
-				notifyListenersDeprecated(new SensorEvent(this, ISwitchListener.ClickType.DOUBLE));
 				state = States.REST;
 			}
 			break;

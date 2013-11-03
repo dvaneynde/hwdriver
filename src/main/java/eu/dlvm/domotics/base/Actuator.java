@@ -77,6 +77,7 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	 * @param sequence
 	 *            A number that increments with each loop. Useful to detect
 	 *            being called twice - which is forbidden.
+	 * TODO move to IHardwareAccess
 	 */
 	public abstract void loop(long currentTime, long sequence);
 	
@@ -85,6 +86,7 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	/**
 	 * To be called from {{@link #loop(long, long)} implementations, to stop program if a loop is looped (should be graph).
 	 * @param currentLoopSequence
+	 * TODO go to IHardwareAcess, also sensors can use it (must use it), perhaps use delegate?
 	 */
 	protected void checkLoopSequence(long currentLoopSequence) {
 		if (currentLoopSequence <= previousLoopSequence) {

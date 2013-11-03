@@ -3,9 +3,9 @@ package eu.dlvm.domotics.blocks.concrete;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.BeforeClass;
 
-import eu.dlvm.domotics.base.ISensorListener;
-import eu.dlvm.domotics.base.SensorEvent;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
+import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -29,13 +29,13 @@ public class TestWindSensor {
 	public static int LOW_TIME_TO_RESET_ALERT = 180 * 1000;
 	
 
-	private ISensorListener sensorListener = new ISensorListener() {
+	private ISwitchListener sensorListener = new ISwitchListener() {
 		@Override
-		public void notify(SensorEvent e) {
-			lastEvent = e;
+		public void onEvent(Switch swtch, ISwitchListener.ClickType click) {
+			lastEvent = click;
 		}
 	};
-	private SensorEvent lastEvent;
+	private ISwitchListener.ClickType lastEvent;
 
 	public void simulateFrequency(int freq, Hardware hw) {
 		// TODO

@@ -7,13 +7,13 @@ import junit.framework.Assert;
 
 import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.mappers.SwitchBoardScreens;
+import eu.dlvm.domotics.mappers.Switch2Screen;
+import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -67,7 +67,7 @@ public class TestSwitchBoardScreens {
 	private Domotic dom;
 	private Switch swDn1, swUp1, swDn2, swUp2;
 	private Screen sr1, sr2;
-	private SwitchBoardScreens sbs;
+	private Switch2Screen s2s1, s2s2, s2sAll;
 	private long cur;
 
 	@Before
@@ -96,15 +96,20 @@ public class TestSwitchBoardScreens {
 				SW_UP_2), dom);
 		sr2 = new Screen("Screen2", "Screen Bathroom", new LogCh(REL_DN_2),
 				new LogCh(REL_UP_2), dom);
-		sbs = new SwitchBoardScreens("sbs", "SwitchBoard Screens");
-		sbs.addScreen(swDn1, swUp1, sr1, true);
-		sbs.addScreen(swDn2, swUp2, sr2, false);
-
+		
+		s2s1 = new Switch2Screen("s2s1", "s2s1",swDn1,swUp1,ISwitchListener.ClickType.SINGLE);
+		s2s1.registerListener(sr1);
+		s2s2 = new Switch2Screen("s2s2", "s2s2",swDn2,swUp2,ISwitchListener.ClickType.SINGLE);
+		s2s2.registerListener(sr2);
+		
 		swDn1.setLongClickEnabled(true);
 		swDn1.setLongClickTimeout(LONGCLICKTIMEOUT);
 		swUp1.setLongClickEnabled(true);
 		swUp1.setLongClickTimeout(LONGCLICKTIMEOUT);
-
+		s2sAll = new Switch2Screen("all", "", swDn1, swUp1, ISwitchListener.ClickType.LONG);
+		s2sAll.registerListener(sr1);
+		s2sAll.registerListener(sr2);
+		
 		cur = 0L;
 		dom.initialize();
 

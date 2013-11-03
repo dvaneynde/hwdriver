@@ -1,24 +1,9 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import static org.junit.Assert.fail;
-
-import org.apache.log4j.BasicConfigurator;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import eu.dlvm.domotics.base.IHardwareAccess;
-import eu.dlvm.domotics.base.ISensorListener;
-import eu.dlvm.domotics.base.IllegalConfigurationException;
-import eu.dlvm.domotics.base.SensorEvent;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.LightSensor;
-import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 public class TestLightSensor {
 
+	/*
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
 		public int level;
 
@@ -46,11 +31,6 @@ public class TestLightSensor {
 	public static void initLog() {
 		BasicConfigurator.configure();
 	}
-
-	//	private void loop(long inc) {
-	//		cur += inc;
-	//		sw.loop(cur, seq++);
-	//	}
 
 	@Test
 	public final void testInitWrong() {
@@ -119,5 +99,6 @@ public class TestLightSensor {
 		}
 
 	}
+	*/
 
 }

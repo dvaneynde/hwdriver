@@ -18,7 +18,7 @@ import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
-public class TestSwitchBoardFans {
+public class TestSwitch2Fans {
 	
 	private final int LAMP1_OUT = 10;
 	private final int LAMP2_OUT = 11;

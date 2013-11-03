@@ -14,9 +14,9 @@ import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.LogCh;
 
-public class TestSwitchBoardDedicatedAllOff {
-	static Logger log = Logger.getLogger(TestSwitchBoardDedicatedAllOff.class);
-	private TestSwitchBoard.Hardware hw;
+public class TestSwitchDedicatedAllOff {
+	static Logger log = Logger.getLogger(TestSwitchDedicatedAllOff.class);
+	private TestSwitchOrTimer2Lamp.Hardware hw;
 	private Domotic dom;
 	private Switch swLamp, swAllOff;
 	private Lamp lamp;
@@ -27,7 +27,7 @@ public class TestSwitchBoardDedicatedAllOff {
 	public void init() {
 		cur = 0L;
 
-		hw = new TestSwitchBoard.Hardware();
+		hw = new TestSwitchOrTimer2Lamp.Hardware();
 		hw.in(0, false);
 		hw.in(1, false);
 		hw.out(10, false);

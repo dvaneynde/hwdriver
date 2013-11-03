@@ -15,9 +15,9 @@ import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
-import eu.dlvm.domotics.mappers.SwitchBoardDimmers;
+import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
-import eu.dlvm.domotics.sensors.DimmerSwitches;
+import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -54,10 +54,10 @@ public class TestSwitchBoardDimmers {
 
 	private Domotic dom;
 	private Hardware hw;
-	private DimmerSwitches dsw1;
+	private DimmerSwitch dsw1;
 	private DimmedLamp dl1;
 	private Switch swAllOnOff;
-	private SwitchBoardDimmers sbd;
+	private DimmerSwitch2Dimmer ds2d;
 	private long cur;
 
 	@BeforeClass
@@ -80,12 +80,14 @@ public class TestSwitchBoardDimmers {
 
 		Domotic.resetSingleton();
 		dom = Domotic.singleton(hw);
-		dsw1 = new DimmerSwitches("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
+		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);
-		sbd = new SwitchBoardDimmers("sbd", "Switchboard Dimmers");
-		sbd.add(dsw1, dl1);
-
+		
+		ds2d = new DimmerSwitch2Dimmer("ds2d", "ds2d");
+		ds2d.setLamp(dl1);
+		dsw1.registerListener(ds2d);
+		
 		swAllOnOff = new Switch("swAll", "Switch All On/Off", SW_ALL, dom);
 		swAllOnOff.setDoubleClickEnabled(true);
 		swAllOnOff.setDoubleClickTimeout(400L);

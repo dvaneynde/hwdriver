@@ -18,9 +18,9 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
-import eu.dlvm.domotics.mappers.SwitchBoardDimmers;
-import eu.dlvm.domotics.mappers.SwitchBoardScreens;
-import eu.dlvm.domotics.sensors.DimmerSwitches;
+import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
+import eu.dlvm.domotics.mappers.Switch2Screen;
+import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.Timer;
@@ -57,12 +57,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			name = atts.getValue("name");
 			Block block2add = blocks.get(name);
 			groupBlocks.add(block2add);
-		} else if (localName.equals("connect")) {
-			handleConnect(atts);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
-			// TODO default attribute values, werkt dat niet?
-
 			boolean singleClick = parseBoolAttribute("singleClick", true, atts);
 			boolean longClick = parseBoolAttribute("longClick", false, atts);
 			boolean doubleClick = parseBoolAttribute("doubleClick", false, atts);
@@ -86,7 +82,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			LogCh channelDown = (s == null ? new LogCh(name + "Down") : new LogCh(s));
 			s = atts.getValue("channelUp");
 			LogCh channelUp = (s == null ? new LogCh(name + "Up") : new LogCh(s));
-			block = new DimmerSwitches(name, desc, channelDown, channelUp, ctx);
+			block = new DimmerSwitch(name, desc, channelDown, channelUp, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lamp")) {
 			parseBaseBlockWithChannel(atts);
@@ -113,33 +109,22 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 				((Screen) block).setMotorOnPeriod(Integer.parseInt(atts.getValue("motor-on-time")));
 			}
 			blocks.put(block.getName(), block);
-		} else if (localName.equals("switchboardDimmer")) {
-			parseBaseBlock(atts);
-			block = new SwitchBoardDimmers(name, desc);
-			blocks.put(block.getName(), block);
-		} else if (localName.equals("switchboardScreens")) {
-			parseBaseBlock(atts);
-			block = new SwitchBoardScreens(name, desc);
-			blocks.put(block.getName(), block);
-		} else if (localName.equals("connection")) {
-			// TODO introduce interface ICapabilitySwitchConnectable to avoid
-			// below if/else, also update parseConnection() and rename
-			// parseSwitchConnection
-			if (block instanceof SwitchBoardDimmers) {
-				parseConnection((SwitchBoardDimmers) block, atts);
-			} else if (block instanceof SwitchBoardScreens) {
-				parseConnection((SwitchBoardScreens) block, atts);
-			} else {
-				throw new ConfigurationException("Connection found in unknown Block.");
-			}
-		} else if (localName.equals("allUpDownSwitches")) {
-			parseAllUpDownSwitch(block, atts);
+		} else if (localName.equals("connect")) {
+			parseConnect(atts);
+		} else if (localName.equals("connect-dimmer")) {
+			parseConnectDimmer(atts);
+		} else if (localName.equals("connect-screen")) {
+			parseConnectScreen(atts);
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}
 	}
 
-	private void handleConnect(Attributes atts) {
+	public void endElement(String uri, String localName, String qqName) throws SAXException {
+	}
+
+
+	private void parseConnect(Attributes atts) {
 		String srcName = atts.getValue("src");
 		String srcEventName = atts.getValue("src-event");
 		String targetName = atts.getValue("target");
@@ -171,11 +156,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			s2oot = new Switch2OnOffToggle(s2ootName, "Switch " + swtch.getName() + " connected to " + targetName);
 			blocks.put(s2ootName, s2oot);
 		}
-		
+
 		s2oot.map(ISwitchListener.ClickType.valueOf(srcEventName.toUpperCase()), IOnOffToggleListener.ActionType.valueOf(eventName.toUpperCase()));
 		swtch.registerListener(s2oot);
 		for (Block target : targetBlocks) {
-			 s2oot.registerListener((IOnOffToggleListener)target);
+			s2oot.registerListener((IOnOffToggleListener) target);
 		}
 	}
 
@@ -189,47 +174,58 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			targetBlocks.add(t);
 		}
 
-		for (Block target:targetBlocks)
-			timer.register((IOnOffToggleListener)target);
+		for (Block target : targetBlocks)
+			timer.register((IOnOffToggleListener) target);
 	}
 
-	public void endElement(String uri, String localName, String qqName) throws SAXException {
-	}
+	private void parseConnectDimmer(Attributes atts) {
+		parseBaseBlock(atts);
 
-	private void parseAllUpDownSwitch(Block sb, Attributes atts) {
-		String allDownSwitchName = atts.getValue("allDownSwitch");
-		String allUpSwitchName = atts.getValue("allUpSwitch");
-
-		if (!blocks.containsKey(allDownSwitchName)) {
-			throw new ConfigurationException("SwitchBoard " + sb.getName() + " needs a Switch named " + allDownSwitchName + ", which it did not encounter in configuration file.");
-		}
-		if (!blocks.containsKey(allUpSwitchName)) {
-			throw new ConfigurationException("SwitchBoard " + sb.getName() + " needs a Switch named " + allUpSwitchName + ", which it did not encounter in configuration file.");
-		}
-
-		SwitchBoardScreens sbs = (SwitchBoardScreens) sb;
-		sbs.setAllUpDownWithSeparateSwitch((Switch) blocks.get(allDownSwitchName), (Switch) blocks.get(allUpSwitchName));
-	}
-
-	private void parseConnection(SwitchBoardDimmers sb, Attributes atts) {
 		String switchName = atts.getValue("dimmerSwitch");
 		String lampName = atts.getValue("dimmedLamp");
 		if (!blocks.containsKey(switchName)) {
-			throw new ConfigurationException("SwitchBoardDimmers " + sb.getName() + " needs DimmerSwitches named " + switchName + ", which it did not encounter in configuration file.");
+			throw new ConfigurationException("Need a DimmerSwitches named " + switchName + ", which I did not encounter in configuration file.");
 		}
 		if (!blocks.containsKey(lampName)) {
-			throw new ConfigurationException("SwitchBoard " + sb.getName() + " needs a Lamp named " + lampName + ", which it did not encounter in configuration file.");
+			throw new ConfigurationException("Need a Lamp named " + lampName + ", which I did not encounter in configuration file.");
 		}
-		sb.add((DimmerSwitches) blocks.get(switchName), (DimmedLamp) blocks.get(lampName));
+		DimmerSwitch ds = (DimmerSwitch) blocks.get(switchName);
+		DimmedLamp dl = (DimmedLamp) blocks.get(lampName);
+		String ds2dName = switchName + "_to_" + lampName;
+		DimmerSwitch2Dimmer ds2d = new DimmerSwitch2Dimmer(ds2dName, ds2dName);
+		blocks.put(ds2d.getName(), ds2d);
+		ds.registerListener(ds2d);
+		ds2d.setLamp(dl);
 	}
 
-	private void parseConnection(SwitchBoardScreens sb, Attributes atts) {
+	private void parseConnectScreen(Attributes atts) {
 		String switchDownName = atts.getValue("switchDown");
 		String switchUpName = atts.getValue("switchUp");
 		String screenName = atts.getValue("screen");
-		sb.addScreen((Switch) blocks.get(switchDownName), (Switch) blocks.get(switchUpName), (Screen) blocks.get(screenName), false);
+		String clickName = atts.getValue("click");
+		
+		List<Block> targetBlocks;
+		Block t = blocks.get(screenName);
+		if (t == null)
+			targetBlocks = group2Blocks.get(screenName);
+		else {
+			targetBlocks = new ArrayList<>(1);
+			targetBlocks.add(t);
+		}
+
+		String csName = "Switch2Screen_"+screenName;
+		Switch down = (Switch)blocks.get(switchDownName);
+		Switch up = (Switch)blocks.get(switchUpName);
+		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
+		Switch2Screen s2s = new Switch2Screen(csName, csName, down, up, click);
+		blocks.put(s2s.getName(), s2s);
+		
+		for (Block target : targetBlocks) {
+			s2s.registerListener((Screen) target);
+		}
 	}
 
+	
 	private void parseBaseBlockWithChannel(Attributes atts) {
 		parseBaseBlock(atts);
 		String s = atts.getValue("channel");

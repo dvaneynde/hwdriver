@@ -7,7 +7,6 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -31,8 +30,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	private long lastUpDnLoopTime;
 	private States state;
 
-	// private boolean newLevelToWrite;
-
+	
 	public enum States {
 		OFF, ON, UP, DOWN
 	};

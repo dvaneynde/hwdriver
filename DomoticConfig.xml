@@ -145,17 +145,20 @@
 	<connect src="TimerNacht" target="LichtNacht" />
 
 	<!-- Ventilatie -->
-	<connect src="SchakVentilatorWC0" src-event="single" target="VentilatorWC0" event="toggle"/>
-	<connect src="SchakVentilatorWC0" src-event="long" target="VentilatorWC0" event="off"/>
-	<connect src="SchakVentilatorBadk0" src-event="single" target="VentilatorBadk0" event="toggle"/>
-	<connect src="SchakVentilatorBadk0" src-event="long" target="VentilatorBadk0" event="off"/>
+	<connect src="SchakVentilatorWC0" src-event="single" target="VentilatorWC0"
+		event="toggle" />
+	<connect src="SchakVentilatorWC0" src-event="long" target="VentilatorWC0"
+		event="off" />
+	<connect src="SchakVentilatorBadk0" src-event="single" target="VentilatorBadk0"
+		event="toggle" />
+	<connect src="SchakVentilatorBadk0" src-event="long" target="VentilatorBadk0"
+		event="off" />
 
 
-	<switchboardDimmer name="Dimmers">
-		<connection dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
-		<connection dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
-		<connection dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
-	</switchboardDimmer>
+	<connect-dimmer dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
+	<connect-dimmer dimmedLamp="LichtCircanteRondom"
+		dimmerSwitch="SchakLichtCircanteRondom" />
+	<connect-dimmer dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
 
 	<!-- Screens -->
 	<screen name="ScreenTomas" motor-on-time="30" />
@@ -181,22 +184,29 @@
 	<switch name="SchakScreenKeukenDown" />
 	<switch name="SchakScreenAllUp" />
 	<switch name="SchakScreenAllDown" />
-	<switchboardScreens name="Screens">
-		<connection screen="ScreenTomas" switchUp="SchakScreenTomasUp"
-			switchDown="SchakScreenTomasDown" />
-		<connection screen="ScreenDriesTuin" switchUp="SchakScreenDriesTuinUp"
-			switchDown="SchakScreenDriesTuinDown" />
-		<connection screen="ScreenDriesOpzij" switchUp="SchakScreenDriesOpzijUp"
-			switchDown="SchakScreenDriesOpzijDown" />
-		<connection screen="ScreenRoos" switchUp="SchakScreenRoosUp"
-			switchDown="SchakScreenRoosDown" />
-		<connection screen="ScreenBreed" switchUp="SchakScreenBreedUp"
-			switchDown="SchakScreenBreedDown" />
-		<connection screen="ScreenLang" switchUp="SchakScreenLangUp"
-			switchDown="SchakScreenLangDown" />
-		<connection screen="ScreenKeuken" switchUp="SchakScreenKeukenUp"
-			switchDown="SchakScreenKeukenDown" />
-		<allUpDownSwitches allDownSwitch="SchakScreenAllDown"
-			allUpSwitch="SchakScreenAllUp" />
-	</switchboardScreens>
+	<group name="Screens">
+		<block name="ScreenTomas" />
+		<block name="ScreenDriesTuin" />
+		<block name="ScreenDriesOpzij" />
+		<block name="ScreenRoos" />
+		<block name="ScreenBreed" />
+		<block name="ScreenLang" />
+		<block name="ScreenKeuken" />
+	</group>
+	<connect-screen screen="ScreenTomas" switchUp="SchakScreenTomasUp"
+		switchDown="SchakScreenTomasDown" click="single" />
+	<connect-screen screen="ScreenDriesTuin" switchUp="SchakScreenDriesTuinUp"
+		switchDown="SchakScreenDriesTuinDown" click="single" />
+	<connect-screen screen="ScreenDriesOpzij" switchUp="SchakScreenDriesOpzijUp"
+		switchDown="SchakScreenDriesOpzijDown" click="single" />
+	<connect-screen screen="ScreenRoos" switchUp="SchakScreenRoosUp"
+		switchDown="SchakScreenRoosDown" click="single" />
+	<connect-screen screen="ScreenBreed" switchUp="SchakScreenBreedUp"
+		switchDown="SchakScreenBreedDown" click="single" />
+	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp"
+		switchDown="SchakScreenLangDown" click="single" />
+	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp"
+		switchDown="SchakScreenKeukenDown" click="single" />
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown"
+		switchUp="SchakScreenAllUp" click="long" />
 </domotic>

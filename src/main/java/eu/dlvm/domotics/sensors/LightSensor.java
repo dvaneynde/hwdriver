@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.base.SensorEvent;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -89,7 +88,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh="
 						+ getHighThreshold());
-				notifyListenersDeprecated(new SensorEvent(this, States.HIGH));
+				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.HIGH));
 			}
 			break;
 		case HIGH:
@@ -107,7 +106,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow="
 						+ getLowThreshold());
-				notifyListenersDeprecated(new SensorEvent(this, States.LOW));
+				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.LOW));
 			}
 			break;
 		default:

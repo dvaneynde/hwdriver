@@ -5,15 +5,6 @@
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
-				<element name="group" type="tns:groupType" />
-				<element name="connect">
-					<complexType>
-						<attribute name="src" type="IDREF" />
-						<attribute name="src-event" type="string" />
-						<attribute name="target" type="IDREF" />
-						<attribute name="event" type="string" />
-					</complexType>
-				</element>
 				<element name="switch" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -29,6 +20,7 @@
 					minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
+
 				<element name="lamp" type="tns:blockWithChannelStruct"
 					minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
@@ -59,45 +51,27 @@
 					</complexType>
 				</element>
 
-				<element name="switchboardDimmer" minOccurs="0" maxOccurs="1">
+				<element name="group" type="tns:groupType" />
+				<element name="connect">
 					<complexType>
-						<complexContent>
-							<extension base="tns:blockStruct">
-								<sequence>
-									<element name="connection" maxOccurs="unbounded">
-										<complexType>
-											<attribute name="dimmerSwitch" type="IDREF" use="required" />
-											<attribute name="dimmedLamp" type="IDREF" use="required" />
-										</complexType>
-									</element>
-								</sequence>
-							</extension>
-						</complexContent>
+						<attribute name="src" type="IDREF" />
+						<attribute name="src-event" type="string" />
+						<attribute name="target" type="IDREF" />
+						<attribute name="event" type="string" />
 					</complexType>
 				</element>
-
-				<element name="switchboardScreens" minOccurs="0" maxOccurs="1">
+				<element name="connect-dimmer">
 					<complexType>
-						<complexContent>
-							<extension base="tns:blockStruct">
-								<sequence>
-									<element name="connection" maxOccurs="unbounded">
-										<complexType>
-											<attribute name="switchDown" type="IDREF" use="required" />
-											<attribute name="switchUp" type="IDREF" use="required" />
-											<attribute name="screen" type="IDREF" use="required" />
-										</complexType>
-									</element>
-									<element name="allUpDownSwitches" minOccurs="0">
-										<complexType>
-											<attribute name="allDownSwitch" type="IDREF" />
-											<attribute name="allUpSwitch" type="IDREF" />
-										</complexType>
-
-									</element>
-								</sequence>
-							</extension>
-						</complexContent>
+						<attribute name="dimmerSwitch" type="IDREF" use="required" />
+						<attribute name="dimmedLamp" type="IDREF" use="required" />
+					</complexType>
+				</element>
+				<element name="connect-screen">
+					<complexType>
+						<attribute name="screen" type="IDREF" use="required" />
+						<attribute name="switchDown" type="IDREF" use="required" />
+						<attribute name="switchUp" type="IDREF" use="required" />
+						<attribute name="click" type="tns:switchEventType" use="required" />
 					</complexType>
 				</element>
 			</choice>

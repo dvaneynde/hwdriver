@@ -1,28 +1,24 @@
 package eu.dlvm.domotics.base;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * Sensors sense input.
+ * TODO can go away, just package hints to it being a sensor, i.e. without listener or being triggered somewhere.
+ * Sensors sense input from hardware, or elsewhere. 
  * <p>
  * They have at least one input channel. They transform simple on or off into
  * higher level events, such as DoubleClick or SingleClick.
  * <p>
  * Only Sensors must read data from hardware. This to avoid difficult to find bugs.
  * @author Dirk Vaneynde
- * 
  */
 public abstract class Sensor extends BlockWithHardwareAccess {
 
 	static Logger log = Logger.getLogger(Sensor.class);
 
 	private LogCh channel;
-	protected Set<ISensorListener> listeners = new HashSet<ISensorListener>();
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
 	 * 
@@ -38,24 +34,10 @@ public abstract class Sensor extends BlockWithHardwareAccess {
 
 	/**
 	 * @return Logical channel that this Sensor is connected on.
+	 * TODO move to IHardwareAccess
 	 */
 	public LogCh getChannel() {
 		return channel;
-	}
-
-	/**
-	 * Blocks that are interested in Sensor events. See also {@link ISensorListener#notify(SensorEvent)}.
-	 * @param l Object to be notified.
-	 */
-	public void registerListenerDeprecated(ISensorListener l) {
-		listeners.add(l);
-	}
-	
-	protected void notifyListenersDeprecated(SensorEvent e) {
-		for (ISensorListener l : listeners) {
-			log.debug("notify switch listener, event=" + e + ", listener=" + l);
-			l.notify(e);
-		}
 	}
 
 	/**
@@ -68,6 +50,7 @@ public abstract class Sensor extends BlockWithHardwareAccess {
 	 * @param sequence
 	 *            A number that increments with each loop. Useful to detect
 	 *            being called twice - which is forbidden.
+	 * TODO move to IHardwareAccess
 	 */
 	public abstract void loop(long currentTime, long sequence);
 
