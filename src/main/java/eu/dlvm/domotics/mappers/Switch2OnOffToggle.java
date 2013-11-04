@@ -50,7 +50,7 @@ public class Switch2OnOffToggle extends Block implements ISwitchListener {
 	public void onEvent(Switch source, ClickType click) {
 		IOnOffToggleListener.ActionType action = mappings.get(click);
 		if (action == null) {
-			log.error("Received unexpected event. This is a configuration error. Event received=" + click + " from switch=" + source);
+			log.debug("Received event for which no action is registered. Name="+getName()+", event received=" + click + ", from switch=" + source);
 			return;
 		}
 		notifyListeners(action);

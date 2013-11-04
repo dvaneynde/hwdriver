@@ -62,8 +62,6 @@ public class DimmerSwitch2Dimmer extends Block implements IDimmerSwitchListener 
 		case RIGHT_WITH_LEFTCLICK:
 			dimmedLamp.on(100);
 			break;
-		default:
-			log.warn("Unknown event from DimmerSwitch. Please fix.");
 		}
 	}
 
