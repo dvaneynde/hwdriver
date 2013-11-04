@@ -12,7 +12,7 @@
 	<fan name="VentilatorWC0" lamp="LichtWC0" desc="WC" />
 	<switch name="SchakLichtGaragePoort" />
 	<lamp name="LichtGaragePoort" desc="Garage Poort" />
-	<switch name="SchakLichtGarageTuin" />
+	<switch name="SchakLichtGarageTuin" longClick="true"/>
 	<lamp name="LichtGarageTuin" desc="Garage Tuin" />
 	<switch name="SchakLichtKeuken" />
 	<lamp name="LichtKeuken" desc="Keuken" />
@@ -71,7 +71,7 @@
 		<block name="LichtRoos" />
 	</group>
 
-	<switch name="SchakBuitenTuin" />
+	<switch name="SchakBuitenTuin" singleClick="false" longClick="true" />
 	<lamp name="LichtTerras" desc="Terras" />
 	<lamp name="StopkBuiten" desc="Buiten" />
 	<group name="Buiten">
@@ -108,6 +108,8 @@
 	<connect src="SchakLichtGaragePoort" src-event="single"
 		target="LichtGaragePoort" event="toggle" />
 	<connect src="SchakLichtGarageTuin" src-event="single" target="LichtGarageTuin"
+		event="toggle" />
+	<connect src="SchakLichtGarageTuin" src-event="long" target="LichtGaragePoort"
 		event="toggle" />
 	<connect src="SchakLichtKeuken" src-event="single" target="LichtKeuken"
 		event="toggle" />

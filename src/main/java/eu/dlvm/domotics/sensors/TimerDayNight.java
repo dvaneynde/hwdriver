@@ -56,7 +56,7 @@ public class TimerDayNight extends Timer {
 					setOnOffTimes(info);
 					log.info("Checked todays' sunrise (" + getOffTimeAsString()
 							+ ") and sunset (" + getOnTimeAsString()
-							+ ") times. I'll check again tomorrow.");
+							+ ") times. Note: these include 30 minutes shimmer time. I'll check again tomorrow.");
 					timesUpdatedForToday = true;
 				} else {
 					log.warn("Did not get times from internet provider. Will try again in "
