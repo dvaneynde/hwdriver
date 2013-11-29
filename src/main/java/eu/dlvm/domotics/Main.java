@@ -248,7 +248,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int looptime = 100; // 100 ms default
+		int looptime = 50; // ms default
 		String path2Driver = null;
 		String logcfgfile = null;
 		String blocksCfgFile = null;
