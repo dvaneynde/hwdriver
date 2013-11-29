@@ -30,7 +30,7 @@ public class Switch extends Sensor {
 
 	static Logger log = Logger.getLogger(Switch.class);
 
-	public static long DEFAULT_LONG_TIMEOUT = 2000L;
+	public static long DEFAULT_LONG_TIMEOUT = 1200L;
 	public static long DEFAULT_DOUBLE_TIMEOUT = 200L;
 
 	private long leftRESTtime = 0L;
