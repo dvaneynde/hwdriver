@@ -44,6 +44,11 @@ public class ProcessWatch {
 		return exitcode;
 	}
 
+	@SuppressWarnings("deprecation")
+	public void terminate() {
+		thread.stop();
+	}
+	
 	@Override
 	public String toString() {
 		return "ProcessWatch [threadname=" + threadname + ", process=" + process + ", running=" + running + ", exitcode=" + exitcode + "]";
