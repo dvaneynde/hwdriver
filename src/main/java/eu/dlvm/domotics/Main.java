@@ -104,7 +104,7 @@ public class Main {
 			boolean stopRequested = false;
 			while (!stopRequested) {
 				try {
-					log.info("Start HwDriver, and wait 5 seconds...");
+					log.info("Start HwDriver, and wait for startup message from driver...");
 					ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
 					final Process process = pb.start();
 					ProcessWatch prWatch = new ProcessWatch(process, "Driver Process Watch");
@@ -114,16 +114,17 @@ public class Main {
 					prStdout.startReading();
 					prStderr.startReading();
 					int maxTries = 5000 / 200;
-					while ((--maxTries >= 0) && prStdout.driverNotReady())
+					int trial = 0;
+					while ((trial++ < maxTries) && prStdout.driverNotReady())
 						Thread.sleep(200);
-					if (maxTries < 0)
-						log.warn("Couldn't see HwDriver to be started (via stdout), but going on anyway. Assume it started.");
+					if (trial >= maxTries)
+						log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
+					else
+						log.info("Driver started in " + (trial - 1) * 200 / 1000.0 + " seconds.");
 					log.info("Initialize domotic system.");
 					dom.initialize();
 					log.info("Start Domotic thread 'Domotic Blocks Execution'.");
 					domoticThread.start();
-					log.info("Start watchdogs, on hwdriver and on blocks execution.");
-					// dan pas domotic starten
 					log.info("Everything started, now watching...");
 					long lastLoopSequence = -1;
 					while (true) {
@@ -163,7 +164,7 @@ public class Main {
 				}
 			}
 		}
-		log.info("Domotica stopped looping.");
+		log.info("Domotica exited.");
 	}
 
 	public String getPid() {
