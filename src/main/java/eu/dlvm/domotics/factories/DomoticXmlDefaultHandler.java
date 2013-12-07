@@ -1,11 +1,15 @@
 package eu.dlvm.domotics.factories;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
@@ -22,12 +26,15 @@ import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.sensors.NewYear;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.Timer;
 import eu.dlvm.domotics.sensors.TimerDayNight;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
+
+	static Logger log = Logger.getLogger(DomoticXmlDefaultHandler.class);
 
 	private Block block;
 	private Map<String, Block> blocks = new HashMap<>();
@@ -115,6 +122,26 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
+		} else if (localName.equals("newyear")) {
+			SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss");
+			try {
+				Date start = format.parse(atts.getValue("start"));
+				Date end = format.parse(atts.getValue("end"));
+				NewYear ny = new NewYear("newyear", start.getTime(), end.getTime());
+				blocks.put(ny.getName(), ny);
+			} catch (ParseException e) {
+				log.error("Failed parsing NewYear",e);
+				throw new RuntimeException("Failed parsing domotic config. Abort.");
+			}
+		} else if (localName.equals("onoff")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+		
+		} else if (localName.equals("random")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+
+		} else if (localName.equals("sine")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}
@@ -122,7 +149,6 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 	public void endElement(String uri, String localName, String qqName) throws SAXException {
 	}
-
 
 	private void parseConnect(Attributes atts) {
 		String srcName = atts.getValue("src");
@@ -203,7 +229,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String switchUpName = atts.getValue("switchUp");
 		String screenName = atts.getValue("screen");
 		String clickName = atts.getValue("click");
-		
+
 		List<Block> targetBlocks;
 		Block t = blocks.get(screenName);
 		if (t == null)
@@ -213,19 +239,18 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			targetBlocks.add(t);
 		}
 
-		String csName = "Switch2Screen_"+screenName;
-		Switch down = (Switch)blocks.get(switchDownName);
-		Switch up = (Switch)blocks.get(switchUpName);
+		String csName = "Switch2Screen_" + screenName;
+		Switch down = (Switch) blocks.get(switchDownName);
+		Switch up = (Switch) blocks.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
 		Switch2Screen s2s = new Switch2Screen(csName, csName, down, up, click);
 		blocks.put(s2s.getName(), s2s);
-		
+
 		for (Block target : targetBlocks) {
 			s2s.registerListener((Screen) target);
 		}
 	}
 
-	
 	private void parseBaseBlockWithChannel(Attributes atts) {
 		parseBaseBlock(atts);
 		String s = atts.getValue("channel");
