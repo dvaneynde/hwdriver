@@ -18,7 +18,8 @@ import eu.dlvm.iohardware.IHardwareIO;
  */
 public class Domotic implements IHardwareAccess {
 
-	static Logger log = Logger.getLogger(Domotic.class);
+	private static Logger log = Logger.getLogger(Domotic.class);
+	private static Logger MON = Logger.getLogger("MONITOR");
 
 	private static Domotic singleton;
 	// protected access for test cases only
@@ -96,6 +97,8 @@ public class Domotic implements IHardwareAccess {
 			throw new RuntimeException("Domotic not initialized.");
 		}
 		loopSequence++;
+		if (loopSequence %10 == 0)
+			MON.info("loopOnce() start, loopSequence="+loopSequence+", currentTime="+currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
 			s.loop(currentTime, loopSequence);
@@ -104,6 +107,8 @@ public class Domotic implements IHardwareAccess {
 			a.loop(currentTime, loopSequence);
 		}
 		hw.refreshOutputs();
+		if (loopSequence %10 == 0)
+			MON.info("loopOnce() done, loopSequence="+loopSequence+", currentTime="+currentTime);
 	}
 
 	/**

@@ -32,8 +32,10 @@ import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
  */
 public class Main {
 
-	static Logger log = Logger.getLogger(Main.class);
-	static Logger logDriver = Logger.getLogger("DRIVER");
+	private static Logger log = Logger.getLogger(Main.class);
+	private static Logger logDriver = Logger.getLogger("DRIVER");
+	private static Logger MON = Logger.getLogger("MONITOR");
+
 	private String pid;
 
 	public IHardwareIO setupHardware(String cfgFile, String host, int port, int readTimeout) {
@@ -101,6 +103,7 @@ public class Main {
 				}
 			};
 			Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
+			// TODO request stop is niet geimplementeerd !
 			boolean stopRequested = false;
 			while (!stopRequested) {
 				try {
@@ -138,7 +141,7 @@ public class Main {
 						// TODO dump state to disk...
 						// TODO extra test: loopcounter moet verhoogd zijn...
 						if (prWatch.isRunning() && prStdout.isRunning() && prStderr.isRunning()) {
-							log.debug("Checked driver sub-process, seems OK.");
+							MON.info("Checked driver sub-process, seems OK.");
 						} else {
 							log.error("Something is wrong with driver subprocess. I'll just continue, recovery not yet implemented, but below is report:");
 							log.error("\tprocess watch: " + prWatch.toString());
@@ -163,6 +166,8 @@ public class Main {
 					domoticThread.stop();
 				}
 			}
+			if (!stopRequested)
+				log.info("Restarting driver after problems. Pray...");
 		}
 		log.info("Domotica exited.");
 	}
