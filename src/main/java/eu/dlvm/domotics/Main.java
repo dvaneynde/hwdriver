@@ -68,6 +68,14 @@ public class Main {
 		}
 	}
 
+	private void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			log.warn("Got interrupted, in Thread.sleep(), IGNORED. Where does this come from?", e);
+		}
+	}
+
 	/**
 	 * Runs it.
 	 * 
@@ -102,66 +110,64 @@ public class Main {
 					}
 				}
 			};
-			Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
-			// TODO request stop is niet geimplementeerd !
 			boolean stopRequested = false;
 			boolean fatalError = false;
+			// TODO request stop is niet geimplementeerd !
 			while (!stopRequested && !fatalError) {
+				log.info("Start HwDriver, and wait for startup message from driver...");
+				ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
+				final Process process;
 				try {
-					log.info("Start HwDriver, and wait for startup message from driver...");
-					ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
-					final Process process;
-					try {
-					 process = pb.start();
-					} catch (IOException e) {
-						log.error("Cannot start driver as subprocess. Abort startup.",e);
-						fatalError = true;
-						continue;
-						
-					}
-					DriverMonitor monitor = new DriverMonitor();
-					monitor.initialize(process);
-					int maxTries = 5000 / 200;
-					int trial = 0;
-					while ((trial++ < maxTries) && monitor.driverNotReady())
-						Thread.sleep(200);
-					if (trial >= maxTries)
-						log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
-					else
-						log.info("Driver started in " + (trial - 1) * 200 / 1000.0 + " seconds.");
-					log.info("Initialize domotic system.");
-					dom.initialize();
-					log.info("Start Domotic thread 'Domotic Blocks Execution'.");
-					domoticThread.start();
-					log.info("Everything started, now monitoring...");
-					long lastLoopSequence = -1;
-					while (true) {
-						Thread.sleep(5000);
-						{
-							long currentLoopSequence = dom.getLoopSequence();
-							if (currentLoopSequence <= lastLoopSequence)
-								log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current=" + currentLoopSequence);
-							lastLoopSequence = currentLoopSequence;
-						}
-						// TODO dump state to disk...
-						if (monitor.everythingSeemsWorking()) {
-							MON.info("Checked driver sub-process, seems OK.");
-						} else {
-							log.error("Something is wrong with driver subprocess. I'll just continue, recovery not yet implemented, but below is report:");
-							log.error(monitor.report());
-							break;
-						}
-					}
-					process.destroy();
-					monitor.terminate();
-				} catch (InterruptedException e) {
-					log.warn("Got interrupted, could be Thread.sleep() stuff; perhaps put in try-catch-repeat. Will restart everything.", e);
+					process = pb.start();
+				} catch (IOException e) {
+					log.error("Cannot start driver as subprocess. Abort startup.", e);
+					fatalError = true;
+					break;
 				}
+				DriverMonitor monitor = new DriverMonitor(process);
+				int maxTries = 5000 / 200;
+				int trial = 0;
+				while ((trial++ < maxTries) && monitor.driverNotReady())
+					sleep(200);
+				if (trial >= maxTries)
+					log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
+				else
+					log.info("Driver started in " + (trial - 1) * 200 / 1000.0 + " seconds.");
+				
+				log.info("Initialize domotic system.");
+				dom.initialize();
+				log.info("Start Domotic thread 'Domotic Blocks Execution'.");
+				Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
+				domoticThread.start();
+				
+				log.info("Everything started, now monitoring...");
+				long lastLoopSequence = -1;
+				while (true) {
+					sleep(5000);
+					long currentLoopSequence = dom.getLoopSequence();
+					if (currentLoopSequence <= lastLoopSequence)
+						log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current=" + currentLoopSequence);
+					lastLoopSequence = currentLoopSequence;
+					// TODO dump state to disk...
+					if (monitor.everythingSeemsWorking()) {
+						MON.info("Checked driver sub-process, seems OK.");
+					} else {
+						log.error("Something is wrong with driver subprocess. I'll try to restart.");
+						log.error(monitor.report());
+						break;
+					}
+				}
+				// shutdown
+				process.destroy();
+				monitor.terminate();
 				domoticThread.stop();
 				dom.shutdown();
+				log.info("Stopped domotic thread and closed connection.");
+				if (!stopRequested && !fatalError) {
+					log.info("Will restart driver in 3 seconds...");
+					sleep(3000);
+				}
 			}
-			if (!stopRequested && !fatalError)
-				log.info("Restarting driver after problems. Pray...");
 		}
 		log.info("Domotica exited.");
 	}

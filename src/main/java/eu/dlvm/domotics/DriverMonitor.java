@@ -6,7 +6,11 @@ public class DriverMonitor {
 	private ProcessReader prStdout;
 	private ProcessReader prStderr;
 
-	public void initialize(Process process) {
+	public DriverMonitor(Process process) {
+		initialize(process);
+	}
+
+	private void initialize(Process process) {
 		prWatch = new ProcessWatch(process, "Driver Process Watch");
 		prStdout = new ProcessReader(process.getInputStream(), "Driver STDOUT Reader");
 		prStderr = new ProcessReader(process.getErrorStream(), "Driver STDERR Reader");
@@ -14,7 +18,7 @@ public class DriverMonitor {
 		prStdout.startReading();
 		prStderr.startReading();
 	}
-	
+
 	public void terminate() {
 		prWatch.terminate();
 		prStdout.terminate();
@@ -31,9 +35,9 @@ public class DriverMonitor {
 
 	public String report() {
 		String s = "";
-		s += "\tprocess watch: " + prWatch.toString();
-		s += "\tprocess stdout: " + prStdout.toString();
-		s += "\tprocess stderr: " + prStderr.toString();
+		s += "\n\tprocess watch: " + prWatch.toString();
+		s += "\n\tprocess stdout: " + prStdout.toString();
+		s += "\n\tprocess stderr: " + prStderr.toString();
 		return s;
 	}
 }
