@@ -34,7 +34,7 @@ public interface IHardwareIO {
 	/**
 	 * Connect to hardware driver and initialize hardware.
 	 */
-	public void initialize();
+	public void initialize() throws ChannelFault;
 
 	/**
 	 * Reads all hardware inputs, refreshing local buffer.

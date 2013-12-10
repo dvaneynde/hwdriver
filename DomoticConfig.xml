@@ -184,8 +184,8 @@
 	<switch name="SchakScreenLangDown" />
 	<switch name="SchakScreenKeukenUp" />
 	<switch name="SchakScreenKeukenDown" />
-	<switch name="SchakScreenAllUp" />
-	<switch name="SchakScreenAllDown" />
+	<switch name="SchakScreenAllUp" singleClick="false" longClick="true"/>
+	<switch name="SchakScreenAllDown" singleClick="false" longClick="true"/>
 	<group name="Screens">
 		<block name="ScreenTomas" />
 		<block name="ScreenDriesTuin" />

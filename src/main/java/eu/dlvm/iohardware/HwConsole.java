@@ -61,7 +61,11 @@ public class HwConsole {
         // Om te testen, zonder hw: volgende twee lijnen vervangen door een pseudo mock IHardwareIO maken, met boards en channelMap.
         HwDriverTcpChannel hdtc = new HwDriverTcpChannel(hostname, port, 1000);
         hw = new HardwareIO(cfgr, hdtc);
-        hw.initialize();
+        try {
+			hw.initialize();
+		} catch (ChannelFault e) {
+			throw new RuntimeException(e.getMessage());
+		}
     }
 
     public void processCommands() {

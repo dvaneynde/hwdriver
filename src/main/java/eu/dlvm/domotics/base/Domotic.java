@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
@@ -64,7 +65,12 @@ public class Domotic implements IHardwareAccess {
 	 */
 	public void initialize() {
 		loopSequence++;
-		hw.initialize();
+		try {
+			hw.initialize();
+		} catch (ChannelFault e) {
+			log.error("Cannot start Domotic, cannot communicate with driver.");
+			throw new RuntimeException("Problem communicating with driver.");
+		}
 		for (Actuator a : actuators) {
 			a.initializeOutput();
 		}
@@ -72,6 +78,10 @@ public class Domotic implements IHardwareAccess {
 		ready = true;
 	}
 
+	public void shutdown() {
+		hw.stop();
+	}
+	
 	/**
 	 * Some external clock must regularly call this method, to let the Blocks
 	 * 'work'.

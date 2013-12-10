@@ -105,20 +105,25 @@ public class Main {
 			Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
 			// TODO request stop is niet geimplementeerd !
 			boolean stopRequested = false;
-			while (!stopRequested) {
+			boolean fatalError = false;
+			while (!stopRequested && !fatalError) {
 				try {
 					log.info("Start HwDriver, and wait for startup message from driver...");
 					ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
-					final Process process = pb.start();
-					ProcessWatch prWatch = new ProcessWatch(process, "Driver Process Watch");
-					ProcessReader prStdout = new ProcessReader(process.getInputStream(), "Driver STDOUT Reader");
-					ProcessReader prStderr = new ProcessReader(process.getErrorStream(), "Driver STDERR Reader");
-					prWatch.startWatching();
-					prStdout.startReading();
-					prStderr.startReading();
+					final Process process;
+					try {
+					 process = pb.start();
+					} catch (IOException e) {
+						log.error("Cannot start driver as subprocess. Abort startup.",e);
+						fatalError = true;
+						continue;
+						
+					}
+					DriverMonitor monitor = new DriverMonitor();
+					monitor.initialize(process);
 					int maxTries = 5000 / 200;
 					int trial = 0;
-					while ((trial++ < maxTries) && prStdout.driverNotReady())
+					while ((trial++ < maxTries) && monitor.driverNotReady())
 						Thread.sleep(200);
 					if (trial >= maxTries)
 						log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
@@ -128,7 +133,7 @@ public class Main {
 					dom.initialize();
 					log.info("Start Domotic thread 'Domotic Blocks Execution'.");
 					domoticThread.start();
-					log.info("Everything started, now watching...");
+					log.info("Everything started, now monitoring...");
 					long lastLoopSequence = -1;
 					while (true) {
 						Thread.sleep(5000);
@@ -139,34 +144,23 @@ public class Main {
 							lastLoopSequence = currentLoopSequence;
 						}
 						// TODO dump state to disk...
-						// TODO extra test: loopcounter moet verhoogd zijn...
-						if (prWatch.isRunning() && prStdout.isRunning() && prStderr.isRunning()) {
+						if (monitor.everythingSeemsWorking()) {
 							MON.info("Checked driver sub-process, seems OK.");
 						} else {
 							log.error("Something is wrong with driver subprocess. I'll just continue, recovery not yet implemented, but below is report:");
-							log.error("\tprocess watch: " + prWatch.toString());
-							log.error("\tprocess stdout: " + prStdout.toString());
-							log.error("\tprocess stderr: " + prStderr.toString());
-							// TODO misschien best non-zero exit code geven, en
-							// soort wrapper herstart het volledige domotica,
-							// dat
-							// ook eerst laatst weggeschreven status leest
+							log.error(monitor.report());
 							break;
 						}
 					}
 					process.destroy();
-					prWatch.terminate();
-					prStdout.terminate();
-					prStderr.terminate();
-				} catch (IOException e) {
-					log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
+					monitor.terminate();
 				} catch (InterruptedException e) {
-					log.fatal("Got interrupted, could be Thread.sleep() stuff; put in try-catch-repeat.", e);
-				} finally {
-					domoticThread.stop();
+					log.warn("Got interrupted, could be Thread.sleep() stuff; perhaps put in try-catch-repeat. Will restart everything.", e);
 				}
+				domoticThread.stop();
+				dom.shutdown();
 			}
-			if (!stopRequested)
+			if (!stopRequested && !fatalError)
 				log.info("Restarting driver after problems. Pray...");
 		}
 		log.info("Domotica exited.");

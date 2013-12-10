@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import eu.dlvm.iohardware.ChannelFault;
 
 /**
  * Communicates via TCP with a Hardware Driver.
@@ -43,7 +46,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#connect()
 	 */
 	@Override
-	public void connect() {
+	public void connect() throws ChannelFault {
 		try {
 			socket = new Socket(serverHostname, serverPort);
 			socket.setSoTimeout(readTimeout);
@@ -52,7 +55,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		} catch (IOException e) {
 			log.fatal("Connecting to " + serverHostname + ':' + serverPort
 					+ " failed.", e);
-			throw new RuntimeException(e);
+			throw new ChannelFault("Cannot connect to "+serverHostname+':'+serverPort+", probably not recoverable.", false);
 		}
 	}
 
@@ -60,7 +63,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#sendAndRecv(java.lang.String)
 	 */
 	@Override
-	public List<String> sendAndRecv(String stringToSend) {
+	public List<String> sendAndRecv(String stringToSend) throws ChannelFault {
 		try {
 			List<String> recvd = new ArrayList<String>();
 			// Send stringToSend to Hardware Driver
@@ -81,6 +84,9 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 				recvd.add(line);
 			}
 			return recvd;
+		} catch (SocketTimeoutException e) {
+			log.warn("Read timeout, probably driver gone? Timeout value is:"+readTimeout, e);
+			throw new ChannelFault("Read timeout, probably driver gone? Timeout value is:"+readTimeout, true);
 		} catch (IOException e) {
 			log.fatal("Error communicating with Hardware Driver.", e);
 			throw new RuntimeException(e);
