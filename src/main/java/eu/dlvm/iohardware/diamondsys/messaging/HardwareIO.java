@@ -130,7 +130,7 @@ public class HardwareIO implements IHardwareIO {
 		try {
 			List<String> recvdLines = driverChannel.sendAndRecv(lines2Send);
 			handleRecvdErrorsOnly(recvdLines);
-		} catch (Exception e) {
+		} catch (ChannelFault e) {
 			log.warn("STOP command to driver gives error. Will try to properly close TCP connection. Message: " + e.getMessage());
 		}
 

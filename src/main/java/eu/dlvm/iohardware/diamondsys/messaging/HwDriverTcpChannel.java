@@ -55,7 +55,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		} catch (IOException e) {
 			log.fatal("Connecting to " + serverHostname + ':' + serverPort
 					+ " failed.", e);
-			throw new ChannelFault("Cannot connect to "+serverHostname+':'+serverPort+", probably not recoverable.", false);
+			throw new ChannelFault("Cannot connect to "+serverHostname+':'+serverPort+", probably not recoverable.");
 		}
 	}
 
@@ -86,10 +86,10 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 			return recvd;
 		} catch (SocketTimeoutException e) {
 			log.warn("Read timeout, probably driver gone? Timeout value is:"+readTimeout, e);
-			throw new ChannelFault("Read timeout, probably driver gone? Timeout value is:"+readTimeout, true);
+			throw new ChannelFault("Read timeout, probably driver gone? Timeout value is:"+readTimeout);
 		} catch (IOException e) {
-			log.fatal("Error communicating with Hardware Driver.", e);
-			throw new RuntimeException(e);
+			log.error("Error communicating with Hardware Driver.", e);
+			throw new ChannelFault("Messages lost in driver interaction. Error message: "+e.getMessage());
 		}
 	}
 
