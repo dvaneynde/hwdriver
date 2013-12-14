@@ -124,7 +124,7 @@ public class Main {
 					fatalError = true;
 					break;
 				}
-				DriverMonitor monitor = new DriverMonitor(process);
+				DriverMonitor monitor = new DriverMonitor(process, "hwdriver");
 				int maxTries = 5000 / 200;
 				int trial = 0;
 				while ((trial++ < maxTries) && monitor.driverNotReady())
@@ -152,8 +152,7 @@ public class Main {
 					if (monitor.everythingSeemsWorking()) {
 						MON.info("Checked driver sub-process, seems OK.");
 					} else {
-						log.error("Something is wrong with driver subprocess. I'll try to restart.");
-						log.error(monitor.report());
+						log.error("Something is wrong with driver subprocess. I'll try to restart.\n"+monitor.report());
 						break;
 					}
 				}

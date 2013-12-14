@@ -6,12 +6,12 @@ public class DriverMonitor {
 	private ProcessReader prStdout;
 	private ProcessReader prStderr;
 
-	public DriverMonitor(Process process) {
-		initialize(process);
+	public DriverMonitor(Process process, String processName) {
+		initialize(process, processName);
 	}
 
-	private void initialize(Process process) {
-		prWatch = new ProcessWatch(process, "Driver Process Watch");
+	private void initialize(Process process, String processName) {
+		prWatch = new ProcessWatch(process, "Driver Process Watch", processName);
 		prStdout = new ProcessReader(process.getInputStream(), "Driver STDOUT Reader");
 		prStderr = new ProcessReader(process.getErrorStream(), "Driver STDERR Reader");
 		prWatch.startWatching();
