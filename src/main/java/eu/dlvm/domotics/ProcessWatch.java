@@ -48,7 +48,7 @@ public class ProcessWatch {
 	}
 
 	private String getPidOfProcess(String name) throws IOException {
-		ProcessBuilder pb = new ProcessBuilder("ps -C " + name + " -o pid --noheading");
+		ProcessBuilder pb = new ProcessBuilder("/bin/ps -C " + name + " -o pid --noheading");
 		Process p = pb.start();
 		BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String pid = br.readLine();

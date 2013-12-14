@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.base;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class RememberedOutput {
@@ -35,7 +36,7 @@ public class RememberedOutput {
 	public static RememberedOutput parse(String s) {
 		if (s==null || s.length()==0)
 			return null;
-		StringTokenizer st = new StringTokenizer(":,");
+		StringTokenizer st = new StringTokenizer(s, ":,");
 		if (!st.hasMoreTokens())
 			return null;
 		String name = st.nextToken();
@@ -44,5 +45,10 @@ public class RememberedOutput {
 		while (st.hasMoreTokens())
 			vals[i++]=Integer.parseInt(st.nextToken());	
 		return new RememberedOutput(name, vals);
+	}
+
+	@Override
+	public String toString() {
+		return "RememberedOutput [blockName=" + blockName + ", vals=" + Arrays.toString(vals) + "]";
 	}
 }

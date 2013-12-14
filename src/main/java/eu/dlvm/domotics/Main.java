@@ -86,9 +86,8 @@ public class Main {
 
 	private File getOutputStatesFile() {
 		if (outputStatesFile == null) {
-			String homeDirName = System.getProperty("user.home");
-			outputStatesFile = new File(homeDirName, "DomoOutputStates.txt");
-			log.info("Save last output states to file " + outputStatesFile.getAbsolutePath());
+			outputStatesFile = new File("/var/local", "DomoticOutputStates.txt");
+			log.info("Safeguard last output states to file " + outputStatesFile.getAbsolutePath());
 		}
 		return outputStatesFile;
 	}
@@ -100,9 +99,11 @@ public class Main {
 			String line;
 			while ((line = br.readLine()) != null) {
 				RememberedOutput ro = RememberedOutput.parse(line);
-				if (ro != null)
+				if (ro != null) {
 					ros.put(ro.getBlockName(), ro);
+				}
 			}
+			log.info("Read previous ouptut states, number of entries is "+ros.size());
 		} catch (FileNotFoundException e) {
 			log.info("No remembered outputs file found, will initialize with defaults. File should be: " + f.getName());
 		} catch (IOException e) {
@@ -119,6 +120,7 @@ public class Main {
 					bw.write(ro.dump() + '\n');
 				}
 			}
+			log.debug("Wrote last output state to "+getOutputStatesFile().getAbsolutePath());
 		} catch (IOException e) {
 			log.error("Failed writing to " + getOutputStatesFile().getName() + ". Functionality might not work.", e);
 		}
