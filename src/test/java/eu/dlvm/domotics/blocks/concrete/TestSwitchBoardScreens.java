@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.ISwitchListener;
@@ -111,7 +112,7 @@ public class TestSwitchBoardScreens {
 		s2sAll.registerListener(sr2);
 		
 		cur = 0L;
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 
 		BasicConfigurator.configure();
 	}

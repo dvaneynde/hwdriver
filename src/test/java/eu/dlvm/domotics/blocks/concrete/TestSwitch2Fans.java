@@ -12,6 +12,7 @@ import org.junit.Test;
 import eu.dlvm.domotics.actuators.Fan;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.mappers.Switch2Fan;
 import eu.dlvm.domotics.sensors.Switch;
@@ -87,7 +88,7 @@ public class TestSwitch2Fans {
 		sw2.registerListener(s2f2);
 		s2f2.registerListener(f2);
 
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 	}
 
 	@Test

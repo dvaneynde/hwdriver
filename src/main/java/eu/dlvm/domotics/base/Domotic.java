@@ -2,6 +2,7 @@ package eu.dlvm.domotics.base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -26,9 +27,9 @@ public class Domotic implements IHardwareAccess {
 	// protected access for test cases only
 	protected IHardwareIO hw = null;
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
-	protected List<Actuator> actuators = new ArrayList<Actuator>(32);
+	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected long loopSequence = -1L;
-	protected boolean ready = false;
+//	protected boolean ready = false;
 
 	public static synchronized  Domotic singleton() {
 		if (singleton == null) {
@@ -62,8 +63,9 @@ public class Domotic implements IHardwareAccess {
 	 * {@link #loopOnce(long)}.
 	 * <p>
 	 * Must be called before {@link #loopOnce(long)} or {@link #stop}.
+	 * @param prevOuts Map of actuator names and previous outputs. If not used must be empty map (not <code>null</code>).
 	 */
-	public void initialize() {
+	public void initialize(Map<String,RememberedOutput> prevOuts) {
 		loopSequence++;
 		try {
 			hw.initialize();
@@ -72,10 +74,11 @@ public class Domotic implements IHardwareAccess {
 			throw new RuntimeException("Problem communicating with driver.");
 		}
 		for (Actuator a : actuators) {
-			a.initializeOutput();
+			RememberedOutput ro = prevOuts.get(a.getName());
+			a.initializeOutput(ro);
 		}
 		hw.refreshOutputs();
-		ready = true;
+//		ready = true;
 	}
 
 	public void shutdown() {
@@ -103,9 +106,9 @@ public class Domotic implements IHardwareAccess {
 	 *            Current time at loopOnce invocation.
 	 */
 	public void loopOnce(long currentTime) {
-		if (!ready) {
-			throw new RuntimeException("Domotic not initialized.");
-		}
+//		if (!ready) {
+//			throw new RuntimeException("Domotic not initialized.");
+//		}
 		loopSequence++;
 		if (loopSequence %10 == 0)
 			MON.info("loopOnce() start, loopSequence="+loopSequence+", currentTime="+currentTime);
@@ -127,7 +130,7 @@ public class Domotic implements IHardwareAccess {
 	 */
 	public void stop() {
 		hw.stop();
-		ready = false;
+//		ready = false;
 	}
 
 	public void setHw(IHardwareIO hw) {
@@ -191,10 +194,10 @@ public class Domotic implements IHardwareAccess {
 		return actuators;
 	}
 
-	public boolean isReady() {
-		return ready;
-	}
-
+//	public boolean isReady() {
+//		return ready;
+//	}
+//
 	public long getLoopSequence() {
 		return loopSequence;
 	}

@@ -1,12 +1,13 @@
 package eu.dlvm.domotics.blocks;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.iohardware.LogCh;
 
 public class TestLoopSequence {
@@ -22,7 +23,7 @@ public class TestLoopSequence {
 		}
 
 		@Override
-		public void initializeOutput() {
+		public void initializeOutput(RememberedOutput ro) {
 		}
 
 		@Override

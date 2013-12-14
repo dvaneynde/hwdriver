@@ -6,8 +6,6 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.iohardware.LogCh;
 
-
-
 /**
  * Actuators actuate output.
  * <p>
@@ -60,10 +58,19 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	}
 
 	/**
-	 * After hardware is initialized, this function may set output values, to be
+	 * After hardware is initialized, this function may set default output values, to be
 	 * picked up in the next {@link #loop(long, long)}.
+	 * @param last known state, or <code>null</code> if first time or unknown
 	 */
-	public abstract void initializeOutput();
+	public abstract void initializeOutput(RememberedOutput ro);
+
+	/**
+	 * Optional. For safeguarding, so output state <i>may</i> be used at initialization time in {@link #initializeOutput()}.
+	 * @return current actuator output
+	 */
+	public RememberedOutput dumpOutput() {
+		return null;
+	}
 
 	/**
 	 * Called regularly by {@link Domotic}, so that concrete actuators can check
@@ -71,28 +78,33 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	 * <p>
 	 * To be enabled this Actuator must first have been registered with
 	 * {@link Domotic#addActuator(Actuator)}.
+	 * 
 	 * @param currentTime
 	 *            Timestamp at which this loop is called. The same for each
 	 *            loop.
 	 * @param sequence
 	 *            A number that increments with each loop. Useful to detect
-	 *            being called twice - which is forbidden.
-	 * TODO move to IHardwareAccess
+	 *            being called twice - which is forbidden. TODO move to
+	 *            IHardwareAccess
 	 */
 	public abstract void loop(long currentTime, long sequence);
-	
+
 	public abstract BlockInfo getActuatorInfo();
-	
+
 	/**
-	 * To be called from {{@link #loop(long, long)} implementations, to stop program if a loop is looped (should be graph).
+	 * To be called from {{@link #loop(long, long)} implementations, to stop
+	 * program if a loop is looped (should be graph).
+	 * 
 	 * @param currentLoopSequence
-	 * TODO go to IHardwareAcess, also sensors can use it (must use it), perhaps use delegate?
+	 *            TODO go to IHardwareAcess, also sensors can use it (must use
+	 *            it), perhaps use delegate?
 	 */
 	protected void checkLoopSequence(long currentLoopSequence) {
 		if (currentLoopSequence <= previousLoopSequence) {
-			log.error("Current loop sequence equal to, or before last recorded. Abort program. current="+currentLoopSequence+", previous="+previousLoopSequence);
+			log.error("Current loop sequence equal to, or before last recorded. Abort program. current=" + currentLoopSequence + ", previous=" + previousLoopSequence);
 			throw new RuntimeException("Current loop sequence equal to, or before last recorded. Abort program.");
 		}
 		previousLoopSequence = currentLoopSequence;
 	}
+
 }

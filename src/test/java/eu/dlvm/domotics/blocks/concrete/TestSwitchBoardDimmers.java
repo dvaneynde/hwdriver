@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
@@ -103,7 +104,7 @@ public class TestSwitchBoardDimmers {
 	@Test
 	public void testFullThenAllOff() {
 		// Initialisatie
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 		Assert.assertEquals(FULL_OUT_VAL/2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);
@@ -134,7 +135,7 @@ public class TestSwitchBoardDimmers {
 	@Test
 	public void testDimUpAndDownDimmer1() {
 		// Initialisatie
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 		Assert.assertEquals(FULL_OUT_VAL/2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);

@@ -1,5 +1,6 @@
 package eu.dlvm.domotics;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.BasicConfigurator;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
@@ -71,7 +73,7 @@ public class TestEnd2EndDimmer {
 	@Test
 	public void testDimmer() {
 		drv.reset("\n", "\n");
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 		log.debug("testDimmer: initialize, sendInputUsed:\n"
 				+ drv.sentToDriver0 + "---");
 		Assert.assertEquals("INIT\nBOARD_INIT O 0x380\nBOARD_INIT D 0x300\n\n", drv.sentToDriver0);

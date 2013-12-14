@@ -1,5 +1,7 @@
 package eu.dlvm.domotics.blocks.concrete;
 
+import java.util.HashMap;
+
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -8,6 +10,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
 import eu.dlvm.domotics.sensors.Switch;
@@ -57,7 +60,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swLamp, lamp);
 		// ssb.add(swAllOff, true, false);
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
@@ -80,7 +83,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swLamp, lamp);
 		// ssb.add(swAllOff, true, false);
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
@@ -103,7 +106,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swAllOff, true, false);
 		// ssb.add(swLamp, lamp, true, false);
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));
@@ -144,7 +147,7 @@ public class TestSwitchDedicatedAllOff {
 		swLamp.setDoubleClickEnabled(false);
 
 		swtch2toggle.map(ClickType.LONG, ActionType.OFF);
-		dom.initialize();
+		dom.initialize(new HashMap<String, RememberedOutput> (0));
 
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));

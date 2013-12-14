@@ -6,6 +6,7 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 import eu.dlvm.iohardware.LogCh;
 
@@ -32,8 +33,15 @@ public class Lamp extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void initializeOutput() {
+	public void initializeOutput(RememberedOutput ro) {
+		if (ro != null)
+			setOn(ro.getVals()[0] == 1);
 		getHw().writeDigitalOutput(getChannel(), outval);
+	}
+
+	@Override
+	public RememberedOutput dumpOutput() {
+		return new RememberedOutput(getName(), new int[] { isOn() ? 1 : 0 });
 	}
 
 	/**
@@ -79,7 +87,6 @@ public class Lamp extends Actuator implements IOnOffToggleListener {
 			break;
 		}
 	}
-
 
 	@Override
 	public void loop(long currentTime, long sequence) {

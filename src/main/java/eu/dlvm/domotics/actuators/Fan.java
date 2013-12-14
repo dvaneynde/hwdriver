@@ -6,6 +6,7 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 import eu.dlvm.iohardware.LogCh;
 
@@ -122,7 +123,7 @@ public class Fan extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void initializeOutput() {
+	public void initializeOutput(RememberedOutput ro) {
 		writeOutput(false);
 	}
 

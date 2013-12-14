@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -50,7 +51,7 @@ public class Screen extends Actuator {
 	private States state = States.REST;
 
 	@Override
-	public void initializeOutput() {
+	public void initializeOutput(RememberedOutput ro) {
 		// Nothing to do;
 	}
 

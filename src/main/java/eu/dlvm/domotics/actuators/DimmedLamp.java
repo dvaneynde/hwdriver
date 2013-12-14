@@ -6,6 +6,7 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 import eu.dlvm.iohardware.LogCh;
 
@@ -30,7 +31,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	private long lastUpDnLoopTime;
 	private States state;
 
-	
 	public enum States {
 		OFF, ON, UP, DOWN
 	};
@@ -76,6 +76,27 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	}
 
 	/**
+	 * Initializes dimmed lamp to 50% on.
+	 */
+	@Override
+	public void initializeOutput(RememberedOutput ro) {
+		if (ro == null) {
+			log.info("Dimmed Lamp initializing to ON, 50% - default behaviour when no previous state known.");
+			on(50);
+		} else {
+			if (ro.getVals()[0] == 0)
+				off();
+			else
+				on(ro.getVals()[1]);
+		}
+	}
+
+	@Override
+	public RememberedOutput dumpOutput() {
+		return new RememberedOutput(getName(), new int[] { (getState() == States.OFF ? 0 : 1), getLevel() });
+	}
+
+	/**
 	 * @return The time to dim between 0% and 100%, in milliseconds.
 	 */
 	public int getMsTimeFullDim() {
@@ -88,15 +109,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	 */
 	public void setMsTimeFullDim(int msTimeFullDim) {
 		this.msTimeFullDim = msTimeFullDim;
-	}
-
-	/**
-	 * Initializes dimmed lamp to 50% on.
-	 */
-	@Override
-	public void initializeOutput() {
-		log.info("Dimmed Lamp initializing to ON, 50%.");
-		on(50);
 	}
 
 	/**
