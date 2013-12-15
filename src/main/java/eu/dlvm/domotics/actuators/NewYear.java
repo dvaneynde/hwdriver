@@ -8,6 +8,7 @@ import eu.dlvm.domotics.actuators.newyear.INewYearGadget;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 
 public class NewYear extends Actuator implements IOnOffToggleListener {
@@ -56,7 +57,7 @@ public class NewYear extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void initializeOutput() {
+	public void initializeOutput(RememberedOutput ro) {
 	}
 
 	@Override
