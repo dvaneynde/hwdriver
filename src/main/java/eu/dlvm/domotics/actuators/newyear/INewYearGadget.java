@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors.newyear;
+package eu.dlvm.domotics.actuators.newyear;
 
 public interface INewYearGadget {
 

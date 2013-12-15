@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors.newyear;
+package eu.dlvm.domotics.actuators.newyear;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +19,18 @@ public class OnOff implements INewYearGadget {
 	private long startTime;
 	private SortedSet<Entry> entries;
 
-	public class Entry implements Comparable<Long> {
-		boolean state;
-		long timeSec;
-
+	public class Entry implements Comparable<Entry> {
+		public boolean state;
+		public long timeSec;
+		public Entry(long timeSec, boolean state) {
+			this.timeSec = timeSec; this.state = state;
+		}
 		@Override
-		public int compareTo(Long o) {
-			if (timeSec == o)
+		public int compareTo(Entry o) {
+			if (timeSec == o.timeSec)
 				return 0;
 			else
-				return timeSec < o ? -1 : 1;
+				return timeSec < o.timeSec ? -1 : 1;
 		}
 	}
 

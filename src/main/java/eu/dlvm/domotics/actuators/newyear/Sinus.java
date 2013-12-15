@@ -1,21 +1,23 @@
-package eu.dlvm.domotics.sensors.newyear;
+package eu.dlvm.domotics.actuators.newyear;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 
 public class Sinus implements INewYearGadget {
 	private int cycleTime;
+	private double cycleStartRadians;
 	private long startTime = -1;
 	private DimmedLamp lamp;
 
-	public Sinus(int cycleTime, DimmedLamp lamp) {
-		this.cycleTime = cycleTime;
+	public Sinus(DimmedLamp lamp, int cycleTimeMs, int cycleStartDegrees) {
 		this.lamp = lamp;
+		this.cycleTime = cycleTimeMs;
+		this.cycleStartRadians = cycleStartDegrees * 2.0D * Math.PI / 360;
 	}
 
 	public double calcValue(long time) {
-		if (startTime < 0L)
-			return 0;
-		double val = Math.sin((time - startTime) * 2.0D * Math.PI / cycleTime) / 2.0 + 0.5;
+		double arg = (time - startTime) * 2.0D * Math.PI / cycleTime + cycleStartRadians;
+		double val = (Math.sin(arg) / 2.0 + 0.5) * 0.7 + 0.3;	// tussen 30% en 100%
+		// System.out.println("arg="+arg+", val="+val);
 		return val;
 	}
 
@@ -27,7 +29,7 @@ public class Sinus implements INewYearGadget {
 	}
 
 	public static void main(String[] args) {
-		Sinus s = new Sinus(2000, null);
+		Sinus s = new Sinus(null, 2000, 270);
 		for (long time = 0L; time <= 2000; time += 100) {
 			System.out.println(Math.round(100 * s.calcValue(time)));
 		}

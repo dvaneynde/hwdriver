@@ -55,21 +55,21 @@
 						<choice minOccurs="1" maxOccurs="unbounded">
 							<element name="onoff">
 								<complexType>
-									<attribute name="actuator" type="string" />
+									<attribute name="lamp" type="string" />
 								</complexType>
 							</element>
 							<element name="random">
 								<complexType>
-									<attribute name="actuator" type="string" />
-									<attribute name="min-on" type="int" />
-									<attribute name="rand-mult" type="int" />
+									<attribute name="lamp" type="string" />
+									<attribute name="min-on-ms" type="int" />
+									<attribute name="rand-mult-ms" type="int" />
 								</complexType>
 							</element>
 							<element name="sine">
 								<complexType>
-									<attribute name="actuator" type="string" />
-									<attribute name="min-on" type="int" />
-									<attribute name="rand-mult" type="int" />
+									<attribute name="lamp" type="string" />
+									<attribute name="cycle-ms" type="int" />
+									<attribute name="cycle-start-deg" type="int" />
 								</complexType>
 							</element>
 						</choice>
