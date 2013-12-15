@@ -50,6 +50,33 @@
 						</complexContent>
 					</complexType>
 				</element>
+				<element name="newyear" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<choice minOccurs="1" maxOccurs="unbounded">
+							<element name="onoff">
+								<complexType>
+									<attribute name="lamp" type="string" />
+								</complexType>
+							</element>
+							<element name="random">
+								<complexType>
+									<attribute name="lamp" type="string" />
+									<attribute name="min-on-ms" type="int" />
+									<attribute name="rand-mult-ms" type="int" />
+								</complexType>
+							</element>
+							<element name="sine">
+								<complexType>
+									<attribute name="lamp" type="string" />
+									<attribute name="cycle-ms" type="int" />
+									<attribute name="cycle-start-deg" type="int" />
+								</complexType>
+							</element>
+						</choice>
+						<attribute name="start" type="dateTime"></attribute>
+						<attribute name="end" type="dateTime"></attribute>
+					</complexType>
+				</element>
 
 				<element name="group" type="tns:groupType" />
 				<element name="connect">

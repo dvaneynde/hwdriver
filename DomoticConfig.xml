@@ -12,7 +12,7 @@
 	<fan name="VentilatorWC0" lamp="LichtWC0" desc="WC" />
 	<switch name="SchakLichtGaragePoort" />
 	<lamp name="LichtGaragePoort" desc="Garage Poort" />
-	<switch name="SchakLichtGarageTuin" longClick="true"/>
+	<switch name="SchakLichtGarageTuin" longClick="true" />
 	<lamp name="LichtGarageTuin" desc="Garage Tuin" />
 	<switch name="SchakLichtKeuken" />
 	<lamp name="LichtKeuken" desc="Keuken" />
@@ -29,7 +29,7 @@
 	<lamp name="LichtCircante" desc="Circante Tafel" />
 	<dimmerSwitches name="SchakLichtZithoek" />
 	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" />
-	<switch name="SchakLichtBureau" />
+	<switch name="SchakLichtBureau" doubleClick="true" />
 	<lamp name="LichtBureau" desc="Bureau" />
 	<group name="LichtBeneden">
 		<block name="LichtInkom" />
@@ -109,8 +109,8 @@
 		target="LichtGaragePoort" event="toggle" />
 	<connect src="SchakLichtGarageTuin" src-event="single" target="LichtGarageTuin"
 		event="toggle" />
-	<connect src="SchakLichtGarageTuin" src-event="long" target="LichtGaragePoort"
-		event="toggle" />
+	<connect src="SchakLichtGarageTuin" src-event="long"
+		target="LichtGaragePoort" event="toggle" />
 	<connect src="SchakLichtKeuken" src-event="single" target="LichtKeuken"
 		event="toggle" />
 	<connect src="SchakLichtBadk0" src-event="single" target="LichtBadk0"
@@ -145,6 +145,17 @@
 	</timerDayNight>
 	<lamp name="LichtNacht" desc="Nachtlichten" />
 	<connect src="TimerNacht" target="LichtNacht" />
+
+	<!-- New Year -->
+	<newyear start="2013-12-15T21:15:00" end="2013-12-15T23:50:00">
+		<sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
+		<sine lamp="LichtCircanteRondom" cycle-ms="5000" cycle-start-deg="120" />
+		<sine lamp="LichtVeranda" cycle-ms="5000" cycle-start-deg="240" />
+		<onoff lamp="LichtBureau" />
+		<random lamp="LichtCircante" min-on-ms="500" rand-mult-ms="1000" />
+	</newyear>
+	<connect src="SchakLichtBureau" src-event="double" target="newyear"
+		event="toggle" />
 
 	<!-- Ventilatie -->
 	<connect src="SchakVentilatorWC0" src-event="single" target="VentilatorWC0"

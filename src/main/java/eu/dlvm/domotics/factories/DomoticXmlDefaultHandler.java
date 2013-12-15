@@ -1,11 +1,15 @@
 package eu.dlvm.domotics.factories;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
@@ -13,12 +17,16 @@ import org.xml.sax.ext.DefaultHandler2;
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Fan;
 import eu.dlvm.domotics.actuators.Lamp;
+import eu.dlvm.domotics.actuators.NewYear;
 import eu.dlvm.domotics.actuators.Screen;
+import eu.dlvm.domotics.actuators.newyear.OnOff;
+import eu.dlvm.domotics.actuators.newyear.RandomOnOff;
+import eu.dlvm.domotics.actuators.newyear.Sinus;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.IOnOffToggleListener;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
-import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
@@ -28,6 +36,8 @@ import eu.dlvm.domotics.sensors.TimerDayNight;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
+
+	static Logger log = Logger.getLogger(DomoticXmlDefaultHandler.class);
 
 	private Block block;
 	private Map<String, Block> blocks = new HashMap<>();
@@ -115,6 +125,36 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
+		} else if (localName.equals("newyear")) {
+			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
+			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
+			NewYear ny = new NewYear("newyear", start.getTime(), end.getTime(), ctx);
+			blocks.put(ny.getName(), ny);
+		} else if (localName.equals("onoff")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+			String lampName = atts.getValue("lamp");
+			Lamp lamp = (Lamp) blocks.get(lampName);
+			OnOff oo = new OnOff(lamp);
+			// TODO tijden in xml; ook start/stop moet hier in doorgaan?
+			oo.add(oo.new Entry(0, false));
+			oo.add(oo.new Entry((ny.getEndTimeMs() - ny.getStartTimeMs()) / 1000, true));
+			ny.addGadget(oo);
+		} else if (localName.equals("random")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+			String lampName = atts.getValue("lamp");
+			Lamp lamp = (Lamp) blocks.get(lampName);
+			int minTimeOnOffMs = Integer.parseInt(atts.getValue("min-on-ms"));
+			int randomMultiplierMs = Integer.parseInt(atts.getValue("rand-mult-ms"));
+			RandomOnOff roo = new RandomOnOff(lamp, minTimeOnOffMs, randomMultiplierMs);
+			ny.addGadget(roo);
+		} else if (localName.equals("sine")) {
+			NewYear ny = (NewYear) blocks.get("newyear");
+			String dimName = atts.getValue("lamp");
+			DimmedLamp dl = (DimmedLamp) blocks.get(dimName);
+			int cycleTimeMs = Integer.parseInt(atts.getValue("cycle-ms"));
+			int cycleStartRd = Integer.parseInt(atts.getValue("cycle-start-deg"));
+			Sinus s = new Sinus(dl, cycleTimeMs, cycleStartRd);
+			ny.addGadget(s);
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}
@@ -122,7 +162,6 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 	public void endElement(String uri, String localName, String qqName) throws SAXException {
 	}
-
 
 	private void parseConnect(Attributes atts) {
 		String srcName = atts.getValue("src");
@@ -203,7 +242,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String switchUpName = atts.getValue("switchUp");
 		String screenName = atts.getValue("screen");
 		String clickName = atts.getValue("click");
-		
+
 		List<Block> targetBlocks;
 		Block t = blocks.get(screenName);
 		if (t == null)
@@ -213,19 +252,18 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			targetBlocks.add(t);
 		}
 
-		String csName = "Switch2Screen_"+screenName;
-		Switch down = (Switch)blocks.get(switchDownName);
-		Switch up = (Switch)blocks.get(switchUpName);
+		String csName = "Switch2Screen_" + screenName;
+		Switch down = (Switch) blocks.get(switchDownName);
+		Switch up = (Switch) blocks.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
 		Switch2Screen s2s = new Switch2Screen(csName, csName, down, up, click);
 		blocks.put(s2s.getName(), s2s);
-		
+
 		for (Block target : targetBlocks) {
 			s2s.registerListener((Screen) target);
 		}
 	}
 
-	
 	private void parseBaseBlockWithChannel(Attributes atts) {
 		parseBaseBlock(atts);
 		String s = atts.getValue("channel");
