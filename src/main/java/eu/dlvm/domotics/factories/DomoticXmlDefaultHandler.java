@@ -128,8 +128,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
-			NewYear ny = new NewYear("newyear", start.getTime(), end.getTime(), ctx);
+			NewYear ny = new NewYearBuilder().build(blocks, start.getTime(), end.getTime(), ctx);
 			blocks.put(ny.getName(), ny);
+/*
 		} else if (localName.equals("onoff")) {
 			NewYear ny = (NewYear) blocks.get("newyear");
 			String lampName = atts.getValue("lamp");
@@ -155,6 +156,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int cycleStartRd = Integer.parseInt(atts.getValue("cycle-start-deg"));
 			Sinus s = new Sinus(dl, cycleTimeMs, cycleStartRd);
 			ny.addGadget(s);
+*/
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}

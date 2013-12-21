@@ -5,7 +5,6 @@ import eu.dlvm.domotics.actuators.DimmedLamp;
 public class Sinus implements INewYearGadget {
 	private int cycleTime;
 	private double cycleStartRadians;
-	private long startTime = -1;
 	private DimmedLamp lamp;
 
 	public Sinus(DimmedLamp lamp, int cycleTimeMs, int cycleStartDegrees) {
@@ -15,16 +14,14 @@ public class Sinus implements INewYearGadget {
 	}
 
 	public double calcValue(long time) {
-		double arg = (time - startTime) * 2.0D * Math.PI / cycleTime + cycleStartRadians;
+		double arg = time * 2.0D * Math.PI / cycleTime + cycleStartRadians;
 		double val = (Math.sin(arg) / 2.0 + 0.5) * 0.7 + 0.3;	// tussen 30% en 100%
 		// System.out.println("arg="+arg+", val="+val);
 		return val;
 	}
 
 	@Override
-	public void loop(long time) {
-		if (startTime < 0L)
-			startTime = time;
+	public void loop2(long time, GSstate state) {
 		lamp.on((int) (calcValue(time) * 100));
 	}
 

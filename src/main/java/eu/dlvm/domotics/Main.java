@@ -112,6 +112,7 @@ public class Main {
 		return ros;
 	}
 
+	private boolean alreadyReportedFileNotFound = false;
 	private void writeRememberedOutputs(List<Actuator> as) {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputStatesFile()))) {
 			for (Actuator a : as) {
@@ -121,6 +122,10 @@ public class Main {
 				}
 			}
 			log.debug("Wrote last output state to "+getOutputStatesFile().getAbsolutePath());
+		} catch (FileNotFoundException e) {
+			if (!alreadyReportedFileNotFound)
+				log.warn("Cannot write remembered output, file not found: "+getOutputStatesFile());
+			alreadyReportedFileNotFound = true;
 		} catch (IOException e) {
 			log.error("Failed writing to " + getOutputStatesFile().getName() + ". Functionality might not work.", e);
 		}

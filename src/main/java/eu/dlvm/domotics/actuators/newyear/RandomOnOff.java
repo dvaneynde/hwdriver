@@ -23,7 +23,7 @@ public class RandomOnOff implements INewYearGadget {
 	}
 
 	@Override
-	public void loop(long time) {
+	public void loop2(long time, GSstate gs) {
 		if ((nextToggleTime < 0) || (time >= nextToggleTime)) {
 			lamp.toggle();
 			int rand = (int)(Math.random() * multMs + minMs);

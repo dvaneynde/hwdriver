@@ -57,7 +57,7 @@ public class OnOff implements INewYearGadget {
 	}
 
 	@Override
-	public void loop(long time) {
+	public void loop2(long time, GSstate state) {
 		if (startTime < 0)
 			startTime = time;
 
