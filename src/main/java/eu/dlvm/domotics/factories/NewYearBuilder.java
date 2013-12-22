@@ -37,13 +37,13 @@ public class NewYearBuilder {
 		gs.gadgets.add(new Blink(lamp, 1));
 		lamp = (Lamp) blocks.get("LichtInkom");
 		gs.gadgets.add(new Blink(lamp, 1));
-		lamp = (Lamp) blocks.get("LichtGangBoven");
-		gs.gadgets.add(new Blink(lamp, 1));
+//		lamp = (Lamp) blocks.get("LichtGangBoven");
+//		gs.gadgets.add(new Blink(lamp, 1));
 		ny.addEntry(gs);
 
 		gs = ny.new GadgetSet();
 		gs.startMs = 10 * 1000;
-		gs.endMs = 15 * 1000;
+		gs.endMs = 40 * 1000;
 		lamp = (Lamp) blocks.get("LichtCircante");
 		gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
 		lamp = (Lamp) blocks.get("LichtKeuken");
@@ -52,14 +52,14 @@ public class NewYearBuilder {
 		gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
 		lamp = (Lamp) blocks.get("LichtInkom");
 		gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
-		lamp = (Lamp) blocks.get("LichtGangBoven");
-		gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+//		lamp = (Lamp) blocks.get("LichtGangBoven");
+//		gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
 		dl = (DimmedLamp) blocks.get("LichtZithoek");
-		gs.gadgets.add(new Sinus(dl, 5000, 0));
+		gs.gadgets.add(new Sinus(dl, 3000, 0));
 		dl = (DimmedLamp) blocks.get("LichtCircanteRondom");
-		gs.gadgets.add(new Sinus(dl, 5000, 120));
+		gs.gadgets.add(new Sinus(dl, 3000, 120));
 		dl = (DimmedLamp) blocks.get("LichtVeranda");
-		gs.gadgets.add(new Sinus(dl, 5000, 240));
+		gs.gadgets.add(new Sinus(dl, 3000, 240));
 		ny.addEntry(gs);
 
 		return ny;

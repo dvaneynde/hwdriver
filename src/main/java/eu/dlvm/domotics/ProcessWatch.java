@@ -48,10 +48,22 @@ public class ProcessWatch {
 	}
 
 	private String getPidOfProcess(String name) throws IOException {
-		ProcessBuilder pb = new ProcessBuilder("/bin/ps -C " + name + " -o pid --noheading");
+		if (log.isDebugEnabled())
+			log.debug("getPidOfProcess(), search pid of process with name=" + name);
+		//ProcessBuilder pb = new ProcessBuilder("/bin/ps", "-C ", name, "-o", "pid", "--noheading");
+		ProcessBuilder pb = new ProcessBuilder("/bin/bash","-c", "ps -C "+name+" -o pid --noheading");
 		Process p = pb.start();
 		BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String pid = br.readLine();
+		String pid = "";
+		char[] cbuf = new char[64];
+		int len;
+		while ((len = br.read(cbuf, 0, cbuf.length)) != -1) {
+			if (log.isDebugEnabled())
+				log.debug("getPidOfProcess(), line=" + new String(cbuf,0, len));
+			pid += new String(cbuf,0, len);
+		}
+		if (log.isDebugEnabled())
+			log.debug("getPidOfProcess(), found pid=" + pid + ", process exitvalue=" + p.exitValue());
 		return pid;
 	}
 
