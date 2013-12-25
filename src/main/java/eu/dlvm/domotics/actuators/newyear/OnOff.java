@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import eu.dlvm.domotics.actuators.Lamp;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 
 /**
  * Lamp die op bepaald moment on/off gaat, eventueel meerdere keren.
@@ -15,18 +15,18 @@ import eu.dlvm.domotics.actuators.Lamp;
  */
 public class OnOff implements INewYearGadget {
 
-	private List<Lamp> lamps;
+	private List<IOnOffToggleCapable> lamps;
 	private long startTime;
-	private SortedSet<Entry> entries;
+	private SortedSet<Event> entries;
 
-	public class Entry implements Comparable<Entry> {
+	public class Event implements Comparable<Event> {
 		public boolean state;
 		public long timeSec;
-		public Entry(long timeSec, boolean state) {
+		public Event(long timeSec, boolean state) {
 			this.timeSec = timeSec; this.state = state;
 		}
 		@Override
-		public int compareTo(Entry o) {
+		public int compareTo(Event o) {
 			if (timeSec == o.timeSec)
 				return 0;
 			else
@@ -34,20 +34,28 @@ public class OnOff implements INewYearGadget {
 		}
 	}
 
-	public OnOff(Lamp lamp) {
+	public OnOff() {
 		this.lamps = new ArrayList<>();
-		lamps.add(lamp);
 		startTime = -1;
 		entries = new TreeSet<>();
 	}
 
-	public void add(Entry e) {
+	public OnOff(IOnOffToggleCapable lamp) {
+		this();
+		lamps.add(lamp);
+	}
+
+	public void add(IOnOffToggleCapable oot) {
+		lamps.add(oot);
+	}
+
+	public void add(Event e) {
 		entries.add(e);
 	}
 
-	private Entry findLastEntryBefore(long time) {
-		Entry lastEntry = null;
-		for (Entry e : entries) {
+	private Event findLastEntryBefore(long time) {
+		Event lastEntry = null;
+		for (Event e : entries) {
 			if ((e.timeSec * 1000 + startTime) <= time)
 				lastEntry = e;
 			else
@@ -61,10 +69,10 @@ public class OnOff implements INewYearGadget {
 		if (startTime < 0)
 			startTime = time;
 
-		Entry e = findLastEntryBefore(time);
+		Event e = findLastEntryBefore(time);
 		if (e != null) {
-			for (Lamp lamp : lamps)
-				lamp.setOn(e.state);
+			for (IOnOffToggleCapable lamp : lamps)
+				lamp.onEvent(e.state ? IOnOffToggleCapable.ActionType.ON : IOnOffToggleCapable.ActionType.OFF);
 		}
 
 	}

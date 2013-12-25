@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.iohardware.LogCh;
 
 public class Timer extends Sensor {
@@ -19,7 +19,7 @@ public class Timer extends Sensor {
 	private int onTime, offTime;
 	private boolean state;
 
-	private Set<IOnOffToggleListener> listeners = new HashSet<>();
+	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
 	public Timer(String name, String description, LogCh channel, IHardwareAccess ctx) {
 		super(name, description, channel, ctx);
@@ -27,13 +27,13 @@ public class Timer extends Sensor {
 		onTime = offTime = 0;
 	}
 
-	public void register(IOnOffToggleListener listener) {
+	public void register(IOnOffToggleCapable listener) {
 		listeners.add(listener);
 	}
 
-	public void notifyListeners(IOnOffToggleListener.ActionType action) {
-		for (IOnOffToggleListener l : listeners)
-			l.onEvent(this, action);
+	public void notifyListeners(IOnOffToggleCapable.ActionType action) {
+		for (IOnOffToggleCapable l : listeners)
+			l.onEvent(action);
 	}
 
 	public static int timeInDay(long time) {

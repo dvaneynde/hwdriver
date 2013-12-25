@@ -7,10 +7,10 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
 
-public class Lamp extends Actuator implements IOnOffToggleListener {
+public class Lamp extends Actuator implements IOnOffToggleCapable {
 
 	static Logger log = Logger.getLogger(Lamp.class);
 	private boolean outval;
@@ -49,14 +49,25 @@ public class Lamp extends Actuator implements IOnOffToggleListener {
 	 * 
 	 * @return New output state.
 	 */
+	@Override
 	public boolean toggle() {
 		setOn(!outval);
 		return outval;
 	}
 
+	@Override
+	public void on() {
+		setOn(true);
+	}
+
+	@Override
+	public void off() {
+		setOn(false);
+	}
+
 	/**
 	 * Sets lamp to On or Off
-	 * 
+	 * @deprecate Use on() or off() or {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType)}.
 	 * @param outval
 	 *            true for On, false for Off
 	 */
@@ -74,7 +85,7 @@ public class Lamp extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void onEvent(Block source, ActionType action) {
+	public void onEvent(ActionType action) {
 		switch (action) {
 		case ON:
 			setOn(true);

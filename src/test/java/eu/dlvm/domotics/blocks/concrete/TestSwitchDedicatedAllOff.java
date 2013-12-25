@@ -12,7 +12,7 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.LogCh;

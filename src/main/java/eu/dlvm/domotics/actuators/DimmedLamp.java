@@ -4,10 +4,9 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -17,7 +16,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author dirk
  */
-public class DimmedLamp extends Actuator implements IOnOffToggleListener {
+public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	/**
 	 * Time in ms to dim from off to fully on.
 	 */
@@ -132,7 +131,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	 * When going on the level of the last on-state is taken. For instance, if
 	 * lamp was 50% and then switched off, it will go on to 50% again.
 	 */
-	public void toggle() {
+	@Override
+	public boolean toggle() {
 		switch (state) {
 		case OFF:
 			on();
@@ -146,6 +146,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 			off();
 			break;
 		}
+		return (getState() == States.ON);
 	}
 
 	/**
@@ -153,6 +154,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	 * won't see a difference; but the same is true if the lamp was before on at
 	 * 1%... so we don't bother about this).
 	 */
+	@Override
 	public void on() {
 		level = prevOnLevel;
 		// TODO waarom mag ik hier niet ineens de output aansturen? er was een
@@ -185,8 +187,9 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	}
 
 	/**
-	 * Switch lamp off, i.e. {@link DimmedLamp#getLevel()} returns 0.
+	 * Switch lamp off.
 	 */
+	@Override
 	public void off() {
 		if (state != States.OFF) {
 			prevOnLevel = level;
@@ -301,7 +304,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void onEvent(Block source, ActionType action) {
+	public void onEvent(ActionType action) {
 		switch (action) {
 		case ON:
 			on();

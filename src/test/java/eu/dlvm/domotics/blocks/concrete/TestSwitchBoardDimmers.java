@@ -17,7 +17,7 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener.ActionType;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;

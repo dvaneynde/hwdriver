@@ -25,7 +25,7 @@ import eu.dlvm.domotics.actuators.newyear.Sinus;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -198,10 +198,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			blocks.put(s2ootName, s2oot);
 		}
 
-		s2oot.map(ISwitchListener.ClickType.valueOf(srcEventName.toUpperCase()), IOnOffToggleListener.ActionType.valueOf(eventName.toUpperCase()));
+		s2oot.map(ISwitchListener.ClickType.valueOf(srcEventName.toUpperCase()), IOnOffToggleCapable.ActionType.valueOf(eventName.toUpperCase()));
 		swtch.registerListener(s2oot);
 		for (Block target : targetBlocks) {
-			s2oot.registerListener((IOnOffToggleListener) target);
+			s2oot.registerListener((IOnOffToggleCapable) target);
 		}
 	}
 
@@ -216,7 +216,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		}
 
 		for (Block target : targetBlocks)
-			timer.register((IOnOffToggleListener) target);
+			timer.register((IOnOffToggleCapable) target);
 	}
 
 	private void parseConnectDimmer(Attributes atts) {

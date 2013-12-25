@@ -7,12 +7,11 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.actuators.newyear.GSstate;
 import eu.dlvm.domotics.actuators.newyear.INewYearGadget;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 
-public class NewYear extends Actuator implements IOnOffToggleListener {
+public class NewYear extends Actuator implements IOnOffToggleCapable {
 
 	private long startTimeMs;
 	private long endTimeMs;
@@ -112,7 +111,7 @@ public class NewYear extends Actuator implements IOnOffToggleListener {
 	}
 
 	@Override
-	public void onEvent(Block source, ActionType action) {
+	public void onEvent(ActionType action) {
 		switch (action) {
 		case ON:
 			start();
@@ -135,5 +134,22 @@ public class NewYear extends Actuator implements IOnOffToggleListener {
 
 	public long getEndTimeMs() {
 		return endTimeMs;
+	}
+
+	@Override
+	public void on() {
+		onEvent(ActionType.ON);
+	}
+
+	@Override
+	public void off() {
+		onEvent(ActionType.OFF);
+	}
+
+	@Override
+	public boolean toggle() {
+		onEvent(ActionType.TOGGLE);
+		// TODO niet correct... return false
+		return false;
 	}
 }

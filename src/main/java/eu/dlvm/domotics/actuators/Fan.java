@@ -4,10 +4,9 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IHardwareAccess;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -30,7 +29,7 @@ import eu.dlvm.iohardware.LogCh;
  * @author Dirk Vaneynde
  */
 
-public class Fan extends Actuator implements IOnOffToggleListener {
+public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	static Logger log = Logger.getLogger(Fan.class);
 
@@ -140,6 +139,16 @@ public class Fan extends Actuator implements IOnOffToggleListener {
 		return (state == States.RUN || state == States.RUN_LAMP_ON || state == States.RUN_LAMP_OFF);
 	}
 
+	@Override
+	public void on() {
+		setOn(true);
+	}
+
+	@Override
+	public void off() {
+		setOn(false);
+	}
+
 	/**
 	 * Toggle between immediately turning and stopping. If started, it runs for
 	 * {@link #getDelayPeriodSec()} seconds.
@@ -210,7 +219,7 @@ public class Fan extends Actuator implements IOnOffToggleListener {
 	 * </ul>
 	 */
 	@Override
-	public void onEvent(Block source, ActionType action) {
+	public void onEvent(ActionType action) {
 		switch (action) {
 		case ON:
 			setOn(true);

@@ -17,7 +17,7 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.mappers.IOnOffToggleListener;
+import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.SwitchClick2Toggle;
 import eu.dlvm.domotics.sensors.ISwitchListener;
@@ -90,8 +90,8 @@ public class TestSwitchOrTimer2Lamp {
 		sct2.registerListener(o2);
 
 		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "");
-		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleListener.ActionType.OFF);
-		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleListener.ActionType.ON);
+		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleCapable.ActionType.OFF);
+		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleCapable.ActionType.ON);
 
 		sw2.registerListener(s2allonoff);
 		s2allonoff.registerListener(o1);
