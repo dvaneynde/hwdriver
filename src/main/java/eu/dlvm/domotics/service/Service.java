@@ -8,18 +8,14 @@ import eu.dlvm.domotica.service.IDomoticSvc;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 
-//@Path("domo")
 public class Service implements IDomoticSvc {
 
-//	@GET
-//	@Produces(MediaType.TEXT_PLAIN)
+	@Override
 	public String getIt() {
 		return "Got it!";
 	}
 
-//	@Path("actuators_txt")
-//	@GET
-//	@Produces(MediaType.TEXT_PLAIN)
+	@Override
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
 		for (Actuator a : Domotic.singleton().getActuators())
@@ -27,14 +23,13 @@ public class Service implements IDomoticSvc {
 		return sb.toString();
 	}
 
-//	@Path("actuators")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	@GET
+	@Override
 	public List<BlockInfo> listActuators() {
 		List<BlockInfo> list = new ArrayList<>();
 		for (Actuator a : Domotic.singleton().getActuators()) {
 			BlockInfo aj = a.getActuatorInfo();
-			list.add(aj);
+			if (aj != null)
+				list.add(aj);
 		}
 		return list;
 	}
