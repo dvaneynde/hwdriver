@@ -11,19 +11,31 @@
 # 10. herleg links
 # 20. herstart domotica
 
-# Debug
-# set -x
-
-# Stop on error
-set -e
-
-if [ "$1" = "" ]
-then
+if [[ $# -ne 1 ]]; then
   echo "Usage: $0 <domotic hostname>"
   exit
 fi
 DOMHOST=$1
 
+# Stop on error
+set -e
+
+pushd /Users/dirkv/dev/ws-kepler/domotic-env/install
+pushd /Users/dirkv/dev/ws-kepler/domotic
+echo
+echo "BUILD ========================"
+echo
+mvn clean install
+popd
+
+echo
+echo "ASSEMBLE ====================="
+echo
+./assemble.sh
+
+echo
+echo "INSTAL  ========================"
+echo
 DOMDIR=/home/dirk/domotic
 NEWDIR=$(date +%F_%T)
 NEWPATH=$DOMDIR/$NEWDIR
@@ -70,4 +82,6 @@ ln -s $NEWDIR/hwdriver hwdriver
 ln -s $NEWDIR/DiamondBoardsConfig.xml DiamondBoardsConfig.xml
 ln -s $NEWDIR/DomoticConfig.xml DomoticConfig.xml
 #ln -s $NEWDIR/log4j.properties log4j.properties
- 
+END
+
+popd
