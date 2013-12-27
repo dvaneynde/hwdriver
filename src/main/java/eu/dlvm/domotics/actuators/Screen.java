@@ -195,7 +195,7 @@ public class Screen extends Actuator {
 	}
 
 	@Override
-	public BlockInfo getActuatorInfo() {
+	public BlockInfo getBlockInfo() {
 		return new BlockInfo(this.getName(),this.getClass().getSimpleName(), getDescription());
 	}
 

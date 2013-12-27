@@ -147,7 +147,7 @@
 	<connect src="TimerNacht" target="LichtNacht" />
 
 	<!-- New Year -->
-	<newyear start="2013-12-26T21:59:50" end="2013-12-27T00:01:00"/>
+	<newyear start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"/>
 
 	<connect src="SchakLichtBureau" src-event="double" target="newyear"
 		event="toggle" />

@@ -27,7 +27,7 @@ public class TestLoopSequence {
 		}
 
 		@Override
-		public BlockInfo getActuatorInfo() {
+		public BlockInfo getBlockInfo() {
 			return null;
 		}
 

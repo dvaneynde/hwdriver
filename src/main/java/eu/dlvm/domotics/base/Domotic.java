@@ -180,8 +180,16 @@ public class Domotic implements IHardwareAccess {
 		log.info("Added actuator " + a.getName());
 	}
 
-	public static Logger getLog() {
-		return log;
+	public List<Actuator> getActuators() {
+		return actuators;
+	}
+	
+	public Actuator findActuator(String name) {
+		for (Actuator a: actuators) {
+			if (a.getName().equals(name))
+				return a;
+		}
+		return null;
 	}
 
 	public List<Sensor> getSensors() {
@@ -189,10 +197,6 @@ public class Domotic implements IHardwareAccess {
 		return sensors;
 	}
 
-	public List<Actuator> getActuators() {
-		// TODO copy of list?
-		return actuators;
-	}
 
 //	public boolean isReady() {
 //		return ready;

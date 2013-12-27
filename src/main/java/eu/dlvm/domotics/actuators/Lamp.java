@@ -67,7 +67,10 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 
 	/**
 	 * Sets lamp to On or Off
-	 * @deprecate Use on() or off() or {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType)}.
+	 * 
+	 * @deprecate Use on() or off() or
+	 *            {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType)}
+	 *            .
 	 * @param outval
 	 *            true for On, false for Off
 	 */
@@ -105,10 +108,20 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public BlockInfo getActuatorInfo() {
+	public BlockInfo getBlockInfo() {
 		BlockInfo ai = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
 		ai.addParm("on", isOn() ? "1" : "0");
 		return ai;
+	}
+
+	@Override
+	public void update(String action) {
+		try {
+			ActionType at = ActionType.valueOf(action.toUpperCase());
+			onEvent(at);
+		} catch (IllegalArgumentException e) {
+			log.warn("update(), ignored unknown action: " + action);
+		}
 	}
 
 	@Override

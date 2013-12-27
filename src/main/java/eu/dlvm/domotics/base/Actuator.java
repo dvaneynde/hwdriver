@@ -58,14 +58,18 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	}
 
 	/**
-	 * After hardware is initialized, this function may set default output values, to be
-	 * picked up in the next {@link #loop(long, long)}.
-	 * @param last known state, or <code>null</code> if first time or unknown
+	 * After hardware is initialized, this function may set default output
+	 * values, to be picked up in the next {@link #loop(long, long)}.
+	 * 
+	 * @param last
+	 *            known state, or <code>null</code> if first time or unknown
 	 */
 	public abstract void initializeOutput(RememberedOutput ro);
 
 	/**
-	 * Optional. For safeguarding, so output state <i>may</i> be used at initialization time in {@link #initializeOutput()}.
+	 * Optional. For safeguarding, so output state <i>may</i> be used at
+	 * initialization time in {@link #initializeOutput()}.
+	 * 
 	 * @return current actuator output
 	 */
 	public RememberedOutput dumpOutput() {
@@ -89,8 +93,6 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	 */
 	public abstract void loop(long currentTime, long sequence);
 
-	public abstract BlockInfo getActuatorInfo();
-
 	/**
 	 * To be called from {{@link #loop(long, long)} implementations, to stop
 	 * program if a loop is looped (should be graph).
@@ -107,4 +109,9 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 		previousLoopSequence = currentLoopSequence;
 	}
 
+	public abstract BlockInfo getBlockInfo();
+
+	public void update(String action) {
+		log.warn("Actuator update not handled: " + action);
+	}
 }
