@@ -1,5 +1,8 @@
 package eu.dlvm.domotics.service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +76,22 @@ public class Service implements IDomoticSvc {
 		} else
 			LOG.warn("Domotic API: quickie '" + name + "' not found.");
 
+	}
+
+	@Override
+	public InputStream viewHome() {
+		LOG.info("Domotic API: home() called.");
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("home.html");
+		if (is == null) {
+			try {
+				LOG.warn("home(), niet in jar gevonden, maar in src/main/resources.");
+				is = new FileInputStream("src/main/resources/home.html");
+			} catch (FileNotFoundException e) {
+				LOG.error("Could not find home.html, neither in jar or development location.");
+				return null;
+			}
+		}
+		return is;
 	}
 
 }
