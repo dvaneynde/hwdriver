@@ -27,20 +27,6 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 		public int startMs, endMs;
 		public GSstate state = GSstate.BEFORE;
 		public List<INewYearGadget> gadgets = new ArrayList<>();
-		// public GadgetSet setStartTime(int ms) {
-		// this.startMs = ms;
-		// return this;
-		// }
-		//
-		// public GadgetSet setEndTime(int ms) {
-		// this.endMs = ms;
-		// return this;
-		// }
-		//
-		// public GadgetSet addGadget(INewYearGadget g) {
-		// gadgets.add(g);
-		// return this;
-		// }
 	}
 
 	public NewYear(String name, long startTimeMs, long endTimeMs, IHardwareAccess ctx) {
@@ -64,6 +50,7 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 
 	public synchronized void start() {
 		LOG.info(getName()+" started.");
+		actualStartMs = -1;
 		running = true;
 		manual = true;
 	}
