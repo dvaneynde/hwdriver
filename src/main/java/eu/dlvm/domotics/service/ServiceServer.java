@@ -1,13 +1,13 @@
 package eu.dlvm.domotics.service;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.RuntimeDelegate;
 
-import com.sun.net.httpserver.HttpHandler;
+import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+
 import com.sun.net.httpserver.HttpServer;
 
 @SuppressWarnings("restriction")
@@ -16,31 +16,15 @@ public class ServiceServer {
 	private HttpServer server;
 
 	public void start() {
-		HttpServer server;
-		try {
-			server = HttpServer.create(new InetSocketAddress(getBaseURI()
-					.getPort()), 0);
-			// create a handler wrapping the JAX-RS application
-			HttpHandler handler = RuntimeDelegate.getInstance().createEndpoint(
-					new JaxRsApplication(), HttpHandler.class);
+		URI baseUri = UriBuilder.fromUri("http://localhost/").port(9998).build();
+		ResourceConfig config = new ResourceConfig(Service.class);
+		config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
+		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 
-			// map JAX-RS handler to the server root
-			server.createContext(getBaseURI().getPath(), handler);
-
-			// start the server
-			server.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	public void stop() {
 		server.stop(0);
-	}
-
-	public static URI getBaseURI() {
-		return UriBuilder.fromUri("http://localhost/").port(8085).build();
 	}
 
 	/**
@@ -52,8 +36,7 @@ public class ServiceServer {
 	public static void main(String[] args) throws IOException {
 		ServiceServer ss = new ServiceServer();
 		ss.start();
-		System.out.println(String.format(
-				"Jersey app started.\nHit enter to stop it..."));
+		System.out.println(String.format("Jersey app started.\nHit enter to stop it..."));
 		System.in.read();
 		ss.stop();
 	}
