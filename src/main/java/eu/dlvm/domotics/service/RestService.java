@@ -1,10 +1,9 @@
 package eu.dlvm.domotics.service;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
@@ -13,13 +12,17 @@ import eu.dlvm.domotica.service.IDomoticSvc;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 
-public class Service implements IDomoticSvc {
+@Singleton
+public class RestService implements IDomoticSvc {
 
-	static Logger LOG = Logger.getLogger(Service.class);
+	private static Logger Log = Logger.getLogger(RestService.class);
+	private static int countInstances = 0;
 
 	private QuickieService qSvc;
 
-	public Service() {
+	public RestService() {
+		countInstances++;
+		Log.info("Count instances: "+countInstances);
 		qSvc = new QuickieService();
 	}
 
@@ -50,11 +53,11 @@ public class Service implements IDomoticSvc {
 	@Override
 	public void updateActuator(String name, String action) {
 		// TODO debug
-		LOG.info("Domotic API: got update actuator '" + name + "' action=" + action);
+		Log.info("Domotic API: got update actuator '" + name + "' action=" + action);
 		Actuator act = Domotic.singleton().findActuator(name);
 		if (act == null) {
 			// TODO iets terugsturen?
-			LOG.warn("Could not find actuator " + name);
+			Log.warn("Could not find actuator " + name);
 			return;
 		}
 		act.update(action);
@@ -67,31 +70,15 @@ public class Service implements IDomoticSvc {
 
 	@Override
 	public void quick(String name) {
-		LOG.info("Domotic API: got quickie '" + name + "'");
+		Log.info("Domotic API: got quickie '" + name + "'");
 		Quickie q = qSvc.find(name);
 		if (q != null) {
 			for (Quickie.KeyVal kv : q.actions) {
 				updateActuator(kv.key, kv.val);
 			}
 		} else
-			LOG.warn("Domotic API: quickie '" + name + "' not found.");
+			Log.warn("Domotic API: quickie '" + name + "' not found.");
 
-	}
-
-	@Override
-	public InputStream viewHome() {
-		LOG.info("Domotic API: home() called.");
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("home.html");
-		if (is == null) {
-			try {
-				LOG.warn("home(), niet in jar gevonden, maar in src/main/resources.");
-				is = new FileInputStream("src/main/resources/home.html");
-			} catch (FileNotFoundException e) {
-				LOG.error("Could not find home.html, neither in jar or development location.");
-				return null;
-			}
-		}
-		return is;
 	}
 
 }

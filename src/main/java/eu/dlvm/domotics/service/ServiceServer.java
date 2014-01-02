@@ -2,6 +2,8 @@ package eu.dlvm.domotics.service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -17,7 +19,10 @@ public class ServiceServer {
 
 	public void start() {
 		URI baseUri = UriBuilder.fromUri("http://localhost/").port(9998).build();
-		ResourceConfig config = new ResourceConfig(Service.class);
+		Set<Class<?>> services = new HashSet<>();
+		services.add(RestService.class);
+		services.add(HtmlService.class);
+		ResourceConfig config = new ResourceConfig(services);
 		config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 

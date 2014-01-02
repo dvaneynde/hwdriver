@@ -5,21 +5,21 @@
 
 	<!-- Lichten en Stopcontacten, met All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
-	<lamp name="LichtInkom" />
+	<lamp name="LichtInkom" desc="Inkom"/>
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
-	<lamp name="LichtWC0" desc="WC inkom" />
+	<lamp name="LichtWC0" desc="WC" />
 	<switch name="SchakVentilatorWC0" />
-	<fan name="VentilatorWC0" lamp="LichtWC0" desc="WC" />
+	<fan name="VentilatorWC0" lamp="LichtWC0" desc="Ventilator WC" />
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage Poort" />
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" />
 	<switch name="SchakLichtGarageTuin" longClick="true" />
-	<lamp name="LichtGarageTuin" desc="Garage Tuin" />
+	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" />
 	<switch name="SchakLichtKeuken" />
 	<lamp name="LichtKeuken" desc="Keuken" />
 	<switch name="SchakLichtBadk0" />
 	<lamp name="LichtBadk0" desc="Badkamer +0" />
 	<switch name="SchakVentilatorBadk0" />
-	<fan name="VentilatorBadk0" desc="Badkamer" />
+	<fan name="VentilatorBadk0" desc="Ventilator Badkamer" />
 	<dimmerSwitches name="SchakLichtVeranda" />
 	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda" />
 	<dimmerSwitches name="SchakLichtCircanteRondom" />
@@ -43,23 +43,23 @@
 	</group>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang" />
+	<lamp name="LichtGangBoven" desc="Gang Boven" />
 	<switch name="SchakLichtBadk1" />
 	<lamp name="LichtBadk1" desc="Badkamer +1" />
 	<switch name="SchakLichtTomasWand" />
 	<lamp name="LichtTomasWand" desc="Tomas Wand" />
 	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt 
 		met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Tomas" /><!-- TODO nakijken of klopt 
+	<lamp name="LichtTomasSpots" desc="Tomas Spots" /><!-- TODO nakijken of klopt 
 		met relais -->
 	<switch name="SchakLichtDriesWand" />
 	<lamp name="LichtDriesWand" desc="Dries Wand" />
 	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Dries" />
+	<lamp name="LichtDries" desc="Dries Spots" />
 	<switch name="SchakLichtRoosWand" />
 	<lamp name="LichtRoosWand" desc="Roos Wand" />
 	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" desc="Roos" />
+	<lamp name="LichtRoos" desc="Roos Spots" />
 	<group name="LichtBoven">
 		<block name="LichtGangBoven" />
 		<block name="LichtBadk1" />
