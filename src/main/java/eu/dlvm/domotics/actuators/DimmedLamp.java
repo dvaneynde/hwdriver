@@ -157,9 +157,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public void on() {
 		level = prevOnLevel;
-		// TODO waarom mag ik hier niet ineens de output aansturen? er was een
-		// reden, maar is die nog geldig...
-		// newLevelToWrite = true;
 		state = States.ON;
 		writeAnalogOutput();
 		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
@@ -178,9 +175,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			return;
 		}
 		level = newLevel;
-		// newLevelToWrite = true;
-		// TODO waarom mag ik hier niet ineens de output aansturen? er was een
-		// reden, maar is die nog geldig...
 		state = States.ON;
 		writeAnalogOutput();
 		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
@@ -194,9 +188,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		if (state != States.OFF) {
 			prevOnLevel = level;
 			level = 0;
-			// newLevelToWrite = true;
-			// TODO waarom mag ik hier niet ineens de output aansturen? er was
-			// een reden, maar is die nog geldig...
 			state = States.OFF;
 			writeAnalogOutput();
 			log.info("DimmedLamp '" + getName() + "' set to OFF (remembered level: " + prevOnLevel + "%)");
@@ -355,10 +346,14 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		}
 	}
 
+	private void writeAnalogOutput() {
+		getHw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
+	}
+
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(getName(), this.getClass().getSimpleName(), getDescription());
-		bi.addParm("on", getState().equals(States.OFF) ? "0" : "1");
+		bi.addParm("on", getState() == States.OFF ? "0" : "1");
 		bi.addParm("level", Integer.toString(getLevel()));
 		return bi;
 	}
@@ -385,10 +380,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public String toString() {
 		return "DimmedLamp (" + super.toString() + ") level=" + getLevel() + " state=" + getState().name();
-	}
-
-	private void writeAnalogOutput() {
-		getHw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
 	}
 
 }
