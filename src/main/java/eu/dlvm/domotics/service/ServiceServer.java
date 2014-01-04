@@ -18,7 +18,7 @@ public class ServiceServer {
 	private HttpServer server;
 
 	public void start() {
-		URI baseUri = UriBuilder.fromUri("http://localhost/").port(9998).build();
+		URI baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build();
 		Set<Class<?>> services = new HashSet<>();
 		services.add(RestService.class);
 		services.add(HtmlService.class);

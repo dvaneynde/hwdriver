@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
@@ -19,17 +20,17 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 
 @Singleton
-@Path("domo2")
+@Path("domo")
 public class HtmlService {
 
 	private static Logger Log = Logger.getLogger(RestService.class);
 	private static int countInstances = 0;
-	
+
 	public HtmlService() {
 		countInstances++;
-		Log.info("Count instances: "+countInstances);
+		Log.info("Count instances: " + countInstances);
 	}
-	
+
 	@Path("home")
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
@@ -66,6 +67,24 @@ public class HtmlService {
 		Log.info("viewable=" + v);
 
 		return v;
+	}
+
+	@Path("js/{name}")
+	@Produces("application/javascript")
+	@GET
+	public InputStream serveJs(@PathParam("name") String name) {
+		Log.info("Domotic API: serveJs() called, name=" + name);
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("js/"+name);
+		if (is == null) {
+			try {
+				is = new FileInputStream("src/main/resources/js/" + name);
+				Log.warn("serveJs(" + name + "), niet in jar gevonden, maar in src/main/resources/js.");
+			} catch (FileNotFoundException e) {
+				Log.error("Could not find " + name + ", neither in jar or development location.");
+				return null;
+			}
+		}
+		return is;
 	}
 
 }
