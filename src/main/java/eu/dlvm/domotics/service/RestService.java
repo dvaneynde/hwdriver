@@ -53,7 +53,7 @@ public class RestService implements IDomoticSvc {
 	@Override
 	public void updateActuator(String name, String action) {
 		// TODO debug
-		Log.info("Domotic API: got update actuator '" + name + "' action=" + action);
+		Log.info("Domotic API: got update actuator '" + name + "' action='" + action+"'");
 		Actuator act = Domotic.singleton().findActuator(name);
 		if (act == null) {
 			// TODO iets terugsturen?

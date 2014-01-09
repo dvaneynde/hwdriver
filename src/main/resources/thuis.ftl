@@ -24,7 +24,9 @@ TOOD:
 		onclick="location.href='quick/fel'">FEL</button>
 	<div align="left"><br>	
 		<#list model.actuators as act>
-			<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> <br>
+			<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+			<#if act.type = "DimmedLamp"><input type="range" name="${act.name}" min="0" max="100" step="5" value="${act.parms['level']}" onchange='sendLevelDL(this);'/></#if>
+			<br>
 		</#list>
 	</div>
 </body>
