@@ -34,26 +34,8 @@ public class HtmlService {
 	@Path("home")
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
-	public InputStream viewHome() {
-		Log.info("Domotic API: home() called.");
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("home.html");
-		if (is == null) {
-			try {
-				Log.warn("home(), niet in jar gevonden, maar in src/main/resources.");
-				is = new FileInputStream("src/main/resources/home.html");
-			} catch (FileNotFoundException e) {
-				Log.error("Could not find home.html, neither in jar or development location.");
-				return null;
-			}
-		}
-		return is;
-	}
-
-	@Path("thuis")
-	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
-	@GET
 	public Viewable viewThuis() {
-		Log.info("thuis opgeroepen");
+		Log.info("viewThuis() opgeroepen");
 		Data data = new Data();
 		data.setTitle("Alleballe");
 		List<BlockInfo> list = new ArrayList<>();
@@ -63,7 +45,7 @@ public class HtmlService {
 				list.add(aj);
 		}
 		data.setActuators(list);
-		Viewable v = new Viewable("/thuis", data);
+		Viewable v = new Viewable("/index", data);
 		Log.info("viewable=" + v);
 
 		return v;
