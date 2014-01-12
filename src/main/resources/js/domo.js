@@ -10,6 +10,11 @@ function sendToggle(element) {
 	$.ajax("act/" + element.name + "/toggle");
 }
 
+function sendQuickie(name) {
+	// alert("sendQuickie, name="+name);
+	$.ajax("quick/"+name);
+}
+
 function sendLevelDL(inputRange) {
 	// alert("sendLevelDL(): send act/" + inputRange.name + "/" + inputRange.value);
 	$.ajax("act/" + inputRange.name + "/" + inputRange.value);

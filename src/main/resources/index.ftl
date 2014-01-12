@@ -32,16 +32,16 @@ TOOD:
    }
 -->
 <body>
-<!--
+<div>
 	<button id="veranda"
-		onclick="location.href='quick/eten'">Veranda</button>
+		onclick="sendQuickie('eten');">Veranda</button>
 	<button id="tv"
-		onclick="location.href='quick/tv'">TV</button>
+		onclick="sendQuickie('tv');">TV</button>
 	<button id="eco"
-		onclick="location.href='quick/eco'">Eco</button>
+		onclick="sendQuickie('eco');">Eco</button>
 	<button id="fel"
-		onclick="location.href='quick/fel'">FEL</button>
-		-->
+		onclick="sendQuickie('fel');">FEL</button>
+</div>
 		<#list model.actuators as act>
 		<div class="block">
 			<span class="toggle">
