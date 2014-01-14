@@ -20,12 +20,13 @@ function sendLevelDL(inputRange) {
 	$.ajax("act/" + inputRange.name + "/" + inputRange.value);
 }
 
-//function sendLevelDL2(el, timeout) {
+//function registerDimmedLampChangeEvents(el, timeout) {
 //	var timer;
 //	var trig = function() {
 //		alert("Send name=" + el.name + ", level=" + el.value);
 //	};
 //	el.bind("change", function() {
+//  	zolang changes snel binnenkomen wordt timer reset; als ze 'timeout' lang niet meer binnenkomen wordt trig opgeroepen
 //		if (timer) {
 //			clearTimeout(timer);
 //		}
