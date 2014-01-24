@@ -104,7 +104,6 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		checkLoopSequence(sequence);
 	}
 
 	@Override

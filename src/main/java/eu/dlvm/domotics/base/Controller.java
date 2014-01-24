@@ -2,7 +2,6 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.iohardware.LogCh;
 
 //TODO geen sensor (dus geen IHwAccess), maar wel loop
@@ -13,7 +12,7 @@ import eu.dlvm.iohardware.LogCh;
  * because Sensors could do the same (multiple listeners) but that did not map
  * to a 'All Off' button in the UI.
  */
-public class Controller extends Block {
+public abstract class Controller extends BlockWithLoop {
 
 	static Logger log = Logger.getLogger(Controller.class);
 

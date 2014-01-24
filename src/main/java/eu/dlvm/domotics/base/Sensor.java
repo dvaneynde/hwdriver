@@ -15,7 +15,7 @@ import eu.dlvm.iohardware.LogCh;
  * Only Sensors must read data from hardware. This to avoid difficult to find bugs.
  * @author Dirk Vaneynde
  */
-public abstract class Sensor extends Block {
+public abstract class Sensor extends BlockWithLoop {
 
 	static Logger log = Logger.getLogger(Sensor.class);
 
@@ -50,20 +50,6 @@ public abstract class Sensor extends Block {
 	public IHardwareIO getHw() {
 		return ctx.getHw();
 	}
-
-	/**
-	 * Sensor should check its input and/or timeouts etc., in other words a run
-	 * is triggered through the logic starting from the Sensor.
-	 * 
-	 * @param currentTime
-	 *            Timestamp at which this loop is called. The same for each
-	 *            loop.
-	 * @param sequence
-	 *            A number that increments with each loop. Useful to detect
-	 *            being called twice - which is forbidden.
-	 * TODO move to IHardwareAccess
-	 */
-	public abstract void loop(long currentTime, long sequence);
 
 	@Override
 	public String toString() {

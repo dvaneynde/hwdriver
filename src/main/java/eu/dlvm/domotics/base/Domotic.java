@@ -106,7 +106,7 @@ public class Domotic implements IDomoticContext {
 	 * @param currentTime
 	 *            Current time at loopOnce invocation.
 	 */
-	public void loopOnce(long currentTime) {
+	public synchronized void loopOnce(long currentTime) {
 //		if (!ready) {
 //			throw new RuntimeException("Domotic not initialized.");
 //		}
@@ -115,10 +115,13 @@ public class Domotic implements IDomoticContext {
 			MON.info("loopOnce() start, loopSequence="+loopSequence+", currentTime="+currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
-			s.loop(currentTime, loopSequence);
+			s.loopWithCheck(currentTime, loopSequence);
+		}
+		for (Controller c : controllers) {
+			c.loopWithCheck(currentTime, loopSequence);
 		}
 		for (Actuator a : actuators) {
-			a.loop(currentTime, loopSequence);
+			a.loopWithCheck(currentTime, loopSequence);
 		}
 		hw.refreshOutputs();
 		if (loopSequence %10 == 0)

@@ -311,7 +311,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 
 	@Override
 	public void loop(long current, long sequence) {
-		checkLoopSequence(sequence);
 		switch (state) {
 		case OFF:
 		case ON:

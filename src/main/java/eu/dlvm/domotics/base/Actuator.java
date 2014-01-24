@@ -25,14 +25,12 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends Block {
+public abstract class Actuator extends BlockWithLoop {
 
-	static Logger log = Logger.getLogger(Actuator.class);
+	private static Logger log = Logger.getLogger(Actuator.class);
 
-	private IDomoticContext ctx;
 	private LogCh channel;
-	// FIXME naar domotic, via IDomoticCtx, en thread safe !
-	private long previousLoopSequence = -1L;
+	private IDomoticContext ctx;
 
 	/**
 	 * Create Actuator Block, i.e. a Block that abstracts output devices like
@@ -79,39 +77,6 @@ public abstract class Actuator extends Block {
 	 */
 	public RememberedOutput dumpOutput() {
 		return null;
-	}
-
-	/**
-	 * Called regularly by {@link Domotic}, so that concrete actuators can check
-	 * timeouts etc.
-	 * <p>
-	 * To be enabled this Actuator must first have been registered with
-	 * {@link Domotic#addActuator(Actuator)}.
-	 * 
-	 * @param currentTime
-	 *            Timestamp at which this loop is called. The same for each
-	 *            loop.
-	 * @param sequence
-	 *            A number that increments with each loop. Useful to detect
-	 *            being called twice - which is forbidden. TODO move to
-	 *            IHardwareAccess
-	 */
-	public abstract void loop(long currentTime, long sequence);
-
-	/**
-	 * To be called from {{@link #loop(long, long)} implementations, to stop
-	 * program if a loop is looped (should be graph).
-	 * 
-	 * @param currentLoopSequence
-	 *            TODO go to IHardwareAcess, also sensors can use it (must use
-	 *            it), perhaps use delegate?
-	 */
-	protected void checkLoopSequence(long currentLoopSequence) {
-		if (currentLoopSequence <= previousLoopSequence) {
-			log.error("Current loop sequence equal to, or before last recorded. Abort program. current=" + currentLoopSequence + ", previous=" + previousLoopSequence);
-			throw new RuntimeException("Current loop sequence equal to, or before last recorded. Abort program.");
-		}
-		previousLoopSequence = currentLoopSequence;
 	}
 
 	public abstract BlockInfo getBlockInfo();

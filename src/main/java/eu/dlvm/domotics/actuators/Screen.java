@@ -69,7 +69,6 @@ public class Screen extends Actuator {
 
 	@Override
 	public void loop(long current, long sequence) {
-		checkLoopSequence(sequence);
 		switch (state) {
 		case REST:
 			// TODO safety time, door hier ook te checken op timeStateStart, delay-protection moet verstreken zijn. Overal waar REST
