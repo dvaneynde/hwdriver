@@ -18,7 +18,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  * @author dirk vaneynde
  * 
  */
-public class Domotic implements IHardwareAccess {
+public class Domotic implements IDomoticContext {
 
 	private static Logger log = Logger.getLogger(Domotic.class);
 	private static Logger MON = Logger.getLogger("MONITOR");
@@ -28,6 +28,7 @@ public class Domotic implements IHardwareAccess {
 	protected IHardwareIO hw = null;
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
+	protected List<Controller> controllers = new ArrayList<Controller>(64);
 	protected long loopSequence = -1L;
 //	protected boolean ready = false;
 
@@ -178,6 +179,19 @@ public class Domotic implements IHardwareAccess {
 		}
 		actuators.add(a);
 		log.info("Added actuator " + a.getName());
+	}
+
+	// TODO generic
+	public void addController(Controller a) {
+		for (Controller aa : controllers) {
+			if (aa == a) {
+				log.warn("Controller already added, ignored: " + a);
+				assert (false);
+				return;
+			}
+		}
+		controllers.add(a);
+		log.info("Added controller " + a.getName());
 	}
 
 	public List<Actuator> getActuators() {

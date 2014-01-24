@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.iohardware.LogCh;
 
@@ -38,7 +38,7 @@ public class DimmerSwitch extends Sensor {
 	}
 
 	/**  */
-	public DimmerSwitch(String name, String description, LogCh channelLeft, LogCh channelRight, IHardwareAccess ctx) {
+	public DimmerSwitch(String name, String description, LogCh channelLeft, LogCh channelRight, IDomoticContext ctx) {
 		super(name, description, channelLeft, ctx);
 		this.channelR = channelRight;
 	}
@@ -51,7 +51,7 @@ public class DimmerSwitch extends Sensor {
 	 * @param channelRight
 	 * @param hw
 	 */
-	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IHardwareAccess ctx) {
+	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IDomoticContext ctx) {
 		this(name, description, new LogCh(channelLeft), new LogCh(channelRight), ctx);
 	}
 

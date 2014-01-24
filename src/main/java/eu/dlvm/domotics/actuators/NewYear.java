@@ -9,7 +9,7 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.actuators.newyear.GSstate;
 import eu.dlvm.domotics.actuators.newyear.INewYearGadget;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 
@@ -29,7 +29,7 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 		public List<INewYearGadget> gadgets = new ArrayList<>();
 	}
 
-	public NewYear(String name, long startTimeMs, long endTimeMs, IHardwareAccess ctx) {
+	public NewYear(String name, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
 		super(name, name, null, ctx);
 		this.startTimeMs = startTimeMs;
 		this.endTimeMs = endTimeMs;

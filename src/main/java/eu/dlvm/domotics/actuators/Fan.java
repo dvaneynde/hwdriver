@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
@@ -58,7 +58,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	/**
 	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, LogCh, IHardwareAccess)} for details.
 	 */
-	public Fan(String name, String description, LogCh channel, IHardwareAccess ctx) {
+	public Fan(String name, String description, LogCh channel, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		this.state = States.REST;
 		this.runningPeriodMs = 1000 * DEFAULT_RUN_PERIOD_SEC;
@@ -80,13 +80,13 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	 *            Logical output channel of fan.
 	 * @param ctx
 	 */
-	public Fan(String name, String description, Lamp lamp, LogCh channel, IHardwareAccess ctx) {
+	public Fan(String name, String description, Lamp lamp, LogCh channel, IDomoticContext ctx) {
 		this(name, description, channel, ctx);
 		this.lamp = lamp;
 		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
 	}
 
-	public Fan(String name, String description, Lamp lamp, int logicalChannel, IHardwareAccess ctx) {
+	public Fan(String name, String description, Lamp lamp, int logicalChannel, IDomoticContext ctx) {
 		super(name, description, new LogCh(logicalChannel), ctx);
 		this.state = States.REST;
 		this.lamp = lamp;

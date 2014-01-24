@@ -9,7 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Fan;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -33,7 +33,7 @@ public class TestFanNoLamp {
 	private static final LogCh FAN_OUT = new LogCh(10);
 	private Fan fan;
 	private Hardware hw;
-	private IHardwareAccess ctx;
+	private IDomoticContext ctx;
 	private long current, seq;
 
 	@BeforeClass

@@ -8,7 +8,7 @@ import org.junit.Test;
 import junit.framework.Assert;
 import eu.dlvm.domotics.actuators.Fan;
 import eu.dlvm.domotics.actuators.Lamp;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -37,7 +37,7 @@ public class TestFanWithLamp {
 	private Fan fan;
 	private Lamp lamp;
 	private Hardware hw;
-	private IHardwareAccess ctx;
+	private IDomoticContext ctx;
 	private long current, seq;
 
 	@BeforeClass

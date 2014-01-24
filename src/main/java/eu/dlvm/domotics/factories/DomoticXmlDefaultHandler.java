@@ -23,7 +23,7 @@ import eu.dlvm.domotics.actuators.newyear.OnOff;
 import eu.dlvm.domotics.actuators.newyear.RandomOnOff;
 import eu.dlvm.domotics.actuators.newyear.Sinus;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
@@ -43,11 +43,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	private Map<String, Block> blocks = new HashMap<>();
 	private List<Block> groupBlocks;
 	private Map<String, List<Block>> group2Blocks = new HashMap<>();
-	private IHardwareAccess ctx;
+	private IDomoticContext ctx;
 	private String name, desc;
 	private LogCh channel;
 
-	public DomoticXmlDefaultHandler(IHardwareAccess ctx) {
+	public DomoticXmlDefaultHandler(IDomoticContext ctx) {
 		super();
 		this.ctx = ctx;
 	}

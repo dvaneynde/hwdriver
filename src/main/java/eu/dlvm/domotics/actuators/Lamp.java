@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
@@ -23,12 +23,12 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Hardware to set output value(s).
 	 */
-	public Lamp(String name, String description, LogCh channel, IHardwareAccess ctx) {
+	public Lamp(String name, String description, LogCh channel, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		this.outval = false;
 	}
 
-	public Lamp(String name, String description, int channel, IHardwareAccess ctx) {
+	public Lamp(String name, String description, int channel, IDomoticContext ctx) {
 		this(name, description, new LogCh(channel), ctx);
 	}
 

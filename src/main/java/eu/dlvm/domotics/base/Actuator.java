@@ -3,7 +3,7 @@ package eu.dlvm.domotics.base;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
-import eu.dlvm.domotics.actuators.Lamp;
+import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -25,11 +25,13 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends BlockWithHardwareAccess {
+public abstract class Actuator extends Block {
 
-	static Logger log = Logger.getLogger(Lamp.class);
+	static Logger log = Logger.getLogger(Actuator.class);
 
+	private IDomoticContext ctx;
 	private LogCh channel;
+	// FIXME naar domotic, via IDomoticCtx, en thread safe !
 	private long previousLoopSequence = -1L;
 
 	/**
@@ -39,8 +41,9 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, LogCh channel, IHardwareAccess ctx) {
-		super(name, description, ctx);
+	public Actuator(String name, String description, LogCh channel, IDomoticContext ctx) {
+		super(name, description);
+		this.ctx = ctx;
 		this.channel = channel;
 		ctx.addActuator(this);
 	}
@@ -52,9 +55,11 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 		return channel;
 	}
 
-	@Override
-	public String toString() {
-		return "Actuator name='" + name + "', ch=" + getChannel() + ", description='" + description + "'";
+	/**
+	 * @return Underlying hardware.
+	 */
+	public IHardwareIO getHw() {
+		return ctx.getHw();
 	}
 
 	/**
@@ -114,4 +119,10 @@ public abstract class Actuator extends BlockWithHardwareAccess {
 	public void update(String action) {
 		log.warn("Actuator update not handled: " + action);
 	}
+	
+	@Override
+	public String toString() {
+		return "Actuator name='" + name + "', ch=" + getChannel() + ", description='" + description + "'";
+	}
+
 }

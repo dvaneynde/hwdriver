@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -32,7 +32,7 @@ public class TestScreens {
 	private static int UP = 1;
 	private Screen sr;
 	private Hardware hw;
-	private IHardwareAccess ctx;
+	private IDomoticContext ctx;
 	private long seq, cur;
 
 	private void loop(long inc) {

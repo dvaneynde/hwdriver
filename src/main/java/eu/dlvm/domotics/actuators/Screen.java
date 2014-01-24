@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.iohardware.LogCh;
 
@@ -38,7 +38,7 @@ public class Screen extends Actuator {
 	private boolean gotUp, gotDown;
 
 	public Screen(String name, String description, LogCh chDown, LogCh chUp,
-			IHardwareAccess ctx) {
+			IDomoticContext ctx) {
 		super(name, description, chDown, ctx);
 		this.chUp = chUp;
 	}

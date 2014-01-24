@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
 import eu.dlvm.iohardware.LogCh;
 
@@ -27,7 +27,7 @@ public class TimerDayNight extends Timer {
 	private OpenWeatherMap openWeatherMap;
 
 	public TimerDayNight(String name, String description, LogCh channel,
-			IHardwareAccess ctx) {
+			IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		setOpenWeatherMap(new OpenWeatherMap());
 	}

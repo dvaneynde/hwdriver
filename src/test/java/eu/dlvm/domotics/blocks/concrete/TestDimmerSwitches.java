@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -24,7 +24,7 @@ public class TestDimmerSwitches {
 	};
 
 	private Hardware hw = new Hardware();
-	private IHardwareAccess ctx = new DomoContextMock(hw);
+	private IDomoticContext ctx = new DomoContextMock(hw);
 	private long seq, cur;
 	private DimmerSwitch ds;
 	private IDimmerSwitchListener.ClickType lastEvent;

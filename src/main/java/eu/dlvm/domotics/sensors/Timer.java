@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
@@ -21,7 +21,7 @@ public class Timer extends Sensor {
 
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
-	public Timer(String name, String description, LogCh channel, IHardwareAccess ctx) {
+	public Timer(String name, String description, LogCh channel, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		state = false;
 		onTime = offTime = 0;

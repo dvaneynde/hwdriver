@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.iohardware.LogCh;
 
@@ -14,7 +14,7 @@ public class TestLoopSequence {
 
 	class MyActuator extends Actuator {
 
-		public MyActuator(String name, String description, LogCh channel, IHardwareAccess ctx) {
+		public MyActuator(String name, String description, LogCh channel, IDomoticContext ctx) {
 			super(name, description, channel, ctx);
 		}
 

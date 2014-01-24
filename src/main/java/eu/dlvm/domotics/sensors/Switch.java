@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
@@ -53,13 +53,13 @@ public class Switch extends Sensor {
 	}
 
 	public Switch(String name, String description, LogCh channel,
-			IHardwareAccess ctx) {
+			IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 	}
 
 	public Switch(String name, String description, LogCh channel,
 			boolean singleClickEnabled, boolean longClickEnabled,
-			boolean doubleClickEnabled, IHardwareAccess ctx) {
+			boolean doubleClickEnabled, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		this.singleClickEnabled = singleClickEnabled;
 		this.longClickEnabled = longClickEnabled;

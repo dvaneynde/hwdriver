@@ -2,18 +2,7 @@ package eu.dlvm.domotics.base;
 
 import eu.dlvm.iohardware.IHardwareIO;
 
-/**
- * Groups functions needed by blocks that need hardware access.
- * 
- * @author dirk vaneynde
- * TODO add loop() here
- */
-public interface IHardwareAccess {
-
-	/**
-	 * @return Underlying hardware.
-	 */
-	public IHardwareIO getHw();
+public interface IDomoticContext {
 
 	/**
 	 * Add Sensor to loop set (see {@link #loopOnce()}. Not essential, just to
@@ -35,4 +24,10 @@ public interface IHardwareAccess {
 	 */
 	public void addActuator(Actuator a);
 
+	public void addController(Controller a);
+	
+	/**
+	 * @return Underlying hardware.
+	 */
+	public IHardwareIO getHw();
 }

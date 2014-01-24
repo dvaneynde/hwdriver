@@ -10,11 +10,11 @@ import eu.dlvm.domotics.actuators.newyear.OnOff;
 import eu.dlvm.domotics.actuators.newyear.RandomOnOff;
 import eu.dlvm.domotics.actuators.newyear.Sinus;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 
 public class NewYearBuilder {
 
-	public NewYear build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IHardwareAccess ctx) {
+	public NewYear build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
 		NewYear ny = new NewYear("newyear", startTimeMs, endTimeMs, ctx);
 
 		// Lamp lamp;

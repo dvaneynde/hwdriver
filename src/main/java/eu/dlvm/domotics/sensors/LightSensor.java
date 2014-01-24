@@ -2,7 +2,7 @@ package eu.dlvm.domotics.sensors;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -48,7 +48,7 @@ public class LightSensor extends Sensor {
 	 * @param high2lowWaitTime
 	 * @throws IllegalConfigurationException
 	 */
-	public LightSensor(String name, String description, LogCh channel, IHardwareAccess ctx, int lowThreshold, int highThreshold,
+	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold,
 			long low2highWaitTime, long high2lowWaitTime) throws IllegalConfigurationException {
 		super(name, description, channel, ctx);
 		timeOfLastSample = 0L;

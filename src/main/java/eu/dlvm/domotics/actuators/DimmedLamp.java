@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.iohardware.LogCh;
@@ -48,7 +48,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IHardwareAccess ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
@@ -70,7 +70,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IHardwareAccess ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoticContext ctx) {
 		this(name, description, outputValueHardwareIfFull, new LogCh(channel), ctx);
 	}
 

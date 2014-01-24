@@ -2,7 +2,7 @@ package eu.dlvm.domotics.sensors;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.iohardware.LogCh;
 
@@ -44,7 +44,7 @@ public class WindSensor extends Sensor {
 	 * @param lowTimeToResetAlert
 	 *            Unit is milliseconds.
 	 */
-	public WindSensor(String name, String description, LogCh channel, IHardwareAccess ctx, int highSpeedThreshold,
+	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highSpeedThreshold,
 			int lowSpeedThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		super(name, description, channel, ctx);
 		if (highSpeedThreshold < lowSpeedThreshold)

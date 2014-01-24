@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
-import eu.dlvm.domotics.base.IHardwareAccess;
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -31,7 +31,7 @@ public class TestDimmedLamp {
 	private static final LogCh LAMP_CH = new LogCh(10);
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
-	private IHardwareAccess ctx = new DomoContextMock(hw);
+	private IDomoticContext ctx = new DomoContextMock(hw);
 	private long seq;
 
 	@BeforeClass

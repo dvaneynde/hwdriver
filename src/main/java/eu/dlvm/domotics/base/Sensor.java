@@ -2,6 +2,7 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
+import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -14,11 +15,13 @@ import eu.dlvm.iohardware.LogCh;
  * Only Sensors must read data from hardware. This to avoid difficult to find bugs.
  * @author Dirk Vaneynde
  */
-public abstract class Sensor extends BlockWithHardwareAccess {
+public abstract class Sensor extends Block {
 
 	static Logger log = Logger.getLogger(Sensor.class);
 
+	private IDomoticContext ctx;
 	private LogCh channel;
+	
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
 	 * 
@@ -26,8 +29,9 @@ public abstract class Sensor extends BlockWithHardwareAccess {
 	 * @param name
 	 * @param description
 	 */
-	public Sensor(String name, String description, LogCh channel, IHardwareAccess ctx) {
-		super(name, description, ctx);
+	public Sensor(String name, String description, LogCh channel, IDomoticContext ctx) {
+		super(name, description);
+		this.ctx = ctx;
 		this.channel = channel;
 		ctx.addSensor(this);
 	}
@@ -38,6 +42,13 @@ public abstract class Sensor extends BlockWithHardwareAccess {
 	 */
 	public LogCh getChannel() {
 		return channel;
+	}
+
+	/**
+	 * @return Underlying hardware.
+	 */
+	public IHardwareIO getHw() {
+		return ctx.getHw();
 	}
 
 	/**
