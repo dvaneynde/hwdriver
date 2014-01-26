@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.sensors;
 
 import static org.junit.Assert.*;
 

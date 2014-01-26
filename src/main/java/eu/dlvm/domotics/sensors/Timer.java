@@ -12,6 +12,11 @@ import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.iohardware.LogCh;
 
+/**
+ * TODO moet Controller worden
+ * @author dirkv
+ *
+ */
 public class Timer extends Sensor {
 
 	static Logger log = Logger.getLogger(Timer.class);
