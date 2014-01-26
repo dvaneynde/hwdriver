@@ -15,7 +15,7 @@ import eu.dlvm.iohardware.LogCh;
  * Only Sensors must read data from hardware. This to avoid difficult to find bugs.
  * @author Dirk Vaneynde
  */
-public abstract class Sensor extends BlockWithLoop {
+public abstract class Sensor extends Block implements IDomoticLoop {
 
 	static Logger log = Logger.getLogger(Sensor.class);
 

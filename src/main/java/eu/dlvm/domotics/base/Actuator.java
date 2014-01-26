@@ -25,7 +25,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends BlockWithLoop {
+public abstract class Actuator extends Block implements IDomoticLoop {
 
 	private static Logger log = Logger.getLogger(Actuator.class);
 

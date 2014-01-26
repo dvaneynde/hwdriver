@@ -12,7 +12,7 @@ import eu.dlvm.iohardware.LogCh;
  * because Sensors could do the same (multiple listeners) but that did not map
  * to a 'All Off' button in the UI.
  */
-public abstract class Controller extends BlockWithLoop {
+public abstract class Controller extends Block implements IDomoticLoop {
 
 	static Logger log = Logger.getLogger(Controller.class);
 

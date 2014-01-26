@@ -24,13 +24,13 @@ public class Domotic implements IDomoticContext {
 	private static Logger MON = Logger.getLogger("MONITOR");
 
 	private static Domotic singleton;
+	
 	// protected access for test cases only
 	protected IHardwareIO hw = null;
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
 	protected long loopSequence = -1L;
-//	protected boolean ready = false;
 
 	public static synchronized  Domotic singleton() {
 		if (singleton == null) {
@@ -79,7 +79,6 @@ public class Domotic implements IDomoticContext {
 			a.initializeOutput(ro);
 		}
 		hw.refreshOutputs();
-//		ready = true;
 	}
 
 	public void shutdown() {
@@ -107,21 +106,18 @@ public class Domotic implements IDomoticContext {
 	 *            Current time at loopOnce invocation.
 	 */
 	public synchronized void loopOnce(long currentTime) {
-//		if (!ready) {
-//			throw new RuntimeException("Domotic not initialized.");
-//		}
 		loopSequence++;
-		if (loopSequence %10 == 0)
+		if (loopSequence %100 == 0)
 			MON.info("loopOnce() start, loopSequence="+loopSequence+", currentTime="+currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
-			s.loopWithCheck(currentTime, loopSequence);
+			s.loop(currentTime, loopSequence);
 		}
 		for (Controller c : controllers) {
-			c.loopWithCheck(currentTime, loopSequence);
+			c.loop(currentTime, loopSequence);
 		}
 		for (Actuator a : actuators) {
-			a.loopWithCheck(currentTime, loopSequence);
+			a.loop(currentTime, loopSequence);
 		}
 		hw.refreshOutputs();
 		if (loopSequence %10 == 0)
@@ -134,7 +130,6 @@ public class Domotic implements IDomoticContext {
 	 */
 	public void stop() {
 		hw.stop();
-//		ready = false;
 	}
 
 	public void setHw(IHardwareIO hw) {
@@ -215,10 +210,6 @@ public class Domotic implements IDomoticContext {
 	}
 
 
-//	public boolean isReady() {
-//		return ready;
-//	}
-//
 	public long getLoopSequence() {
 		return loopSequence;
 	}
