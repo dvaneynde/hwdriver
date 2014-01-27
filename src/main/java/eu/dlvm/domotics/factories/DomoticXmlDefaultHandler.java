@@ -23,6 +23,7 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
+import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
@@ -168,10 +169,36 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String eventName = atts.getValue("event");
 
 		Block src = blocks.get(srcName);
-		if (src instanceof Timer) {
+		if (src instanceof Switch) {
+			handleConnectSwitch2OOT((Switch) src, srcEventName, targetName, eventName);
+		} else if (src instanceof Timer) {
 			handleConnectTimer((Timer) src, targetName);
 		} else {
 			throw new ConfigurationException("Unsupported type for connect, source=" + srcName + ", target=" + targetName + ", source event=" + srcEventName);
+		}
+	}
+
+	private void handleConnectSwitch2OOT(Switch swtch, String srcEventName, String targetName, String eventName) {
+		List<Block> targetBlocks;
+		Block t = blocks.get(targetName);
+		if (t == null)
+			targetBlocks = group2Blocks.get(targetName);
+		else {
+			targetBlocks = new ArrayList<>(1);
+			targetBlocks.add(t);
+		}
+
+		String s2ootName = swtch.getName() + "_to_" + targetName;
+		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocks.get(s2ootName);
+		if (s2oot == null) {
+			s2oot = new Switch2OnOffToggle(s2ootName, "Switch " + swtch.getName() + " connected to " + targetName);
+			blocks.put(s2ootName, s2oot);
+		}
+
+		s2oot.map(ISwitchListener.ClickType.valueOf(srcEventName.toUpperCase()), IOnOffToggleCapable.ActionType.valueOf(eventName.toUpperCase()));
+		swtch.registerListener(s2oot);
+		for (Block target : targetBlocks) {
+			s2oot.registerListener((IOnOffToggleCapable) target);
 		}
 	}
 

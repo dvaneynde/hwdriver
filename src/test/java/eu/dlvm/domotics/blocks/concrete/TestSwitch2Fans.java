@@ -80,10 +80,11 @@ public class TestSwitch2Fans {
 		f1 = new Fan("Fan1", "Fan1", l1, new LogCh(FAN1_OUT), dom);
 		f2 = new Fan("Fan2", "Fan2", l2, new LogCh(FAN2_OUT), dom);
 		
+		
 		Switch2Fan s2f1 = new Switch2Fan("s2f1", "s2f1");
 		sw1.registerListener(s2f1);
 		s2f1.registerListener(f1);
-
+		
 		Switch2Fan s2f2 = new Switch2Fan("s2f2", "s2f2");
 		sw2.registerListener(s2f2);
 		s2f2.registerListener(f2);
