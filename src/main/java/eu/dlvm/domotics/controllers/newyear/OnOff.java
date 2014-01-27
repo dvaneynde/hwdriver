@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.actuators.newyear;
+package eu.dlvm.domotics.controllers.newyear;
 
 import java.util.ArrayList;
 import java.util.List;

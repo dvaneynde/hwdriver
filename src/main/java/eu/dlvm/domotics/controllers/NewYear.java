@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.actuators;
+package eu.dlvm.domotics.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +6,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotica.service.BlockInfo;
-import eu.dlvm.domotics.actuators.newyear.GSstate;
-import eu.dlvm.domotics.actuators.newyear.INewYearGadget;
-import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.RememberedOutput;
+import eu.dlvm.domotics.controllers.newyear.GSstate;
+import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 
-public class NewYear extends Actuator implements IOnOffToggleCapable {
+public class NewYear extends Controller implements IOnOffToggleCapable {
 
 	static Logger LOG = Logger.getLogger(NewYear.class);
 	private long startTimeMs;
@@ -49,21 +48,21 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 	}
 
 	public synchronized void start() {
-		LOG.info(getName()+" started.");
+		LOG.info(getName() + " started.");
 		actualStartMs = -1;
 		running = true;
 		manual = true;
 	}
 
 	public synchronized void stop() {
-		LOG.info(getName()+" stopped.");
+		LOG.info(getName() + " stopped.");
 		running = false;
 		manual = true;
 	}
 
 	private synchronized boolean needToRun(long currentTime) {
 		if (!manual)
-			running= (currentTime >= startTimeMs && currentTime <= endTimeMs);
+			running = (currentTime >= startTimeMs && currentTime <= endTimeMs);
 		return running;
 	}
 
@@ -90,10 +89,6 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 					g.loop2(currentTime - actualStartMs - e.startMs, e.state);
 			}
 		}
-	}
-
-	@Override
-	public void initializeOutput(RememberedOutput ro) {
 	}
 
 	@Override
@@ -138,25 +133,17 @@ public class NewYear extends Actuator implements IOnOffToggleCapable {
 		// TODO niet correct... return false
 		return false;
 	}
-	
+
 	@Override
 	public BlockInfo getBlockInfo() {
-		BlockInfo ai = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
-		ai.addParm("running", running ? "1" : "0");
-		ai.addParm("startTimeMs", ""+startTimeMs);
-		ai.addParm("endTimeMs", ""+endTimeMs);
-		return ai;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void update(String action) {
-		try {
-			ActionType at = ActionType.valueOf(action.toUpperCase());
-			onEvent(at);
-		} catch (IllegalArgumentException e) {
-			LOG.warn("update(), ignored unknown action: " + action);
-		}
+		// TODO Auto-generated method stub
+		
 	}
-
 
 }

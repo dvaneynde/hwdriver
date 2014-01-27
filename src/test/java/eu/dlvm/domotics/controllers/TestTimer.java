@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors;
+package eu.dlvm.domotics.controllers;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.Timer;
+import eu.dlvm.domotics.controllers.Timer;
 
 public class TestTimer {
 

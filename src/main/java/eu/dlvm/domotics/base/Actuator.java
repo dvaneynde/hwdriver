@@ -25,7 +25,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends Block implements IDomoticLoop {
+public abstract class Actuator extends Block implements IDomoticLoop, IUserInterfaceAPI {
 
 	private static Logger log = Logger.getLogger(Actuator.class);
 
@@ -79,12 +79,6 @@ public abstract class Actuator extends Block implements IDomoticLoop {
 		return null;
 	}
 
-	public abstract BlockInfo getBlockInfo();
-
-	public void update(String action) {
-		log.warn("Actuator update not handled: " + action);
-	}
-	
 	@Override
 	public String toString() {
 		return "Actuator name='" + name + "', ch=" + getChannel() + ", description='" + description + "'";

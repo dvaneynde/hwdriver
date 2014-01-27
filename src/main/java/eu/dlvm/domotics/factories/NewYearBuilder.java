@@ -4,13 +4,13 @@ import java.util.Map;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Lamp;
-import eu.dlvm.domotics.actuators.NewYear;
-import eu.dlvm.domotics.actuators.newyear.Blink;
-import eu.dlvm.domotics.actuators.newyear.OnOff;
-import eu.dlvm.domotics.actuators.newyear.RandomOnOff;
-import eu.dlvm.domotics.actuators.newyear.Sinus;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.controllers.NewYear;
+import eu.dlvm.domotics.controllers.newyear.Blink;
+import eu.dlvm.domotics.controllers.newyear.OnOff;
+import eu.dlvm.domotics.controllers.newyear.RandomOnOff;
+import eu.dlvm.domotics.controllers.newyear.Sinus;
 
 public class NewYearBuilder {
 

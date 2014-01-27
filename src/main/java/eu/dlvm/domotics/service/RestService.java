@@ -11,6 +11,7 @@ import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotica.service.IDomoticSvc;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.IUserInterfaceAPI;
 
 @Singleton
 public class RestService implements IDomoticSvc {
@@ -42,7 +43,7 @@ public class RestService implements IDomoticSvc {
 	@Override
 	public List<BlockInfo> listActuators() {
 		List<BlockInfo> list = new ArrayList<>();
-		for (Actuator a : Domotic.singleton().getActuators()) {
+		for (IUserInterfaceAPI a : Domotic.singleton().getActuators()) {
 			BlockInfo aj = a.getBlockInfo();
 			if (aj != null)
 				list.add(aj);
@@ -54,7 +55,7 @@ public class RestService implements IDomoticSvc {
 	public void updateActuator(String name, String action) {
 		// TODO debug
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action+"'");
-		Actuator act = Domotic.singleton().findActuator(name);
+		IUserInterfaceAPI act = Domotic.singleton().findActuator(name);
 		if (act == null) {
 			// TODO iets terugsturen?
 			Log.warn("Could not find actuator " + name);

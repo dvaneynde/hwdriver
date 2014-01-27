@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.actuators.newyear;
+package eu.dlvm.domotics.controllers.newyear;
 
 import eu.dlvm.domotics.actuators.Lamp;
 

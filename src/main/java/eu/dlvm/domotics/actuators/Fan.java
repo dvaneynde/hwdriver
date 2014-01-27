@@ -306,6 +306,12 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 		return bi;
 	}
 
+	@Override
+	public void update(String action) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void writeOutput(boolean val) {
 		getHw().writeDigitalOutput(getChannel(), val);
 	}

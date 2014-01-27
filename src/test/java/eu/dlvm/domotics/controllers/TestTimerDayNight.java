@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors;
+package eu.dlvm.domotics.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
 import eu.dlvm.iohardware.LogCh;
 

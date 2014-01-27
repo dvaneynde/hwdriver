@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors;
+package eu.dlvm.domotics.controllers;
 
 import java.util.Calendar;
 import java.util.HashSet;
@@ -6,8 +6,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import eu.dlvm.domotica.service.BlockInfo;
+import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.iohardware.LogCh;
@@ -17,7 +18,7 @@ import eu.dlvm.iohardware.LogCh;
  * @author dirkv
  *
  */
-public class Timer extends Sensor {
+public class Timer extends Controller {
 
 	static Logger log = Logger.getLogger(Timer.class);
 
@@ -95,5 +96,17 @@ public class Timer extends Sensor {
 			log.info("Timer '" + getName() + "' sends event '" + (state ? "ON" : "OFF") + "'");
 			notifyListeners(state ? ActionType.ON : ActionType.OFF);
 		}
+	}
+
+	@Override
+	public BlockInfo getBlockInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void update(String action) {
+		// TODO Auto-generated method stub
+		
 	}
 }

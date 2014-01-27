@@ -17,10 +17,12 @@ import org.xml.sax.ext.DefaultHandler2;
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Fan;
 import eu.dlvm.domotics.actuators.Lamp;
-import eu.dlvm.domotics.actuators.NewYear;
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.controllers.NewYear;
+import eu.dlvm.domotics.controllers.Timer;
+import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
@@ -28,8 +30,6 @@ import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.domotics.sensors.Timer;
-import eu.dlvm.domotics.sensors.TimerDayNight;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {

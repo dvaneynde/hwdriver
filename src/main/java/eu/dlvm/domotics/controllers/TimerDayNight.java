@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.sensors;
+package eu.dlvm.domotics.controllers;
 
 import java.util.Calendar;
 import java.util.concurrent.Callable;
@@ -117,7 +117,7 @@ public class TimerDayNight extends Timer {
 		@Override
 		public Info call() throws Exception {
 			Info info = openWeatherMap.getWeatherReport();
-			System.out.println("call() info="+info);
+			log.debug("WheatherInfoCallable.call() info="+info);
 			return info;
 		}
 	}

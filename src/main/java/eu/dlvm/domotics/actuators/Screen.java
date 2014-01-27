@@ -188,14 +188,19 @@ public class Screen extends Actuator {
 	}
 
 	@Override
-	public String toString() {
-		return "Screen " + super.toString() + ", motorOnPeriod="
-				+ motorOnPeriodMs + ", state=" + state + "]";
-	}
-
-	@Override
 	public BlockInfo getBlockInfo() {
 		return new BlockInfo(this.getName(),this.getClass().getSimpleName(), getDescription());
 	}
 
+	@Override
+	public void update(String action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String toString() {
+		return "Screen " + super.toString() + ", motorOnPeriod="
+				+ motorOnPeriodMs + ", state=" + state + "]";
+	}
 }

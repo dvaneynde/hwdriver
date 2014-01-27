@@ -168,7 +168,7 @@ public class Domotic implements IDomoticContext {
 	 *            more than once.
 	 */
 	public void addActuator(Actuator a) {
-		for (Actuator aa : actuators) {
+		for (IUserInterfaceAPI aa : actuators) {
 			if (aa == a) {
 				log.warn("Actuator already added, ignored: " + a);
 				assert (false);
@@ -196,7 +196,7 @@ public class Domotic implements IDomoticContext {
 		return actuators;
 	}
 	
-	public Actuator findActuator(String name) {
+	public IUserInterfaceAPI findActuator(String name) {
 		for (Actuator a: actuators) {
 			if (a.getName().equals(name))
 				return a;
