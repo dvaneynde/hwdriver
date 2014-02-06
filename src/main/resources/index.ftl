@@ -3,26 +3,16 @@
 <head>
 	<meta charset="US-ASCII">
 	<meta name="viewport" content="width=320, maximum-scale=1.0" />
-	<title>Domotica v2</title>
+	<title>Domotica</title>
+	
+	<!--
 	<script type="text/javascript" src="js/jquery-2.0.3.js"></script>
+	-->
+	
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script	src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>	
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
 	<script type="text/javascript" src="js/domo.js"></script>
-	<style type="text/css" media="all">
-div.block{
-  overflow:hidden;
-}
-div.block .toggle{
-  width:150px;
-  display:block;
-  float:left;
-  text-align:left;
-}
-div.block .slider{
-  margin-left:4px;
-  float:left;
-}
-	</style>
-	<style type="text/css" media="handheld">
-	</style>
 </head>
 <!--
 TOOD:
@@ -32,23 +22,39 @@ TOOD:
    }
 -->
 <body>
-<div>
-	<button id="veranda"
-		onclick="sendQuickie('eten');">Veranda</button>
-	<button id="tv"
-		onclick="sendQuickie('tv');">TV</button>
-	<button id="eco"
-		onclick="sendQuickie('eco');">Eco</button>
-	<button id="fel"
-		onclick="sendQuickie('fel');">FEL</button>
-</div>
-		<#list model.actuators as act>
-		<div class="block">
-			<span class="toggle">
-				<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
-			</span>
-			<#if act.type = "DimmedLamp"><input class="slider" type="range" name="${act.name}" min="0" max="100" step="5" value="${act.parms['level']}" onchange='sendLevelDL(this);'/></#if>
+	<div data-role="page" id="pageone">
+		<div data-role="header">
+			<h1>Domotica</h1>
+		</div>
+
+		<div data-role="content">
+			<div data-role="collapsible">
+	    	<h4>Quickies...</h4>
+				<div data-role="controlgroup" data-type="horizontal"><!-- ui-mini ui-btn-inline -->
+					<button id="veranda" class="ui-btn ui-corner-all "
+						onclick="sendQuickie('eten');">Veranda</button>
+					<button id="tv" class="ui-btn ui-corner-all"
+						onclick="sendQuickie('tv');">TV</button>
+					<button id="eco" class="ui-btn ui-corner-all"
+						onclick="sendQuickie('eco');">Eco</button>
+					<button id="fel" class="ui-btn ui-corner-all"
+						onclick="sendQuickie('fel');">FEL</button>
+				</div>
+			</div>
+			<#list model.actuators as act>
+			<div >
+				<label><!-- TODO Flip Switch ipv checkbox -->
+					<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+				</label>
+				<#if act.type = "DimmedLamp"><input type="range" name="${act.name}" min="0" max="100" step="5" value="${act.parms['level']}" onchange='sendLevelDL(this);'/></#if>
+			</div>
+			</#list>
+		</div>
+
+		<div data-role="footer">
+			<h1>TODO knopkes</h1>
+		</div>
 	</div>
-		</#list>
+		
 </body>
 </html>
