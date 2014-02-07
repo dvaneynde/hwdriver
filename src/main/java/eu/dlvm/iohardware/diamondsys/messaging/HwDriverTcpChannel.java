@@ -103,6 +103,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		} catch (IOException e) {
 			log.warn("TCP socket close to driver throws IO exception.", e);
 		}
+		log.info("Connection to driver closed. socket="+socket);
 	}
 
 }

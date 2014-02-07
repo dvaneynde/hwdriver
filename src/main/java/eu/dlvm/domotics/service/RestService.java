@@ -82,4 +82,15 @@ public class RestService implements IDomoticSvc {
 
 	}
 
+	@Override
+	public void shutdown() {
+		Domotic.singleton().stopRequested.set(true);
+		Log.info("shutdown requested !");
+	}
+	
+	@Override
+	public String ping(String token) {
+		return token;
+	}
+
 }

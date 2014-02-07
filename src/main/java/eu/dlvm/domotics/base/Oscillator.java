@@ -37,4 +37,8 @@ public class Oscillator {
 	public synchronized void stop() {
 		goOn = false;
 	}
+	
+	public synchronized boolean stopRequested() {
+		return !goOn;
+	}
 }

@@ -1,28 +1,19 @@
 package eu.dlvm.domotics;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.Oscillator;
-import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
-import eu.dlvm.domotics.service.ServiceServer;
 import eu.dlvm.iohardware.HwConsole;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
@@ -44,7 +35,6 @@ public class Main {
 	private static Logger MON = Logger.getLogger("MONITOR");
 
 	private String pid;
-	private File outputStatesFile;
 
 	public IHardwareIO setupHardware(String cfgFile, String host, int port, int readTimeout) {
 		XmlHwConfigurator xcf = new XmlHwConfigurator();
@@ -76,155 +66,21 @@ public class Main {
 		}
 	}
 
-	private void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			log.warn("Got interrupted, in Thread.sleep(), IGNORED. Where does this come from?", e);
-		}
+	private void startAndRunDomotic(int looptime, String path2Driver, String logcfgfile, String blocksCfgFile, String hwCfgFile, String hostname, int port, boolean simulation) {
+		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\tlog-config:\t" + logcfgfile + "\n\thardware cfg:\t" + hwCfgFile
+				+ "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + getPid());
+
+		storePid();
+		IHardwareIO hw;
+		if (simulation)
+			hw = setupSimulatedHardware(hwCfgFile);
+		else
+			hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10);
+
+		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
+		dom.runDomotic(looptime, path2Driver);
 	}
 
-	private File getOutputStatesFile() {
-		if (outputStatesFile == null) {
-			outputStatesFile = new File("/var/local", "DomoticOutputStates.txt");
-			log.info("Safeguard last output states to file " + outputStatesFile.getAbsolutePath());
-		}
-		return outputStatesFile;
-	}
-
-	private Map<String, RememberedOutput> readRememberedOutputs() {
-		Map<String, RememberedOutput> ros = new HashMap<String, RememberedOutput>();
-		File f = getOutputStatesFile();
-		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				RememberedOutput ro = RememberedOutput.parse(line);
-				if (ro != null) {
-					ros.put(ro.getBlockName(), ro);
-				}
-			}
-			log.info("Read previous ouptut states, number of entries is "+ros.size());
-		} catch (FileNotFoundException e) {
-			log.info("No remembered outputs file found, will initialize with defaults. File should be: " + f.getName());
-		} catch (IOException e) {
-			log.error("Error reading " + f.getName() + ", will not use remembered outputs.", e);
-		}
-		return ros;
-	}
-
-	private boolean alreadyReportedFileNotFound = false;
-	private void writeRememberedOutputs(List<Actuator> as) {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputStatesFile()))) {
-			for (Actuator a : as) {
-				RememberedOutput ro = a.dumpOutput();
-				if (ro != null) {
-					bw.write(ro.dump() + '\n');
-				}
-			}
-			log.debug("Wrote last output state to "+getOutputStatesFile().getAbsolutePath());
-		} catch (FileNotFoundException e) {
-			if (!alreadyReportedFileNotFound)
-				log.warn("Cannot write remembered output, file not found: "+getOutputStatesFile());
-			alreadyReportedFileNotFound = true;
-		} catch (IOException e) {
-			log.error("Failed writing to " + getOutputStatesFile().getName() + ". Functionality might not work.", e);
-		}
-	}
-
-	/**
-	 * Runs it.
-	 * 
-	 * @param osc
-	 *            Drives the Domotic system, and references it.
-	 * @param pathToDriver
-	 *            If non-null, attempts to start the HwDriver executable at that
-	 *            path. Note that this driver must be on the same host, since
-	 *            'localhost' is passed to it as an argument. Otherwise that
-	 *            driver should be started separately, after this one shows
-	 *            "START" in the log.
-	 */
-	@SuppressWarnings("deprecation")
-	public void runDomotic(final Domotic dom, final Oscillator osc, String pathToDriver) {
-		// TODO see
-		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
-		Runnable domoticRunner = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					log.info("Oscillator oscillates...");
-					osc.go();
-					log.error("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
-				} catch (Exception e) {
-					log.error("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
-				}
-			}
-		};
-		boolean stopRequested = false;
-		boolean fatalError = false;
-		// TODO request stop is niet geimplementeerd !
-		while (!stopRequested && !fatalError) {
-			DriverMonitor monitor = null;
-			Process process = null;
-			if (pathToDriver != null) {
-				log.info("Start HwDriver, and wait for startup message from driver...");
-				ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
-				try {
-					process = pb.start();
-				} catch (IOException e) {
-					log.error("Cannot start driver as subprocess. Abort startup.", e);
-					fatalError = true;
-					break;
-				}
-				monitor = new DriverMonitor(process, "hwdriver");
-				int maxTries = 5000 / 200;
-				int trial = 0;
-				while ((trial++ < maxTries) && monitor.driverNotReady())
-					sleep(200);
-				if (trial >= maxTries)
-					log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
-				else
-					log.info("Driver started in " + (trial - 1) * 200 / 1000.0 + " seconds.");
-			}
-			log.info("Initialize domotic system.");
-			Map<String, RememberedOutput> ros = readRememberedOutputs();
-			dom.initialize(ros);
-			log.info("Start Domotic thread 'Domotic Blocks Execution'.");
-			Thread domoticThread = new Thread(domoticRunner, "Domotic Blocks Execution.");
-			domoticThread.start();
-
-			log.info("Everything started, now monitoring...");
-			long lastLoopSequence = -1;
-			while (true) {
-				sleep(5000);
-				long currentLoopSequence = dom.getLoopSequence();
-				if (currentLoopSequence <= lastLoopSequence)
-					log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current=" + currentLoopSequence);
-				lastLoopSequence = currentLoopSequence;
-				if (pathToDriver != null) {
-					if (monitor.everythingSeemsWorking()) {
-						MON.info("Checked driver sub-process, seems OK.");
-					} else {
-						log.error("Something is wrong with driver subprocess. I'll try to restart.\n" + monitor.report());
-						break;
-					}
-				}
-				writeRememberedOutputs(dom.getActuators());
-			}
-			// shutdown
-			if (pathToDriver != null) {
-				process.destroy();
-				monitor.terminate();
-			}
-			domoticThread.stop();
-			dom.shutdown();
-			log.info("Stopped domotic thread and closed connection.");
-			if (!stopRequested && !fatalError) {
-				log.info("Will restart driver in 3 seconds...");
-				sleep(3000);
-			}
-		}
-		log.info("Domotica exited.");
-	}
 
 	public String getPid() {
 		if (pid == null) {
@@ -383,22 +239,7 @@ public class Main {
 
 		Main main = new Main();
 		if (domotic) {
-			log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\tlog-config:\t" + logcfgfile + "\n\thardware cfg:\t"
-					+ hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + main.getPid());
-
-			main.storePid();
-			IHardwareIO hw;
-			if (simulation)
-				hw = main.setupSimulatedHardware(hwCfgFile);
-			else
-				hw = main.setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10);
-			Domotic dom = main.setupBlocksConfig(blocksCfgFile, hw);
-
-			ServiceServer server = new ServiceServer();
-			server.start();
-
-			Oscillator osc = new Oscillator(dom, looptime);
-			main.runDomotic(dom, osc, path2Driver);
+			main.startAndRunDomotic(looptime, path2Driver, logcfgfile, blocksCfgFile, hwCfgFile, hostname, port, simulation);
 		} else {
 			main.runHwConsole(hwCfgFile, hostname, port, path2Driver);
 		}

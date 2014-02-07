@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -24,12 +25,15 @@ public class ServiceServer {
 		services.add(HtmlService.class);
 		ResourceConfig config = new ResourceConfig(services);
 		config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
+		
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
-
 	}
 
 	public void stop() {
-		server.stop(0);
+		// http://stackoverflow.com/questions/928211/how-to-shutdown-com-sun-net-httpserver-httpserver
+		server.stop(1);
+		ExecutorService threadpool = (ExecutorService)server.getExecutor();
+		threadpool.shutdownNow();
 	}
 
 	/**
