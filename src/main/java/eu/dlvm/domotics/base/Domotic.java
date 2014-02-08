@@ -35,6 +35,8 @@ public class Domotic implements IDomoticContext {
 	private static Logger MON = Logger.getLogger("MONITOR");
 
 	private static Domotic singleton;
+	private Thread maintThread;
+	private File outputStatesFile;
 
 	// protected access for test cases only
 	protected IHardwareIO hw = null;
@@ -43,7 +45,6 @@ public class Domotic implements IDomoticContext {
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
 	protected long loopSequence = -1L;
 
-	private File outputStatesFile;
 
 	public AtomicBoolean stopRequested = new AtomicBoolean();
 
@@ -66,10 +67,10 @@ public class Domotic implements IDomoticContext {
 		singleton = null;
 	}
 
-	private Domotic() {
-		super();
-	}
-
+//	private Domotic() {
+//		super();
+//	}
+//
 	/**
 	 * Initializes {@link IHardwareIO} and Domotic {@link Actuator} blocks.
 	 * Initializing the Actuators implies that the hardware outputs are set in
@@ -99,11 +100,9 @@ public class Domotic implements IDomoticContext {
 		hw.refreshOutputs();
 	}
 
-//	public void shutdown() {
-//		hw.stop();
-//	}
-//
 	/**
+	 * TODO move naar Oscillator, en hernoem die naar DomoticBlocksLoop
+	 * 
 	 * Some external clock must regularly call this method, to let the Blocks
 	 * 'work'.
 	 * <p>
@@ -140,14 +139,6 @@ public class Domotic implements IDomoticContext {
 		hw.refreshOutputs();
 		if (loopSequence % 10 == 0)
 			MON.info("loopOnce() done, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
-	}
-
-	/**
-	 * Stops hardware. After this you need to call {@link #initialize()} if you
-	 * need to restart.
-	 */
-	public void stop() {
-		hw.stop();
 	}
 
 	public void setHw(IHardwareIO hw) {
@@ -252,6 +243,7 @@ public class Domotic implements IDomoticContext {
 		log.info("Shutdown hook attached.");
 	}
 
+	// TODO ook naar DomoticBlockLoop ?
 	class LoopExecutor implements Runnable {
 		private Oscillator osc;
 
@@ -274,6 +266,15 @@ public class Domotic implements IDomoticContext {
 		}
 	}
 
+	public void interruptMainThread() {
+		if (maintThread == null) {
+			log.error("Calling interruptMainThread(), but mainThread is not set. Ignored.");
+		} else {
+			maintThread.interrupt();
+			log.info("Interrupted main thread, done by thread="+Thread.currentThread().getName());
+		}
+	}
+
 	/**
 	 * Runs it.
 	 * 
@@ -288,10 +289,11 @@ public class Domotic implements IDomoticContext {
 	 */
 	public void runDomotic(int looptime, String pathToDriver) {
 		addShutdownHook(this);
+		this.maintThread = Thread.currentThread();
 
 		ServiceServer server = new ServiceServer();
 		server.start();
-			
+
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
 		Oscillator osc = new Oscillator(this, looptime);
@@ -331,8 +333,7 @@ public class Domotic implements IDomoticContext {
 			log.info("Everything started, now monitoring...");
 			long lastLoopSequence = -1;
 			while (!stopRequested.get()) {
-				System.err.println("loop !");
-				System.err.flush();
+				// TODO deze sleep moet interrupted !
 				sleep(5000);
 				long currentLoopSequence = getLoopSequence();
 				if (currentLoopSequence <= lastLoopSequence)
@@ -354,7 +355,7 @@ public class Domotic implements IDomoticContext {
 				driverProcess.destroy();
 				monitor.terminate();
 			}
-			//shutdown();
+			// shutdown();
 			hw.stop();
 			osc.stop();
 			server.stop();
@@ -420,7 +421,7 @@ public class Domotic implements IDomoticContext {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
-			log.warn("Got interrupted, in Thread.sleep(), IGNORED. Where does this come from?", e);
+			log.debug("Got interrupted, in Thread.sleep(). ", e);
 		}
 	}
 

@@ -85,6 +85,7 @@ public class RestService implements IDomoticSvc {
 	@Override
 	public void shutdown() {
 		Domotic.singleton().stopRequested.set(true);
+		Domotic.singleton().interruptMainThread();
 		Log.info("shutdown requested !");
 	}
 	
