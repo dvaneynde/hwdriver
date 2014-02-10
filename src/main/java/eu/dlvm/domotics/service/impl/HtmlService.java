@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service;
+package eu.dlvm.domotics.service.impl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +22,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.IUserInterfaceAPI;
 
 @Singleton
 @Path("domo")
@@ -38,54 +39,59 @@ public class HtmlService {
 	}
 
 	private synchronized void ensureModelDataFilledIn() {
-		if (data != null)
-			return;
-		data = new Data();
-		data.setTitle(new Date().toLocaleString());
-
-		List<Actuator> actuators = Domotic.singleton().getActuators();
 		try {
-			List<String> groupnames = new ArrayList<>();
-			Map<String, List<BlockInfo>> groupname2blockinfos = new HashMap<>();
-			data.setGroupNames(groupnames);
-			data.setGroupname2infos(groupname2blockinfos);
-			// Opbouw structuren
-			for (Actuator a : actuators) {
-				if (a.getUi() == null)
-					continue;
-				StringTokenizer st = new StringTokenizer(a.getUi(), ":");
-				String groupName = st.nextToken();
-				int idx = Integer.parseInt(st.nextToken());
-				if (!groupnames.contains(groupName)) {
-					groupnames.add(groupName);
-					groupname2blockinfos.put(groupName, new ArrayList<BlockInfo>());
+			if (data == null) {
+				data = new Data();
+				List<Actuator> actuators = Domotic.singleton().getActuators();
+				List<String> groupnames = new ArrayList<>();
+				Map<String, List<BlockInfo>> groupname2blockinfos = new HashMap<>();
+				data.setGroupNames(groupnames);
+				data.setGroupname2infos(groupname2blockinfos);
+				// Opbouw structuren
+				for (Actuator a : actuators) {
+					if (a.getUi() == null)
+						continue;
+					StringTokenizer st = new StringTokenizer(a.getUi(), ":");
+					String groupName = st.nextToken();
+					int idx = Integer.parseInt(st.nextToken());
+					if (!groupnames.contains(groupName)) {
+						groupnames.add(groupName);
+						groupname2blockinfos.put(groupName, new ArrayList<BlockInfo>());
+					}
+					List<BlockInfo> blockinfos = groupname2blockinfos.get(groupName);
+					if (idx >= blockinfos.size()) {
+						for (int i = blockinfos.size(); i < idx; i++)
+							blockinfos.add(null);
+						blockinfos.add(a.getBlockInfo());
+					} else {
+						blockinfos.add(idx, a.getBlockInfo());
+					}
 				}
-				List<BlockInfo> blockinfos = groupname2blockinfos.get(groupName);
-				if (idx >= blockinfos.size()) {
-					for (int i = blockinfos.size(); i < idx; i++)
-						blockinfos.add(null);
-					blockinfos.add(a.getBlockInfo());
-				} else {
-					blockinfos.add(idx, a.getBlockInfo());
+				// Opkuis structuren, d.i. null eruithalen
+				for (String groupName : data.getGroupNames()) {
+					List<BlockInfo> newBlockinfos = new ArrayList<>();
+					for (BlockInfo oldBlockInfo : data.getGroupname2infos().get(groupName)) {
+						if (oldBlockInfo != null)
+							newBlockinfos.add(oldBlockInfo);
+					}
+					data.getGroupname2infos().put(groupName, newBlockinfos);
+				}
+				Log.info("Web model data first-time initialized. Data=" + data);
+			} else {
+				for (List<BlockInfo> list : data.groupname2infos.values()) {
+					for (int i = 0; i < list.size(); i++) {
+						IUserInterfaceAPI act = Domotic.singleton().findActuator(list.get(i).getName());
+						list.set(i, act.getBlockInfo());
+					}
 				}
 			}
-			// Opkuis structuren, d.i. null eruithalen
-			for (String groupName : data.getGroupNames()) {
-				List<BlockInfo> newBlockinfos = new ArrayList<>();
-				for (BlockInfo oldBlockInfo: data.getGroupname2infos().get(groupName)) {
-					if (oldBlockInfo!= null)
-						newBlockinfos.add(oldBlockInfo);
-				}
-				data.getGroupname2infos().put(groupName, newBlockinfos);
-			}
+			data.setTitle(new Date().toLocaleString());
 		} catch (Exception e) {
 			Log.error("Unexpected exception.", e);
 			throw new RuntimeException("Server Error - check log.");
 		}
-		Log.info("Web model data ready. Data=" + data);
 	}
 
-	
 	@Path("home")
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
@@ -98,7 +104,6 @@ public class HtmlService {
 		return v;
 	}
 
-	
 	@Path("js/{name}")
 	@Produces("application/javascript")
 	@GET

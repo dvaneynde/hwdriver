@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service;
+package eu.dlvm.domotics.service.impl;
 
 import java.io.IOException;
 import java.net.URI;

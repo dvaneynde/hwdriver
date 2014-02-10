@@ -30,7 +30,7 @@ TOOD:
 		<div data-role="content">
 			<div data-role="collapsible-set" data-theme="a" data-content-theme="a">
 
- 			<div data-role="collapsible" data-collapsed="false">
+ 			<div data-role="collapsible" data-collapsed="true">
 	    	<h4>Quickies...</h4>
 				<div data-role="controlgroup" data-type="horizontal"><!-- ui-mini ui-btn-inline -->
 					<button id="veranda" class="ui-btn ui-corner-all"

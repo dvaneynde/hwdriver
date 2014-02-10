@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.DriverMonitor;
-import eu.dlvm.domotics.service.ServiceServer;
+import eu.dlvm.domotics.service.impl.ServiceServer;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
 

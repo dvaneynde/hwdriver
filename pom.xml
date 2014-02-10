@@ -112,11 +112,6 @@
 			<artifactId>jersey-mvc-freemarker</artifactId>
 			</dependency>
 
-		<dependency>
-			<groupId>eu.dlvm</groupId>
-			<artifactId>domotic-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
