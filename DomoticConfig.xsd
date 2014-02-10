@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
 	elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
@@ -16,13 +15,11 @@
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
 
-				<element name="lamp" type="tns:blockWithChannelStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -52,29 +49,13 @@
 				</element>
 				<element name="newyear" minOccurs="0" maxOccurs="1">
 					<complexType>
-						<choice minOccurs="0" maxOccurs="unbounded">
-							<element name="onoff">
-								<complexType>
-									<attribute name="lamp" type="string" />
-								</complexType>
-							</element>
-							<element name="random">
-								<complexType>
-									<attribute name="lamp" type="string" />
-									<attribute name="min-on-ms" type="int" />
-									<attribute name="rand-mult-ms" type="int" />
-								</complexType>
-							</element>
-							<element name="sine">
-								<complexType>
-									<attribute name="lamp" type="string" />
-									<attribute name="cycle-ms" type="int" />
-									<attribute name="cycle-start-deg" type="int" />
-								</complexType>
-							</element>
-						</choice>
-						<attribute name="start" type="dateTime"></attribute>
-						<attribute name="end" type="dateTime"></attribute>
+						<complexContent>
+							<extension base="tns:blockWithChannelStruct">
+
+								<attribute name="start" type="dateTime"></attribute>
+								<attribute name="end" type="dateTime"></attribute>
+							</extension>
+						</complexContent>
 					</complexType>
 				</element>
 
@@ -108,7 +89,7 @@
 
 	<complexType name="groupType">
 		<choice maxOccurs="unbounded">
-			<!-- <element name="group" type="tns:groupType" /> not supported, would 
+			<!-- <element name="group" type="tns:groupType" /> not supported, would
 				complicate parser and is probably not needed -->
 			<element name="group-ref">
 				<complexType>
@@ -168,6 +149,7 @@
 	<complexType name="blockStruct">
 		<attribute name="name" use="required" type="ID" />
 		<attribute name="desc" use="optional" type="string" />
+		<attribute name="ui" type="string" use="optional" />
 	</complexType>
 	<complexType name="blockWithChannelStruct">
 		<complexContent>

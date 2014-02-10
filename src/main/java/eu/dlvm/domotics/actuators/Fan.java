@@ -55,11 +55,12 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	};
 	private States state;
 
+	
 	/**
 	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, LogCh, IHardwareAccess)} for details.
 	 */
 	public Fan(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+		super(name, description, null, channel, ctx);
 		this.state = States.REST;
 		this.runningPeriodMs = 1000 * DEFAULT_RUN_PERIOD_SEC;
 	}
@@ -86,10 +87,11 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public Fan(String name, String description, Lamp lamp, int logicalChannel, IDomoticContext ctx) {
-		super(name, description, new LogCh(logicalChannel), ctx);
-		this.state = States.REST;
-		this.lamp = lamp;
+		this(name, description, lamp, new LogCh(logicalChannel), ctx);
 	}
 
 	/**

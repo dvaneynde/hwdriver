@@ -24,10 +24,18 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 *            Hardware to set output value(s).
 	 */
 	public Lamp(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+		super(name, description, null, channel, ctx);
 		this.outval = false;
 	}
 
+	public Lamp(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+		super(name, description, ui, channel, ctx);
+		this.outval = false;
+	}
+
+	/**
+	 * @deprecated
+	 */
 	public Lamp(String name, String description, int channel, IDomoticContext ctx) {
 		this(name, description, new LogCh(channel), ctx);
 	}

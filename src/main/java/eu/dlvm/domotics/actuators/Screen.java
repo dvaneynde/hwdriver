@@ -39,7 +39,7 @@ public class Screen extends Actuator {
 
 	public Screen(String name, String description, LogCh chDown, LogCh chUp,
 			IDomoticContext ctx) {
-		super(name, description, chDown, ctx);
+		super(name, description, null, chDown, ctx);
 		this.chUp = chUp;
 	}
 

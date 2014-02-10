@@ -2,7 +2,6 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
@@ -39,8 +38,8 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUserInter
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description);
+	public Actuator(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+		super(name, description, ui);
 		this.ctx = ctx;
 		this.channel = channel;
 		ctx.addActuator(this);

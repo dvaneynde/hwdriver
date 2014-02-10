@@ -28,7 +28,7 @@ public class Timer extends Controller {
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
 	public Timer(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+		super(name, description, null, channel, ctx);
 		state = false;
 		onTime = offTime = 0;
 	}

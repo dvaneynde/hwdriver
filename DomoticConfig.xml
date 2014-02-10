@@ -5,32 +5,32 @@
 
 	<!-- Lichten en Stopcontacten, met All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
-	<lamp name="LichtInkom" desc="Inkom"/>
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0"/>
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
-	<lamp name="LichtWC0" desc="WC" />
+	<lamp name="LichtWC0" desc="WC" ui="Nutsruimtes:6"/>
 	<switch name="SchakVentilatorWC0" />
 	<fan name="VentilatorWC0" lamp="LichtWC0" desc="Ventilator WC" />
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" />
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2"/>
 	<switch name="SchakLichtGarageTuin" longClick="true" />
-	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" />
+	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3"/>
 	<switch name="SchakLichtKeuken" />
-	<lamp name="LichtKeuken" desc="Keuken" />
+	<lamp name="LichtKeuken" desc="Keuken" ui="Beneden:0"/>
 	<switch name="SchakLichtBadk0" />
-	<lamp name="LichtBadk0" desc="Badkamer +0" />
+	<lamp name="LichtBadk0" desc="Badkamer +0" ui="Nutsruimtes:4"/>
 	<switch name="SchakVentilatorBadk0" />
 	<fan name="VentilatorBadk0" desc="Ventilator Badkamer" />
 	<dimmerSwitches name="SchakLichtVeranda" />
-	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda" />
+	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda" ui="Beneden:1"/>
 	<dimmerSwitches name="SchakLichtCircanteRondom" />
 	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095"
-		desc="Eetkamer" />
+		desc="Eetkamer" ui="Beneden:2"/>
 	<switch name="SchakLichtCircante" />
-	<lamp name="LichtCircante" desc="Circante Tafel" />
+	<lamp name="LichtCircante" desc="Circante Tafel" ui="Beneden:3"/>
 	<dimmerSwitches name="SchakLichtZithoek" />
-	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" />
+	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" ui="Beneden:4"/>
 	<switch name="SchakLichtBureau" doubleClick="true" />
-	<lamp name="LichtBureau" desc="Bureau" />
+	<lamp name="LichtBureau" desc="Bureau" ui="Beneden:5"/>
 	<group name="LichtBeneden">
 		<block name="LichtInkom" />
 		<block name="LichtWC0" />
@@ -43,23 +43,23 @@
 	</group>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" />
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1"/>
 	<switch name="SchakLichtBadk1" />
-	<lamp name="LichtBadk1" desc="Badkamer +1" />
+	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Nutsruimtes:5"/>
 	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" desc="Tomas Wand" />
+	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Tomas:0"/>
 	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt 
 		met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Tomas Spots" /><!-- TODO nakijken of klopt 
+	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Tomas:1"/><!-- TODO nakijken of klopt 
 		met relais -->
 	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" desc="Dries Wand" />
+	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Dries:0"/>
 	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Dries Spots" />
+	<lamp name="LichtDries" desc="Dries Spots" ui="Dries:1"/>
 	<switch name="SchakLichtRoosWand" />
-	<lamp name="LichtRoosWand" desc="Roos Wand" />
+	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Roos:0"/>
 	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" desc="Roos Spots" />
+	<lamp name="LichtRoos" desc="Roos Spots" ui="Roos:1"/>
 	<group name="LichtBoven">
 		<block name="LichtGangBoven" />
 		<block name="LichtBadk1" />
@@ -72,8 +72,8 @@
 	</group>
 
 	<switch name="SchakBuitenTuin" singleClick="false" longClick="true" />
-	<lamp name="LichtTerras" desc="Terras" />
-	<lamp name="StopkBuiten" desc="Buiten" />
+	<lamp name="LichtTerras" desc="Terras" ui="Buiten:0"/>
+	<lamp name="StopkBuiten" desc="Buiten" ui="Buiten:1"/>
 	<group name="Buiten">
 		<block name="LichtTerras" />
 		<block name="StopkBuiten" />
@@ -147,7 +147,7 @@
 	<connect src="TimerNacht" target="LichtNacht" />
 
 	<!-- New Year -->
-	<newyear start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"/>
+	<newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"/>
 
 	<connect src="SchakLichtBureau" src-event="double" target="newyear"
 		event="toggle" />

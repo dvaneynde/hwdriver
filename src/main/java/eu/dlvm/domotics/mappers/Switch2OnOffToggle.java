@@ -29,7 +29,7 @@ public class Switch2OnOffToggle extends Block implements ISwitchListener {
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 	
 	public Switch2OnOffToggle(String name, String description) {
-		super(name, description);
+		super(name, description, null);
 		mappings = new HashMap<>(3);
 	}
 

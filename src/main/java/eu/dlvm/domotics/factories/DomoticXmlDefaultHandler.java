@@ -41,7 +41,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	private List<Block> groupBlocks;
 	private Map<String, List<Block>> group2Blocks = new HashMap<>();
 	private IDomoticContext ctx;
-	private String name, desc;
+	private String name, desc, ui;
 	private LogCh channel;
 
 	public DomoticXmlDefaultHandler(IDomoticContext ctx) {
@@ -93,12 +93,12 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lamp")) {
 			parseBaseBlockWithChannel(atts);
-			block = new Lamp(name, desc, channel, ctx);
+			block = new Lamp(name, desc, ui, channel, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("dimmedLamp")) {
 			parseBaseBlockWithChannel(atts);
 			int fullOn = Integer.parseInt(atts.getValue("fullOnHwOutput"));
-			block = new DimmedLamp(name, desc, fullOn, channel, ctx);
+			block = new DimmedLamp(name, desc, ui, fullOn, channel, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("fan")) {
 			parseBaseBlockWithChannel(atts);
@@ -127,33 +127,6 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
 			NewYear ny = new NewYearBuilder().build(blocks, start.getTime(), end.getTime(), ctx);
 			blocks.put(ny.getName(), ny);
-/*
-		} else if (localName.equals("onoff")) {
-			NewYear ny = (NewYear) blocks.get("newyear");
-			String lampName = atts.getValue("lamp");
-			Lamp lamp = (Lamp) blocks.get(lampName);
-			OnOff oo = new OnOff(lamp);
-			// TODO tijden in xml; ook start/stop moet hier in doorgaan?
-			oo.add(oo.new Entry(0, false));
-			oo.add(oo.new Entry((ny.getEndTimeMs() - ny.getStartTimeMs()) / 1000, true));
-			ny.addGadget(oo);
-		} else if (localName.equals("random")) {
-			NewYear ny = (NewYear) blocks.get("newyear");
-			String lampName = atts.getValue("lamp");
-			Lamp lamp = (Lamp) blocks.get(lampName);
-			int minTimeOnOffMs = Integer.parseInt(atts.getValue("min-on-ms"));
-			int randomMultiplierMs = Integer.parseInt(atts.getValue("rand-mult-ms"));
-			RandomOnOff roo = new RandomOnOff(lamp, minTimeOnOffMs, randomMultiplierMs);
-			ny.addGadget(roo);
-		} else if (localName.equals("sine")) {
-			NewYear ny = (NewYear) blocks.get("newyear");
-			String dimName = atts.getValue("lamp");
-			DimmedLamp dl = (DimmedLamp) blocks.get(dimName);
-			int cycleTimeMs = Integer.parseInt(atts.getValue("cycle-ms"));
-			int cycleStartRd = Integer.parseInt(atts.getValue("cycle-start-deg"));
-			Sinus s = new Sinus(dl, cycleTimeMs, cycleStartRd);
-			ny.addGadget(s);
-*/
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}
@@ -274,6 +247,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	private void parseBaseBlock(Attributes atts) {
 		name = atts.getValue("name");
 		desc = atts.getValue("desc");
+		ui = atts.getValue("ui");
 	}
 
 	private boolean parseBoolAttribute(String attName, boolean defaultVal, Attributes atts) {

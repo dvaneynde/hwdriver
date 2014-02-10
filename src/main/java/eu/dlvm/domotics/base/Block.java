@@ -16,15 +16,17 @@ public abstract class Block {
 
 	protected String name;
 	protected String description;
+	protected String ui;
 
-	public Block(String name, String description) {
+	public Block(String name, String description, String ui) {
 		this.name = name;
 		this.description = description;
+		this.ui = ui;
 	}
 
 	@Override
 	public String toString() {
-		return "Block name='" + name;
+		return "Block name='" + name + ", ui=" + ui;
 	}
 
 	public String getName() {
@@ -35,4 +37,7 @@ public abstract class Block {
 		return description;
 	}
 
+	public String getUi() {
+		return ui;
+	}
 }

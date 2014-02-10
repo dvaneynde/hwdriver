@@ -48,12 +48,16 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
+		super(name, description, ui, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
 		level = 0;
 		prevOnLevel = 100;
+	}
+
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
+		this(name, description, null, outputValueHardwareIfFull, channel, ctx);
 	}
 
 	/**
@@ -69,9 +73,10 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 *            Logical id of analog output channel.
 	 * @param hardware
 	 *            Link to underlying hardware layer.
+	 * @deprecated
 	 */
 	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoticContext ctx) {
-		this(name, description, outputValueHardwareIfFull, new LogCh(channel), ctx);
+		this(name, description, null, outputValueHardwareIfFull, new LogCh(channel), ctx);
 	}
 
 	/**

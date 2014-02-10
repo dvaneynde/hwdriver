@@ -24,14 +24,16 @@ TOOD:
 <body>
 	<div data-role="page" id="pageone">
 		<div data-role="header">
-			<h1>Domotica</h1>
+			<h1>${model.title}</h1>
 		</div>
 
 		<div data-role="content">
-			<div data-role="collapsible">
+			<div data-role="collapsible-set" data-theme="a" data-content-theme="a">
+
+ 			<div data-role="collapsible" data-collapsed="false">
 	    	<h4>Quickies...</h4>
 				<div data-role="controlgroup" data-type="horizontal"><!-- ui-mini ui-btn-inline -->
-					<button id="veranda" class="ui-btn ui-corner-all "
+					<button id="veranda" class="ui-btn ui-corner-all"
 						onclick="sendQuickie('eten');">Veranda</button>
 					<button id="tv" class="ui-btn ui-corner-all"
 						onclick="sendQuickie('tv');">TV</button>
@@ -41,20 +43,25 @@ TOOD:
 						onclick="sendQuickie('fel');">FEL</button>
 				</div>
 			</div>
-			<#list model.actuators as act>
-			<div >
+
+			<#list model.groupNames as group>
+			<div data-role="collapsible" >
+			<!-- TODO lichtgeel als er minstens 1 licht aan is; misschien gradaties van geel om aantal lichten (absoluut) aan te geven? -->
+			<h4>${group}</h4>
+			<#list model.groupname2infos[group] as act>
 				<label><!-- TODO Flip Switch ipv checkbox -->
 					<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
 				</label>
 				<#if act.type = "DimmedLamp"><input type="range" name="${act.name}" min="0" max="100" step="5" value="${act.parms['level']}" onchange='sendLevelDL(this);'/></#if>
+			</#list>
 			</div>
 			</#list>
+
 		</div>
 
 		<div data-role="footer">
-			<h1>TODO knopkes</h1>
+			<h1>TODO </h1>
 		</div>
 	</div>
-		
 </body>
 </html>

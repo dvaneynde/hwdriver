@@ -29,7 +29,7 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 	}
 
 	public NewYear(String name, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
-		super(name, name, null, ctx);
+		super(name, name, null, null, ctx);
 		this.startTimeMs = startTimeMs;
 		this.endTimeMs = endTimeMs;
 		gadgetSets = new ArrayList<>();

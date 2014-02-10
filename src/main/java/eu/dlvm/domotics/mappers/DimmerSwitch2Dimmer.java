@@ -27,7 +27,7 @@ public class DimmerSwitch2Dimmer extends Block implements IDimmerSwitchListener 
 	private DimmedLamp dimmedLamp;
 
 	public DimmerSwitch2Dimmer(String name, String description) {
-		super(name, description);
+		super(name, description, null);
 	}
 
 	public DimmedLamp getLamp() {

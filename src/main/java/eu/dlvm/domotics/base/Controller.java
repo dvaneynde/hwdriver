@@ -18,8 +18,8 @@ public abstract class Controller extends Block implements IDomoticLoop, IUserInt
 
 	private IDomoticContext ctx;
 
-	public Controller(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description);
+	public Controller(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+		super(name, description, ui);
 		this.ctx = ctx;
 		ctx.addController(this);
 	}

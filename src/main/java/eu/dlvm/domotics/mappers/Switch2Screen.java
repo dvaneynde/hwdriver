@@ -29,7 +29,7 @@ public class Switch2Screen extends Block implements ISwitchListener {
 	private Switch down;
 
 	public Switch2Screen(String name, String description, Switch down, Switch up, ClickType clickEvent) {
-		super(name, description);
+		super(name, description, null);
 		this.down = down;
 		this.clickEvent = clickEvent;
 		down.registerListener(this);
