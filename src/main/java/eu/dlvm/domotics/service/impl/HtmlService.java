@@ -19,10 +19,10 @@ import javax.ws.rs.Produces;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import eu.dlvm.domotica.service.BlockInfo;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.service.BlockInfo;
 
 @Singleton
 @Path("domo")
@@ -85,6 +85,18 @@ public class HtmlService {
 					}
 				}
 			}
+			Map<String, Boolean> onMap = new HashMap<>(data.getGroupNames().size());
+			for (String group : data.getGroupname2infos().keySet()) {
+				boolean groupOn = false;
+				for (BlockInfo info : data.getGroupname2infos().get(group)) {
+					if (info.getParms().containsKey("on") && info.getParms().get("on").equals("1")) {
+						groupOn = true;
+						break;
+					}
+				}
+				onMap.put(group, groupOn);
+			}
+			data.setGroupOn(onMap);
 			data.setTitle(new Date().toLocaleString());
 		} catch (Exception e) {
 			Log.error("Unexpected exception.", e);
@@ -121,4 +133,40 @@ public class HtmlService {
 		}
 		return is;
 	}
+
+	@Path("css/{name}")
+	@Produces("text/css")
+	@GET
+	public InputStream serveCss(@PathParam("name") String name) {
+		Log.info("Domotic API: serveCss() called, name=" + name);
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("css/" + name);
+		if (is == null) {
+			try {
+				is = new FileInputStream("src/main/resources/css/" + name);
+				Log.warn("serveCss(" + name + "), niet in jar gevonden, maar in src/main/resources/css.");
+			} catch (FileNotFoundException e) {
+				Log.error("Could not find " + name + ", neither in jar or development location.");
+				return null;
+			}
+		}
+		return is;
+	}
+
+	@Path("test")
+	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
+	@GET
+	public InputStream serveHtml() {
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("home2.html");
+		if (is == null) {
+			try {
+				is = new FileInputStream("src/main/resources/home2.html");
+				Log.warn("html niet in jar gevonden, maar in src/main/resources/js.");
+			} catch (FileNotFoundException e) {
+				Log.error("Could not find html file, neither in jar or development location.");
+				return null;
+			}
+		}
+		return is;
+	}
+
 }

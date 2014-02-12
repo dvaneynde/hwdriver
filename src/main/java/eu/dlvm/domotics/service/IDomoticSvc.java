@@ -1,4 +1,4 @@
-package eu.dlvm.domotica.service;
+package eu.dlvm.domotics.service;
 
 import java.util.List;
 

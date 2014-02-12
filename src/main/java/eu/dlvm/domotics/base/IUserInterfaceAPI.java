@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import eu.dlvm.domotica.service.BlockInfo;
+import eu.dlvm.domotics.service.BlockInfo;
 
 public interface IUserInterfaceAPI {
 

@@ -7,11 +7,11 @@ import javax.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotica.service.BlockInfo;
-import eu.dlvm.domotica.service.IDomoticSvc;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.IDomoticSvc;
 
 @Singleton
 public class RestService implements IDomoticSvc {
