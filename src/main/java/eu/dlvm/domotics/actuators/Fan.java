@@ -303,7 +303,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
-		bi.addParm("on", isOn() ? "1" : "0");
+		//bi.addParm("on", isOn() ? "1" : "0");
+		bi.setOn(isOn());
 		// TODO time still running, if running
 		return bi;
 	}

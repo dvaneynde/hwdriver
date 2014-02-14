@@ -357,8 +357,10 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(getName(), this.getClass().getSimpleName(), getDescription());
-		bi.addParm("on", getState() == States.OFF ? "0" : "1");
-		bi.addParm("level", Integer.toString(getLevel()));
+		//bi.addParm("on", getState() == States.OFF ? "0" : "1");
+		//bi.addParm("level", Integer.toString(getLevel()));
+		bi.setOn(getState()!=States.OFF);
+		bi.setLevel(getLevel());
 		return bi;
 	}
 

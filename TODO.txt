@@ -1,9 +1,0 @@
-
-- ui elementen groeperen via xml instructies; ook filteren misschien, b.v. nachtlamp
-- toggle, moet return value bekijken om te zien of het nu wel degelijk aan of uit is; 
-  misschien eerst call doen om juiste toestand te weten te komen en dan pas toggle() 
-  doen als die toestand niet veranderd is
-- slider voor dimmers
-- alles uit/aan - hoe doen we dat? groups...
-
-- websocket om acutele toestand juist te hebben

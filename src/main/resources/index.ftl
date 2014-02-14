@@ -60,9 +60,9 @@ TOOD:
 			<div data-theme="a">
 			<#list model.groupname2infos[group] as act>
 				<label><!-- TODO Flip Switch ipv checkbox -->
-					<input type="checkbox" name="${act.name}" value="${act.name}" <#if act.parms["on"] = "1">checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+					<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
 				</label>
-				<#if act.type = "DimmedLamp"><input type="range" name="${act.name}" min="0" max="100" step="5" value="${act.parms['level']}" onchange='sendLevelDL(this);'/></#if>
+				<#if act.type = "DimmedLamp"><input type="range" id="${act.name}_lvl" name="${act.name}_lvl" min="0" max="100" step="5" value="${act.level}" onchange='sendLevelDL(this);'/></#if>
 			</#list></div>
 			</div>
 			</#list>
@@ -70,7 +70,7 @@ TOOD:
 		</div>
 
 		<div data-role="footer">
-			<h1>TODO </h1>
+			<buttond id="refresh" class="ui-btn ui-corner-all" onclick="refreshActuators();">Refresh</button>
 		</div>
 	</div>
 </body>

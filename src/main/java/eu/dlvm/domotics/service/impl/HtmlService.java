@@ -89,7 +89,9 @@ public class HtmlService {
 			for (String group : data.getGroupname2infos().keySet()) {
 				boolean groupOn = false;
 				for (BlockInfo info : data.getGroupname2infos().get(group)) {
-					if (info.getParms().containsKey("on") && info.getParms().get("on").equals("1")) {
+					// if (info.getParms().containsKey("on") &&
+					// info.getParms().get("on").equals("1")) {
+					if (info.isOn()) {
 						groupOn = true;
 						break;
 					}

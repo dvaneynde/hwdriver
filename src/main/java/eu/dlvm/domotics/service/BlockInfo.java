@@ -1,16 +1,17 @@
 package eu.dlvm.domotics.service;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class BlockInfo {
 	private String name;
 	private String type;
 	private String description;
-	private Map<String, String> parms;
+	private boolean on;
+	private int level;
+
+	// private Map<String, String> parms;
 
 	public BlockInfo() {
-		parms = new HashMap<>();
+		//parms = new HashMap<>();
 	}
 
 	public BlockInfo(String name, String type, String description) {
@@ -36,17 +37,17 @@ public class BlockInfo {
 		this.type = type;
 	}
 
-	public Map<String, String> getParms() {
-		return parms;
-	}
-
-	public void setParms(Map<String, String> parms) {
-		this.parms = parms;
-	}
-
-	public void addParm(String key, String value) {
-		parms.put(key, value);
-	}
+	// public Map<String, String> getParms() {
+	// return parms;
+	// }
+	//
+	// public void setParms(Map<String, String> parms) {
+	// this.parms = parms;
+	// }
+	//
+	// public void addParm(String key, String value) {
+	// parms.put(key, value);
+	// }
 
 	public String getDescription() {
 		return description;
@@ -58,6 +59,22 @@ public class BlockInfo {
 
 	@Override
 	public String toString() {
-		return "BlockInfo [name=" + name + ", type=" + type + ", description=" + description + ", parms=" + parms + "]";
+		return "BlockInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level=" + level + "]";
+	}
+
+	public boolean isOn() {
+		return on;
+	}
+
+	public void setOn(boolean on) {
+		this.on = on;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 }
