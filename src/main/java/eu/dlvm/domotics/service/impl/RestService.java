@@ -23,7 +23,7 @@ public class RestService implements IDomoticSvc {
 
 	public RestService() {
 		countInstances++;
-		Log.info("Count instances: "+countInstances);
+		Log.info("Count instances: " + countInstances);
 		qSvc = new QuickieService();
 	}
 
@@ -43,18 +43,24 @@ public class RestService implements IDomoticSvc {
 	@Override
 	public List<BlockInfo> listActuators() {
 		List<BlockInfo> list = new ArrayList<>();
-		for (IUserInterfaceAPI a : Domotic.singleton().getActuators()) {
-			BlockInfo aj = a.getBlockInfo();
-			if (aj != null)
-				list.add(aj);
+		try {
+			for (IUserInterfaceAPI a : Domotic.singleton().getActuators()) {
+				BlockInfo aj = a.getBlockInfo();
+				if (aj != null)
+					list.add(aj);
+			}
+		} catch (Throwable e) {
+			Log.warn("listActuators() failed", e);
+			list.clear();
 		}
+		Log.info("listActuators() returns: "+list);
 		return list;
 	}
 
 	@Override
 	public void updateActuator(String name, String action) {
 		// TODO debug
-		Log.info("Domotic API: got update actuator '" + name + "' action='" + action+"'");
+		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
 		IUserInterfaceAPI act = Domotic.singleton().findActuator(name);
 		if (act == null) {
 			// TODO iets terugsturen?
@@ -88,7 +94,7 @@ public class RestService implements IDomoticSvc {
 		Domotic.singleton().interruptMainThread();
 		Log.info("shutdown requested !");
 	}
-	
+
 	@Override
 	public String ping(String token) {
 		return token;

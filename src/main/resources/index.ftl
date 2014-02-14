@@ -62,7 +62,10 @@ TOOD:
 				<label><!-- TODO Flip Switch ipv checkbox -->
 					<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
 				</label>
-				<#if act.type = "DimmedLamp"><input type="range" id="${act.name}_lvl" name="${act.name}_lvl" min="0" max="100" step="5" value="${act.level}" onchange='sendLevelDL(this);'/></#if>
+				<#if act.type = "DimmedLamp">
+					<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
+					<input type="range" id="${act.name}_lvl" name="${act.name}_lvl" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+				</#if>
 			</#list></div>
 			</div>
 			</#list>

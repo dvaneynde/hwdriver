@@ -35,32 +35,11 @@ function refreshActuators() {
 		// alert("Load was performed. Data0=" + data[0].name);
 		for (i=0; i<data.length; i++) {
 			act = data[i];
-			//alert("p.name="+act.name+", data[0].name="+data[0].name);
-//			alert("act name="+act.name+", on="+act.on+", level="+act.level);
-//			for ( var key in act) {
-//				if (act.hasOwnProperty(key)) {
-//					alert(key + " -> " + act[key]);
-//					alert("on="+act[key].parms.entry.on)
-//					break;
-//				}
-//			}
-			//$("#pageone").page();
-			$("#LichtVeranda_lvl").val(3);
-			$("#LichtVeranda_lvl").slider('refresh');
-			alert("Klaar slider.");
-			$("#LichtVeranda").prop( "checked", true ).checkboxradio( "refresh" );
-			alert("Klaar checkbox.");
-			break;
-			box=$("#LichtKeuken")[0];
-			box.checked=true;
-//			for (var key in box){
-//				if (box.hasOwnProperty(key)) {
-//					alert(key + " -> " + box[key]);
-//				}
-//			}
-			$("#LichtKeuken").
-			alert("klaar");
-			break;
+			$("#"+act.name).prop( "checked", act.on ).checkboxradio( "refresh" );
+			if (act.type === "DimmedLamp") {
+				$("#"+act.name+"_lvl").val(act.level);
+				$("#"+act.name+"_lvl").slider( "option", "disabled", !act.on ).slider('refresh');
+			}
 		}
 	});
 }

@@ -12,12 +12,10 @@
 		<url>http://www.dlvmechanografie.eu</url>
 	</organization>
 	<properties>
-		<jackson-2-version>2.2.3</jackson-2-version>
-		<!-- TODO upgrade version naar 2.5 van jersey? was 2.3.1...-->
-		<jersey.version>2.5</jersey.version>
+		<jackson-2-version>2.3.0</jackson-2-version>
+		<jersey.version>2.5.1</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
 
 	<dependencyManagement>
 		<dependencies>
@@ -30,7 +28,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -65,7 +62,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- the core, which includes Streaming API, shared low-level abstractions 
+		<!-- the core, which includes Streaming API, shared low-level abstractions
 			(but NOT data-binding) -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -73,7 +70,7 @@
 			<version>${jackson-2-version}</version>
 		</dependency>
 
-		<!-- Just the annotations; use this dependency if you want to attach annotations 
+		<!-- Just the annotations; use this dependency if you want to attach annotations
 			to classes without connecting them to the code. -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -100,9 +97,6 @@
 			<artifactId>jersey-client</artifactId>
 			<!-- <scope>test</scope> -->
 		</dependency>
-		<!-- <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-json-jackson</artifactId> 
-			<version>2.3.1</version> </dependency> -->
-		<!-- uncomment this to get JSON support: -->
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
@@ -110,7 +104,7 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-mvc-freemarker</artifactId>
-			</dependency>
+		</dependency>
 
 	</dependencies>
 	<build>
@@ -123,11 +117,6 @@
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${project.version}</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -155,13 +144,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 
-				<configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
-				</descriptorRefs> <archive> <index>true</index> <manifest> <addClasspath>true</addClasspath> 
-				<addDefaultImplementationEntries>true</addDefaultImplementationEntries> <mainClass>eu.dlvm.domotica.Main</mainClass> 
-				</manifest> </archive> </configuration> <executions> <execution> <id>make-assembly</id> 
-				<phase>package</phase> <goals> <goal>single</goal> </goals> </execution> 
-				</executions> </plugin> -->
 		</plugins>
 	</build>
 	<reporting>
