@@ -168,6 +168,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	/**
+	 * FIXME opsplitsen on/off en setlevel?
 	 * Switch lamp on if necessary, and set level to given percentage (range
 	 * [0..100]).
 	 * 
