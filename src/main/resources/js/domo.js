@@ -8,7 +8,7 @@
 function sendToggle(element) {
 	// alert("toggle(): name=" + element.name);
 	$.ajax("act/" + element.name + "/toggle");
-	// TODO check als dimmer, dan disable slider
+	$("#" + element.name + "_lvl").slider("option", "disabled", !element.checked).slider('refresh');
 }
 
 function sendQuickie(name) {
@@ -19,7 +19,7 @@ function sendQuickie(name) {
 function sendLevelDL(inputRange) {
 	// alert("sendLevelDL(): send act/" + inputRange.name + "/" +
 	// inputRange.value);
-	
+
 	// TODO check dat dit niet gebeurt als off
 	$.ajax("act/" + inputRange.name + "/" + inputRange.value);
 }
@@ -33,12 +33,14 @@ function refreshActuatorsTxt() {
 function refreshActuators() {
 	$.getJSON("actuators", function(data) {
 		// alert("Load was performed. Data0=" + data[0].name);
-		for (i=0; i<data.length; i++) {
+		for (i = 0; i < data.length; i++) {
 			act = data[i];
-			$("#"+act.name).prop( "checked", act.on ).checkboxradio( "refresh" );
+			$("#" + act.name).prop("checked", act.on).checkboxradio("refresh");
 			if (act.type === "DimmedLamp") {
-				$("#"+act.name+"_lvl").val(act.level);
-				$("#"+act.name+"_lvl").slider( "option", "disabled", !act.on ).slider('refresh');
+				$("#" + act.name + "_lvl").val(act.level);
+				$("#" + act.name + "_lvl")
+						.slider("option", "disabled", !act.on)
+						.slider('refresh');
 			}
 		}
 	});
