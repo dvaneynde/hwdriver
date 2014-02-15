@@ -1,2 +1,4 @@
 target/
 /domotic.pid
+/jersey.log.1
+/jersey.log.lck

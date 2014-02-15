@@ -1,0 +1,2 @@
+- logging.properties ook op bordje, en -D bij domotic.sh
+- vervangen door logback en bridge

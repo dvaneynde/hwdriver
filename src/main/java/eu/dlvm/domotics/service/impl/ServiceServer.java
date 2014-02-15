@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -25,7 +26,7 @@ public class ServiceServer {
 		services.add(HtmlService.class);
 		ResourceConfig config = new ResourceConfig(services);
 		config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
-		
+		config.register(JacksonFeature.class);
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 	}
 

@@ -64,7 +64,7 @@ TOOD:
 				</label>
 				<#if act.type = "DimmedLamp">
 					<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
-					<input type="range" id="${act.name}_lvl" name="${act.name}_lvl" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+					<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
 				</#if>
 			</#list></div>
 			</div>

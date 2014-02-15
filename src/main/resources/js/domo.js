@@ -8,6 +8,7 @@
 function sendToggle(element) {
 	// alert("toggle(): name=" + element.name);
 	$.ajax("act/" + element.name + "/toggle");
+	// TODO check als dimmer, dan disable slider
 }
 
 function sendQuickie(name) {
@@ -18,6 +19,8 @@ function sendQuickie(name) {
 function sendLevelDL(inputRange) {
 	// alert("sendLevelDL(): send act/" + inputRange.name + "/" +
 	// inputRange.value);
+	
+	// TODO check dat dit niet gebeurt als off
 	$.ajax("act/" + inputRange.name + "/" + inputRange.value);
 }
 
@@ -25,9 +28,6 @@ function refreshActuatorsTxt() {
 	$.get("actuators_txt", function(data) {
 		alert("Load was performed. Data=" + data);
 	});
-	// var acts = $.get("actuators_txt");
-	// alert("actuator text: "+acts);
-	// alert("Actuator 0="+acts[0]);
 }
 
 function refreshActuators() {
@@ -43,6 +43,7 @@ function refreshActuators() {
 		}
 	});
 }
+
 // function registerDimmedLampChangeEvents(el, timeout) {
 // var timer;
 // var trig = function() {
