@@ -53,7 +53,7 @@ public class RestService implements IDomoticSvc {
 			Log.warn("listActuators() failed", e);
 			list.clear();
 		}
-		Log.info("listActuators() returns: "+list);
+		Log.debug("listActuators() returns: "+list);
 		return list;
 	}
 

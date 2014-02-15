@@ -1,13 +1,10 @@
+- xml resources in src/main/resources
+- log4j en logging files in src/main/resources
 - logging.properties ook op bordje, en -D bij domotic.sh
 - vervangen door logback en bridge
 
+- groepen moeten aangepast, als 1 licht aan is moet group ook aan - uitbreiden blockinfo?
+- automatisch refresh, elke seconde
 
-NOG PROBLEEM:
-
-
-2014-02-15 01:36:50,630  INFO [pool-2-thread-7] impl.RestService - Domotic API: got update actuator 'LichtCircanteRondom' action='toggle'
-2014-02-15 01:36:50,630  INFO [pool-2-thread-8] impl.RestService - Domotic API: got update actuator 'LichtCircanteRondom' action='50'
-2014-02-15 01:36:50,630  INFO [pool-2-thread-7] actuators.DimmedLamp - DimmedLamp 'LichtCircanteRondom' set to OFF (remembered level: 50%)
-2014-02-15 01:36:50,631  INFO [pool-2-thread-8] actuators.DimmedLamp - DimmedLamp 'LichtCircanteRondom' set to ON: 50%
-
-ON gebeurt door slider - waarom ?
+- fix shutdown - werkt blijkbaar niet goed (blijft hangen)
+- bash script dat ping check doet en herstart als nodig, of zowiezo elke nacht herstart

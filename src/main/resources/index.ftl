@@ -75,7 +75,8 @@ TOOD:
 		<div data-role="footer" data-theme="b" data-position="fixed" >
 		<div class="ui-bar">
 			<!-- <buttond id="refresh" class="ui-btn ui-corner-all" data-position="center" onclick="refreshActuators();">Refresh</button> -->
-			<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Refresh</a><span class="ui-title"></span>
+			<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear" onclick="refreshActuators();">Refresh</a>
+			<span class="ui-title"></span>
 		</div>
 		</div>
 	</div>
