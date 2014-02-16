@@ -83,6 +83,13 @@ function refreshActuators() {
 	});
 }
 
+function autorefresh() {
+	refreshActuators();
+    setTimeout( autorefresh, 1000 );
+}
+
+autorefresh();
+
 // function registerDimmedLampChangeEvents(el, timeout) {
 // var timer;
 // var trig = function() {
