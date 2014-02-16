@@ -71,12 +71,16 @@ TOOD:
 			</#list>
 
 		</div>
-
+<!--
 		<div data-role="footer" data-theme="b" data-position="fixed" >
 		<div class="ui-bar">
-			<!-- <buttond id="refresh" class="ui-btn ui-corner-all" data-position="center" onclick="refreshActuators();">Refresh</button> -->
-			<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear" onclick="refreshActuators();">Refresh</a>
-			<span class="ui-title"></span>
+	        <select name="flip-7" id="flip-7" data-role="slider" >
+	            <option value="off">manual</option>
+	            <option value="on">auto</option>
+	        </select>
+			<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-refresh" onclick="refreshActuators();">Refresh</a>
+			<span class="ui-title"></span> 
+			-->
 		</div>
 		</div>
 	</div>

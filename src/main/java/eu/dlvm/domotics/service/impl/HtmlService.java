@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +98,7 @@ public class HtmlService {
 				onMap.put(group, groupOn);
 			}
 			data.setGroupOn(onMap);
-			data.setTitle(new Date().toLocaleString());
+			data.setTitle("Domotica");
 		} catch (Exception e) {
 			Log.error("Unexpected exception.", e);
 			throw new RuntimeException("Server Error - check log.");
