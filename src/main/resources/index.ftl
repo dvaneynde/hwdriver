@@ -51,23 +51,23 @@ TOOD:
 <!-- TODO ui-group-theme-[a-z] zet theme voor een collapsible -->
 			<#list model.groupNames as group>
 			<#if model.groupOn[group]>
-			<div data-role="collapsible" data-theme="c">
+			<div id="${group}" data-role="collapsible" data-theme="c">
 			<#else>
-			<div data-role="collapsible" data-theme="a">
+			<div id="${group}" data-role="collapsible" data-theme="a">
 			</#if>
 			<!-- TODO lichtgeel als er minstens 1 licht aan is; misschien gradaties van geel om aantal lichten (absoluut) aan te geven? -->
-			<h4 style="color:red">${group}</h4>
-			<div data-theme="a">
-			<#list model.groupname2infos[group] as act>
-				<label><!-- TODO Flip Switch ipv checkbox -->
-					<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
-				</label>
-				<#if act.type = "DimmedLamp">
-					<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
-					<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
-				</#if>
-			</#list></div>
-			</div>
+			<h4>${group}</h4>
+				<div data-theme="a">
+				<#list model.groupname2infos[group] as act>
+					<label><!-- TODO Flip Switch ipv checkbox -->
+						<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+					</label>
+					<#if act.type = "DimmedLamp">
+						<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
+						<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+					</#if>
+				</#list></div>
+				</div>
 			</#list>
 
 		</div>

@@ -5,6 +5,8 @@ public class BlockInfo {
 	private String name;
 	private String type;
 	private String description;
+	// TODO wordt dat nu gebruikt, groupName?
+	private String groupName;
 	private boolean on;
 	private int level;
 
@@ -76,5 +78,13 @@ public class BlockInfo {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 }

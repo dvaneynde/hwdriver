@@ -1,6 +1,7 @@
 package eu.dlvm.domotics.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,6 +24,11 @@ public interface IDomoticSvc {
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	public List<BlockInfo> listActuators();
+
+	@Path("groups")
+	@Produces(MediaType.APPLICATION_JSON)
+	@GET
+	public Map<String, Boolean> getGroups2Status();
 
 	/**
 	 * TODO return result must be new state of Block

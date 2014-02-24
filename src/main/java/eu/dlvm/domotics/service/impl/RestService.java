@@ -2,6 +2,7 @@ package eu.dlvm.domotics.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Singleton;
 
@@ -55,6 +56,11 @@ public class RestService implements IDomoticSvc {
 		}
 		Log.debug("listActuators() returns: "+list);
 		return list;
+	}
+
+	@Override
+	public Map<String, Boolean> getGroups2Status() {
+		return HtmlService.getGroup2Status();
 	}
 
 	@Override

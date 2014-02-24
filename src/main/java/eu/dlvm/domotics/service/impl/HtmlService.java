@@ -37,7 +37,12 @@ public class HtmlService {
 		Log.info("Count instances: " + countInstances);
 	}
 
-	private synchronized void ensureModelDataFilledIn() {
+	public static Map<String, Boolean> getGroup2Status() {
+		ensureModelDataFilledIn();
+		return data.groupOn;
+	}
+	
+	private static synchronized void ensureModelDataFilledIn() {
 		try {
 			if (data == null) {
 				data = new Data();

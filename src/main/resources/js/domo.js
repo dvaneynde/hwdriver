@@ -66,13 +66,14 @@ function refreshActuators() {
 		window.isRefreshing = true;
 		for (i = 0; i < data.length; i++) {
 			act = data[i];
-			//curOn = $("#" + act.name).prop("checked");
-			//act.on = !curOn;
+			// curOn = $("#" + act.name).prop("checked");
+			// act.on = !curOn;
 			$("#" + act.name).prop("checked", act.on).checkboxradio("refresh");
 			if (act.type === "DimmedLamp") {
 				// TODO: onderstaand code triggert sendLevelDL(), maar
 				// bovenstaande niet sendToggle()... Hoe komt dat, te
-				// ondervangen? Wel niet altijd, sendToggle() wordt blijkbaar enkel opgeroepen bij verandering, sendLevelDL() altijd?
+				// ondervangen? Wel niet altijd, sendToggle() wordt blijkbaar
+				// enkel opgeroepen bij verandering, sendLevelDL() altijd?
 				$("#" + act.name + "_lvl").val(act.level);
 				$("#" + act.name + "_lvl")
 						.slider("option", "disabled", !act.on)
@@ -81,11 +82,28 @@ function refreshActuators() {
 		}
 		window.isRefreshing = false;
 	});
+	$.getJSON("groups", function(data) {
+		for ( var key in data) {
+			if (data.hasOwnProperty(key)) {
+				//AAA = $("#" + key);
+				status = $("#" + key).attr('data-theme');
+				//letter = (status === "a") ? "c" : "a";
+				letter = (data[key]) ? "c" : "a";
+				console.log("refreshGroups, key=" + key + ", val=" + data[key]
+				+ " current data-theme=" + status+", new data-them="+letter);
+				$("#" + key).attr("data-theme", letter);
+				$("#" + key).children().first().children().first().removeClass("ui-btn-"+status).addClass("ui-btn-" + letter);
+				//status = $("#" + key).attr('data-theme');
+				//console.log("--> data-theme=" + status + ", letter=" + letter);
+			}
+		}
+	});
+
 }
 
 function autorefresh() {
 	refreshActuators();
-    setTimeout( autorefresh, 1000 );
+	setTimeout(autorefresh, 1000);
 }
 
 autorefresh();
