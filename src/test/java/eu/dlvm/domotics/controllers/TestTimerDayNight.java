@@ -127,16 +127,16 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 4, 10) + 50, seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.isOn());
-		assertEquals("07:24", t.getOffTimeAsString());
-		assertEquals("18:08", t.getOnTimeAsString());
+		assertEquals("07:39", t.getOffTimeAsString());
+		assertEquals("17:53", t.getOnTimeAsString());
 		assertEquals(3, owmt.callseqnr);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 10, 0), seq);
 		sleepwell();
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 10, 0) + 50, seq++);
 		assertFalse(t.isOn());
-		assertEquals("07:24", t.getOffTimeAsString());
-		assertEquals("18:08", t.getOnTimeAsString());
+		assertEquals("07:39", t.getOffTimeAsString());
+		assertEquals("17:53", t.getOnTimeAsString());
 		assertEquals(3, owmt.callseqnr);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 18, 9), seq++);
@@ -144,8 +144,8 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 18, 9) + 50, seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.isOn());
-		assertEquals("07:24", t.getOffTimeAsString());
-		assertEquals("18:08", t.getOnTimeAsString());
+		assertEquals("07:39", t.getOffTimeAsString());
+		assertEquals("17:53", t.getOnTimeAsString());
 		assertEquals(3, owmt.callseqnr);
 
 		// simulate next day, and internet provider gives no result yet
@@ -157,8 +157,8 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 0) + 50, seq++);
 		assertFalse(t.isTimesUpdatedForToday());
 		assertTrue(t.isOn());
-		assertEquals("07:24", t.getOffTimeAsString());
-		assertEquals("18:08", t.getOnTimeAsString());
+		assertEquals("07:39", t.getOffTimeAsString());
+		assertEquals("17:53", t.getOnTimeAsString());
 		assertEquals(4, owmt.callseqnr);
 
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 5), seq++);
@@ -166,8 +166,8 @@ public class TestTimerDayNight {
 		t.loop(TimerDayNight.getTimeMsSameDayAtHourMinute(basetime, 0, 5) + 50, seq++);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.isOn());
-		assertEquals("07:26", t.getOffTimeAsString());
-		assertEquals("18:05", t.getOnTimeAsString());
+		assertEquals("07:41", t.getOffTimeAsString());
+		assertEquals("17:50", t.getOnTimeAsString());
 		assertEquals(5, owmt.callseqnr);
 	}
 	
