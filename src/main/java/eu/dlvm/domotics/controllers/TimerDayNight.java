@@ -22,9 +22,18 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class TimerDayNight extends Timer {
 
+
 	static Logger LOG = Logger.getLogger(TimerDayNight.class);
 
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
+	/**
+	 * 15 minutes later off than official sun set.
+	 */
+	public static final int SUNSET_LATER_SEC = 15 * 60;
+	/**
+	 * 15 minutes earlier off than official sunrise
+	 */
+	public static final int SUNRISE_EARLIER_SEC = 15 * 60;
 
 	private boolean timesUpdatedForToday;
 	private Calendar today;
@@ -95,11 +104,11 @@ public class TimerDayNight extends Timer {
 
 	private void setOnOffTimes(OpenWeatherMap.Info info) {
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis((info.sunset_sec + 30 * 60) * 1000L);
+		c.setTimeInMillis((info.sunset_sec + SUNSET_LATER_SEC) * 1000L);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		setOnTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-		c.setTimeInMillis((info.sunrise_sec - 30 * 60) * 1000L);
+		c.setTimeInMillis((info.sunrise_sec - SUNRISE_EARLIER_SEC) * 1000L);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		setOffTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
