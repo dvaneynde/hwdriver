@@ -28,7 +28,7 @@ import eu.dlvm.iohardware.IHardwareIO;
 public class Domotic implements IDomoticContext {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
-	public static int RESTART_DRIVER_WAITTIME_MS = 5000;
+	public static int RESTART_DRIVER_WAITTIME_MS = 30000;
 
 	private static Logger log = Logger.getLogger(Domotic.class);
 
@@ -74,7 +74,8 @@ public class Domotic implements IDomoticContext {
 	private Domotic() {
 		super();
 		saveState = new OutputStateSaver();
-		restartOnceADay = new OnceADayWithinPeriod(2, 0, 4, 0);
+		// TODO configurable via xml !
+		restartOnceADay = new OnceADayWithinPeriod(23, 00, 23, 10);
 	}
 
 	public void setHw(IHardwareIO hw) {
@@ -240,10 +241,15 @@ public class Domotic implements IDomoticContext {
 					break;
 			}
 
-			if (!restartDriverRequested.get()) {
-				log.info("Initialize domotic system.");
-				initialize(saveState.readRememberedOutputs());
-			}
+			// TODO is initializatie nodig? probleem is dat ik het nu moet doen
+			// want anders wordt TCP connectie niet gelegd
+			// Rare is wel dat de lampen blijven branden als er geen connectie
+			// is met driver - ik dacht dat dan alles zou uitgaan. Maar ook als
+			// driver process weg is blijven lampen branden.
+			// if (!restartDriverRequested.get()) {
+			log.info("Initialize domotic system.");
+			initialize(saveState.readRememberedOutputs());
+			// }
 
 			log.info("Start Domotic thread 'Oscillator'.");
 			Oscillator osc = new Oscillator(this, looptime);
@@ -252,8 +258,9 @@ public class Domotic implements IDomoticContext {
 			log.info("Everything started, now monitoring...");
 			long lastLoopSequence = -1;
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
-				sleep(MONITORING_INTERVAL_MS); // TODO deze sleep moet interrupted ! Of heb ik dat
-								// al gedaan?
+				sleep(MONITORING_INTERVAL_MS); // TODO deze sleep moet
+												// interrupted ! Of heb ik dat
+				// al gedaan?
 				saveState.writeRememberedOutputs(getActuators());
 
 				long currentLoopSequence = loopSequence;
@@ -271,7 +278,12 @@ public class Domotic implements IDomoticContext {
 						break;
 					}
 				}
-				restartDriverRequested.set(checkIfDriverRestartTimeHasCome(looptime));
+
+				// TODO werkt niet, process gaat in TIME_WAIT; so_reuseaddr in
+				// hwdriver toegevoegd, maar dan had ik er 2 draaien...
+				// restartDriverRequested.set(checkIfDriverRestartTimeHasCome(osc.getLastCurrentTime()));
+				// if (restartDriverRequested.get())
+				// restartOnceADay.markDoneForToday();
 			}
 			// shutdown
 			stopDriverOscilatorAndMonitor(pathToDriver, osc);
@@ -348,22 +360,45 @@ public class Domotic implements IDomoticContext {
 	}
 
 	private void stopDriverOscilatorAndMonitor(String pathToDriver, Oscillator osc) {
+		osc.requestStop();
+		// TODO 50 vervangen door tick time variable
+		sleep(50);
+		// Zend STOP naar driver
+		hw.stop();
 		if (pathToDriver != null) {
-			log.info("Stopping driver and monitor.");
-			driverProcess.destroy();
+			// Zeker zijn dat STOP verwerkt is
+			sleep(500);
+			if (driverMonitor.getProcessWatch().isRunning()) {
+				log.warn("STOP command to driver did not work, stop forcibly...");
+				driverProcess.destroy();
+				sleep(500);
+				if (driverMonitor.getProcessWatch().isRunning()) {
+					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid() + ". Ignored, you'll see what happens.");
+					// TODO stop domotic?
+				}
+			} else {
+				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode() + ". Now Stopping driver monitor.");
+			}
 			driverMonitor.terminate();
 		}
-		hw.stop();
-		osc.requestStop();
 		driverMonitor = null;
 		driverProcess = null;
-		log.info("Stopped hardware, oscillator and server ...");
+		log.info("Stopped hardware, oscillator and monitor.");
 	}
 
-	private boolean checkIfDriverRestartTimeHasCome(long looptime) {
+	private boolean checkIfDriverRestartTimeHasCome(long lastCurrentTime) {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Brussels"));
-		cal.setTimeInMillis(looptime);
-		boolean restart = (restartOnceADay.canCheckForToday(looptime) && !restartOnceADay.checkDoneForToday(looptime));
+		cal.setTimeInMillis(lastCurrentTime);
+		boolean restart = false;
+		if (restartOnceADay.canCheckForToday(lastCurrentTime)) {
+			log.debug("checkIfDriverRestartTimeHasCome() cancheck=true; now see if already done.");
+			if (!restartOnceADay.checkDoneForToday(lastCurrentTime)) {
+				log.debug("checkIfDriverRestartTimeHasCome() cancheck=true, checkDone=false, so RESTART !");
+				restart = true;
+			} else {
+				log.debug("checkIfDriverRestartTimeHasCome() cancheck and already done, so no restart.");
+			}
+		}
 		if (restart)
 			log.info("The time has come to restart the driver. Time=" + cal.get(Calendar.HOUR) + ':' + cal.get(Calendar.MINUTE) + '.');
 		return restart;

@@ -13,6 +13,7 @@ public class ProcessWatch {
 
 	private String threadname;
 	private Process process;
+	private String pid;
 	private String psName;
 	private Thread thread;
 	private boolean running;
@@ -26,7 +27,7 @@ public class ProcessWatch {
 
 	public void startWatching() {
 		try {
-			String pid = getPidOfProcess(psName);
+			pid = getPidOfProcess(psName);
 			log.info("PID of process " + psName + " is " + pid);
 		} catch (IOException e) {
 			log.warn("Could not get pid of " + psName + " process. Ignored, will continue.", e);
@@ -69,6 +70,10 @@ public class ProcessWatch {
 		return pid;
 	}
 
+	public String getPid() {
+		return pid;
+	}
+	
 	public boolean isRunning() {
 		log.debug("thread.isAlive()=" + thread == null ? "null" : thread.isAlive() + ", running=" + running);
 		return running;

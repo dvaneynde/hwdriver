@@ -2,13 +2,19 @@ package eu.dlvm.domotics.utils;
 
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
+
 /**
  * Helper, checks that something ('thingie') is done only once a day.
- * <p>Timezone used to determine current 'day' is default one.
+ * <p>
+ * Timezone used to determine current 'day' is default one.
+ * 
  * @author dirkv
- *
+ * 
  */
 public class OnceADay {
+
+	private static Logger log = Logger.getLogger(OnceADay.class);
 
 	protected Calendar today;
 	protected boolean doneForToday;
@@ -30,19 +36,30 @@ public class OnceADay {
 				doneForToday = false;
 			}
 		}
+		if (log.isDebugEnabled())
+			log.debug("checkDoneForToday() currentTime=" + currentTime + ", done=" + doneForToday + ", this=" + this);
 		return doneForToday;
 	}
 
 	/**
 	 * Call this when you have done your thingie for today.
-	 * @param currentTimeMillis Not used.
+	 * 
+	 * @param currentTimeMillis
+	 *            Not used.
 	 */
-	public void markDoneForToday(long currentTimeMillis) {
+	public void markDoneForToday() {
 		doneForToday = true;
+		if (log.isDebugEnabled())
+			log.debug("marked done for today, this=" + toString());
 	}
 
 	private static boolean sameday(Calendar cal1, Calendar cal2) {
 		return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+	}
+
+	@Override
+	public String toString() {
+		return "OnceADay [doneForToday=" + doneForToday + ", today=" + today + "]";
 	}
 
 }

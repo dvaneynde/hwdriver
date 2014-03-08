@@ -9,11 +9,17 @@ public class Oscillator extends Thread {
 	private Domotic dom;
 	private long tickTimeMs;
 	private boolean goOn;
+	private long currentTime;
 	
 	public Oscillator(Domotic dom, long tickTimeMs) {
 		super("DomoticOscillator.");
 		this.dom = dom;
 		this.tickTimeMs = tickTimeMs;
+		this.currentTime = System.currentTimeMillis();
+	}
+	
+	public long getLastCurrentTime() {
+		return currentTime;
 	}
 	
 	public void go() {
@@ -23,7 +29,7 @@ public class Oscillator extends Thread {
 			localGoOn = goOn;
 		}
 		while (localGoOn) {
-			long currentTime = System.currentTimeMillis();
+			currentTime = System.currentTimeMillis();
 			dom.loopOnce(currentTime);
 			try {
 				Thread.sleep(tickTimeMs);

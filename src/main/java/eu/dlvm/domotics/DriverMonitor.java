@@ -34,6 +34,10 @@ public class DriverMonitor {
 		return (prWatch.isRunning() && prStdout.isRunning() && prStderr.isRunning());
 	}
 
+	public ProcessWatch getProcessWatch() {
+		return prWatch;
+	}
+	
 	public String report() {
 		String s = "";
 		s += "\n\tprocess watch: " + prWatch.toString();

@@ -14,7 +14,7 @@ public class TestOnceADay {
 		assertFalse(t.doneForToday);
 		assertFalse(t.checkDoneForToday(System.currentTimeMillis()));
 		assertFalse(t.doneForToday);
-		t.markDoneForToday(System.currentTimeMillis());
+		t.markDoneForToday();
 		assertTrue(t.checkDoneForToday(System.currentTimeMillis()));
 		assertTrue(t.doneForToday);
 		System.out.println("today="+t.today);

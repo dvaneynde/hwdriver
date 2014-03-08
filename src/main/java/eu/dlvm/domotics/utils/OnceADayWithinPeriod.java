@@ -4,8 +4,6 @@ import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.Domotic;
-
 public class OnceADayWithinPeriod extends OnceADay {
 
 	private static Logger log = Logger.getLogger(OnceADayWithinPeriod.class);
@@ -24,23 +22,34 @@ public class OnceADayWithinPeriod extends OnceADay {
 		Calendar c1 = createCalendarHourMinute(currentTime, winEndHour, winEndMinutes);
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(currentTime);
-		return !(c.before(c0) || c.after(c1));
+//		System.out.println("c0="+c0.getTime()+"\n c="+c.getTime()+"\nc1="+c1.getTime());
+//		System.out.println("c before c0="+c.before(c0));
+//		System.out.println("c after c1="+c.after(c1));
+		boolean canCheck = !(c.before(c0) || c.after(c1));
+		if (log.isDebugEnabled())
+			log.debug("can check=" + canCheck + ", currentTime=" + currentTime + ", this=" + toString());
+		return canCheck;
 	}
 
 	@Override
-	public void markDoneForToday(long currentTime) {
-		if (!canCheckForToday(currentTime)) {
-			log.error("markDoneForToday() called outside time window. Ignored.");
-			return;
-		}
-		super.markDoneForToday(currentTime);
+	public void markDoneForToday() {
+		super.markDoneForToday();
 	}
-	
+
 	private Calendar createCalendarHourMinute(long currentTime, int winHour, int winMinutes) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(currentTime);
-		c.set(Calendar.HOUR, winHour);
+		c.set(Calendar.HOUR_OF_DAY, winHour);
 		c.set(Calendar.MINUTE, winMinutes);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
 		return c;
 	}
+
+	@Override
+	public String toString() {
+		return "OnceADayWithinPeriod [winStartHour=" + winStartHour + ", winStartMinutes=" + winStartMinutes + ", winEndHour=" + winEndHour + ", winEndMinutes=" + winEndMinutes + ", super="
+				+ super.toString() + "]";
+	}
+
 }
