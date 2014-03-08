@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
+// TODO move to base, or move base/* to here?
+
 public class ProcessWatch {
 	static Logger log = Logger.getLogger(ProcessWatch.class);
 

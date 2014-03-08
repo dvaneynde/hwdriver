@@ -2,7 +2,7 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
-public class Oscillator {
+public class Oscillator extends Thread {
 
 	static Logger log = Logger.getLogger(Oscillator.class);
 	
@@ -11,6 +11,7 @@ public class Oscillator {
 	private boolean goOn;
 	
 	public Oscillator(Domotic dom, long tickTimeMs) {
+		super("DomoticOscillator.");
 		this.dom = dom;
 		this.tickTimeMs = tickTimeMs;
 	}
@@ -34,11 +35,26 @@ public class Oscillator {
 		}
 	}
 	
-	public synchronized void stop() {
+	public synchronized void requestStop() {
 		goOn = false;
 	}
 	
 	public synchronized boolean stopRequested() {
 		return !goOn;
 	}
+	
+	@Override
+	public void run() {
+		try {
+			log.info("Oscillator oscillates...");
+			go();
+			if (stopRequested())
+				log.info("Oscillator stops since so requested.");
+			else
+				log.error("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
+		} catch (Exception e) {
+			log.error("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
+		}
+	}
+
 }

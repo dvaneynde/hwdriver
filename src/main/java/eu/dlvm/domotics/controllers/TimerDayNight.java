@@ -47,6 +47,7 @@ public class TimerDayNight extends Timer {
 		setOpenWeatherMap(new OpenWeatherMap());
 	}
 
+	// TODO vervangen door OnceADay
 	void checktTimesUpdatedForToday(long currentTime) {
 		if (timesUpdatedForToday || (today == null)) {
 			// check if still today: if not, false; above test on today is to force to initialize today

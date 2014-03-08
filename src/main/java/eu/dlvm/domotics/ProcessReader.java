@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
+// TODO move to base, or move base/* to here?
 public class ProcessReader {
 	static Logger log = Logger.getLogger(ProcessReader.class);
 	static Logger logDriver = Logger.getLogger("DRIVER");
@@ -56,7 +57,7 @@ public class ProcessReader {
 	public boolean driverNotReady() {
 		return !driverReady;
 	}
-	
+
 	public boolean isRunning() {
 		log.debug("thread.isAlive()=" + thread == null ? "null" : thread.isAlive() + ", running=" + running);
 		return running;
@@ -66,7 +67,7 @@ public class ProcessReader {
 	public void terminate() {
 		thread.stop();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "ProcessReader [threadname=" + threadname + ", driverStarted=" + driverStarted + ", running=" + running + "]";

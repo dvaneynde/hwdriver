@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.log4j.Logger;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -17,6 +18,7 @@ import com.sun.net.httpserver.HttpServer;
 @SuppressWarnings("restriction")
 public class ServiceServer {
 
+	private static Logger log = Logger.getLogger(ServiceServer.class);
 	private HttpServer server;
 
 	public void start() {
@@ -28,6 +30,7 @@ public class ServiceServer {
 		config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
 		config.register(JacksonFeature.class);
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
+		log.info("HTTP Server started.");
 	}
 
 	public void stop() {
@@ -35,6 +38,7 @@ public class ServiceServer {
 		server.stop(1);
 		ExecutorService threadpool = (ExecutorService)server.getExecutor();
 		threadpool.shutdownNow();
+		log.info("HTTP Server stopped.");
 	}
 
 	/**
