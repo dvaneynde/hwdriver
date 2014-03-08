@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 # Start domotic system at startup.
 #
@@ -10,7 +10,7 @@
 #set -x
 
 DOMDIR=/home/dirk/domotic
-BOOTLOG=$DOMDIR/domotic.out
+BOOTLOG=$DOMDIR/boot.out
 echo Boot Domotic | tee -a $BOOTLOG
 date | tee -a $BOOTLOG
 id | tee -a $BOOTLOG
@@ -52,23 +52,16 @@ d_stop() {
 		echo "No $PIDFILE file found, cannot stop domotic system." | tee -a $BOOTLOG
 	else
 		kill $(cat $PIDFILE) 
-		ps -p $(cat $PIDFILE) >/dev/null
-		if [ $? -ne 0 ]
+		sleep 1
+		ps -p $(cat $PIDFILE) 
+		if [ $? -eq 0 ]
 		then
-			echo " can't stop it, doing it the hard way." | tee -a $BOOTLOG
-			kill -9 $(cat $PIDFILE) >/dev/null
-			kill -9 $(cat $PIDFILE_DRIVER) >/dev/null
+			echo "... can't stop it, doing it the hard way." | tee -a $BOOTLOG
+			#kill -9 $(cat $PIDFILE) 
+			#kill -9 $(cat $PIDFILE_DRIVER) >/dev/null 2>&1
 		fi
-		ps -p $(cat $PIDFILE) >/dev/null
-		if [ $? -eq 0 ]
-		then echo "Domotic system stopped." && rm -f "$PIDFILE" | tee -a $BOOTLOG
-		fi
-		ps -p $(cat $PIDFILE_DRIVER) >/dev/null
-		if [ $? -eq 0 ]
-		then echo "Driver for Domotic system stopped." && rm -f "$PIDFILE_DRIVER" | tee -a $BOOTLOG
-		fi
+		echo "Done." | tee -a $BOOTLOG
 	fi
-	echo "Done." | tee -a $BOOTLOG
 }
 
 #
