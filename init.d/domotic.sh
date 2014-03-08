@@ -50,23 +50,23 @@ d_stop() {
 	if [ ! \( -f $PIDFILE \) ]
 	then
 		echo "No $PIDFILE file found, cannot stop domotic system." | tee -a $BOOTLOG
-		exit 0
-	fi
-	kill $(cat $PIDFILE) 
-	ps -p $(cat $PIDFILE) >/dev/null
-	if [ $? -ne 0 ]
-	then
-		echo " can't stop it, doing it the hard way." | tee -a $BOOTLOG
-		kill -9 $(cat $PIDFILE) >/dev/null
-		kill -9 $(cat $PIDFILE_DRIVER) >/dev/null
-	fi
-	ps -p $(cat $PIDFILE) >/dev/null
-	if [ $? -eq 0 ]
-	then echo "Domotic system stopped." && rm -f "$PIDFILE" | tee -a $BOOTLOG
-	fi
-	ps -p $(cat $PIDFILE_DRIVER) >/dev/null
-	if [ $? -eq 0 ]
-	then echo "Driver for Domotic system stopped." && rm -f "$PIDFILE_DRIVER" | tee -a $BOOTLOG
+	else
+		kill $(cat $PIDFILE) 
+		ps -p $(cat $PIDFILE) >/dev/null
+		if [ $? -ne 0 ]
+		then
+			echo " can't stop it, doing it the hard way." | tee -a $BOOTLOG
+			kill -9 $(cat $PIDFILE) >/dev/null
+			kill -9 $(cat $PIDFILE_DRIVER) >/dev/null
+		fi
+		ps -p $(cat $PIDFILE) >/dev/null
+		if [ $? -eq 0 ]
+		then echo "Domotic system stopped." && rm -f "$PIDFILE" | tee -a $BOOTLOG
+		fi
+		ps -p $(cat $PIDFILE_DRIVER) >/dev/null
+		if [ $? -eq 0 ]
+		then echo "Driver for Domotic system stopped." && rm -f "$PIDFILE_DRIVER" | tee -a $BOOTLOG
+		fi
 	fi
 	echo "Done." | tee -a $BOOTLOG
 }
