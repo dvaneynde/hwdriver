@@ -47,6 +47,7 @@ int opalmmReadDigIn(int port) {
 
 #include <sys/io.h>
 #include <errno.h>
+#include <string.h>
 
 /*
  * Initialize the DMM-AT board. This function passes the various

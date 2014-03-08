@@ -37,6 +37,7 @@
 #define MSGSIZE	2048
 
 int debug;
+long msgCounter = 0;
 
 char hostname[256];
 char msgIn[MSGSIZE]; // Buffer for incoming message
@@ -249,7 +250,7 @@ void parseRecvdMsgLine(char* line) {
 		}
 		break;
 	case QUIT:
-		mylog(MYLOG_DEBUG, "\nQUIT command - 't is gedaan!\n");
+		mylog(MYLOG_INFO, "\nQUIT command - 't is gedaan!\n");
 		close(clntSock);
 		endDiamondDriver();
 		// TODO close boards properly ? Set stop flag so that run() can stop properly?
@@ -307,6 +308,11 @@ void runAsServer() {
 		sprintf(logmsg, "Answering with:\n%s-----", msgOut);
 		mylog(MYLOG_DEBUG, logmsg);
 		sendMsg(msgOut);
+		if ((msgCounter % (20 * 60)) == 0) { // elke minuut
+			sprintf(logmsg, "Still alive, msgCounter=%ld.", msgCounter);
+			mylog(MYLOG_INFO, logmsg);
+		}
+		msgCounter++;
 	}
 
 }
