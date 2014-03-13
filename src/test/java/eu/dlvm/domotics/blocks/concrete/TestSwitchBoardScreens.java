@@ -89,13 +89,13 @@ public class TestSwitchBoardScreens {
 				SW_DN_1), dom);
 		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen",
 				new LogCh(SW_UP_1), dom);
-		sr1 = new Screen("Screen1", "Screen Kitchen", new LogCh(REL_DN_1),
+		sr1 = new Screen("Screen1", "Screen Kitchen", null, new LogCh(REL_DN_1),
 				new LogCh(REL_UP_1), dom);
 		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", new LogCh(
 				SW_DN_2), dom);
 		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", new LogCh(
 				SW_UP_2), dom);
-		sr2 = new Screen("Screen2", "Screen Bathroom", new LogCh(REL_DN_2),
+		sr2 = new Screen("Screen2", "Screen Bathroom", null, new LogCh(REL_DN_2),
 				new LogCh(REL_UP_2), dom);
 		
 		s2s1 = new Switch2Screen("s2s1", "s2s1",swDn1,swUp1,ISwitchListener.ClickType.SINGLE);

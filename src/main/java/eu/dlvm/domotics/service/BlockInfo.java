@@ -9,6 +9,7 @@ public class BlockInfo {
 	private String groupName;
 	private boolean on;
 	private int level;
+	private String status;
 
 	// private Map<String, String> parms;
 
@@ -78,6 +79,14 @@ public class BlockInfo {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getGroupName() {

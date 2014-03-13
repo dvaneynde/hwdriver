@@ -48,7 +48,7 @@ public class TestScreens {
 	public void init() {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
-		sr = new Screen("TestScreens", "TestScreens", new LogCh(DN), new LogCh(
+		sr = new Screen("TestScreens", "TestScreens", null, new LogCh(DN), new LogCh(
 				UP), ctx);
 		sr.setMotorOnPeriod(30);
 		seq = cur = 0L;

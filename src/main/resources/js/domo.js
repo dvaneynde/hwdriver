@@ -27,6 +27,20 @@ function sendToggle(element) {
 	// alert("na disable dimmer !")
 }
 
+function sendUp(button) {
+	if (window.isRefreshing)
+		return;
+	$.ajax("act/" + button.name + "/up");
+	console.log("sendUp() " + button.name)
+}
+
+function sendDown(button) {
+	if (window.isRefreshing)
+		return;
+	$.ajax("act/" + button.name + "/down");
+	console.log("sendDown() " + button.name)
+}
+
 function sendLevelDL(inputRange) {
 	// alert("sendLevelDL(): send act/" + inputRange.name + "/" +
 	// inputRange.value);
@@ -78,6 +92,11 @@ function refreshActuators() {
 				$("#" + act.name + "_lvl")
 						.slider("option", "disabled", !act.on)
 						.slider('refresh');
+			} else if (act.type === "Screen") {
+				//var statusveld = $("#"+act.name+"_status");
+				//$("#"+act.name+"_status").children().first().innerHTML = act.status;
+				var statusveld = document.getElementById(act.name+"_status");
+				statusveld.innerHTML = act.status;
 			}
 		}
 		window.isRefreshing = false;

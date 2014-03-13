@@ -111,7 +111,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			LogCh channelDown = (s == null ? new LogCh(name + "Down") : new LogCh(s));
 			s = atts.getValue("channelUp");
 			LogCh channelUp = (s == null ? new LogCh(name + "Up") : new LogCh(s));
-			block = new Screen(name, desc, channelDown, channelUp, ctx);
+			block = new Screen(name, desc, ui, channelDown, channelUp, ctx);
 			if (atts.getValue("motor-on-time") != null) {
 				((Screen) block).setMotorOnPeriod(Integer.parseInt(atts.getValue("motor-on-time")));
 			}

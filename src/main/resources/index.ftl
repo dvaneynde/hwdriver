@@ -50,26 +50,42 @@ TOOD:
 			</div>
 <!-- TODO ui-group-theme-[a-z] zet theme voor een collapsible -->
 			<#list model.groupNames as group>
-			<#if model.groupOn[group]>
-			<div id="${group}" data-role="collapsible" data-theme="c">
-			<#else>
-			<div id="${group}" data-role="collapsible" data-theme="a">
-			</#if>
-			<!-- TODO lichtgeel als er minstens 1 licht aan is; misschien gradaties van geel om aantal lichten (absoluut) aan te geven? -->
-			<h4>${group}</h4>
-				<div data-theme="a">
-				<#list model.groupname2infos[group] as act>
-					<label><!-- TODO Flip Switch ipv checkbox -->
-						<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
-					</label>
-					<#if act.type = "DimmedLamp">
-						<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
-						<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+				<#if group = "Screens">
+					<div id="Screens" data-role="collapsible" data-theme="a">
+						<h4>${group}</h4>
+						<#list model.groupname2infos[group] as act>
+							<fieldset class="ui-grid-b">
+							<label for="${act.name}-controlgroup" class="ui-block-a">${act.description}</label>
+							<p id="${act.name}_status" for="${act.name}-controlgroup" class="ui-block-b">[${act.status}]</p>
+							<div class="ui-block-c" id="${act.name}-controlgroup" data-role="controlgroup" data-type="horizontal">
+							    <button name="${act.name}" class="ui-btn ui-icon-carat-d ui-btn-icon-notext ui-corner-all" onclick='sendDown(this);'>Down</button>
+							    <button name="${act.name}" class="ui-btn ui-icon-carat-u ui-btn-icon-notext ui-corner-all" onclick='sendUp(this);'>Up</button>
+							</div>
+							</fieldset>
+						</#list>
+					</div>
+				<#else>
+					<#if model.groupOn[group]>
+					<div id="${group}" data-role="collapsible" data-theme="c">
+					<#else>
+					<div id="${group}" data-role="collapsible" data-theme="a">
 					</#if>
-				</#list></div>
-				</div>
+					<!-- TODO lichtgeel als er minstens 1 licht aan is; misschien gradaties van geel om aantal lichten (absoluut) aan te geven? -->
+					<h4>${group}</h4>
+						<div data-theme="a">
+						<#list model.groupname2infos[group] as act>
+							<label><!-- TODO Flip Switch ipv checkbox -->
+								<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+							</label>
+							<#if act.type = "DimmedLamp">
+								<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
+								<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+							</#if>
+						</#list>
+						</div>
+					</div>
+				</#if>
 			</#list>
-
 		</div>
 <!--
 		<div data-role="footer" data-theme="b" data-position="fixed" >
