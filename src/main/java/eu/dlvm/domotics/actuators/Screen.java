@@ -35,10 +35,10 @@ public class Screen extends Actuator {
 	public static final long DEFAULT_MOTOR_ON_PERIOD_SEC = 30;
 
 	private LogCh chUp;
-	public long motorOnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
-
+	private long motorOnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long timeStateStart;
 	private boolean gotUp, gotDown;
+	private double percClosed;
 
 	public Screen(String name, String description, String ui, LogCh chDown, LogCh chUp, IDomoticContext ctx) {
 		super(name, description, ui, chDown, ctx);
@@ -50,12 +50,18 @@ public class Screen extends Actuator {
 		REST, UP, SWITCH_DOWN_2_UP, SWITCH_UP_2_DOWN, DOWN;
 		public String getNlName() {
 			switch (this) {
-			case DOWN: return "Neer...";
-			case UP: return "Omhoog...";
-			case REST: return "-";
-			case SWITCH_DOWN_2_UP: return "Wachten (^)";
-			case SWITCH_UP_2_DOWN: return "Wachten (v)";
-			default: return "ERROR";
+			case DOWN:
+				return "Neer...";
+			case UP:
+				return "Omhoog...";
+			case REST:
+				return "-";
+			case SWITCH_DOWN_2_UP:
+				return "Wachten (^)";
+			case SWITCH_UP_2_DOWN:
+				return "Wachten (v)";
+			default:
+				return "ERROR";
 			}
 		}
 	};
@@ -155,6 +161,8 @@ public class Screen extends Actuator {
 	}
 
 	private void exitUp(long current) {
+		percClosed = Math.max(0.0, percClosed - (current - timeStateStart) / (double) motorOnPeriodMs);
+		log.info("exitUp() percClosed=" + percClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(chUp, false);
 	}
@@ -166,6 +174,8 @@ public class Screen extends Actuator {
 	}
 
 	private void exitDown(long current) {
+		percClosed = Math.min(1.0, percClosed + (current - timeStateStart) / (double) motorOnPeriodMs);
+		log.info("exitDown() percClosed=" + percClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(getChannel(), false);
 	}
@@ -189,7 +199,14 @@ public class Screen extends Actuator {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
-		bi.setStatus(getState().getNlName());
+		double tmpPercentageClosed = percClosed;
+		if (getState()==States.UP) {
+			tmpPercentageClosed = Math.max(0.0, percClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorOnPeriodMs);
+		} else if (getState()==States.DOWN) {
+			tmpPercentageClosed = Math.min(1.0, percClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorOnPeriodMs);
+		}
+		//log.info("getBlockInfo() percClosed=" + percClosed);
+		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + getState().getNlName());
 		return bi;
 	}
 
