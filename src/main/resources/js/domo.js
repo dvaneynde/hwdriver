@@ -96,7 +96,7 @@ function refreshActuators() {
 				//var statusveld = $("#"+act.name+"_status");
 				//$("#"+act.name+"_status").children().first().innerHTML = act.status;
 				var statusveld = document.getElementById(act.name+"_status");
-				statusveld.innerHTML = act.status;
+				statusveld.innerHTML = act.description+" [ "+act.status+" ]";
 			}
 		}
 		window.isRefreshing = false;

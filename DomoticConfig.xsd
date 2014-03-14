@@ -42,7 +42,8 @@
 					<complexType>
 						<complexContent>
 							<extension base="tns:BlockWithChannelUpDownStruct">
-								<attribute name="motor-on-time" type="int" />
+								<attribute name="motor-up-time" type="int" />
+								<attribute name="motor-dn-time" type="int" />
 							</extension>
 						</complexContent>
 					</complexType>

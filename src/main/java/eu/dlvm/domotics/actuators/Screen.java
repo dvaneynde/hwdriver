@@ -35,7 +35,8 @@ public class Screen extends Actuator {
 	public static final long DEFAULT_MOTOR_ON_PERIOD_SEC = 30;
 
 	private LogCh chUp;
-	private long motorOnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
+	private long motorUpPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
+	private long motorDnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long timeStateStart;
 	private boolean gotUp, gotDown;
 	private double percClosed;
@@ -48,18 +49,18 @@ public class Screen extends Actuator {
 	// TODO see bug 80
 	public enum States {
 		REST, UP, SWITCH_DOWN_2_UP, SWITCH_UP_2_DOWN, DOWN;
-		public String getNlName() {
+		public String asSign() {
 			switch (this) {
 			case DOWN:
-				return "Neer...";
+				return "v";
 			case UP:
-				return "Omhoog...";
+				return "^";
 			case REST:
 				return "-";
 			case SWITCH_DOWN_2_UP:
-				return "Wachten (^)";
+				return "(v-^)";
 			case SWITCH_UP_2_DOWN:
-				return "Wachten (v)";
+				return "(^-v)";
 			default:
 				return "ERROR";
 			}
@@ -94,10 +95,10 @@ public class Screen extends Actuator {
 			// gezet wordt moet die tijd ook gezet worden.
 			if (gotUp) {
 				setStateAndEntryUp(current);
-				log.info("Screen " + getName() + " is going UP, for maximum " + getMotorOnPeriod() + " sec.");
+				log.info("Screen " + getName() + " is going UP, for maximum " + getMotorUpPeriod() + " sec.");
 			} else if (gotDown) {
 				setStateAndEntryDown(current);
-				log.info("Screen " + getName() + " is going DOWN, for maximum " + getMotorOnPeriod() + " sec.");
+				log.info("Screen " + getName() + " is going DOWN, for maximum " + getMotorDnPeriod() + " sec.");
 			}
 			break;
 		case DOWN:
@@ -109,7 +110,7 @@ public class Screen extends Actuator {
 				exitDown(current);
 				state = States.SWITCH_DOWN_2_UP;
 				log.info("Screen " + getName() + " stopped going down due to UP event. Will go up after safety time.");
-			} else if ((current - timeStateStart) > motorOnPeriodMs) {
+			} else if ((current - timeStateStart) > motorDnPeriodMs) {
 				exitDown(current);
 				state = States.REST;
 				log.info("Screen " + getName() + " stopped going down because motor-on time is reached.");
@@ -124,7 +125,7 @@ public class Screen extends Actuator {
 				exitUp(current);
 				state = States.REST;
 				log.info("Screen " + getName() + " stopped going up due to UP event.");
-			} else if ((current - timeStateStart) > motorOnPeriodMs) {
+			} else if ((current - timeStateStart) > motorUpPeriodMs) {
 				exitUp(current);
 				state = States.REST;
 				log.info("Screen " + getName() + " stopped going up because motor-on time is reached.");
@@ -161,7 +162,7 @@ public class Screen extends Actuator {
 	}
 
 	private void exitUp(long current) {
-		percClosed = Math.max(0.0, percClosed - (current - timeStateStart) / (double) motorOnPeriodMs);
+		percClosed = Math.max(0.0, percClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
 		log.info("exitUp() percClosed=" + percClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(chUp, false);
@@ -174,26 +175,10 @@ public class Screen extends Actuator {
 	}
 
 	private void exitDown(long current) {
-		percClosed = Math.min(1.0, percClosed + (current - timeStateStart) / (double) motorOnPeriodMs);
+		percClosed = Math.min(1.0, percClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
 		log.info("exitDown() percClosed=" + percClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(getChannel(), false);
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public int getMotorOnPeriod() {
-		return (int) (motorOnPeriodMs / 1000);
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public void setMotorOnPeriod(int motorOnPeriod) {
-		this.motorOnPeriodMs = motorOnPeriod * 1000L;
 	}
 
 	@Override
@@ -201,12 +186,12 @@ public class Screen extends Actuator {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
 		double tmpPercentageClosed = percClosed;
 		if (getState()==States.UP) {
-			tmpPercentageClosed = Math.max(0.0, percClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorOnPeriodMs);
+			tmpPercentageClosed = Math.max(0.0, percClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
 		} else if (getState()==States.DOWN) {
-			tmpPercentageClosed = Math.min(1.0, percClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorOnPeriodMs);
+			tmpPercentageClosed = Math.min(1.0, percClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
 		}
 		//log.info("getBlockInfo() percClosed=" + percClosed);
-		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + getState().getNlName());
+		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + getState().asSign());
 		return bi;
 	}
 
@@ -227,6 +212,38 @@ public class Screen extends Actuator {
 
 	@Override
 	public String toString() {
-		return "Screen " + super.toString() + ", motorOnPeriod=" + motorOnPeriodMs + ", state=" + state + "]";
+		return "Screen " + super.toString() + ", motorDnPeriod=" + motorDnPeriodMs + ", motorUpPeriod=" + motorUpPeriodMs + ", state=" + state + "]";
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public int getMotorUpPeriod() {
+		return (int)(motorUpPeriodMs/1000);
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public void setMotorUpPeriod(int motorUpPeriod) {
+		this.motorUpPeriodMs = motorUpPeriod*1000;
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public long getMotorDnPeriod() {
+		return (int)(motorDnPeriodMs/1000);
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public void setMotorDnPeriod(long motorDnPeriod) {
+		this.motorDnPeriodMs = motorDnPeriod*1000;
 	}
 }

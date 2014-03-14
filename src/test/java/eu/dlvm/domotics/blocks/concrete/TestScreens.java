@@ -50,7 +50,8 @@ public class TestScreens {
 		ctx = new DomoContextMock(hw);
 		sr = new Screen("TestScreens", "TestScreens", null, new LogCh(DN), new LogCh(
 				UP), ctx);
-		sr.setMotorOnPeriod(30);
+		sr.setMotorUpPeriod(30);
+		sr.setMotorDnPeriod(30);
 		seq = cur = 0L;
 	}
 
@@ -66,7 +67,8 @@ public class TestScreens {
 
 	@Test
 	public void downLongTime() {
-		sr.setMotorOnPeriod(30);
+		sr.setMotorUpPeriod(30);
+		sr.setMotorDnPeriod(30);
 		clickAndFullPeriod(true);
 	}
 
@@ -90,8 +92,8 @@ public class TestScreens {
 		Assert.assertTrue(hw.upRelais == !down);
 		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
 				&& hw.upRelais);
-
-		loop(sr.getMotorOnPeriod() * 1000L + 10);
+		// TODO verschil down / up
+		loop(sr.getMotorDnPeriod() * 1000L + 10);
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
@@ -127,7 +129,8 @@ public class TestScreens {
 		Assert.assertTrue(hw.upRelais == !down);
 		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
 				&& hw.upRelais);
-		loop(sr.getMotorOnPeriod() * 1000L / 2);
+		// TODO verschil down / up
+		loop(sr.getMotorUpPeriod() * 1000L / 2);
 		loop();
 		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
 				sr.getState());
@@ -181,7 +184,8 @@ public class TestScreens {
 				: !hw.dnRelais && hw.upRelais);
 
 		// test halfway
-		loop(sr.getMotorOnPeriod() * 1000L / 2);
+		// TODO verschil down / up
+		loop(sr.getMotorUpPeriod() * 1000L / 2);
 		Assert.assertEquals(
 				(firstDown ? Screen.States.DOWN : Screen.States.UP),
 				sr.getState());

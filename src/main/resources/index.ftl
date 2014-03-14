@@ -54,10 +54,9 @@ TOOD:
 					<div id="Screens" data-role="collapsible" data-theme="a">
 						<h4>${group}</h4>
 						<#list model.groupname2infos[group] as act>
-							<fieldset class="ui-grid-b">
-							<label for="${act.name}-controlgroup" class="ui-block-a">${act.description}</label>
-							<p id="${act.name}_status" for="${act.name}-controlgroup" class="ui-block-b">[${act.status}]</p>
-							<div class="ui-block-c" id="${act.name}-controlgroup" data-role="controlgroup" data-type="horizontal">
+							<fieldset class="ui-grid-a">
+							<label id="${act.name}_status" for="${act.name}-controlgroup" class="ui-block-a">${act.description} [ ${act.status} ]</label>
+							<div class="ui-block-b" id="${act.name}-controlgroup" data-role="controlgroup" data-type="horizontal">
 							    <button name="${act.name}" class="ui-btn ui-icon-carat-d ui-btn-icon-notext ui-corner-all" onclick='sendDown(this);'>Down</button>
 							    <button name="${act.name}" class="ui-btn ui-icon-carat-u ui-btn-icon-notext ui-corner-all" onclick='sendUp(this);'>Up</button>
 							</div>

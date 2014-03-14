@@ -112,9 +112,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			s = atts.getValue("channelUp");
 			LogCh channelUp = (s == null ? new LogCh(name + "Up") : new LogCh(s));
 			block = new Screen(name, desc, ui, channelDown, channelUp, ctx);
-			if (atts.getValue("motor-on-time") != null) {
-				((Screen) block).setMotorOnPeriod(Integer.parseInt(atts.getValue("motor-on-time")));
-			}
+			if (atts.getValue("motor-up-time") != null)
+				((Screen) block).setMotorUpPeriod(Integer.parseInt(atts.getValue("motor-up-time")));
+			if (atts.getValue("motor-dn-time") != null)
+				((Screen) block).setMotorDnPeriod(Integer.parseInt(atts.getValue("motor-dn-time")));
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("connect")) {
 			parseConnect(atts);
