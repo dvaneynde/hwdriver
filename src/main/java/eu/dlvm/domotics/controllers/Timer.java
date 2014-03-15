@@ -11,7 +11,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.service.BlockInfo;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * TODO moet Controller worden
@@ -27,8 +26,8 @@ public class Timer extends Controller {
 
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
-	public Timer(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, null, channel, ctx);
+	public Timer(String name, String description, IDomoticContext ctx) {
+		super(name, description, null, ctx);
 		state = false;
 		onTime = offTime = 0;
 	}

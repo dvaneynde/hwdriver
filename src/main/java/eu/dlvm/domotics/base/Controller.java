@@ -2,8 +2,6 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.iohardware.LogCh;
-
 //TODO geen sensor (dus geen IHwAccess), maar wel loop
 /**
  * Controller drives Actuators, like Sensors, but without access to hardware.
@@ -16,11 +14,8 @@ public abstract class Controller extends Block implements IDomoticLoop, IUserInt
 
 	static Logger log = Logger.getLogger(Controller.class);
 
-	private IDomoticContext ctx;
-
-	public Controller(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+	public Controller(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui);
-		this.ctx = ctx;
 		ctx.addController(this);
 	}
 

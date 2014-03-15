@@ -73,11 +73,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("timer")) {
 			parseBaseBlock(atts);
-			block = new Timer(name, desc, channel, ctx);
+			block = new Timer(name, desc, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("timerDayNight")) {
 			parseBaseBlock(atts);
-			block = new TimerDayNight(name, desc, channel, ctx);
+			block = new TimerDayNight(name, desc, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("on")) {
 			((Timer) block).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));

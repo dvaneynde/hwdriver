@@ -186,7 +186,7 @@ public class TestSwitchOrTimer2Lamp {
 
 	@Test
 	public void testTimer() {
-		Timer t = new Timer("timer", "timer", null, dom);
+		Timer t = new Timer("timer", "timer", dom);
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
 		t.register(o1);

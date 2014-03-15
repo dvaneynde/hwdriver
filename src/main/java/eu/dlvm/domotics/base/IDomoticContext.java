@@ -2,6 +2,7 @@ package eu.dlvm.domotics.base;
 
 import eu.dlvm.iohardware.IHardwareIO;
 
+// TODO weggooien, en enkel IHardwareIO gebruiken, en na creatie expliciet toevoegen aan domotic ?
 public interface IDomoticContext {
 
 	/**

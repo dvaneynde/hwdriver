@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
 import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Checks via {@link OpenWeatherMap} the sunrise and sunset times, and uses
@@ -42,8 +41,8 @@ public class TimerDayNight extends Timer {
 	private OpenWeatherMap openWeatherMap;
 	private Future<Info> asyncCheckWeather;
 
-	public TimerDayNight(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+	public TimerDayNight(String name, String description, IDomoticContext ctx) {
+		super(name, description, ctx);
 		setOpenWeatherMap(new OpenWeatherMap());
 	}
 

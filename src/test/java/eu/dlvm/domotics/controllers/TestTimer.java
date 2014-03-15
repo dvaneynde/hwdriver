@@ -14,7 +14,7 @@ public class TestTimer {
 
 	@Test
 	public void testTypicalDay() {
-		Timer t = new Timer("timer", "timer test", null, new DomoContextMock(null));
+		Timer t = new Timer("timer", "timer test", new DomoContextMock(null));
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
 		assertFalse(t.isOn());
@@ -58,7 +58,7 @@ public class TestTimer {
 
 	@Test
 	public void testBoundaryOnIsOff() {
-		Timer t = new Timer("timer", "timer test", null, new DomoContextMock(null));
+		Timer t = new Timer("timer", "timer test", new DomoContextMock(null));
 		t.setOnTime(10, 0);
 		t.setOffTime(10, 0);
 		assertFalse(t.isOn());
