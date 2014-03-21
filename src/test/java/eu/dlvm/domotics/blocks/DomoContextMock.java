@@ -62,4 +62,8 @@ public class DomoContextMock implements IDomoticContext {
 	public long getLoopSequence() {
 		return 0;
 	}
+
+	@Override
+	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
+	}
 }

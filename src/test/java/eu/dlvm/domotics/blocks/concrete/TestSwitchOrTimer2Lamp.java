@@ -89,7 +89,7 @@ public class TestSwitchOrTimer2Lamp {
 		sw2.registerListener(sct2);
 		sct2.registerListener(o2);
 
-		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "");
+		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "", null);
 		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleCapable.ActionType.OFF);
 		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleCapable.ActionType.ON);
 

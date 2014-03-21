@@ -51,6 +51,8 @@ public class Domotic implements IDomoticContext {
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
 	protected long loopSequence = -1L;
 
+	private List<IUserInterfaceAPI> uiblocks = new ArrayList<IUserInterfaceAPI>(64);
+	
 	public static synchronized Domotic singleton() {
 		if (singleton == null) {
 			singleton = new Domotic();
@@ -103,7 +105,7 @@ public class Domotic implements IDomoticContext {
 			}
 		}
 		sensors.add(s);
-		log.info("Added sensor " + s.getName());
+		log.debug("Added sensor " + s.getName());
 	}
 
 	/**
@@ -122,7 +124,9 @@ public class Domotic implements IDomoticContext {
 			}
 		}
 		actuators.add(a);
-		log.info("Added actuator " + a.getName());
+		if (a instanceof IUserInterfaceAPI)
+			addUiCapableBlock((IUserInterfaceAPI)a);
+		log.debug("Added actuator " + a.getName());
 	}
 
 	// TODO generic
@@ -135,7 +139,9 @@ public class Domotic implements IDomoticContext {
 			}
 		}
 		controllers.add(a);
-		log.info("Added controller " + a.getName());
+		if (a instanceof IUserInterfaceAPI)
+			addUiCapableBlock((IUserInterfaceAPI)a);
+		log.debug("Added controller " + a.getName());
 	}
 
 	public List<Sensor> getSensors() {
@@ -147,12 +153,38 @@ public class Domotic implements IDomoticContext {
 		return actuators;
 	}
 
-	public IUserInterfaceAPI findActuator(String name) {
-		for (Actuator a : actuators) {
-			if (a.getName().equals(name))
-				return a;
+	public IUserInterfaceAPI findUiCapable(String name) {
+		for (IUserInterfaceAPI ui : uiblocks) {
+			if (ui.getName().equals(name))
+				return ui;
 		}
 		return null;
+	}
+
+	/**
+	 * @return all registered {@link Actuator} and {@link Controller} blocks that implement {@link IUserInterfaceAPI}, or those blocks registered explicitly...
+	 */
+	public List<IUserInterfaceAPI> getUiCapableBlocks() {
+		return uiblocks;
+	}
+	
+	@Override
+	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
+//		Block block0 = (Block)uiblock0;
+//		for (IUserInterfaceAPI uiblock:uiblocks) {
+//			if (((Block)uiblock).getName().equals(block0.name)) {
+//				log.warn("addUiCapableBlock(): incominb block '"+block0.name+"' already registered - ignored.");
+//				return;
+//			}
+//		}
+		for (IUserInterfaceAPI uiblock:uiblocks) {
+			if (uiblock.getName().equals(uiblock0.getName())) {
+				log.warn("addUiCapableBlock(): incoming UiCapable '"+uiblock0.getName()+"' already registered - ignored.");
+				return;
+			}
+		}
+		uiblocks.add(uiblock0);
+		log.debug("Added UiCapableBlock " + uiblock0.getName());
 	}
 
 	/**
@@ -386,6 +418,8 @@ public class Domotic implements IDomoticContext {
 		log.info("Stopped hardware, oscillator and monitor.");
 	}
 
+	// TODO Werkt niet wegens TIME_WAIT, server zou even moeten wachten of select() doen - volgend leven
+	@SuppressWarnings("unused")
 	private boolean checkIfDriverRestartTimeHasCome(long lastCurrentTime) {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Brussels"));
 		cal.setTimeInMillis(lastCurrentTime);

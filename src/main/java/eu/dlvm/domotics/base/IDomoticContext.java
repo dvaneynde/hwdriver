@@ -3,6 +3,7 @@ package eu.dlvm.domotics.base;
 import eu.dlvm.iohardware.IHardwareIO;
 
 // TODO weggooien, en enkel IHardwareIO gebruiken, en na creatie expliciet toevoegen aan domotic ?
+// TODO alhoewel, actuator, controller, sensor en zelfs mappers die IUiCapable zijn moeten zich kunnen registreren; werkt een polymorfe methode, b.v. addBlock(Block) die dan overridden is? denk het niet... 
 public interface IDomoticContext {
 
 	/**
@@ -26,7 +27,9 @@ public interface IDomoticContext {
 	public void addActuator(Actuator a);
 
 	public void addController(Controller a);
-	
+
+	public void addUiCapableBlock(IUserInterfaceAPI uiblock0);
+
 	/**
 	 * @return Underlying hardware.
 	 */

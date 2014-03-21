@@ -93,9 +93,6 @@
 	<!-- Buiten -->
 	<connect src="SchakBuitenTuin" src-event="long" target="Buiten" event="toggle" />
 
-	<!-- Alle lichten uit -->
-	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" />
-
 	<!-- Licht Beneden -->
 	<connect src="SchakLichtInkom" src-event="single" target="LichtInkom" event="toggle" />
 	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle" />
@@ -183,5 +180,11 @@
 	<connect-screen screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" click="single" />
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" />
+
+	<!-- Alles... -->
+	<!-- Alle lichten uit -->
+	<!--  TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
+	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit"/>
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1" desc="Alle Screens"/>
+
 </domotic>

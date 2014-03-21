@@ -142,6 +142,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String targetName = atts.getValue("target");
 		String eventName = atts.getValue("event");
 
+		// Not null in case of UiCapable mapper
+		desc = atts.getValue("desc");
+		ui = atts.getValue("ui");
+
 		Block src = blocks.get(srcName);
 		if (src instanceof Switch) {
 			handleConnectSwitch2OOT((Switch) src, srcEventName, targetName, eventName);
@@ -165,7 +169,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String s2ootName = swtch.getName() + "_to_" + targetName;
 		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocks.get(s2ootName);
 		if (s2oot == null) {
-			s2oot = new Switch2OnOffToggle(s2ootName, "Switch " + swtch.getName() + " connected to " + targetName);
+			s2oot = new Switch2OnOffToggle(s2ootName, (desc == null ? "Switch " + swtch.getName() + " connected to " + targetName : desc), ui);
+			if (ui!=null && ui.length()>0) {
+				// TODO algemenere oplossing...
+				ctx.addUiCapableBlock(s2oot);
+			}
 			blocks.put(s2ootName, s2oot);
 		}
 
@@ -216,6 +224,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String screenName = atts.getValue("screen");
 		String clickName = atts.getValue("click");
 
+		// Not null in case of UiCapable mapper
+		desc = atts.getValue("desc");
+		ui = atts.getValue("ui");
+
 		List<Block> targetBlocks;
 		Block t = blocks.get(screenName);
 		if (t == null)
@@ -229,7 +241,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		Switch down = (Switch) blocks.get(switchDownName);
 		Switch up = (Switch) blocks.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
-		Switch2Screen s2s = new Switch2Screen(csName, csName, down, up, click);
+		Switch2Screen s2s = new Switch2Screen(csName, desc, ui, down, up, click);
+		if (ui!=null && ui.length()>0) {
+			// TODO algemenere oplossing...
+			ctx.addUiCapableBlock(s2s);
+		}
 		blocks.put(s2s.getName(), s2s);
 
 		for (Block target : targetBlocks) {

@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
+import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
+import eu.dlvm.domotics.service.BlockInfo;
 
 /**
  * TODO wrong... Connects a {@link Switch} event to one or more {@link Screen}'s
@@ -20,7 +22,7 @@ import eu.dlvm.domotics.sensors.Switch;
  * @author dirk vaneynde
  * 
  */
-public class Switch2Screen extends Block implements ISwitchListener {
+public class Switch2Screen extends Block implements ISwitchListener, IUserInterfaceAPI {
 
 	static Logger log = Logger.getLogger(Switch2Screen.class);
 
@@ -28,8 +30,8 @@ public class Switch2Screen extends Block implements ISwitchListener {
 	private ISwitchListener.ClickType clickEvent;
 	private Switch down;
 
-	public Switch2Screen(String name, String description, Switch down, Switch up, ClickType clickEvent) {
-		super(name, description, null);
+	public Switch2Screen(String name, String description, String ui, Switch down, Switch up, ClickType clickEvent) {
+		super(name, description, ui);
 		this.down = down;
 		this.clickEvent = clickEvent;
 		down.registerListener(this);
@@ -53,6 +55,29 @@ public class Switch2Screen extends Block implements ISwitchListener {
 			if (log.isDebugEnabled())
 				log.debug("Switch2Screen " + getName() + ": ignored click event " + click + " from source=" + source);
 		}
+	}
+
+	@Override
+	public BlockInfo getBlockInfo() {
+		BlockInfo bi = null;
+		if (ui != null) {
+			log.debug("getBlockInfo(), ui='" + ui + "'");
+			bi = new BlockInfo(this.getName(), "DimmerSwitch", this.getDescription());
+		}
+		return bi;
+	}
+
+	// TODO slecht, apart block subtype van maken...
+	@Override
+	public void update(String action) {
+		if (action.equals("down")) {
+			for (Screen screen : screens)
+				screen.down();
+		} else if (action.equals("up")) {
+			for (Screen screen : screens)
+				screen.up();
+		} else
+			log.warn("update(), unknown action=" + action + ", on me=" + toString());
 	}
 
 	@Override

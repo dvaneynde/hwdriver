@@ -63,10 +63,12 @@
 				<element name="group" type="tns:groupType" />
 				<element name="connect">
 					<complexType>
-						<attribute name="src" type="IDREF" />
+						<attribute name="src" type="IDREF" use="required" />
 						<attribute name="src-event" type="string" />
-						<attribute name="target" type="IDREF" />
+						<attribute name="target" type="IDREF" use="required" />
 						<attribute name="event" type="string" />
+						<attribute name="ui" type="string" />
+						<attribute name="desc" type="string" />
 					</complexType>
 				</element>
 				<element name="connect-dimmer">
@@ -81,6 +83,8 @@
 						<attribute name="switchDown" type="IDREF" use="required" />
 						<attribute name="switchUp" type="IDREF" use="required" />
 						<attribute name="click" type="tns:switchEventType" use="required" />
+						<attribute name="ui" type="string" />
+						<attribute name="desc" type="string" />
 					</complexType>
 				</element>
 			</choice>

@@ -41,12 +41,12 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff = new Switch("SwitchAllOff", "Switch All Off", new LogCh(1), dom);
 		lamp = new Lamp("Lamp1", "Lamp1", new LogCh(10), dom);
 
-		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle");
+		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
 		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);
 		swLamp.registerListener(swtch2toggle);
 		swtch2toggle.registerListener(lamp);
 
-		swtch2All = new Switch2OnOffToggle("allof", "alloff");
+		swtch2All = new Switch2OnOffToggle("allof", "alloff", null);
 		swtch2All.map(ClickType.LONG, ActionType.OFF);
 		swAllOff.registerListener(swtch2All);
 		swtch2All.registerListener(lamp);

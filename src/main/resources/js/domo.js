@@ -3,6 +3,7 @@
  */
 
 var isRefreshing = false;
+var nochange = false;
 
 function sendQuickie(name) {
 	// alert("sendQuickie, name="+name);
@@ -39,6 +40,13 @@ function sendDown(button) {
 		return;
 	$.ajax("act/" + button.name + "/down");
 	console.log("sendDown() " + button.name)
+}
+
+function sendClick(button, what) {
+	if (window.isRefreshing)
+		return;
+	$.ajax("act/" + button.name + "/" + what);
+	console.log("sendClick() button=" + button.name + ", what=" + what)
 }
 
 function sendLevelDL(inputRange) {
@@ -82,7 +90,9 @@ function refreshActuators() {
 			act = data[i];
 			// curOn = $("#" + act.name).prop("checked");
 			// act.on = !curOn;
-			$("#" + act.name).prop("checked", act.on).checkboxradio("refresh");
+			if (act.type !== "Switch") {	// toegevoegd, omdat het fout gaf (wel raar dat Screen dan geen fout gaf...)
+				$("#" + act.name).prop("checked", act.on).checkboxradio("refresh");
+			}
 			if (act.type === "DimmedLamp") {
 				// TODO: onderstaand code triggert sendLevelDL(), maar
 				// bovenstaande niet sendToggle()... Hoe komt dat, te
@@ -93,10 +103,12 @@ function refreshActuators() {
 						.slider("option", "disabled", !act.on)
 						.slider('refresh');
 			} else if (act.type === "Screen") {
-				//var statusveld = $("#"+act.name+"_status");
-				//$("#"+act.name+"_status").children().first().innerHTML = act.status;
-				var statusveld = document.getElementById(act.name+"_status");
-				statusveld.innerHTML = act.description+" [ "+act.status+" ]";
+				// var statusveld = $("#"+act.name+"_status");
+				// $("#"+act.name+"_status").children().first().innerHTML =
+				// act.status;
+				var statusveld = document.getElementById(act.name + "_status");
+				statusveld.innerHTML = act.description + " [ " + act.status
+						+ " ]";
 			}
 		}
 		window.isRefreshing = false;
@@ -104,40 +116,29 @@ function refreshActuators() {
 	$.getJSON("groups", function(data) {
 		for ( var key in data) {
 			if (data.hasOwnProperty(key)) {
-				//AAA = $("#" + key);
+				// AAA = $("#" + key);
 				status = $("#" + key).attr('data-theme');
-				//letter = (status === "a") ? "c" : "a";
+				// letter = (status === "a") ? "c" : "a";
 				letter = (data[key]) ? "c" : "a";
 				console.log("refreshGroups, key=" + key + ", val=" + data[key]
-				+ " current data-theme=" + status+", new data-them="+letter);
+						+ " current data-theme=" + status + ", new data-them="
+						+ letter);
 				$("#" + key).attr("data-theme", letter);
-				$("#" + key).children().first().children().first().removeClass("ui-btn-"+status).addClass("ui-btn-" + letter);
-				//status = $("#" + key).attr('data-theme');
-				//console.log("--> data-theme=" + status + ", letter=" + letter);
+				$("#" + key).children().first().children().first().removeClass(
+						"ui-btn-" + status).addClass("ui-btn-" + letter);
+				// status = $("#" + key).attr('data-theme');
+				// console.log("--> data-theme=" + status + ", letter=" +
+				// letter);
 			}
 		}
 	});
 
 }
 
-function autorefresh() {
-	refreshActuators();
+$(document).ready(function autorefresh() {
+	if ($("#autorefreshbutton option:selected").val() === "on")
+		refreshActuators();
+	window.isRefreshing = false;
 	setTimeout(autorefresh, 1000);
-}
+});
 
-autorefresh();
-
-// function registerDimmedLampChangeEvents(el, timeout) {
-// var timer;
-// var trig = function() {
-// alert("Send name=" + el.name + ", level=" + el.value);
-// };
-// el.bind("change", function() {
-// zolang changes snel binnenkomen wordt timer reset; als ze 'timeout' lang niet
-// meer binnenkomen wordt trig opgeroepen
-// if (timer) {
-// clearTimeout(timer);
-// }
-// timer = setTimeout(trig, timeout);
-// });
-// }

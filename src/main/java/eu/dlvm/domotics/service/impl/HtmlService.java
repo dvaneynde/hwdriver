@@ -18,7 +18,6 @@ import javax.ws.rs.Produces;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.service.BlockInfo;
@@ -46,13 +45,13 @@ public class HtmlService {
 		try {
 			if (data == null) {
 				data = new Data();
-				List<Actuator> actuators = Domotic.singleton().getActuators();
+				List<IUserInterfaceAPI> actuators = Domotic.singleton().getUiCapableBlocks();
 				List<String> groupnames = new ArrayList<>();
 				Map<String, List<BlockInfo>> groupname2blockinfos = new HashMap<>();
 				data.setGroupNames(groupnames);
 				data.setGroupname2infos(groupname2blockinfos);
 				// Opbouw structuren
-				for (Actuator a : actuators) {
+				for (IUserInterfaceAPI a : actuators) {
 					if (a.getUi() == null)
 						continue;
 					StringTokenizer st = new StringTokenizer(a.getUi(), ":");
@@ -84,7 +83,7 @@ public class HtmlService {
 			} else {
 				for (List<BlockInfo> list : data.groupname2infos.values()) {
 					for (int i = 0; i < list.size(); i++) {
-						IUserInterfaceAPI act = Domotic.singleton().findActuator(list.get(i).getName());
+						IUserInterfaceAPI act = Domotic.singleton().findUiCapable(list.get(i).getName());
 						list.set(i, act.getBlockInfo());
 					}
 				}

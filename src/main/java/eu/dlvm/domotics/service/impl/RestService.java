@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.service.BlockInfo;
@@ -33,19 +32,22 @@ public class RestService implements IDomoticSvc {
 		return "Got it!";
 	}
 
+	// TODO rename
 	@Override
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
-		for (Actuator a : Domotic.singleton().getActuators())
+		for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks())
 			sb.append(a.getName()).append('\n');
 		return sb.toString();
 	}
 
+	// TODO rename
+	// TODO zou het kunnen dat getBlockInfo 2 keer per browser refresh wordt opgeroepen? 2 verschillende threads...
 	@Override
 	public List<BlockInfo> listActuators() {
 		List<BlockInfo> list = new ArrayList<>();
 		try {
-			for (IUserInterfaceAPI a : Domotic.singleton().getActuators()) {
+			for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks()) {
 				BlockInfo aj = a.getBlockInfo();
 				if (aj != null)
 					list.add(aj);
@@ -63,11 +65,12 @@ public class RestService implements IDomoticSvc {
 		return HtmlService.getGroup2Status();
 	}
 
+	// TODO rename
 	@Override
 	public void updateActuator(String name, String action) {
 		// TODO debug
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
-		IUserInterfaceAPI act = Domotic.singleton().findActuator(name);
+		IUserInterfaceAPI act = Domotic.singleton().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
 			Log.warn("Could not find actuator " + name);

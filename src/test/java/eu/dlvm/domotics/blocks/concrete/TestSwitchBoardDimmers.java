@@ -95,7 +95,7 @@ public class TestSwitchBoardDimmers {
 		swAllOnOff.setLongClickEnabled(true);
 		swAllOnOff.setLongClickTimeout(1000L);
 		swAllOnOff.setSingleClickEnabled(false);
-		Switch2OnOffToggle swtch2AllOff = new Switch2OnOffToggle("allOff", "allOff");
+		Switch2OnOffToggle swtch2AllOff = new Switch2OnOffToggle("allOff", "allOff", null);
 		swtch2AllOff.map(ClickType.LONG, ActionType.OFF);
 		swAllOnOff.registerListener(swtch2AllOff);
 		swtch2AllOff.registerListener(dl1);

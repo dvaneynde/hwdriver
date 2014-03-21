@@ -73,12 +73,24 @@ TOOD:
 					<h4>${group}</h4>
 						<div data-theme="a">
 						<#list model.groupname2infos[group] as act>
-							<label><!-- TODO Flip Switch ipv checkbox -->
-								<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
-							</label>
-							<#if act.type = "DimmedLamp">
-								<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
-								<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+							<#if act.type = "Switch">
+								<button id="${act.name}" name="${act.name}" class="ui-btn ui-corner-all" onclick='sendClick(this, "clicked");'>${act.description}</button>
+							<#elseif act.type = "DimmerSwitch">
+								<fieldset class="ui-grid-a">
+									<label for="${act.name}-controlgroup" class="ui-block-a">${act.description}</label>
+									<div class="ui-block-b" id="${act.name}-controlgroup" data-role="controlgroup" data-type="horizontal">
+									    <button name="${act.name}" class="ui-btn ui-icon-carat-d ui-btn-icon-notext ui-corner-all" onclick='sendDown(this);'>Down</button>
+									    <button name="${act.name}" class="ui-btn ui-icon-carat-u ui-btn-icon-notext ui-corner-all" onclick='sendUp(this);'>Up</button>
+									</div>
+								</fieldset>
+							<#else>
+								<label><!-- TODO Flip Switch ipv checkbox -->
+									<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+								</label>
+								<#if act.type = "DimmedLamp">
+									<#if act.on><#assign disableslider="false"><#else><#assign disableslider="true"></#if>
+									<input type="range" id="${act.name}_lvl" name="${act.name}" min="0" max="100" step="5" value="${act.level}" data-disabled="${disableslider}" onchange='sendLevelDL(this);'/>
+								</#if>
 							</#if>
 						</#list>
 						</div>
@@ -86,17 +98,25 @@ TOOD:
 				</#if>
 			</#list>
 		</div>
-<!--
 		<div data-role="footer" data-theme="b" data-position="fixed" >
-		<div class="ui-bar">
-	        <select name="flip-7" id="flip-7" data-role="slider" >
-	            <option value="off">manual</option>
-	            <option value="on">auto</option>
-	        </select>
-			<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-refresh" onclick="refreshActuators();">Refresh</a>
-			<span class="ui-title"></span> 
-			-->
-		</div>
+			<div class="ui-grid-a">
+				<div class="ui-block-a">
+			        <select id="autorefreshbutton" name="autorefreshbutton" data-role="slider" >
+			            <option value="off">manual</option>
+			            <option value="on" selected="selected">auto</option>
+			        </select>
+			    </div>
+			    <div class="ui-block-b">
+			        <select id="ro" name="ro" data-role="slider" class="ui-right">
+			            <option value="off">wijzigen</option>
+			            <option value="on" selected="selected">lezen</option>
+			        </select>
+			        <!--
+					<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-refresh" onclick="refreshActuators();">Refresh</a>
+					<span class="ui-title">titel</span> 
+					-->
+				</div>
+			</div>
 		</div>
 	</div>
 </body>

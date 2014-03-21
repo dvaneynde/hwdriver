@@ -8,9 +8,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.Block;
+import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
+import eu.dlvm.domotics.service.BlockInfo;
 
 /**
  * Keeps one or more mappings, each mapping maps one incoming
@@ -20,39 +22,59 @@ import eu.dlvm.domotics.sensors.Switch;
  * 
  * @author dirkv
  * 
+ * TODO die mappers zijn eigenlijk low-level mechanismes; een all on/off is hoger niveau en kan makkelijk met <group> gemaakt worden, maar als je UI ziet... dus hoe kan dat algemeen opgelost? AllOnOff als apart element - maar wat dan? We lijken terug naar switchboards te gaan... Of Mapper heeft in- en output events, geen loop(), maar eventueel wel IUiCapable? En ook registreren bij Domotic, maar meestal niks bijhouden tenzij IUiCapable?
  */
-public class Switch2OnOffToggle extends Block implements ISwitchListener {
+public class Switch2OnOffToggle extends Block implements ISwitchListener, IUserInterfaceAPI {
 
 	static Logger log = Logger.getLogger(Switch2OnOffToggle.class);
 
 	private Map<ClickType, IOnOffToggleCapable.ActionType> mappings;
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
-	
-	public Switch2OnOffToggle(String name, String description) {
-		super(name, description, null);
+
+	public Switch2OnOffToggle(String name, String description, String ui) {
+		super(name, description, ui);
 		mappings = new HashMap<>(3);
 	}
 
 	public void map(ClickType click, IOnOffToggleCapable.ActionType action) {
 		mappings.put(click, action);
 	}
-	
+
 	public void registerListener(IOnOffToggleCapable listener) {
 		listeners.add(listener);
 	}
-	
+
 	public void notifyListeners(ActionType action) {
-		for (IOnOffToggleCapable l:listeners)
+		for (IOnOffToggleCapable l : listeners)
 			l.onEvent(action);
 	}
-	
+
 	@Override
 	public void onEvent(Switch source, ClickType click) {
 		IOnOffToggleCapable.ActionType action = mappings.get(click);
 		if (action == null) {
-			log.debug("Received event for which no action is registered. Name="+getName()+", event received=" + click + ", from switch=" + source);
+			log.debug("Received event for which no action is registered. Name=" + getName() + ", event received=" + click + ", from switch=" + source);
 			return;
 		}
 		notifyListeners(action);
+	}
+
+	@Override
+	public BlockInfo getBlockInfo() {
+		BlockInfo bi = null;
+		if (ui != null) {
+			log.debug("getBlockInfo(), ui='"+ui+"'");
+			bi = new BlockInfo(this.getName(), "Switch", this.getDescription());
+		}
+		return bi;
+	}
+
+	// TODO slecht, want LONG is hardcoded, en hangt eigenlijk af van configuratie...
+	@Override
+	public void update(String action) {
+		if (action.equals("clicked")) {
+			IOnOffToggleCapable.ActionType actionType = mappings.get(ClickType.LONG);
+			notifyListeners(actionType);
+		}
 	}
 }

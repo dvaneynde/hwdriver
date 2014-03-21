@@ -98,16 +98,16 @@ public class TestSwitchBoardScreens {
 		sr2 = new Screen("Screen2", "Screen Bathroom", null, new LogCh(REL_DN_2),
 				new LogCh(REL_UP_2), dom);
 		
-		s2s1 = new Switch2Screen("s2s1", "s2s1",swDn1,swUp1,ISwitchListener.ClickType.SINGLE);
+		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1,swUp1,ISwitchListener.ClickType.SINGLE);
 		s2s1.registerListener(sr1);
-		s2s2 = new Switch2Screen("s2s2", "s2s2",swDn2,swUp2,ISwitchListener.ClickType.SINGLE);
+		s2s2 = new Switch2Screen("s2s2", "s2s2", null, swDn2,swUp2,ISwitchListener.ClickType.SINGLE);
 		s2s2.registerListener(sr2);
 		
 		swDn1.setLongClickEnabled(true);
 		swDn1.setLongClickTimeout(LONGCLICKTIMEOUT);
 		swUp1.setLongClickEnabled(true);
 		swUp1.setLongClickTimeout(LONGCLICKTIMEOUT);
-		s2sAll = new Switch2Screen("all", "", swDn1, swUp1, ISwitchListener.ClickType.LONG);
+		s2sAll = new Switch2Screen("all", "", null, swDn1, swUp1, ISwitchListener.ClickType.LONG);
 		s2sAll.registerListener(sr1);
 		s2sAll.registerListener(sr2);
 		
