@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;
 
 /**

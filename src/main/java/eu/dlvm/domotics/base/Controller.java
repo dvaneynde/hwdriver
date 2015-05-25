@@ -2,7 +2,6 @@ package eu.dlvm.domotics.base;
 
 import org.apache.log4j.Logger;
 
-//TODO geen sensor (dus geen IHwAccess), maar wel loop
 /**
  * Controller drives Actuators, like Sensors, but without access to hardware.
  * <p>

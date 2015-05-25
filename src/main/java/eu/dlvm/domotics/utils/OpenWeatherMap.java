@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,7 +48,7 @@ public class OpenWeatherMap {
 			return weather;
 		} catch (Exception e) {
 			log.warn("Contacting openweathermap.org, no result, got exception:"
-					+ e.getMessage());
+					+ e.getMessage(),e);
 		} finally {
 			httpGet.releaseConnection();
 		}
@@ -73,6 +74,7 @@ public class OpenWeatherMap {
 	}
 
 	public static void main(String[] args) {
+		BasicConfigurator.configure();
 		OpenWeatherMap owm = new OpenWeatherMap();
 		OpenWeatherMap.Info info = owm.getWeatherReport();
 		Calendar c = Calendar.getInstance();

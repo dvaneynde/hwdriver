@@ -9,7 +9,7 @@ import eu.dlvm.domotics.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * Represents two Relays, one for the motor lifting a screen, one for the 2nd
+ * Represents two Screen relays, one for the motor lifting a screen, one for the 2nd
  * motor lowering the screen. Both are put in one abstraction to avoid 2 motors
  * being activated together.
  * <p>

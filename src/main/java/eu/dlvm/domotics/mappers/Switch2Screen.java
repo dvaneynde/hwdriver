@@ -13,11 +13,8 @@ import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.service.BlockInfo;
 
 /**
- * TODO wrong... Connects a {@link Switch} event to one or more {@link Screen}'s
- * with one fixed Screen operation, either Up or Down. So for one screen you
- * need two of these, connected to the same screen but to two different
- * switches, or more general two different (switch, switch-event) tuples
- * connected to one screen.
+ * Connects a Down and Up {@link Switch} to one or more {@link Screen}'s to go
+ * down or up. It will only react on one specific {@link ClickType} event.
  * 
  * @author dirk vaneynde
  * 

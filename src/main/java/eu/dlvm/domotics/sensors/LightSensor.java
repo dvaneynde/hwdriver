@@ -1,5 +1,8 @@
 package eu.dlvm.domotics.sensors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -27,6 +30,8 @@ public class LightSensor extends Sensor {
 	private long lowWaitingTime;
 	private long highWaitingTime;
 	private long sampleIntervalTimeMs;
+	// TODO listeners via generic in Sensor basis class
+	private Set<IThresholdListener> listeners = new HashSet<>();
 
 	public static enum States {
 		LOW, LOW2HIGH_WAITING, HIGH, HIGH2LOW_WAITING,
@@ -64,6 +69,15 @@ public class LightSensor extends Sensor {
 		this.highWaitingTime = high2lowWaitTime;
 	}
 
+	public void registerListener(IThresholdListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void notifyListeners(IThresholdListener.EventType event) {
+		for (IThresholdListener l:listeners)
+			l.onEvent(this, event);
+	}
+
 	@Override
 	public void loop(long currentTime, long sequence) {
 		if ((currentTime - timeOfLastSample) < sampleIntervalTimeMs)
@@ -88,7 +102,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh="
 						+ getHighThreshold());
-				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.HIGH));
+				notifyListeners(IThresholdListener.EventType.HIGH);
 			}
 			break;
 		case HIGH:
@@ -106,7 +120,7 @@ public class LightSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow="
 						+ getLowThreshold());
-				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.LOW));
+				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;
 		default:
