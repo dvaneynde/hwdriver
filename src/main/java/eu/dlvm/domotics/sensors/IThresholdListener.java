@@ -9,6 +9,6 @@ public interface IThresholdListener {
 		HIGH, LOW;
 	}
 
-	public void onEvent(Sensor source, EventType click);
+	public void onEvent(Sensor source, EventType event);
 	
 }

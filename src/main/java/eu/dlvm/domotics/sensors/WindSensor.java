@@ -1,5 +1,8 @@
 package eu.dlvm.domotics.sensors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -18,10 +21,12 @@ import eu.dlvm.iohardware.LogCh;
 public class WindSensor extends Sensor {
 
 	private static Logger log = Logger.getLogger(WindSensor.class);
-	private int highSpeedThreshold;
-	private int lowSpeedThreshold;
+	private int highFreqThreshold;
+	private int lowFreqThreshold;
 	private long highTimeBeforeAlert;
 	private long lowTimeToResetAlert;
+	// TODO listeners via generic in Sensor basis class
+	private Set<IThresholdListener> listeners = new HashSet<>();
 
 	public static enum States {
 		NORMAL, TOO_HIGH, ALARM, ALARM_BUT_LOW,
@@ -37,20 +42,20 @@ public class WindSensor extends Sensor {
 	 * @param description
 	 * @param channel
 	 * @param ctx
-	 * @param highSpeedThreshold
-	 * @param lowSpeedThreshold
+	 * @param highFreqThreshold
+	 * @param lowFreqThreshold
 	 * @param highTimeBeforeAlert
 	 *            Unit is milliseconds.
 	 * @param lowTimeToResetAlert
 	 *            Unit is milliseconds.
 	 */
-	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highSpeedThreshold,
-			int lowSpeedThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
+	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highFreqThreshold,
+			int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		super(name, description, channel, ctx);
-		if (highSpeedThreshold < lowSpeedThreshold)
+		if (highFreqThreshold < lowFreqThreshold)
 			throw new RuntimeException("Configuration error: highSpeedThreshold must be lower than lowSpeedThreshold.");
-		this.highSpeedThreshold = highSpeedThreshold;
-		this.lowSpeedThreshold = lowSpeedThreshold;
+		this.highFreqThreshold = highFreqThreshold;
+		this.lowFreqThreshold = lowFreqThreshold;
 		this.highTimeBeforeAlert = highTimeBeforeAlert;
 		this.lowTimeToResetAlert = lowTimeToResetAlert;
 
@@ -59,12 +64,21 @@ public class WindSensor extends Sensor {
 		this.lastFrequency = 0L;
 	}
 
+	public void registerListener(IThresholdListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void notifyListeners(IThresholdListener.EventType event) {
+		for (IThresholdListener l:listeners)
+			l.onEvent(this, event);
+	}
+
 	@Override
 	public void loop(long currentTime, long sequence) {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		double freq = gauge.getFrequency();
-
+System.err.println("freq="+freq);
 		if (freq == lastFrequency)
 			return;
 		else
@@ -72,39 +86,39 @@ public class WindSensor extends Sensor {
 		
 		switch (state) {
 		case NORMAL:
-			if (freq >= getHighSpeedThreshold()) {
+			if (freq >= getHighFreqThreshold()) {
 				state = States.TOO_HIGH;
 				timeCurrentStateStarted = currentTime;
 			}
 			break;
 		case TOO_HIGH:
-			if (freq < getHighSpeedThreshold()) {
+			if (freq < getHighFreqThreshold()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) > getHighTimeBeforeAlert()) {
 				state = States.ALARM;
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies ALARM event: freq=" + freq + " > thresholdHigh="
-						+ getHighSpeedThreshold());
-				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
+						+ getHighFreqThreshold());
+				notifyListeners(IThresholdListener.EventType.HIGH);
 			}
 			break;
 		case ALARM:
-			if (freq <= getLowSpeedThreshold()) {
+			if (freq <= getFreqSpeedThreshold()) {
 				state = States.ALARM_BUT_LOW;
 				timeCurrentStateStarted = currentTime;
 			}
 			break;
 		case ALARM_BUT_LOW:
-			if (freq > getLowSpeedThreshold()) {
+			if (freq > getFreqSpeedThreshold()) {
 				state = States.ALARM;
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlert()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow="
-						+ getLowSpeedThreshold());
-				// FIXME notifyListenersDeprecated(new SensorEvent(this, States.ALARM));
+						+ getFreqSpeedThreshold());
+				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;
 		default:
@@ -120,15 +134,15 @@ public class WindSensor extends Sensor {
 	/**
 	 * @return the highSpeedThreshold
 	 */
-	public int getHighSpeedThreshold() {
-		return highSpeedThreshold;
+	public int getHighFreqThreshold() {
+		return highFreqThreshold;
 	}
 
 	/**
 	 * @return the lowSpeedThreshold
 	 */
-	public int getLowSpeedThreshold() {
-		return lowSpeedThreshold;
+	public int getFreqSpeedThreshold() {
+		return lowFreqThreshold;
 	}
 
 	/**

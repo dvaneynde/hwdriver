@@ -24,7 +24,7 @@ public class FrequencyGauge {
 
 	private double frequency = 0.0;
 	private boolean lastInputval; // last measured input value
-	private long timeLastOffInput; // last time  that input value read was 0
+	private long timeLastOffInput; // last time that input value read was 0
 
 	private boolean doMeans;
 	private int idxLastMeasure, cyclesToMeasure;
@@ -95,9 +95,8 @@ public class FrequencyGauge {
 
 	/**
 	 * Samples inputval to determine frequency. Frequency is the inverse of the
-	 * period of one 'cycle'.
-	 * A cycle is measured as an inputval that changed from off-on-off, or
-	 * false-true-false.
+	 * period of one 'cycle'. A cycle is measured as an inputval that changed
+	 * from off-on-off, or false-true-false.
 	 * 
 	 * @param currentTimeMs
 	 *            Timestamp in milliseconds.
@@ -106,7 +105,8 @@ public class FrequencyGauge {
 	 */
 	public void sample(long currentTimeMs, boolean inputval) {
 		if (timeLastOffInput == 0) {
-			// initialization takes as long as we did not read an 'off' input value
+			// initialization takes as long as we did not read an 'off' input
+			// value
 			if (!inputval) {
 				lastInputval = inputval;
 				timeLastOffInput = currentTimeMs;

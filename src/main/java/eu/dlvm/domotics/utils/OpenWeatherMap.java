@@ -17,8 +17,8 @@ public class OpenWeatherMap {
 
 	static Logger log = Logger.getLogger(OpenWeatherMap.class);
 
-	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be";
-
+	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=9432e6e90eb0c5c30b4f4c19ba396d37";
+	
 	public class Info {
 		public long sunrise_sec;
 		public long sunset_sec;
