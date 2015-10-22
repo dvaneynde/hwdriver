@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class FrequencyGauge {
 
-	private static Logger LOG = Logger.getLogger(FrequencyGauge.class);
+	private static Logger log = Logger.getLogger(FrequencyGauge.class);
 
 	private double frequency = 0.0;
 	private boolean lastInputval; // last measured input value
@@ -75,7 +75,8 @@ public class FrequencyGauge {
 	 */
 	public double getAvgFreq() {
 		if (!doMeans)
-			throw new RuntimeException("Gauge was not configured to calculate average freauencies.");
+			return frequency;
+			//throw new RuntimeException("Gauge was not configured to calculate average freauencies.");
 		return avgFreq;
 	}
 

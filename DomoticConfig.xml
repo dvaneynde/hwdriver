@@ -2,6 +2,8 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
+	<windmeter highTimeBeforeAlertMs="2000" name="Windmeter" lowFreq="3" highFreq="10" lowTimeToResetAlertMs="5000" />
+	
 	<!-- Lichten en Stopcontacten, met All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
@@ -141,11 +143,11 @@
 	<!-- Screens -->
 	<screen name="ScreenTomas" desc="Tomas" motor-up-time="30" motor-dn-time="30" ui="Screens:3" />
 	<screen name="ScreenDriesTuin" desc="Dries (T)" motor-up-time="30" motor-dn-time="30" ui="Screens:4" />
-	<screen name="ScreenDriesOpzij" desc="Dries (Z)" motor-up-time="30" motor-dn-time="30"  ui="Screens:5" />
-	<screen name="ScreenRoos" desc="Roos" motor-up-time="30" motor-dn-time="30"  ui="Screens:6" />
-	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36"  ui="Screens:1" />
-	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100"  ui="Screens:2" />
-	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20"  ui="Screens:0" />
+	<screen name="ScreenDriesOpzij" desc="Dries (Z)" motor-up-time="30" motor-dn-time="30" ui="Screens:5" />
+	<screen name="ScreenRoos" desc="Roos" motor-up-time="30" motor-dn-time="30" ui="Screens:6" />
+	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" ui="Screens:1" />
+	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100" ui="Screens:2" />
+	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0" />
 	<switch name="SchakScreenTomasUp" />
 	<switch name="SchakScreenTomasDown" />
 	<switch name="SchakScreenDriesTuinUp" />
@@ -183,8 +185,9 @@
 
 	<!-- Alles... -->
 	<!-- Alle lichten uit -->
-	<!--  TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
-	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit"/>
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1" desc="Alle Screens"/>
+	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
+	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit" />
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
+		desc="Alle Screens" />
 
 </domotic>

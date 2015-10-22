@@ -4,6 +4,7 @@
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
+				<!-- sensors -->
 				<element name="switch" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -18,7 +19,9 @@
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
+				<element name="windmeter" type="tns:windmeterType" />
 
+				<!-- actuators -->
 				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
@@ -142,6 +145,17 @@
 						</complexType>
 					</element>
 				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="windmeterType">
+		<complexContent>
+			<extension base="tns:blockWithChannelStruct">
+				<attribute name="highFreq" use="required" />
+				<attribute name="lowFreq" use="required" />
+				<attribute name="highTimeBeforeAlertMs" use="required" />
+				<attribute name="lowTimeToResetAlertMs" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>

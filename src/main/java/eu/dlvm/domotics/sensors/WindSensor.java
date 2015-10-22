@@ -12,9 +12,8 @@ import eu.dlvm.iohardware.LogCh;
 /**
  * Niet simpel. Moet de frequentie meten van het windmolentje aan/uit singaal.
  * En dan als ze gedurende een bepaalde tijd een kritische grens overschreden
- * wordt gaat het 'alarm aan'.
- * Als dan gedurende een langere periode een ondergrens onderschreden wordt gaat
- * het terug af.
+ * wordt gaat het 'alarm aan'. Als dan gedurende een langere periode een
+ * ondergrens onderschreden wordt gaat het terug af.
  * 
  * @author Dirk Vaneynde
  */
@@ -29,13 +28,13 @@ public class WindSensor extends Sensor {
 	private Set<IThresholdListener> listeners = new HashSet<>();
 
 	public static enum States {
-		NORMAL, TOO_HIGH, ALARM, ALARM_BUT_LOW,
+		NORMAL, HIGH, ALARM, ALARM_BUT_LOW,
 	};
 
 	private States state;
 	private long timeCurrentStateStarted;
 	private double lastFrequency;
-	FrequencyGauge gauge;	// package scope for unit tests
+	FrequencyGauge gauge; // package scope for unit tests
 
 	/**
 	 * @param name
@@ -49,8 +48,7 @@ public class WindSensor extends Sensor {
 	 * @param lowTimeToResetAlert
 	 *            Unit is milliseconds.
 	 */
-	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highFreqThreshold,
-			int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
+	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highFreqThreshold, int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		super(name, description, channel, ctx);
 		if (highFreqThreshold < lowFreqThreshold)
 			throw new RuntimeException("Configuration error: highSpeedThreshold must be lower than lowSpeedThreshold.");
@@ -59,7 +57,7 @@ public class WindSensor extends Sensor {
 		this.highTimeBeforeAlert = highTimeBeforeAlert;
 		this.lowTimeToResetAlert = lowTimeToResetAlert;
 
-		this.gauge = new FrequencyGauge();
+		this.gauge = new FrequencyGauge(7);
 		this.state = States.NORMAL;
 		this.lastFrequency = 0L;
 	}
@@ -67,9 +65,9 @@ public class WindSensor extends Sensor {
 	public void registerListener(IThresholdListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public void notifyListeners(IThresholdListener.EventType event) {
-		for (IThresholdListener l:listeners)
+		for (IThresholdListener l : listeners)
 			l.onEvent(this, event);
 	}
 
@@ -77,29 +75,28 @@ public class WindSensor extends Sensor {
 	public void loop(long currentTime, long sequence) {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
-		double freq = gauge.getFrequency();
-System.err.println("freq="+freq);
+		double freq = gauge.getAvgFreq();
 		if (freq == lastFrequency)
 			return;
 		else
 			lastFrequency = freq;
+		log.debug("time="+currentTime+"\tfreq=" + freq+"\tcur.state="+state);
 		
 		switch (state) {
 		case NORMAL:
 			if (freq >= getHighFreqThreshold()) {
-				state = States.TOO_HIGH;
+				state = States.HIGH;
 				timeCurrentStateStarted = currentTime;
 			}
 			break;
-		case TOO_HIGH:
+		case HIGH:
 			if (freq < getHighFreqThreshold()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) > getHighTimeBeforeAlert()) {
 				state = States.ALARM;
 				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor -" + getName() + "' notifies ALARM event: freq=" + freq + " > thresholdHigh="
-						+ getHighFreqThreshold());
+				log.info("WindSensor -" + getName() + "' notifies ALARM event: freq=" + freq + " > thresholdHigh=" + getHighFreqThreshold());
 				notifyListeners(IThresholdListener.EventType.HIGH);
 			}
 			break;
@@ -116,8 +113,7 @@ System.err.println("freq="+freq);
 			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlert()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow="
-						+ getFreqSpeedThreshold());
+				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow=" + getFreqSpeedThreshold());
 				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;

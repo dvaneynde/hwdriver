@@ -30,6 +30,7 @@ import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
+import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
@@ -64,6 +65,14 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			name = atts.getValue("name");
 			Block block2add = blocks.get(name);
 			groupBlocks.add(block2add);
+		} else if (localName.equals("windmeter")) {
+			parseBaseBlockWithChannel(atts);
+			int highFreqThreshold = parseIntAttribute("highFreqThreshold", atts);
+			int lowFreqThreshold = parseIntAttribute("lowFreqThreshold", atts);
+			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
+			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert",atts);
+			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,lowTimeToResetAlert);
+			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
 			boolean singleClick = parseBoolAttribute("singleClick", true, atts);
@@ -272,6 +281,13 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			return defaultVal;
 		else
 			return Boolean.parseBoolean(atts.getValue(attName));
+	}
+
+	private int parseIntAttribute(String attName, Attributes atts) {
+		if (atts.getValue(attName) == null)
+			return 0;
+		else
+			return Integer.parseInt(atts.getValue(attName));
 	}
 
 }
