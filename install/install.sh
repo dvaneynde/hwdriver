@@ -19,9 +19,8 @@ DOMHOST=$1
 
 # Stop on error
 set -e
-
-pushd /Users/dirkv/dev/ws-kepler/domotic-env/install
-pushd /Users/dirkv/dev/ws-kepler/domotic
+pushd /Users/dirk/dev/ws-kepler/domotic-env/install
+pushd /Users/dirk/dev/ws-kepler/domotic
 echo
 echo "BUILD ========================"
 echo
