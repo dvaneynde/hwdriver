@@ -67,10 +67,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			groupBlocks.add(block2add);
 		} else if (localName.equals("windmeter")) {
 			parseBaseBlockWithChannel(atts);
-			int highFreqThreshold = parseIntAttribute("highFreqThreshold", atts);
-			int lowFreqThreshold = parseIntAttribute("lowFreqThreshold", atts);
-			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
-			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert",atts);
+			int highFreqThreshold = parseIntAttribute("highFreq", atts);
+			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
+			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlertMs", atts);
+			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlertMs",atts);
 			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,lowTimeToResetAlert);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
@@ -284,9 +284,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	}
 
 	private int parseIntAttribute(String attName, Attributes atts) {
-		if (atts.getValue(attName) == null)
-			return 0;
-		else
+//		if (atts.getValue(attName) == null)
+//			return 0;
+//		else
 			return Integer.parseInt(atts.getValue(attName));
 	}
 

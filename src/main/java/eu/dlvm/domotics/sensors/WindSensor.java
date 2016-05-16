@@ -60,6 +60,8 @@ public class WindSensor extends Sensor {
 		this.gauge = new FrequencyGauge(7);
 		this.state = States.NORMAL;
 		this.lastFrequency = 0L;
+		log.info("Windsensor '" + getName() + "' configured: highFreq=" + getHighFreqThreshold() + ", highTimeBeforeAlert=" + getHighTimeBeforeAlert() / 1000.0 + "(s), lowFreq="
+				+ getLowFreqThreshold() + ", lowTimeToResetAlert=" + getLowTimeToResetAlert() / 1000.0 + "(s).");
 	}
 
 	public void registerListener(IThresholdListener listener) {
@@ -80,8 +82,8 @@ public class WindSensor extends Sensor {
 			return;
 		else
 			lastFrequency = freq;
-		log.debug("time="+currentTime+"\tfreq=" + freq+"\tcur.state="+state);
-		
+		log.debug("frequency changed: time=" + (currentTime / 1000) % 1000 + "s. " + currentTime % 1000 + "ms.\tfreq=" + freq + "\tcur.state=" + state);
+
 		switch (state) {
 		case NORMAL:
 			if (freq >= getHighFreqThreshold()) {
@@ -101,19 +103,19 @@ public class WindSensor extends Sensor {
 			}
 			break;
 		case ALARM:
-			if (freq <= getFreqSpeedThreshold()) {
+			if (freq <= getLowFreqThreshold()) {
 				state = States.ALARM_BUT_LOW;
 				timeCurrentStateStarted = currentTime;
 			}
 			break;
 		case ALARM_BUT_LOW:
-			if (freq > getFreqSpeedThreshold()) {
+			if (freq > getLowFreqThreshold()) {
 				state = States.ALARM;
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlert()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow=" + getFreqSpeedThreshold());
+				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + freq + " < thresholdLow=" + getLowFreqThreshold());
 				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;
@@ -128,28 +130,32 @@ public class WindSensor extends Sensor {
 	}
 
 	/**
-	 * @return the highSpeedThreshold
+	 * TODO double
+	 * 
+	 * @return high frequency limit
 	 */
 	public int getHighFreqThreshold() {
 		return highFreqThreshold;
 	}
 
 	/**
-	 * @return the lowSpeedThreshold
+	 * TODO double
+	 * 
+	 * @return low frequency limit
 	 */
-	public int getFreqSpeedThreshold() {
+	public int getLowFreqThreshold() {
 		return lowFreqThreshold;
 	}
 
 	/**
-	 * @return the highTimeBeforeAlert
+	 * @return the high time after which to raise alarm, in milliseconds
 	 */
 	public long getHighTimeBeforeAlert() {
 		return highTimeBeforeAlert;
 	}
 
 	/**
-	 * @return the lowTimeToResetAlert
+	 * @return the low time to reset alert, in milliseconds
 	 */
 	public long getLowTimeToResetAlert() {
 		return lowTimeToResetAlert;

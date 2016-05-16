@@ -29,7 +29,8 @@ public class FrequencyGauge {
 	private boolean doMeans;
 	private int idxLastMeasure, cyclesToMeasure;
 	private long measures[];
-	private double avgFreq;
+
+	// private double avgFreq;
 
 	/**
 	 * Use for immediate frequency only. No average frequencies are kept.
@@ -53,8 +54,8 @@ public class FrequencyGauge {
 			cyclesToMeasure = cyclesPerAveragePeriod;
 			idxLastMeasure = -1;
 			measures = new long[cyclesToMeasure];
-			avgFreq = 0L;
 		}
+		log.info("Frequency gauge configured: means calculated from " + cyclesPerAveragePeriod + " cycles per clock tick (if 0 then immediate frequency");
 	}
 
 	/**
@@ -76,8 +77,9 @@ public class FrequencyGauge {
 	public double getAvgFreq() {
 		if (!doMeans)
 			return frequency;
-			//throw new RuntimeException("Gauge was not configured to calculate average freauencies.");
-		return avgFreq;
+		// throw new
+		// RuntimeException("Gauge was not configured to calculate average freauencies.");
+		return calcMeans();
 	}
 
 	/**
@@ -106,47 +108,54 @@ public class FrequencyGauge {
 	 */
 	public void sample(long currentTimeMs, boolean inputval) {
 		if (timeLastOffInput == 0) {
-			// initialization takes as long as we did not read an 'off' input
-			// value
+			// initialization takes as long as we do not read an 'off' input value
 			if (!inputval) {
 				lastInputval = inputval;
 				timeLastOffInput = currentTimeMs;
+				log.debug("FrequencyGauge initialized, time=" + timeMsFormat(currentTimeMs));
 			}
-			return;
 		}
-		if (inputval != lastInputval) {
+		else if (inputval != lastInputval) {
 			lastInputval = inputval;
 			if (!inputval) {
 				long delta = currentTimeMs - timeLastOffInput;
+				// freq = 1 / dt(s) = 1 / (dtInMs / 1000) = 1000 / dtInMs
 				frequency = 1000.00 / (delta);
 				if (doMeans) {
-					calcMeans(delta);
+					idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
+					measures[idxLastMeasure] = delta;
 				}
 				timeLastOffInput = currentTimeMs;
+				log.debug("FrequencyGauge sampled, currentTime=" + timeMsFormat(currentTimeMs) + ", delta=" + delta + "ms., freq=" + frequency + ", mean freq=" + calcMeans());
 			}
 		}
 	}
 
-	private void calcMeans(long delta) {
-		idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
-		measures[idxLastMeasure] = delta;
+	private double calcMeans() {
+		if (!doMeans)
+			return -1;
 		long sum = 0L;
 		for (int i = 0; i < cyclesToMeasure; i++)
 			sum += measures[i];
-		avgFreq = 1000.0 / (sum / cyclesToMeasure);
+		double avgFreq = 1000.0 / (sum / cyclesToMeasure);
+		return avgFreq;
+	}
+
+	public static String timeMsFormat(long timeMs) {
+		return "time=" + (timeMs / 1000) % 1000 + "s. " + timeMs % 1000 + "ms.";
 	}
 
 	/*
 	 * Alternatieve berekening voor calcMeans, sneller bij grote arrays.
 	 */
-	private long avgTotal = 0L;
-
-	private void calcMeans2(long delta) {
-		idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
-		avgTotal -= measures[idxLastMeasure];
-		measures[idxLastMeasure] = delta;
-		avgTotal += delta;
-		avgFreq = 1000.0 / (avgTotal / cyclesToMeasure);
-	}
+	// private long avgTotal = 0L;
+	//
+	// private void calcMeans2(long delta) {
+	// idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
+	// avgTotal -= measures[idxLastMeasure];
+	// measures[idxLastMeasure] = delta;
+	// avgTotal += delta;
+	// avgFreq = 1000.0 / (avgTotal / cyclesToMeasure);
+	// }
 
 }

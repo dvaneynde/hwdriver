@@ -2,8 +2,6 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
-	<windmeter highTimeBeforeAlertMs="2000" name="Windmeter" lowFreq="3" highFreq="10" lowTimeToResetAlertMs="5000" />
-	
 	<!-- Lichten en Stopcontacten, met All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
@@ -71,9 +69,9 @@
 		<block name="LichtRoos" />
 	</group>
 
-	<switch name="SchakBuitenTuin" singleClick="false" longClick="true" />
-	<lamp name="LichtTerras" desc="Terras" ui="Buiten:0" />
-	<lamp name="StopkBuiten" desc="Buiten" ui="Buiten:1" />
+	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
+	<lamp name="LichtTerras" desc="Licht terras & zijkant" ui="Buiten:0" />
+	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1" />
 	<group name="Buiten">
 		<block name="LichtTerras" />
 		<block name="StopkBuiten" />
@@ -93,7 +91,8 @@
 	</group>
 
 	<!-- Buiten -->
-	<connect src="SchakBuitenTuin" src-event="long" target="Buiten" event="toggle" />
+	<connect src="SchakBuitenTuin" src-event="single" target="LichtTerras" event="toggle" />
+	<connect src="SchakBuitenTuin" src-event="long" target="StopkBuiten" event="toggle" />
 
 	<!-- Licht Beneden -->
 	<connect src="SchakLichtInkom" src-event="single" target="LichtInkom" event="toggle" />
@@ -182,6 +181,9 @@
 	<connect-screen screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" click="single" />
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
+
+	<!-- Windmeter -->
+	<windmeter name="windmeter" highTimeBeforeAlertMs="2000" highFreq="25" lowTimeToResetAlertMs="10000" lowFreq="2" channel="Windmeter" />
 
 	<!-- Alles... -->
 	<!-- Alle lichten uit -->
