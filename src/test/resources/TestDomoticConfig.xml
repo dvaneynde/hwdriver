@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig ../../../DomoticConfig.xsd ">
 	<switch channel="1" name="SchakLichtBadkamer0" desc="Licht badkamer gelijkvloers." />
 	<switch channel="2" name="SchakLichtWC0" desc="Licht badkamer boven." />
@@ -18,14 +17,19 @@
 		<block name="LichtBadkamer0" />
 		<block name="LichtWC0" />
 	</group>
-	<connect src="SchakLichtBadkamer0" src-event="single" target="LichtBadkamer0" event="toggle"/>
-	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle"/>
-	<connect src="AllOnOff" src-event="long" target="Lampen" event="off"/>
-	<connect src="SchakFanWC0" src-event="single" target="FanWC0" event="toggle"/>
-	<connect src="SchakFanWC0" src-event="long" target="FanWC0" event="off"/>
-	<connect src="SchakFanBadkamer0" src-event="single" target="FanBadkamer0" event="toggle"/>
-	<connect src="SchakFanBadkamer0" src-event="long" target="FanBadkamer0" event="off"/>
+	<connect src="SchakLichtBadkamer0" src-event="single" target="LichtBadkamer0" event="toggle" />
+	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle" />
+	<connect src="AllOnOff" src-event="long" target="Lampen" event="off" />
+	<connect src="SchakFanWC0" src-event="single" target="FanWC0" event="toggle" />
+	<connect src="SchakFanWC0" src-event="long" target="FanWC0" event="off" />
+	<connect src="SchakFanBadkamer0" src-event="single" target="FanBadkamer0" event="toggle" />
+	<connect src="SchakFanBadkamer0" src-event="long" target="FanBadkamer0" event="off" />
 
-	<connect-screen  screen="SchermKeuken" switchDown="SchakKeukenScreenNeer"
-			switchUp="SchakKeukenScreenOp" click="single"/>
+	<connect-screen screen="SchermKeuken" switchDown="SchakKeukenScreenNeer" switchUp="SchakKeukenScreenOp" click="single" />
+
+	<repeatOff name="GarageAutoUit" desc="test repeat off" intervalSec="60">
+		<on hour="21" minute="0" />
+		<off hour="21" minute="15" />
+	</repeatOff>
+	<connect src="GarageAutoUit" target="LichtBadkamer0" />
 </domotic>

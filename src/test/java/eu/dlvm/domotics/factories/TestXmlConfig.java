@@ -7,7 +7,6 @@ import org.junit.Test;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
 
-
 public class TestXmlConfig {
 
 	@Test
@@ -18,5 +17,6 @@ public class TestXmlConfig {
 		cf.configure(ctx);
 		Assert.assertEquals(7, ctx.sensors.size());
 		Assert.assertEquals(5, ctx.actuators.size());
+		Assert.assertEquals(1, ctx.controllers.size());
 	}
 }

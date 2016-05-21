@@ -2,7 +2,7 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
-	<!-- Lichten en Stopcontacten, met All On/Off -->
+	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
@@ -123,6 +123,18 @@
 	<lamp name="LichtNacht" desc="Nachtlichten" />
 	<connect src="TimerNacht" target="LichtNacht" />
 
+	<!-- Ecologie -->
+	<repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600">
+		<on hour="7" minute="30" />
+		<off hour="9" minute="0" />
+	</repeatOff>
+	<connect src="GarageAutoUitOchtend" target="LichtGaragePoort" />
+	<repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600">
+		<on hour="16" minute="30" />
+		<off hour="17" minute="30" />
+	</repeatOff>
+	<connect src="GarageAutoUitAvond" target="LichtGaragePoort" />
+
 	<!-- New Year -->
 	<newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00" />
 
@@ -184,9 +196,9 @@
 
 	<!-- Wind & Lichg meter -->
 	<windGauge name="windmeter" highTimeBeforeAlertMs="2000" highFreq="25" lowTimeToResetAlertMs="10000" lowFreq="2" channel="Windmeter" />
-	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn"/>
-	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn"/>
-	 
+	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
+	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
+
 	<!-- Alles... -->
 	<!-- Alle lichten uit -->
 	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->

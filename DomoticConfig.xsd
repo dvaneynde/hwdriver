@@ -19,6 +19,7 @@
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
+				<element name="repeatOff" type="tns:repeatOffType" />
 				<element name="windGauge" type="tns:windGaugeType" />
 				<element name="lightGauge" type="tns:lightGaugeType" />
 
@@ -146,6 +147,14 @@
 						</complexType>
 					</element>
 				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="repeatOffType">
+		<complexContent>
+			<extension base="tns:timerType">
+				<attribute name="intervalSec" use="required" type="int"/>
 			</extension>
 		</complexContent>
 	</complexType>

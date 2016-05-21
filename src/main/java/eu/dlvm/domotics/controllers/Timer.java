@@ -13,34 +13,20 @@ import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.service.BlockInfo;
 
 /**
- * TODO moet Controller worden
- * @author dirkv
- *
+ * @author dirk Has two per-day times, at {@link #setOnTime(int, int)} an on
+ *         signal is sent, at {@link #setOffTime(int, int)} an off signal is
+ *         sent.
+ *         <p>
+ *         Targets {@link IOnOffToggleCapable} listeners.
  */
 public class Timer extends Controller {
 
-	static Logger log = Logger.getLogger(Timer.class);
-
-	private int onTime, offTime;
-	private boolean state;
-
+	private static Logger log = Logger.getLogger(Timer.class);
+	protected int onTime, offTime;
+	protected boolean state;
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
-	public Timer(String name, String description, IDomoticContext ctx) {
-		super(name, description, null, ctx);
-		state = false;
-		onTime = offTime = 0;
-	}
-
-	public void register(IOnOffToggleCapable listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IOnOffToggleCapable.ActionType action) {
-		for (IOnOffToggleCapable l : listeners)
-			l.onEvent(action);
-	}
-
+	// helpers
 	public static int timeInDay(long time) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
@@ -59,12 +45,43 @@ public class Timer extends Controller {
 		return new int[] { hour, minute };
 	}
 
+	public static long getTimeMsSameDayAtHourMinute(long basetime, int hour, int minute) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(basetime);
+		c.set(Calendar.HOUR_OF_DAY, hour);
+		c.set(Calendar.MINUTE, minute);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTimeInMillis();
+	}
+
+	// timer usage interface
+	public Timer(String name, String description, IDomoticContext ctx) {
+		super(name, description, null, ctx);
+		state = false;
+		onTime = offTime = 0;
+	}
+
 	public void setOnTime(int hour, int minute) {
 		onTime = timeInDayMillis(hour, minute);
 	}
 
 	public void setOffTime(int hour, int minute) {
 		offTime = timeInDayMillis(hour, minute);
+	}
+
+	public boolean isOn() {
+		return state;
+	}
+
+	// internal usage interface
+	public void register(IOnOffToggleCapable listener) {
+		listeners.add(listener);
+	}
+
+	public void notifyListeners(IOnOffToggleCapable.ActionType action) {
+		for (IOnOffToggleCapable l : listeners)
+			l.onEvent(action);
 	}
 
 	public String getOnTimeAsString() {
@@ -75,10 +92,6 @@ public class Timer extends Controller {
 	public String getOffTimeAsString() {
 		int[] times = hourMinute(offTime);
 		return String.format("%02d:%02d", times[0], times[1]);
-	}
-
-	public boolean isOn() {
-		return state;
 	}
 
 	@Override
@@ -106,6 +119,6 @@ public class Timer extends Controller {
 	@Override
 	public void update(String action) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

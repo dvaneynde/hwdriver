@@ -21,6 +21,7 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.controllers.NewYear;
+import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
@@ -95,6 +96,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("timerDayNight")) {
 			parseBaseBlock(atts);
 			block = new TimerDayNight(name, desc, ctx);
+			blocks.put(block.getName(), block);
+		} else if (localName.equals("repeatOff")) {
+			parseBaseBlock(atts);
+			int intervalSec = parseIntAttribute("intervalSec", atts);
+			block = new RepeatOffAtTimer(name, desc, ctx, intervalSec);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("on")) {
 			((Timer) block).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));

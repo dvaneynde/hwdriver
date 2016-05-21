@@ -21,8 +21,7 @@ import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
  */
 public class TimerDayNight extends Timer {
 
-
-	static Logger LOG = Logger.getLogger(TimerDayNight.class);
+	private static Logger log = Logger.getLogger(TimerDayNight.class);
 
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
 	/**
@@ -49,7 +48,8 @@ public class TimerDayNight extends Timer {
 	// TODO vervangen door OnceADay
 	void checktTimesUpdatedForToday(long currentTime) {
 		if (timesUpdatedForToday || (today == null)) {
-			// check if still today: if not, false; above test on today is to force to initialize today
+			// check if still today: if not, false; above test on today is to
+			// force to initialize today
 			Calendar now = Calendar.getInstance();
 			now.setTimeInMillis(currentTime);
 			if (today == null || (now.get(Calendar.DAY_OF_MONTH) != today.get(Calendar.DAY_OF_MONTH))) {
@@ -63,6 +63,7 @@ public class TimerDayNight extends Timer {
 	boolean isTimesUpdatedForToday() {
 		return timesUpdatedForToday;
 	}
+
 	/** Testing only */
 	void setTimesUpdatedForToday(boolean value) {
 		timesUpdatedForToday = value;
@@ -126,19 +127,8 @@ public class TimerDayNight extends Timer {
 		@Override
 		public Info call() throws Exception {
 			Info info = openWeatherMap.getWeatherReport();
-			log.debug("WheatherInfoCallable.call() info="+info);
+			log.debug("WheatherInfoCallable.call() info=" + info);
 			return info;
 		}
 	}
-
-	public static long getTimeMsSameDayAtHourMinute(long basetime, int hour, int minute) {
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(basetime);
-		c.set(Calendar.HOUR_OF_DAY, hour);
-		c.set(Calendar.MINUTE, minute);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-		return c.getTimeInMillis();
-	}
-
 }
