@@ -15,6 +15,8 @@ import eu.dlvm.iohardware.LogCh;
  * wordt gaat het 'alarm aan'. Als dan gedurende een langere periode een
  * ondergrens onderschreden wordt gaat het terug af.
  * 
+ * TODO moet opgaande en afgaande delta berekenen, niet enkel afgaande ! Dat halveert de benodigde samplingfrequentie.
+ * 
  * @author Dirk Vaneynde
  */
 public class WindSensor extends Sensor {

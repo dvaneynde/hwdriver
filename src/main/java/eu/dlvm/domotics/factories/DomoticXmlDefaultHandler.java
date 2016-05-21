@@ -29,6 +29,7 @@ import eu.dlvm.domotics.mappers.Switch2OnOffToggle;
 import eu.dlvm.domotics.mappers.Switch2Screen;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.iohardware.LogCh;
@@ -65,13 +66,20 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			name = atts.getValue("name");
 			Block block2add = blocks.get(name);
 			groupBlocks.add(block2add);
-		} else if (localName.equals("windmeter")) {
+		} else if (localName.equals("windGauge")) {
 			parseBaseBlockWithChannel(atts);
 			int highFreqThreshold = parseIntAttribute("highFreq", atts);
 			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
 			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlertMs", atts);
 			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlertMs",atts);
 			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,lowTimeToResetAlert);
+			blocks.put(block.getName(), block);
+		} else if (localName.equals("lightGauge")) {
+			parseBaseBlockWithChannel(atts);
+			int highThreshold = parseIntAttribute("high", atts);
+			int lowThreshold = parseIntAttribute("low", atts);
+			int thresholdTimeMs = parseIntAttribute("thresholdTimeMs", atts);
+			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, (long)thresholdTimeMs);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);

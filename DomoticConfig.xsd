@@ -19,7 +19,8 @@
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
-				<element name="windmeter" type="tns:windmeterType" />
+				<element name="windGauge" type="tns:windGaugeType" />
+				<element name="lightGauge" type="tns:lightGaugeType" />
 
 				<!-- actuators -->
 				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0" maxOccurs="1" />
@@ -149,13 +150,23 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="windmeterType">
+	<complexType name="windGaugeType">
 		<complexContent>
 			<extension base="tns:blockWithChannelStruct">
 				<attribute name="highFreq" use="required" />
 				<attribute name="lowFreq" use="required" />
 				<attribute name="highTimeBeforeAlertMs" use="required" />
 				<attribute name="lowTimeToResetAlertMs" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="lightGaugeType">
+		<complexContent>
+			<extension base="tns:blockWithChannelStruct">
+				<attribute name="high" use="required" />
+				<attribute name="low" use="required" />
+				<attribute name="thresholdTimeMs" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>

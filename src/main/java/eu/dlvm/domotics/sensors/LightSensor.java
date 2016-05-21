@@ -16,7 +16,7 @@ import eu.dlvm.iohardware.LogCh;
  * {@link IHardwareIO#readAnalogInput(LogCh)}) every 200 ms. If this input value
  * is higher than {@link #getHighThreshold()} for {@link #getHighWaitingTime()}
  * milliseconds a {@link States#HIGH} event is sent once. If lower than
- * {@link #getLowThreshold()} for {@link #getLowWaitingTime()} milliseconds a
+ * {@link #getLowThreshold()} for {@link #thresholdWaitingTimeMs()} milliseconds a
  * {@link States#LOW} event is sent once.
  * 
  * @author dirk vaneynde
@@ -27,8 +27,7 @@ public class LightSensor extends Sensor {
 	private static Logger log = Logger.getLogger(LightSensor.class);
 	private int highThreshold;
 	private int lowThreshold;
-	private long lowWaitingTime;
-	private long highWaitingTime;
+	private long thresholdWaitingTimeMs;
 	private long sampleIntervalTimeMs;
 	// TODO listeners via generic in Sensor basis class
 	private Set<IThresholdListener> listeners = new HashSet<>();
@@ -41,20 +40,8 @@ public class LightSensor extends Sensor {
 	private long timeCurrentStateStarted;
 	private long timeOfLastSample;
 
-	/**
-	 * 
-	 * @param name
-	 * @param description
-	 * @param channel
-	 * @param ctx
-	 * @param lowThreshold
-	 * @param highThreshold
-	 * @param low2highWaitTime
-	 * @param high2lowWaitTime
-	 * @throws IllegalConfigurationException
-	 */
 	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold,
-			long low2highWaitTime, long high2lowWaitTime) throws IllegalConfigurationException {
+			long thresholdWaitingTimeMs) throws IllegalConfigurationException {
 		super(name, description, channel, ctx);
 		timeOfLastSample = 0L;
 		timeCurrentStateStarted = 0L;
@@ -65,8 +52,8 @@ public class LightSensor extends Sensor {
 		}
 		this.lowThreshold = lowThreshold;
 		this.highThreshold = highThreshold;
-		this.lowWaitingTime = low2highWaitTime;
-		this.highWaitingTime = high2lowWaitTime;
+		this.thresholdWaitingTimeMs = thresholdWaitingTimeMs;
+		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low="+getLowThreshold()+", time before effective="+thresholdWaitingTimeMs()+", channel="+getChannel());
 	}
 
 	public void registerListener(IThresholdListener listener) {
@@ -85,6 +72,8 @@ public class LightSensor extends Sensor {
 
 		int newInput = getHw().readAnalogInput(getChannel());
 		timeOfLastSample = currentTime;
+		
+		log.debug("LightSensor "+getName()+": ana in="+newInput);
 
 		switch (state) {
 		case LOW:
@@ -97,7 +86,7 @@ public class LightSensor extends Sensor {
 			if (newInput < getHighThreshold()) {
 				state = States.LOW;
 				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > getLowWaitingTime()) {
+			} else if ((currentTime - timeCurrentStateStarted) > thresholdWaitingTimeMs()) {
 				state = States.HIGH;
 				timeCurrentStateStarted = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh="
@@ -115,7 +104,7 @@ public class LightSensor extends Sensor {
 			if (newInput > getLowThreshold()) {
 				state = States.HIGH;
 				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > getHighWaitingTime()) {
+			} else if ((currentTime - timeCurrentStateStarted) > thresholdWaitingTimeMs()) {
 				state = States.LOW;
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow="
@@ -140,7 +129,7 @@ public class LightSensor extends Sensor {
 
 	/**
 	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(LogCh)})
-	 * for {@link States#HIGH} state. See also {@link #getLowWaitingTime()}.
+	 * for {@link States#HIGH} state. See also {@link #thresholdWaitingTimeMs()}.
 	 * 
 	 * @return low threshold value
 	 */
@@ -149,23 +138,12 @@ public class LightSensor extends Sensor {
 	}
 
 	/**
-	 * While in state {@link States#HIGH}, time that input must be below
-	 * {@link #getLowThreshold()} for state to become {@link States#LOW}
+	 * Time in ms that a threshold crossing must remain until the new state is effective.
 	 * 
 	 * @return waiting time in milliseconds
 	 */
-	public long getLowWaitingTime() {
-		return lowWaitingTime;
-	}
-
-	/**
-	 * While in state {@link States#LOW}, time that input must be below
-	 * {@link #getHighThreshold()} for state to become {@link States#HIGH}
-	 * 
-	 * @return waiting time in milliseconds
-	 */
-	public long getHighWaitingTime() {
-		return highWaitingTime;
+	public long thresholdWaitingTimeMs() {
+		return thresholdWaitingTimeMs;
 	}
 
 	/**

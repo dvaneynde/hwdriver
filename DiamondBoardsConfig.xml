@@ -3,8 +3,7 @@
 	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig DiamondBoardsConfig.xsd ">
 	<dmmat board="0" address="0x330" desc="Board 0, dmmatt.">
 		<analog-input>
-			<channel channel="0" logical-id="Analog0" />
-			<channel channel="1" logical-id="Analog1" />
+			<channel channel="0" logical-id="AnalogIn" />
 		</analog-input>
 		<analog-output>
 			<channel channel="0" logical-id="LichtVeranda" />

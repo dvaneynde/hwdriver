@@ -70,7 +70,7 @@
 	</group>
 
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
-	<lamp name="LichtTerras" desc="Licht terras & zijkant" ui="Buiten:0" />
+	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0" />
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1" />
 	<group name="Buiten">
 		<block name="LichtTerras" />
@@ -182,9 +182,11 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
 
-	<!-- Windmeter -->
-	<windmeter name="windmeter" highTimeBeforeAlertMs="2000" highFreq="25" lowTimeToResetAlertMs="10000" lowFreq="2" channel="Windmeter" />
-
+	<!-- Wind & Lichg meter -->
+	<windGauge name="windmeter" highTimeBeforeAlertMs="2000" highFreq="25" lowTimeToResetAlertMs="10000" lowFreq="2" channel="Windmeter" />
+	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn"/>
+	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn"/>
+	 
 	<!-- Alles... -->
 	<!-- Alle lichten uit -->
 	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
