@@ -4,3 +4,6 @@ target/
 /jersey.log.lck
 /target
 
+/domotic.log
+/driver.log
+/monitor.log
