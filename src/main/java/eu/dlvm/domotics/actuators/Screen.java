@@ -9,23 +9,28 @@ import eu.dlvm.domotics.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * Represents two Screen relays, one for the motor lifting a screen, one for the 2nd
- * motor lowering the screen. Both are put in one abstraction to avoid 2 motors
- * being activated together.
+ * Represents two Screen relays, one for the motor lifting a screen, the second
+ * motor lowering the screen. Both relays are put in one class to ensure that
+ * they cannot be activated together, potentially destroying a motor.
  * <p>
  * If a screen is going up and one presses the down button a Screen will stop
  * the up motor, <strong>wait {@link #MOTOR_SWITCH_DELAY_PROTECTION}</strong>
- * and then start the down motor. This is to be sure that not both motors are
- * active.
+ * and then start the down motor. Again this is to be sure that both motors are
+ * active together.
+ * <p>
+ * To protect against wind the {@link #setProtect(boolean)} protect property,
+ * when set to <code>true</code>, will cause the Screen to go up, and all
+ * {@link #down()} or {@link #up} methods to be ignored, until the protection is
+ * canceled.
  * 
  * @author Dirk Vaneynde
  */
 public class Screen extends Actuator {
 
-	static Logger log = Logger.getLogger(Screen.class);
+	private static final Logger log = Logger.getLogger(Screen.class);
 
 	/**
-	 * Delay in ms between switching motors, i.e. periode that both motors are
+	 * Delay in ms between switching motors, i.e. period that both motors are
 	 * off after one was on and before the other goes on.
 	 */
 	public static final long MOTOR_SWITCH_DELAY_PROTECTION = 500;
@@ -38,9 +43,13 @@ public class Screen extends Actuator {
 	private long motorUpPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long motorDnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long timeStateStart;
-	private boolean gotUp, gotDown;
-	private double percClosed;
+	private boolean gotUp, gotDown, protect;
+	private double ratioClosed;
+	private States state = States.REST;
 
+	/*
+	 * Public API
+	 */
 	public Screen(String name, String description, String ui, LogCh chDown, LogCh chUp, IDomoticContext ctx) {
 		super(name, description, ui, chDown, ctx);
 		this.chUp = chUp;
@@ -48,42 +57,76 @@ public class Screen extends Actuator {
 
 	// TODO see bug 80
 	public enum States {
-		REST, UP, DELAY_DOWN_2_UP, DELAY_UP_2_DOWN, DOWN;
-		public String asSign() {
-			switch (this) {
-			case DOWN:
-				return "v";
-			case UP:
-				return "^";
-			case REST:
-				return "-";
-			case DELAY_DOWN_2_UP:
-				return "(v-^)";
-			case DELAY_UP_2_DOWN:
-				return "(^-v)";
-			default:
-				return "ERROR";
-			}
-		}
+		REST, UP, DELAY_DOWN_2_UP, DELAY_UP_2_DOWN, DOWN, REST_PROTECT;
 	};
-
-	private States state = States.REST;
-
-	@Override
-	public void initializeOutput(RememberedOutput ro) {
-		// Nothing to do;
-	}
 
 	public States getState() {
 		return state;
 	}
 
 	public void up() {
-		gotUp = true;
+		if (!protect)
+			gotUp = true;
 	}
 
 	public void down() {
-		gotDown = true;
+		if (!protect)
+			gotDown = true;
+	}
+
+	public void setProtect(boolean enable) {
+		protect = enable;
+		gotUp = false;
+		gotDown = false;
+	}
+
+	public boolean getProtect() {
+		return protect;
+	}
+
+	public double getRatioClosed() {
+		return ratioClosed;
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public int getMotorUpPeriod() {
+		return (int) (motorUpPeriodMs / 1000);
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public void setMotorUpPeriod(int motorUpPeriod) {
+		this.motorUpPeriodMs = motorUpPeriod * 1000;
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public long getMotorDnPeriod() {
+		return (int) (motorDnPeriodMs / 1000);
+	}
+
+	/**
+	 * Time in seconds a screen motor is working, i.e. time to completely open
+	 * or close a screen.
+	 */
+	public void setMotorDnPeriod(long motorDnPeriod) {
+		this.motorDnPeriodMs = motorDnPeriod * 1000;
+	}
+
+	/*
+	 * Internal API
+	 */
+
+	@Override
+	public void initializeOutput(RememberedOutput ro) {
+		// Nothing to do;
 	}
 
 	@Override
@@ -93,7 +136,10 @@ public class Screen extends Actuator {
 			// TODO safety time, door hier ook te checken op timeStateStart,
 			// delay-protection moet verstreken zijn. Overal waar REST
 			// gezet wordt moet die tijd ook gezet worden.
-			if (gotUp) {
+			if (protect) {
+				setStateAndEntryUp(current);
+				log.info("Screen " + getName() + " is going UP (PROTECTION mode), for maximum " + getMotorUpPeriod() + " sec.");
+			} else if (gotUp) {
 				setStateAndEntryUp(current);
 				log.info("Screen " + getName() + " is going UP, for maximum " + getMotorUpPeriod() + " sec.");
 			} else if (gotDown) {
@@ -102,14 +148,14 @@ public class Screen extends Actuator {
 			}
 			break;
 		case DOWN:
-			if (gotDown) {
+			if (gotDown && !protect) {
 				exitDown(current);
 				state = States.REST;
 				log.info("Screen " + getName() + " stopped going down due to DOWN event.");
-			} else if (gotUp) {
+			} else if (gotUp || protect) {
 				exitDown(current);
 				state = States.DELAY_DOWN_2_UP;
-				log.info("Screen " + getName() + " stopped going down due to UP event. Will go up after safety time.");
+				log.info("Screen " + getName() + " stopped going down due to UP event" + (protect ? " for PROTECT mode" : "") + ". Will go up after safety time.");
 			} else if ((current - timeStateStart) > motorDnPeriodMs) {
 				exitDown(current);
 				state = States.REST;
@@ -117,40 +163,65 @@ public class Screen extends Actuator {
 			}
 			break;
 		case UP:
-			if (gotDown) {
+			if (gotDown && !protect) {
 				exitUp(current);
 				state = States.DELAY_UP_2_DOWN;
 				log.info("Screen " + getName() + " stopped going up due to DOWN event. Will go down after safety time.");
-			} else if (gotUp) {
+			} else if (gotUp && !protect) {
 				exitUp(current);
 				state = States.REST;
 				log.info("Screen " + getName() + " stopped going up due to UP event.");
 			} else if ((current - timeStateStart) > motorUpPeriodMs) {
 				exitUp(current);
-				state = States.REST;
-				log.info("Screen " + getName() + " stopped going up because motor-on time is reached.");
+				if (protect) {
+					state = States.REST_PROTECT;
+					log.info("Screen " + getName() + " stopped going up because motor-on time is reached, and goes in PROTECTED mode.");
+				} else {
+					state = States.REST;
+					log.info("Screen " + getName() + " stopped going up because motor-on time is reached.");
+				}
 			}
 			break;
 		case DELAY_UP_2_DOWN:
 			if (gotDown || gotUp) {
 				timeStateStart = current;
 				state = States.REST;
-				log.info("Screen " + getName() + " got event while switching up to down, strange. Therefore stop screen.");
+				log.warn("Screen " + getName() + " got event while switching up to down, strange. Therefore stop screen.");
 			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
-				setStateAndEntryDown(current);
-				log.info("Screen " + getName() + " going UP after safety time.");
+				if (protect) {
+					setStateAndEntryUp(current);
+					log.info("Screen " + getName() + " going UP after safety time because of PROTECT.");
+				} else {
+					setStateAndEntryDown(current);
+					log.info("Screen " + getName() + " going DOWN after safety time.");
+				}
 			}
 			break;
 		case DELAY_DOWN_2_UP:
 			if (gotDown || gotUp) {
 				timeStateStart = current;
 				state = States.REST;
-				log.info("Screen " + getName() + " got event while switching down to up, strange. Therefore stop screen.");
+				log.warn("Screen " + getName() + " got event while switching down to up, strange. Therefore stop screen.");
 			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
-				setStateAndEntryUp(current);
-				log.info("Screen " + getName() + " going DOWN after safety time.");
+				if (protect) {
+					setStateAndEntryUp(current);
+					log.info("Screen " + getName() + " going UP after safety time because of PROTECT.");
+				} else {
+					setStateAndEntryUp(current);
+					log.info("Screen " + getName() + " going UP after safety time.");
+				}
 			}
 			break;
+		case REST_PROTECT:
+			if (!protect) {
+				timeStateStart = current;
+				state = States.REST;
+				log.info("Screen " + getName() + " leaves PROTECTED mode.");
+			}
+			break;
+		default:
+			break;
+
 		}
 		gotUp = gotDown = false;
 	}
@@ -162,8 +233,8 @@ public class Screen extends Actuator {
 	}
 
 	private void exitUp(long current) {
-		percClosed = Math.max(0.0, percClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
-		log.info("exitUp() percClosed=" + percClosed);
+		ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
+		log.debug("exitUp() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(chUp, false);
 	}
@@ -175,8 +246,8 @@ public class Screen extends Actuator {
 	}
 
 	private void exitDown(long current) {
-		percClosed = Math.min(1.0, percClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
-		log.info("exitDown() percClosed=" + percClosed);
+		ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
+		log.debug("exitDown() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(getChannel(), false);
 	}
@@ -184,15 +255,38 @@ public class Screen extends Actuator {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
-		double tmpPercentageClosed = percClosed;
-		if (getState()==States.UP) {
-			tmpPercentageClosed = Math.max(0.0, percClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
-		} else if (getState()==States.DOWN) {
-			tmpPercentageClosed = Math.min(1.0, percClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
+		double tmpPercentageClosed = ratioClosed;
+		if (getState() == States.UP) {
+			tmpPercentageClosed = Math.max(0.0, ratioClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
+		} else if (getState() == States.DOWN) {
+			tmpPercentageClosed = Math.min(1.0, ratioClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
 		}
-		//log.info("getBlockInfo() percClosed=" + percClosed);
-		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + getState().asSign());
+		// log.info("getBlockInfo() percClosed=" + percClosed);
+		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + asSign(tmpPercentageClosed) + (protect ? " !!!" : ""));
 		return bi;
+	}
+
+	private String asSign(double ratioClosed) {
+		switch (getState()) {
+		case DOWN:
+			return "vvvv";
+		case UP:
+			return "^^^^";
+		case REST:
+			if (ratioClosed > 0.90)
+				return "-^^-";
+			else if (ratioClosed < 0.10)
+				return "-vv-";
+			else
+				return "^v^v";
+		case DELAY_DOWN_2_UP:
+			return "v->^";
+		case DELAY_UP_2_DOWN:
+			return "^->v";
+		case REST_PROTECT:
+			return "!^^!";
+		}
+		return "ERROR";
 	}
 
 	@Override
@@ -213,37 +307,5 @@ public class Screen extends Actuator {
 	@Override
 	public String toString() {
 		return "Screen " + super.toString() + ", motorDnPeriod=" + motorDnPeriodMs + ", motorUpPeriod=" + motorUpPeriodMs + ", state=" + state + "]";
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public int getMotorUpPeriod() {
-		return (int)(motorUpPeriodMs/1000);
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public void setMotorUpPeriod(int motorUpPeriod) {
-		this.motorUpPeriodMs = motorUpPeriod*1000;
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public long getMotorDnPeriod() {
-		return (int)(motorDnPeriodMs/1000);
-	}
-
-	/**
-	 * Time in seconds a screen motor is working, i.e. time to completely open
-	 * or close a screen.
-	 */
-	public void setMotorDnPeriod(long motorDnPeriod) {
-		this.motorDnPeriodMs = motorDnPeriod*1000;
 	}
 }

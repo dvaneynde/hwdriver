@@ -1,11 +1,11 @@
 package eu.dlvm.domotics.base;
 
 /**
- * A block is represents an Sensor, Controller or Actuator, or Mapper together forming a
- * Domotic instance.
+ * A block is a building block for anything from switches to lamps.
  * 
  * @author dirk vaneynde
  * 
+ * TODO ui must go out here
  */
 public abstract class Block {
 

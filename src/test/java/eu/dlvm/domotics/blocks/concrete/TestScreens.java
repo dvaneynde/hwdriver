@@ -2,58 +2,11 @@ package eu.dlvm.domotics.blocks.concrete;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
-import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
-public class TestScreens {
-
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
-		public boolean dnRelais;
-		public boolean upRelais;
-
-		@Override
-		public void writeDigitalOutput(LogCh ch, boolean value)
-				throws IllegalArgumentException {
-			if (ch.id().equals("0"))
-				dnRelais = value;
-			else
-				upRelais = value;
-		}
-	};
-
-	private static int DN = 0;
-	private static int UP = 1;
-	private Screen sr;
-	private Hardware hw;
-	private IDomoticContext ctx;
-	private long seq, cur;
-
-	private void loop(long inc) {
-		cur += inc;
-		sr.loop(cur, seq++);
-	}
-
-	private void loop() {
-		loop(10);
-	}
-
-	@Before
-	public void init() {
-		hw = new Hardware();
-		ctx = new DomoContextMock(hw);
-		sr = new Screen("TestScreens", "TestScreens", null, new LogCh(DN), new LogCh(
-				UP), ctx);
-		sr.setMotorUpPeriod(30);
-		sr.setMotorDnPeriod(30);
-		seq = cur = 0L;
-	}
+public class TestScreens extends TestScreensBase {
 
 	@Test
 	public void down() {

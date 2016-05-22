@@ -18,6 +18,10 @@ import eu.dlvm.domotics.service.BlockInfo;
  * 
  * @author dirk vaneynde
  * 
+ *         TODO constructor mag geen switche hebben, dit moet puur een listener
+ *         zijn; voor down en up moeten dan wel 2 aparte connectors gemaakt,
+ *         maar dat kan in xml handler; wel probleem met UI; en alles kan dan
+ *         hermaakt naar Translator en Connector
  */
 public class Switch2Screen extends Connector implements ISwitchListener, IUserInterfaceAPI {
 

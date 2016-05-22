@@ -2,6 +2,12 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
+	<!-- Wind & Lichg meter -->
+	<windGauge name="windmeter" highTimeBeforeAlertMs="1000" highFreq="5" lowTimeToResetAlertMs="10000" lowFreq="1" channel="Windmeter" />
+	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
+	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
+
+
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
@@ -151,6 +157,11 @@
 	<connect-dimmer dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
 	<connect-dimmer dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
 
+	<!-- Alle lichten uit -->
+	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
+	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit" />
+
+
 	<!-- Screens -->
 	<screen name="ScreenTomas" desc="Tomas" motor-up-time="30" motor-dn-time="30" ui="Screens:3" />
 	<screen name="ScreenDriesTuin" desc="Dries (T)" motor-up-time="30" motor-dn-time="30" ui="Screens:4" />
@@ -194,15 +205,8 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
 
-	<!-- Wind & Lichg meter -->
-	<windGauge name="windmeter" highTimeBeforeAlertMs="2000" highFreq="25" lowTimeToResetAlertMs="10000" lowFreq="2" channel="Windmeter" />
-	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
-	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
-
-	<!-- Alles... -->
-	<!-- Alle lichten uit -->
-	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
-	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit" />
+<!-- Alle screens -->
+	<connect-windsensor screen="Screens" windsensor="windmeter" />
 	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
 		desc="Alle Screens" />
 

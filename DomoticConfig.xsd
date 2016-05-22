@@ -92,6 +92,14 @@
 						<attribute name="desc" type="string" />
 					</complexType>
 				</element>
+				<element name="connect-windsensor">
+					<complexType>
+						<attribute name="windsensor" type="IDREF" use="required" />
+						<attribute name="screen" type="IDREF" use="required" />
+						<attribute name="ui" type="string" />
+						<attribute name="desc" type="string" />
+					</complexType>
+				</element>
 			</choice>
 		</complexType>
 	</element>

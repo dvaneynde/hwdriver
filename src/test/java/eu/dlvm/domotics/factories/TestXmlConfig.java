@@ -15,8 +15,8 @@ public class TestXmlConfig {
 		XmlDomoticConfigurator cf = new XmlDomoticConfigurator();
 		cf.setCfgFilepath("src/test/resources/TestDomoticConfig.xml");
 		cf.configure(ctx);
-		Assert.assertEquals(7, ctx.sensors.size());
-		Assert.assertEquals(5, ctx.actuators.size());
+		Assert.assertEquals(16, ctx.sensors.size());
+		Assert.assertEquals(6, ctx.actuators.size());
 		Assert.assertEquals(1, ctx.controllers.size());
 	}
 }

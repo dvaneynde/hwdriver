@@ -24,6 +24,7 @@ import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.connectors.Switch2Screen;
+import eu.dlvm.domotics.connectors.Windsensor2Screen;
 import eu.dlvm.domotics.controllers.NewYear;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.Timer;
@@ -72,15 +73,15 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int highFreqThreshold = parseIntAttribute("highFreq", atts);
 			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
 			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlertMs", atts);
-			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlertMs",atts);
-			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,lowTimeToResetAlert);
+			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlertMs", atts);
+			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert, lowTimeToResetAlert);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lightGauge")) {
 			parseBaseBlockWithChannel(atts);
 			int highThreshold = parseIntAttribute("high", atts);
 			int lowThreshold = parseIntAttribute("low", atts);
 			int thresholdTimeMs = parseIntAttribute("thresholdTimeMs", atts);
-			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, (long)thresholdTimeMs);
+			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, (long) thresholdTimeMs);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
@@ -146,6 +147,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
+		} else if (localName.equals("connect-windsensor")) {
+			parseConnectWindsensor(atts);		
 		} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
@@ -193,7 +196,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocks.get(s2ootName);
 		if (s2oot == null) {
 			s2oot = new Switch2OnOffToggle(s2ootName, (desc == null ? "Switch " + swtch.getName() + " connected to " + targetName : desc), ui);
-			if (ui!=null && ui.length()>0) {
+			if (ui != null && ui.length() > 0) {
 				// TODO algemenere oplossing...
 				ctx.addUiCapableBlock(s2oot);
 			}
@@ -265,7 +268,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		Switch up = (Switch) blocks.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
 		Switch2Screen s2s = new Switch2Screen(csName, desc, ui, down, up, click);
-		if (ui!=null && ui.length()>0) {
+		if (ui != null && ui.length() > 0) {
 			// TODO algemenere oplossing...
 			ctx.addUiCapableBlock(s2s);
 		}
@@ -273,6 +276,35 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 		for (Block target : targetBlocks) {
 			s2s.registerListener((Screen) target);
+		}
+	}
+
+	private void parseConnectWindsensor(Attributes atts) {
+		String wsName = atts.getValue("windsensor");
+		String screenName = atts.getValue("screen");
+
+		// Not null in case of UiCapable mapper
+		desc = atts.getValue("desc");
+		ui = atts.getValue("ui");
+
+		List<Block> targetBlocks;
+		Block t = blocks.get(screenName);
+		if (t == null)
+			targetBlocks = group2Blocks.get(screenName);
+		else {
+			targetBlocks = new ArrayList<>(1);
+			targetBlocks.add(t);
+		}
+
+		try {
+			WindSensor ws = (WindSensor) blocks.get(wsName);
+			Windsensor2Screen ws2s = new Windsensor2Screen(wsName+"_2_"+screenName, desc);
+			ws.registerListener(ws2s);
+			for (Block target : targetBlocks) {
+				ws2s.registerListener((Screen) target);
+			}	
+		} catch (ClassCastException e) {
+			throw new ConfigurationException("Unsupported type for connect, source=" + wsName + ", screen=" + screenName + ".");
 		}
 	}
 
@@ -298,10 +330,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	}
 
 	private int parseIntAttribute(String attName, Attributes atts) {
-//		if (atts.getValue(attName) == null)
-//			return 0;
-//		else
-			return Integer.parseInt(atts.getValue(attName));
+		// if (atts.getValue(attName) == null)
+		// return 0;
+		// else
+		return Integer.parseInt(atts.getValue(attName));
 	}
 
 }
