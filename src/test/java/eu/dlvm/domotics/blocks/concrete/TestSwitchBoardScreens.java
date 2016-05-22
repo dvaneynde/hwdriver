@@ -13,7 +13,7 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.mappers.Switch2Screen;
+import eu.dlvm.domotics.connectors.Switch2Screen;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;

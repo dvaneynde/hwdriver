@@ -48,7 +48,7 @@ public class Screen extends Actuator {
 
 	// TODO see bug 80
 	public enum States {
-		REST, UP, SWITCH_DOWN_2_UP, SWITCH_UP_2_DOWN, DOWN;
+		REST, UP, DELAY_DOWN_2_UP, DELAY_UP_2_DOWN, DOWN;
 		public String asSign() {
 			switch (this) {
 			case DOWN:
@@ -57,9 +57,9 @@ public class Screen extends Actuator {
 				return "^";
 			case REST:
 				return "-";
-			case SWITCH_DOWN_2_UP:
+			case DELAY_DOWN_2_UP:
 				return "(v-^)";
-			case SWITCH_UP_2_DOWN:
+			case DELAY_UP_2_DOWN:
 				return "(^-v)";
 			default:
 				return "ERROR";
@@ -108,7 +108,7 @@ public class Screen extends Actuator {
 				log.info("Screen " + getName() + " stopped going down due to DOWN event.");
 			} else if (gotUp) {
 				exitDown(current);
-				state = States.SWITCH_DOWN_2_UP;
+				state = States.DELAY_DOWN_2_UP;
 				log.info("Screen " + getName() + " stopped going down due to UP event. Will go up after safety time.");
 			} else if ((current - timeStateStart) > motorDnPeriodMs) {
 				exitDown(current);
@@ -119,7 +119,7 @@ public class Screen extends Actuator {
 		case UP:
 			if (gotDown) {
 				exitUp(current);
-				state = States.SWITCH_UP_2_DOWN;
+				state = States.DELAY_UP_2_DOWN;
 				log.info("Screen " + getName() + " stopped going up due to DOWN event. Will go down after safety time.");
 			} else if (gotUp) {
 				exitUp(current);
@@ -131,7 +131,7 @@ public class Screen extends Actuator {
 				log.info("Screen " + getName() + " stopped going up because motor-on time is reached.");
 			}
 			break;
-		case SWITCH_UP_2_DOWN:
+		case DELAY_UP_2_DOWN:
 			if (gotDown || gotUp) {
 				timeStateStart = current;
 				state = States.REST;
@@ -141,7 +141,7 @@ public class Screen extends Actuator {
 				log.info("Screen " + getName() + " going UP after safety time.");
 			}
 			break;
-		case SWITCH_DOWN_2_UP:
+		case DELAY_DOWN_2_UP:
 			if (gotDown || gotUp) {
 				timeStateStart = current;
 				state = States.REST;

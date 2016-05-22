@@ -12,7 +12,7 @@ import org.junit.Test;
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.DimmerSwitch2Dimmer;
+import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;

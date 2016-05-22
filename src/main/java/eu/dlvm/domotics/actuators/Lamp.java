@@ -6,7 +6,7 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.service.BlockInfo;
 import eu.dlvm.iohardware.LogCh;
 
@@ -77,7 +77,7 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 * Sets lamp to On or Off
 	 * 
 	 * @deprecate Use on() or off() or
-	 *            {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType)}
+	 *            {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType)}
 	 *            .
 	 * @param outval
 	 *            true for On, false for Off

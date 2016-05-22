@@ -11,16 +11,13 @@ import eu.dlvm.iohardware.LogCh;
  * They have at least one output channel. They control their own state, control
  * the hardware, have a fairly high-level input to change their state.
  * <p>
- * Some rules:
+ * Rules:
  * <ol>
  * <li>Only Actuators change outputs.</li>
  * <li>Only Actuators should use the Hardware layers output operations. These
  * must only be called within an {@link #loop(long, long)} call.</li>
  * <li></li>
  * </ol>
- * <p>
- * These rules avoid difficult to find bugs (from experience, but don't remember
- * exactly) and simplify things.
  * 
  * @author Dirk Vaneynde
  */

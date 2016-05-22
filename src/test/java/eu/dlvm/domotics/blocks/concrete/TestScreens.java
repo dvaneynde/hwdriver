@@ -200,16 +200,16 @@ public class TestScreens {
 		else
 			sr.down();
 		loop();
-		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP
-				: Screen.States.SWITCH_UP_2_DOWN), sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP
+				: Screen.States.DELAY_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
 		// check motor switch delay protection, must still not have changed direction
 		loop(Screen.MOTOR_SWITCH_DELAY_PROTECTION - 20);
-		Assert.assertEquals((firstDown ? Screen.States.SWITCH_DOWN_2_UP
-				: Screen.States.SWITCH_UP_2_DOWN), sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP
+				: Screen.States.DELAY_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);

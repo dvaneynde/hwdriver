@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.mappers;
+package eu.dlvm.domotics.connectors;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.actuators.Screen;
-import eu.dlvm.domotics.base.Block;
+import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
@@ -19,7 +19,7 @@ import eu.dlvm.domotics.service.BlockInfo;
  * @author dirk vaneynde
  * 
  */
-public class Switch2Screen extends Block implements ISwitchListener, IUserInterfaceAPI {
+public class Switch2Screen extends Connector implements ISwitchListener, IUserInterfaceAPI {
 
 	static Logger log = Logger.getLogger(Switch2Screen.class);
 

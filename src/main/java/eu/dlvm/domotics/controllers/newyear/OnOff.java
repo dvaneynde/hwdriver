@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 
 /**
  * Lamp die op bepaald moment on/off gaat, eventueel meerdere keren.

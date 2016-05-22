@@ -1,9 +1,9 @@
-package eu.dlvm.domotics.mappers;
+package eu.dlvm.domotics.connectors;
 
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
-import eu.dlvm.domotics.base.Block;
+import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
 
@@ -21,7 +21,7 @@ import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
  * <p>Note: all-off or all-on can be realised by {@link Switch2OnOffToggle}.
  * @author dirk vaneynde
  */
-public class DimmerSwitch2Dimmer extends Block implements IDimmerSwitchListener {
+public class DimmerSwitch2Dimmer extends Connector implements IDimmerSwitchListener {
 	static Logger log = Logger.getLogger(DimmerSwitch2Dimmer.class);
 
 	private DimmedLamp dimmedLamp;

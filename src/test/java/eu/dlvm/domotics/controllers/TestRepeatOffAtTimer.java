@@ -8,9 +8,9 @@ import java.util.GregorianCalendar;
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.controllers.Timer;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
 
 public class TestRepeatOffAtTimer {
 	boolean lastOffCalled = false;

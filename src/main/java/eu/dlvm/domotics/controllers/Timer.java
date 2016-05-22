@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.service.BlockInfo;
 
 /**

@@ -1,6 +1,6 @@
-package eu.dlvm.domotics.mappers;
+package eu.dlvm.domotics.connectors;
 
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 
 public class Switch2Fan extends Switch2OnOffToggle {
 

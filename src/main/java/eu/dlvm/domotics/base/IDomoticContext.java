@@ -6,6 +6,8 @@ import eu.dlvm.iohardware.IHardwareIO;
  * Actuator, controller, sensor en IUiCapable blocks moeten zich kunnen
  * registreren. En geeft toegang tot hardware.
  * 
+ * TODO getHw() zou in aparte interface moeten, enkel voor sensors en actuators
+ * TODO kan dit niet dynamisch, b.v. addBlock en dan kijkt code zelf of het sensor is, of ui capable is? en hw al dan niet zetten? Factory maken?
  * @author dirkv
  * 
  */

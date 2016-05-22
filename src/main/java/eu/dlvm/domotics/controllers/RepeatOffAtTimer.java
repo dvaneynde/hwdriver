@@ -3,7 +3,7 @@ package eu.dlvm.domotics.controllers;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 
 public class RepeatOffAtTimer extends Timer {
 	private static Logger log = Logger.getLogger(RepeatOffAtTimer.class);

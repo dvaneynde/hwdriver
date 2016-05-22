@@ -13,7 +13,7 @@ import org.junit.Test;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.mappers.SwitchClick2Toggle;
+import eu.dlvm.domotics.connectors.SwitchClick2Toggle;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.LogCh;

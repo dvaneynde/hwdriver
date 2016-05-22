@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.controllers.newyear.GSstate;
 import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
-import eu.dlvm.domotics.mappers.IOnOffToggleCapable;
 import eu.dlvm.domotics.service.BlockInfo;
 
 public class NewYear extends Controller implements IOnOffToggleCapable {

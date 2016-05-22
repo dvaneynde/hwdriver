@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.mappers;
+package eu.dlvm.domotics.connectors;
 
 
 public interface IOnOffToggleCapable {
