@@ -27,7 +27,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(sr.getMotorUpPeriod() * 1000L + 10);
 		assertOpenInRestProtected();
 	}
-
+	
 	@Test
 	public void firstDownAndThenProtect_WhileUpDoDownOrUp_ThenUnprotectAndDown() {
 		loop();
@@ -122,6 +122,9 @@ public class TestScreensProtection extends TestScreensBase {
 		assertOpenInRestProtected();			
 	}
 	
+	/*
+	 * Helpers
+	 */
 	private void assertOpenAndRest() {
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);

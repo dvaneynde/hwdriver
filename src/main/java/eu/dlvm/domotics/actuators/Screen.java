@@ -88,6 +88,10 @@ public class Screen extends Actuator {
 		return ratioClosed;
 	}
 
+	public int getRatioClosedAsPercentage() {
+		return ((int) (getRatioClosed() * 100));
+	}
+
 	/**
 	 * Time in seconds a screen motor is working, i.e. time to completely open
 	 * or close a screen.
@@ -148,37 +152,40 @@ public class Screen extends Actuator {
 			}
 			break;
 		case DOWN:
+			ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
 			if (gotDown && !protect) {
 				exitDown(current);
 				state = States.REST;
-				log.info("Screen " + getName() + " stopped going down due to DOWN event.");
+				log.info("Screen " + getName() + " stopped going down due to DOWN event. Closed for " + getRatioClosedAsPercentage() + "%.");
 			} else if (gotUp || protect) {
 				exitDown(current);
 				state = States.DELAY_DOWN_2_UP;
-				log.info("Screen " + getName() + " stopped going down due to UP event" + (protect ? " for PROTECT mode" : "") + ". Will go up after safety time.");
+				log.info("Screen " + getName() + " stopped going down due to UP event" + (protect ? " for PROTECT mode" : "") + ". Will go up after safety time. Closed for "
+						+ getRatioClosedAsPercentage() + "%.");
 			} else if ((current - timeStateStart) > motorDnPeriodMs) {
 				exitDown(current);
 				state = States.REST;
-				log.info("Screen " + getName() + " stopped going down because motor-on time is reached.");
+				log.info("Screen " + getName() + " stopped going down because motor-on time is reached. Closed for " + getRatioClosedAsPercentage() + "%.");
 			}
 			break;
 		case UP:
+			ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
 			if (gotDown && !protect) {
 				exitUp(current);
 				state = States.DELAY_UP_2_DOWN;
-				log.info("Screen " + getName() + " stopped going up due to DOWN event. Will go down after safety time.");
+				log.info("Screen " + getName() + " stopped going up due to DOWN event. Will go down after safety time. Closed for " + getRatioClosedAsPercentage() + "%.");
 			} else if (gotUp && !protect) {
 				exitUp(current);
 				state = States.REST;
-				log.info("Screen " + getName() + " stopped going up due to UP event.");
+				log.info("Screen " + getName() + " stopped going up due to UP event. Closed for " + getRatioClosedAsPercentage() + "%.");
 			} else if ((current - timeStateStart) > motorUpPeriodMs) {
 				exitUp(current);
 				if (protect) {
 					state = States.REST_PROTECT;
-					log.info("Screen " + getName() + " stopped going up because motor-on time is reached, and goes in PROTECTED mode.");
+					log.info("Screen " + getName() + " stopped going up because motor-on time is reached, and goes in PROTECTED mode. Closed for " + getRatioClosedAsPercentage() + "%.");
 				} else {
 					state = States.REST;
-					log.info("Screen " + getName() + " stopped going up because motor-on time is reached.");
+					log.info("Screen " + getName() + " stopped going up because motor-on time is reached. Closed for " + getRatioClosedAsPercentage() + "%.");
 				}
 			}
 			break;
@@ -233,8 +240,9 @@ public class Screen extends Actuator {
 	}
 
 	private void exitUp(long current) {
-		ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
-		log.debug("exitUp() ratioClosed=" + ratioClosed);
+		// ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart)
+		// / (double) motorUpPeriodMs);
+		// log.debug("exitUp() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(chUp, false);
 	}
@@ -246,8 +254,9 @@ public class Screen extends Actuator {
 	}
 
 	private void exitDown(long current) {
-		ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
-		log.debug("exitDown() ratioClosed=" + ratioClosed);
+		// ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart)
+		// / (double) motorDnPeriodMs);
+		// log.debug("exitDown() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(getChannel(), false);
 	}
@@ -255,18 +264,18 @@ public class Screen extends Actuator {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
-		double tmpPercentageClosed = ratioClosed;
-		if (getState() == States.UP) {
-			tmpPercentageClosed = Math.max(0.0, ratioClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
-		} else if (getState() == States.DOWN) {
-			tmpPercentageClosed = Math.min(1.0, ratioClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
-		}
-		// log.info("getBlockInfo() percClosed=" + percClosed);
-		bi.setStatus("" + ((int) (tmpPercentageClosed * 100)) + "% " + asSign(tmpPercentageClosed) + (protect ? " !!!" : ""));
+//		double tmpPercentageClosed = ratioClosed;
+//		if (getState() == States.UP) {
+//			tmpPercentageClosed = Math.max(0.0, ratioClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
+//		} else if (getState() == States.DOWN) {
+//			tmpPercentageClosed = Math.min(1.0, ratioClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
+//		}
+//		log.info("getBlockInfo() percClosed=" + percClosed);
+		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " !!!" : ""));
 		return bi;
 	}
 
-	private String asSign(double ratioClosed) {
+	private String asSign() {
 		switch (getState()) {
 		case DOWN:
 			return "vvvv";
