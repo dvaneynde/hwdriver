@@ -1,7 +1,5 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import javax.validation.constraints.AssertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,61 +7,110 @@ import eu.dlvm.domotics.sensors.FrequencyGauge;
 
 public class TestFreqGauge {
 
-	private static final boolean T = true;
-	private static final boolean F = false;
+	// BASIC TESTS
 
 	@Test
-	public void testFreq1() {
-		FrequencyGauge fg = new FrequencyGauge();
-		boolean[] vals = new boolean[] { F, T, F };
-		double[] freqs = new double[] { 0, 0, 50 };
-		long time = 1000L;
-		for (int i = 0; i < vals.length; i++) {
-			fg.sample(time, vals[i]);
-			Assert.assertTrue("time=" + time + ", i=" + i, equald2(freqs[i], fg.getFrequency()));
-			time += 10;
+	public void testTooFewCyclesSampled() {
+		new FrequencyGauge(2);
+		try {
+			new FrequencyGauge(1);
+			Assert.fail("Should throw IllegalArgumentException.");
+		} catch (IllegalArgumentException e) {
+		}
+		try {
+			new FrequencyGauge(0);
+			Assert.fail("Should throw IllegalArgumentException.");
+		} catch (IllegalArgumentException e) {
 		}
 	}
 
-	@Test
-	public void testFreq2() {
-		FrequencyGauge fg = new FrequencyGauge();
-		boolean[] vals = new boolean[] { T, F, T, T, F, F, T, T, T, F, F, F, T, T, F };
-		double[] freqs = new double[] { 0.00, 0.00, 0.00, 0.00, 33.33, 33.33, 33.33, 33.33, 33.33, 20.00, 20.00, 20.00, 20.00, 20.00, 20.00 };
-		Assert.assertEquals(vals.length, freqs.length);
-
-		long time = 1000L;
-		for (int i = 0; i < vals.length; i++) {
-			fg.sample(time, vals[i]);
-			Assert.assertTrue("time=" + time + ", i=" + i, equald2(freqs[i], fg.getFrequency()));
-			time += 10;
-		}
-	}
+	// SIMPLE FREQ TEST
 
 	@Test
 	public void testSteadyFrequency() {
-		boolean[] vals = new boolean[100];
-		for (int i = 0; i < vals.length; i++)
-			vals[i] = i % 2 == 0;
-		FrequencyGauge fg = new FrequencyGauge(7);
-
-		for (int i = 0; i < vals.length; i++)
-			fg.sample(i * 500, vals[i]);
-		Assert.assertEquals(1.0, fg.getFrequency());
-		Assert.assertEquals(1.0, fg.getAvgFreq());
-
-		for (int i = 0; i < vals.length; i++)
-			fg.sample(i * 50, vals[i]);
-		Assert.assertEquals(10.0, fg.getFrequency());
-		Assert.assertEquals(10.0, fg.getAvgFreq());
-
-		for (int i = 0; i < vals.length; i++)
-			fg.sample(i * 25, vals[i]);
-		Assert.assertEquals(20.0, fg.getFrequency());
-		Assert.assertEquals(20.0, fg.getAvgFreq());
+		FrequencyGauge fg = new FrequencyGauge(5);
+		long currentTimeMs = 0L;
+		long deltaMs = 25;
+		// 10 Hz, 25ms sample time --> 20 times on/off per second or every 50 ms
+		// on then off
+		boolean inputval = false;
+		fg.sample(currentTimeMs, inputval);
+		currentTimeMs += deltaMs;
+		for (int i = 0; i < 1; i++) {
+			inputval = !inputval;
+			fg.sample(currentTimeMs, inputval);
+			currentTimeMs += deltaMs;
+			fg.sample(currentTimeMs, inputval);
+			currentTimeMs += deltaMs;
+			inputval = !inputval;
+			fg.sample(currentTimeMs, inputval);
+			currentTimeMs += deltaMs;
+			fg.sample(currentTimeMs, inputval);
+			currentTimeMs += deltaMs;
+		}
+		System.out.println("testSteadyFrequency: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(10L, Math.round(fg.getAvgFreq()));
 	}
 
-	private static boolean equald2(double a, double b) {
-		return ((long) (a * 100) == (long) (b * 100));
+	// REAL TESTS
+	// TODO slope up, slope down
+
+	@Test
+	public void testWithOscillator_10Hz_25ms() {
+		FrequencyGauge fg = new FrequencyGauge(20);
+		oscillateSteady(fg, 10, 25, 1);
+		System.out.println("testWithOscillator_10Hz_25ms: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(10L, Math.round(fg.getAvgFreq()));
+	}
+
+	@Test
+	public void testWithOscillator_10Hz_20ms() {
+		FrequencyGauge fg = new FrequencyGauge(75);
+		oscillateSteady(fg, 10, 20, 2.5);
+		System.out.println("testWithOscillator_10Hz_20ms: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(10L, Math.round(fg.getAvgFreq()));
+	}
+
+	@Test
+	public void testWithOscillator_24Hz_20ms_limit() {
+		FrequencyGauge fg = new FrequencyGauge(50);
+		oscillateSteady(fg, 24, 20, 2);
+		System.out.println("testWithOscillator_24Hz_20ms_limit: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(24.0, Math.floor(fg.getAvgFreq()));
+	}
+
+	@Test
+	public void testWithOscillator_1Hz_20ms() {
+		FrequencyGauge fg = new FrequencyGauge(50);
+		oscillateSteady(fg, 1, 20, 1.5);
+		System.out.println("testWithOscillator_1Hz_20ms: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(1L, Math.round(fg.getAvgFreq()));
+	}
+
+	@Test
+	public void testWithOscillator_0point3Hz_20ms() {
+		FrequencyGauge fg = new FrequencyGauge(50);
+		oscillateSteady(fg, 0.3, 20, 1.5);
+		System.out.println("testWithOscillator_0point3Hz_20ms: measured freq=" + fg.getAvgFreq());
+		Assert.assertEquals(0L, Math.round(fg.getAvgFreq()));
+	}
+
+	private void oscillateSteady(FrequencyGauge fg, double freq, int samplePeriodMs, double durationSec) {
+		double transitionPeriodMs = 1000 / (2.0 * freq);
+
+		int nrTransitions = 1;
+		double nextTransitionTime = nrTransitions * transitionPeriodMs;
+		boolean val = false;
+
+		long time = 0L;
+		while (time <= 1000 * durationSec) {
+			if (time >= nextTransitionTime) {
+				val = !val;
+				nrTransitions++;
+				nextTransitionTime = nrTransitions * transitionPeriodMs;
+			}
+			fg.sample(time, val);
+			time += samplePeriodMs;
+		}
 	}
 }

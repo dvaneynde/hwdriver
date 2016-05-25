@@ -1,5 +1,7 @@
 package eu.dlvm.domotics.sensors;
 
+import java.security.acl.LastOwnerException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -20,15 +22,22 @@ import org.apache.log4j.Logger;
  */
 public class FrequencyGauge {
 
-	private static Logger log = Logger.getLogger(FrequencyGauge.class);
+	private static class Sample {
+		public Sample() {
+			time = -1L;
+		}
+		long time;
+		boolean value;
+		
+		@Override
+		public String toString() {
+			return "Sample [time=" + time + ", value=" + value + "]";
+		}
+	}
 
-	private double frequency = 0.0;
-	private boolean lastInputval; // last measured input value
-	private long timeLastOffInput; // last time that input value read was 0
-
-	private boolean doMeans;
-	private int idxLastMeasure, cyclesToMeasure;
-	private long measures[];
+	private static final Logger log = Logger.getLogger(FrequencyGauge.class);
+		private int idxLastSample, nrSamplesPerAverage;
+	private Sample samples[];
 
 	// private double avgFreq;
 
@@ -36,126 +45,79 @@ public class FrequencyGauge {
 	 * Use for immediate frequency only. No average frequencies are kept.
 	 */
 	public FrequencyGauge() {
-		this(0);
+		this(10);
 	}
 
 	/**
 	 * Use for both immediate and average frequency measurements.
 	 * 
-	 * @param cyclesPerAveragePeriod
+	 * @param nrSamplesPerAverage
 	 *            Number of cycles to measure per average.
 	 */
-	public FrequencyGauge(int cyclesPerAveragePeriod) {
-		super();
-		lastInputval = false;
-		timeLastOffInput = 0L;
-		doMeans = (cyclesPerAveragePeriod != 0);
-		if (doMeans) {
-			cyclesToMeasure = cyclesPerAveragePeriod;
-			idxLastMeasure = -1;
-			measures = new long[cyclesToMeasure];
+	public FrequencyGauge(int nrSamplesPerAverage) {
+		if (nrSamplesPerAverage<2)
+			throw new IllegalArgumentException("Need at least 2 samples.");
+		// TODO aantal cycles zou in verband moeten staan met sample frequentie
+		// en thresholds
+		this.nrSamplesPerAverage = nrSamplesPerAverage;
+		idxLastSample = -1;
+		samples = new Sample[nrSamplesPerAverage];
+		for (int i = 0; i < nrSamplesPerAverage; i++) {
+			samples[i] = new Sample();
 		}
-		log.info("Frequency gauge configured: means calculated from " + cyclesPerAveragePeriod + " cycles per clock tick (if 0 then immediate frequency");
+		log.info("Frequency gauge configured: means calculated from " + nrSamplesPerAverage + " samples.");
 	}
 
 	/**
-	 * Frequency measured; will be zero before first full cycle has been
-	 * measured.
-	 * <p>
-	 * Throws exception if {{@link #isInitialized()} = false.
-	 * 
-	 * @return the frequency
-	 */
-	public double getFrequency() {
-		return frequency;
-	}
-
-	/**
-	 * @return Average frequency over number of cycles specified in constructor
+	 * @return Average frequency over number of samples specified in constructor
 	 *         {@link #FrequencyGauge(int)}.
 	 */
 	public double getAvgFreq() {
-		if (!doMeans)
-			return frequency;
-		// throw new
-		// RuntimeException("Gauge was not configured to calculate average freauencies.");
-		return calcMeans();
+		if (samples[nrSamplesPerAverage - 1].time == -1L)
+			return 0.0;
+		double avgFreq = 0.0;
+		int nrTransitions = 0;
+
+		int idx = (idxLastSample + 1) % nrSamplesPerAverage;
+		Sample last = samples[idx];
+		boolean firstTransitionFound = false;
+		do {
+			idx = (idx + 1) % nrSamplesPerAverage;
+			if (samples[idx].value != last.value) {
+				if (!firstTransitionFound) {
+					last = samples[idx];
+					firstTransitionFound = true;
+				} else {
+					double freq = 1000.0 / (2.0 * ((double) Math.abs(samples[idx].time - last.time)));
+					avgFreq += freq;
+					nrTransitions++;
+					last = samples[idx];
+				}
+			}
+		} while (idx != idxLastSample);
+		if (nrTransitions == 0)
+			avgFreq = 0.0;
+		else
+			avgFreq = avgFreq / (double) nrTransitions;
+		return avgFreq;
 	}
 
 	/**
-	 * As long as this gauge is not 'ready' the output of
-	 * {@link #getFrequency()} or {@link #getAvgFreq()} are meaningless.
-	 * <p>
-	 * At least one cycle off-on-off must have been read; also, if the very
-	 * first input value is a 'on' this is ignored, the gauge waits for the
-	 * first 'off'.
-	 * 
-	 * @return whether gauge is ready and has meaningful frequencies
-	 */
-	public boolean isReady() {
-		return (timeLastOffInput != 0L);
-	}
-
-	/**
-	 * Samples inputval to determine frequency. Frequency is the inverse of the
-	 * period of one 'cycle'. A cycle is measured as an inputval that changed
-	 * from off-on-off, or false-true-false.
+	 * Takes sample.
 	 * 
 	 * @param currentTimeMs
 	 *            Timestamp in milliseconds.
 	 * @param inputval
-	 *            Measured input value.
+	 *            Sampled input value.
 	 */
 	public void sample(long currentTimeMs, boolean inputval) {
-		if (timeLastOffInput == 0) {
-			// initialization takes as long as we do not read an 'off' input value
-			if (!inputval) {
-				lastInputval = inputval;
-				timeLastOffInput = currentTimeMs;
-				log.debug("FrequencyGauge initialized, time=" + timeMsFormat(currentTimeMs));
-			}
-		}
-		else if (inputval != lastInputval) {
-			lastInputval = inputval;
-			if (!inputval) {
-				long delta = currentTimeMs - timeLastOffInput;
-				// freq = 1 / dt(s) = 1 / (dtInMs / 1000) = 1000 / dtInMs
-				frequency = 1000.00 / (delta);
-				if (doMeans) {
-					idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
-					measures[idxLastMeasure] = delta;
-				}
-				timeLastOffInput = currentTimeMs;
-				log.debug("FrequencyGauge sampled, currentTime=" + timeMsFormat(currentTimeMs) + ", delta=" + delta + "ms., freq=" + frequency + ", mean freq=" + calcMeans());
-			}
-		}
-	}
-
-	private double calcMeans() {
-		if (!doMeans)
-			return -1;
-		long sum = 0L;
-		for (int i = 0; i < cyclesToMeasure; i++)
-			sum += measures[i];
-		double avgFreq = 1000.0 / (sum / cyclesToMeasure);
-		return avgFreq;
+		idxLastSample = (++idxLastSample) % nrSamplesPerAverage;
+		samples[idxLastSample].time = currentTimeMs;
+		samples[idxLastSample].value = inputval;
 	}
 
 	public static String timeMsFormat(long timeMs) {
 		return "time=" + (timeMs / 1000) % 1000 + "s. " + timeMs % 1000 + "ms.";
 	}
-
-	/*
-	 * Alternatieve berekening voor calcMeans, sneller bij grote arrays.
-	 */
-	// private long avgTotal = 0L;
-	//
-	// private void calcMeans2(long delta) {
-	// idxLastMeasure = (++idxLastMeasure) % cyclesToMeasure;
-	// avgTotal -= measures[idxLastMeasure];
-	// measures[idxLastMeasure] = delta;
-	// avgTotal += delta;
-	// avgFreq = 1000.0 / (avgTotal / cyclesToMeasure);
-	// }
 
 }

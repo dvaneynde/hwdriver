@@ -44,7 +44,7 @@ public class Screen extends Actuator {
 	private long motorDnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long timeStateStart;
 	private boolean gotUp, gotDown, protect;
-	private double ratioClosed;
+	private double ratioClosed, ratioClosedAtStateStart;
 	private States state = States.REST;
 
 	/*
@@ -141,10 +141,10 @@ public class Screen extends Actuator {
 			// delay-protection moet verstreken zijn. Overal waar REST
 			// gezet wordt moet die tijd ook gezet worden.
 			if (protect) {
-				setStateAndEntryUp(current);
+				setStateAndEnterUp(current);
 				log.info("Screen " + getName() + " is going UP (PROTECTION mode), for maximum " + getMotorUpPeriod() + " sec.");
 			} else if (gotUp) {
-				setStateAndEntryUp(current);
+				setStateAndEnterUp(current);
 				log.info("Screen " + getName() + " is going UP, for maximum " + getMotorUpPeriod() + " sec.");
 			} else if (gotDown) {
 				setStateAndEntryDown(current);
@@ -152,7 +152,7 @@ public class Screen extends Actuator {
 			}
 			break;
 		case DOWN:
-			ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart) / (double) motorDnPeriodMs);
+			ratioClosed = Math.min(1.0, ratioClosedAtStateStart + (current - timeStateStart) / (double) motorDnPeriodMs);
 			if (gotDown && !protect) {
 				exitDown(current);
 				state = States.REST;
@@ -169,7 +169,7 @@ public class Screen extends Actuator {
 			}
 			break;
 		case UP:
-			ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart) / (double) motorUpPeriodMs);
+			ratioClosed = Math.max(0.0, ratioClosedAtStateStart - (current - timeStateStart) / (double) motorUpPeriodMs);
 			if (gotDown && !protect) {
 				exitUp(current);
 				state = States.DELAY_UP_2_DOWN;
@@ -196,7 +196,7 @@ public class Screen extends Actuator {
 				log.warn("Screen " + getName() + " got event while switching up to down, strange. Therefore stop screen.");
 			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
 				if (protect) {
-					setStateAndEntryUp(current);
+					setStateAndEnterUp(current);
 					log.info("Screen " + getName() + " going UP after safety time because of PROTECT.");
 				} else {
 					setStateAndEntryDown(current);
@@ -211,10 +211,10 @@ public class Screen extends Actuator {
 				log.warn("Screen " + getName() + " got event while switching down to up, strange. Therefore stop screen.");
 			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
 				if (protect) {
-					setStateAndEntryUp(current);
+					setStateAndEnterUp(current);
 					log.info("Screen " + getName() + " going UP after safety time because of PROTECT.");
 				} else {
-					setStateAndEntryUp(current);
+					setStateAndEnterUp(current);
 					log.info("Screen " + getName() + " going UP after safety time.");
 				}
 			}
@@ -233,30 +233,26 @@ public class Screen extends Actuator {
 		gotUp = gotDown = false;
 	}
 
-	private void setStateAndEntryUp(long current) {
+	private void setStateAndEnterUp(long current) {
 		timeStateStart = current;
+		ratioClosedAtStateStart = ratioClosed;
 		state = States.UP;
 		getHw().writeDigitalOutput(chUp, true);
 	}
 
 	private void exitUp(long current) {
-		// ratioClosed = Math.max(0.0, ratioClosed - (current - timeStateStart)
-		// / (double) motorUpPeriodMs);
-		// log.debug("exitUp() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(chUp, false);
 	}
 
 	private void setStateAndEntryDown(long current) {
 		timeStateStart = current;
+		ratioClosedAtStateStart = ratioClosed;
 		state = States.DOWN;
 		getHw().writeDigitalOutput(getChannel(), true);
 	}
 
 	private void exitDown(long current) {
-		// ratioClosed = Math.min(1.0, ratioClosed + (current - timeStateStart)
-		// / (double) motorDnPeriodMs);
-		// log.debug("exitDown() ratioClosed=" + ratioClosed);
 		timeStateStart = current;
 		getHw().writeDigitalOutput(getChannel(), false);
 	}
@@ -264,13 +260,6 @@ public class Screen extends Actuator {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
-//		double tmpPercentageClosed = ratioClosed;
-//		if (getState() == States.UP) {
-//			tmpPercentageClosed = Math.max(0.0, ratioClosed - (System.currentTimeMillis() - timeStateStart) / (double) motorUpPeriodMs);
-//		} else if (getState() == States.DOWN) {
-//			tmpPercentageClosed = Math.min(1.0, ratioClosed + (System.currentTimeMillis() - timeStateStart) / (double) motorDnPeriodMs);
-//		}
-//		log.info("getBlockInfo() percClosed=" + percClosed);
 		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " !!!" : ""));
 		return bi;
 	}
@@ -278,22 +267,22 @@ public class Screen extends Actuator {
 	private String asSign() {
 		switch (getState()) {
 		case DOWN:
-			return "vvvv";
+			return "vvv";
 		case UP:
-			return "^^^^";
+			return "^^^";
 		case REST:
 			if (ratioClosed > 0.90)
-				return "-^^-";
+				return "TOE";
 			else if (ratioClosed < 0.10)
-				return "-vv-";
+				return "OPEN";
 			else
-				return "^v^v";
+				return "HALF";
 		case DELAY_DOWN_2_UP:
-			return "v->^";
+			return "WACHT";
 		case DELAY_UP_2_DOWN:
-			return "^->v";
+			return "WACHT";
 		case REST_PROTECT:
-			return "!^^!";
+			return "STORM";
 		}
 		return "ERROR";
 	}
