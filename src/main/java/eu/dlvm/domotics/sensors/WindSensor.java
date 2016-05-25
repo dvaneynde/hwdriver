@@ -80,7 +80,7 @@ public class WindSensor extends Sensor {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		double freq = gauge.getAvgFreq();
-		//log.debug("frequency: time=" + (currentTime / 1000) % 1000 + "s. " + currentTime % 1000 + "ms.\tfreq=" + freq + "\tcur.state=" + state);
+		log.debug("frequency: time=\t" + (currentTime / 1000) % 1000 + "s.\t" + currentTime % 1000 + "ms.\tfreq=" + freq + "\tcur.state=" + state);
 
 		switch (state) {
 		case NORMAL:
