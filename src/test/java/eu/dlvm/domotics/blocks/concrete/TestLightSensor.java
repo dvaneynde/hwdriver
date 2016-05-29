@@ -12,12 +12,12 @@ import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.IThresholdListener;
+import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
-public class TestLightSensor implements IThresholdListener {
+public class TestLightSensor implements IAlarmListener {
 
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
 		public int level;
@@ -59,7 +59,7 @@ public class TestLightSensor implements IThresholdListener {
 	public void onEvent(Sensor source, EventType event) {
 		lastEvent = event;
 	}
-	private IThresholdListener.EventType lastEvent;
+	private IAlarmListener.EventType lastEvent;
 
 	@Test
 	public final void testLowHighLow() {
@@ -71,16 +71,16 @@ public class TestLightSensor implements IThresholdListener {
 			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
 			hw.level = 1100;
 			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW2HIGH_WAITING, ls.getState());
+			Assert.assertEquals(LightSensor.States.LOW2HIGH_DELAY, ls.getState());
 			Assert.assertNull(lastEvent);
 
 			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW2HIGH_WAITING, ls.getState());
+			Assert.assertEquals(LightSensor.States.LOW2HIGH_DELAY, ls.getState());
 			Assert.assertNull(lastEvent);
 
 			loop200(ls);
 			Assert.assertEquals(LightSensor.States.HIGH, ls.getState());
-			Assert.assertEquals(EventType.HIGH, lastEvent);
+			Assert.assertEquals(EventType.ALARM, lastEvent);
 			lastEvent = null;
 
 			loop200(ls);
@@ -89,16 +89,16 @@ public class TestLightSensor implements IThresholdListener {
 
 			hw.level = 400;
 			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH2LOW_WAITING, ls.getState());
+			Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, ls.getState());
 			Assert.assertNull(lastEvent);
 
 			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH2LOW_WAITING, ls.getState());
+			Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, ls.getState());
 			Assert.assertNull(lastEvent);
 
 			loop200(ls);
 			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
-			Assert.assertEquals(EventType.LOW, lastEvent);
+			Assert.assertEquals(EventType.SAFE, lastEvent);
 			lastEvent = null;
 
 			loop200(ls);

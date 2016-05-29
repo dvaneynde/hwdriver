@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.sensors.IThresholdListener;
+import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.WindSensor;
 
 /**
@@ -18,15 +18,15 @@ import eu.dlvm.domotics.sensors.WindSensor;
  * @author dirk vaneynde
  * 
  */
-public class Windsensor2Screen extends Connector implements IThresholdListener {
+public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 
-	private static final Logger log = Logger.getLogger(Windsensor2Screen.class);
+	private static final Logger log = Logger.getLogger(AlarmEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*
 	 * Public API
 	 */
-	public Windsensor2Screen(String name, String description) {
+	public AlarmEvent2Screen(String name, String description) {
 		super(name, description, null);
 	}
 
@@ -41,12 +41,12 @@ public class Windsensor2Screen extends Connector implements IThresholdListener {
 	public void onEvent(Sensor source, EventType event) {
 		if (source instanceof WindSensor)
 			switch (event) {
-			case HIGH:
+			case ALARM:
 				for (Screen screen : screens) {
 					screen.setProtect(true);
 				}
 				break;
-			case LOW:
+			case SAFE:
 				for (Screen screen : screens) {
 					screen.setProtect(false);
 				}

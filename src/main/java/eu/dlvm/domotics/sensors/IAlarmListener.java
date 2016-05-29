@@ -3,10 +3,10 @@ package eu.dlvm.domotics.sensors;
 import eu.dlvm.domotics.base.Sensor;
 
 
-public interface IThresholdListener {
+public interface IAlarmListener {
 
 	public static enum EventType {
-		HIGH, LOW;
+		ALARM, SAFE;
 	}
 
 	public void onEvent(Sensor source, EventType event);

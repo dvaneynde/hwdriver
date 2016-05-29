@@ -22,7 +22,7 @@ public class WindSensor extends Sensor {
 	private int lowFreqThreshold;
 	private long highTimeBeforeAlertMs;
 	private long lowTimeToResetAlertMs;
-	private Set<IThresholdListener> listeners = new HashSet<>();
+	private Set<IAlarmListener> listeners = new HashSet<>();
 	private States state;
 	private long timeCurrentStateStarted;
 	FrequencyGauge gauge; // package scope for unit tests
@@ -103,15 +103,6 @@ public class WindSensor extends Sensor {
 	// ===================
 	// INTERNAL API
 
-	public void registerListener(IThresholdListener listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IThresholdListener.EventType event) {
-		for (IThresholdListener l : listeners)
-			l.onEvent(this, event);
-	}
-
 	private int infoCounter = 0;
 
 	@Override
@@ -146,7 +137,7 @@ public class WindSensor extends Sensor {
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies HIGH event because in ALARM state: freq=" + freq + " > thresholdHigh=" + getHighFreqThreshold() + " for more than "
 						+ getHighTimeBeforeAlert() / 1000 + "sec.");
-				notifyListeners(IThresholdListener.EventType.HIGH);
+				notifyListeners(IAlarmListener.EventType.ALARM);
 			}
 			break;
 		case ALARM:
@@ -165,12 +156,21 @@ public class WindSensor extends Sensor {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies LOW event because wind has been low long enough: freq=" + freq + " < thresholdLow=" + getLowFreqThreshold());
-				notifyListeners(IThresholdListener.EventType.LOW);
+				notifyListeners(IAlarmListener.EventType.SAFE);
 			}
 			break;
 		default:
 			throw new RuntimeException("Programming Error. Unhandled state.");
 		}
+	}
+
+	public void registerListener(IAlarmListener listener) {
+		listeners.add(listener);
+	}
+
+	public void notifyListeners(IAlarmListener.EventType event) {
+		for (IAlarmListener l : listeners)
+			l.onEvent(this, event);
 	}
 
 	@Override

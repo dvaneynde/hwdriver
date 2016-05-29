@@ -11,12 +11,12 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.IThresholdListener;
+import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
-public class TestWindSensor implements IThresholdListener {
+public class TestWindSensor implements IAlarmListener {
 
 	public class HardwareWindSensor extends BaseHardwareMock implements IHardwareIO {
 		public boolean inval;
@@ -48,7 +48,7 @@ public class TestWindSensor implements IThresholdListener {
 		lastEvent = event;
 	}
 
-	private IThresholdListener.EventType lastEvent;
+	private IAlarmListener.EventType lastEvent;
 
 	@BeforeClass
 	public static void initLog() {

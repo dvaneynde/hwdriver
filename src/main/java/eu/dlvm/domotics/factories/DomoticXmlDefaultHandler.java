@@ -24,7 +24,7 @@ import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.connectors.Switch2Screen;
-import eu.dlvm.domotics.connectors.Windsensor2Screen;
+import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
 import eu.dlvm.domotics.controllers.NewYear;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.Timer;
@@ -298,7 +298,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 		try {
 			WindSensor ws = (WindSensor) blocks.get(wsName);
-			Windsensor2Screen ws2s = new Windsensor2Screen(wsName + "_2_" + screenName, desc);
+			AlarmEvent2Screen ws2s = new AlarmEvent2Screen(wsName + "_2_" + screenName, desc);
 			ws.registerListener(ws2s);
 			for (Block target : targetBlocks) {
 				ws2s.registerListener((Screen) target);

@@ -13,11 +13,11 @@ import eu.dlvm.iohardware.LogCh;
 
 /**
  * Measures light via analog input (via
- * {@link IHardwareIO#readAnalogInput(LogCh)}) every 200 ms. If this input value
+ * {@link IHardwareIO#readAnalogInput(LogCh)}) . If this input value
  * is higher than {@link #getHighThreshold()} for {@link #getHighWaitingTime()}
  * milliseconds a {@link States#HIGH} event is sent once. If lower than
- * {@link #getLowThreshold()} for {@link #thresholdWaitingTimeMs()} milliseconds a
- * {@link States#LOW} event is sent once.
+ * {@link #getLowThreshold()} for {@link #getThresholdDelayMs()} milliseconds
+ * a {@link States#LOW} event is sent once.
  * 
  * @author dirk vaneynde
  * 
@@ -27,94 +27,33 @@ public class LightSensor extends Sensor {
 	private static Logger log = Logger.getLogger(LightSensor.class);
 	private int highThreshold;
 	private int lowThreshold;
-	private long thresholdWaitingTimeMs;
-	private long sampleIntervalTimeMs;
-	// TODO listeners via generic in Sensor basis class
-	private Set<IThresholdListener> listeners = new HashSet<>();
-
-	public static enum States {
-		LOW, LOW2HIGH_WAITING, HIGH, HIGH2LOW_WAITING,
-	};
-
+	private long thresholdDelayMs;
 	private States state;
 	private long timeCurrentStateStarted;
-	private long timeOfLastSample;
 
-	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold,
-			long thresholdWaitingTimeMs) throws IllegalConfigurationException {
+	// TODO listeners via generic in Sensor basis class
+	private Set<IAlarmListener> listeners = new HashSet<>();
+
+	// ==========
+	// PUBLIC API
+	
+	public static enum States {
+		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
+	};
+
+	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold, long thresholdDelayMs)
+			throws IllegalConfigurationException {
 		super(name, description, channel, ctx);
-		timeOfLastSample = 0L;
 		timeCurrentStateStarted = 0L;
 		state = States.LOW;
-		sampleIntervalTimeMs = 200L;
 		if ((highThreshold < lowThreshold) || lowThreshold < 0 || highThreshold < 0) {
 			throw new IllegalConfigurationException("Incorrect parameters. Check doc.");
 		}
 		this.lowThreshold = lowThreshold;
 		this.highThreshold = highThreshold;
-		this.thresholdWaitingTimeMs = thresholdWaitingTimeMs;
-		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low="+getLowThreshold()+", time before effective="+thresholdWaitingTimeMs()+", channel="+getChannel());
-	}
-
-	public void registerListener(IThresholdListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void notifyListeners(IThresholdListener.EventType event) {
-		for (IThresholdListener l:listeners)
-			l.onEvent(this, event);
-	}
-
-	@Override
-	public void loop(long currentTime, long sequence) {
-		if ((currentTime - timeOfLastSample) < sampleIntervalTimeMs)
-			return;
-
-		int newInput = getHw().readAnalogInput(getChannel());
-		timeOfLastSample = currentTime;
-		
-		log.debug("LightSensor "+getName()+": ana in="+newInput);
-
-		switch (state) {
-		case LOW:
-			if (newInput >= getHighThreshold()) {
-				state = States.LOW2HIGH_WAITING;
-				timeCurrentStateStarted = currentTime;
-			}
-			break;
-		case LOW2HIGH_WAITING:
-			if (newInput < getHighThreshold()) {
-				state = States.LOW;
-				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > thresholdWaitingTimeMs()) {
-				state = States.HIGH;
-				timeCurrentStateStarted = currentTime;
-				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh="
-						+ getHighThreshold());
-				notifyListeners(IThresholdListener.EventType.HIGH);
-			}
-			break;
-		case HIGH:
-			if (newInput < getLowThreshold()) {
-				state = States.HIGH2LOW_WAITING;
-				timeCurrentStateStarted = currentTime;
-			}
-			break;
-		case HIGH2LOW_WAITING:
-			if (newInput > getLowThreshold()) {
-				state = States.HIGH;
-				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > thresholdWaitingTimeMs()) {
-				state = States.LOW;
-				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow="
-						+ getLowThreshold());
-				notifyListeners(IThresholdListener.EventType.LOW);
-			}
-			break;
-		default:
-			throw new RuntimeException("Programming Error. Unhandled state.");
-		}
+		this.thresholdDelayMs = thresholdDelayMs;
+		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low=" + getLowThreshold() + ", time before effective=" + getThresholdDelayMs() + ", channel="
+				+ getChannel());
 	}
 
 	/**
@@ -129,7 +68,8 @@ public class LightSensor extends Sensor {
 
 	/**
 	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(LogCh)})
-	 * for {@link States#HIGH} state. See also {@link #thresholdWaitingTimeMs()}.
+	 * for {@link States#HIGH} state. See also {@link #getThresholdDelayMs()}
+	 * .
 	 * 
 	 * @return low threshold value
 	 */
@@ -138,12 +78,13 @@ public class LightSensor extends Sensor {
 	}
 
 	/**
-	 * Time in ms that a threshold crossing must remain until the new state is effective.
+	 * Time in ms that a threshold crossing must remain until the new state is
+	 * effective.
 	 * 
 	 * @return waiting time in milliseconds
 	 */
-	public long thresholdWaitingTimeMs() {
-		return thresholdWaitingTimeMs;
+	public long getThresholdDelayMs() {
+		return thresholdDelayMs;
 	}
 
 	/**
@@ -151,6 +92,65 @@ public class LightSensor extends Sensor {
 	 */
 	public States getState() {
 		return state;
+	}
+
+	
+	// ===========
+	// PRIVATE API
+	
+	@Override
+	public void loop(long currentTime, long sequence) {
+		int newInput = getHw().readAnalogInput(getChannel());
+
+		log.debug("LightSensor " + getName() + ": ana in=" + newInput);
+
+		switch (state) {
+		case LOW:
+			if (newInput >= getHighThreshold()) {
+				state = States.LOW2HIGH_DELAY;
+				timeCurrentStateStarted = currentTime;
+			}
+			break;
+		case LOW2HIGH_DELAY:
+			if (newInput < getHighThreshold()) {
+				state = States.LOW;
+				timeCurrentStateStarted = currentTime;
+			} else if ((currentTime - timeCurrentStateStarted) > getThresholdDelayMs()) {
+				state = States.HIGH;
+				timeCurrentStateStarted = currentTime;
+				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh=" + getHighThreshold());
+				notifyListeners(IAlarmListener.EventType.ALARM);
+			}
+			break;
+		case HIGH:
+			if (newInput < getLowThreshold()) {
+				state = States.HIGH2LOW_DELAY;
+				timeCurrentStateStarted = currentTime;
+			}
+			break;
+		case HIGH2LOW_DELAY:
+			if (newInput > getLowThreshold()) {
+				state = States.HIGH;
+				timeCurrentStateStarted = currentTime;
+			} else if ((currentTime - timeCurrentStateStarted) > getThresholdDelayMs()) {
+				state = States.LOW;
+				timeCurrentStateStarted = currentTime;
+				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow=" + getLowThreshold());
+				notifyListeners(IAlarmListener.EventType.SAFE);
+			}
+			break;
+		default:
+			throw new RuntimeException("Programming Error. Unhandled state.");
+		}
+	}
+
+	public void registerListener(IAlarmListener listener) {
+		listeners.add(listener);
+	}
+
+	public void notifyListeners(IAlarmListener.EventType event) {
+		for (IAlarmListener l : listeners)
+			l.onEvent(this, event);
 	}
 
 	@Override
