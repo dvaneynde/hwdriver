@@ -1,61 +1,44 @@
 package eu.dlvm.domotics.sensors;
 
-import java.security.acl.LastOwnerException;
-
 import org.apache.log4j.Logger;
 
 /**
- * Measures frequency of a pulse train, both immediate as with
- * {@link #getFrequency()} or over a set of cycles as with {@link #getAvgFreq()}
- * .
- * <p>
- * Immediate frequency is 1 / dT where dT is time of one cycle [off-on-off[.
+ * Measures frequency of a pulse train.
  * <p>
  * Make sure that sampling frequency, see {{@link #sample(long, boolean)}, is at
- * least twice the maximum frequency of the pulse train.
- * <p>
- * TODO als twee cycles >10% afwijken, een soort alarm geven? Want dat kan
- * waarschijnlijk niet...
+ * least twice the maximum frequency of the signal.
  * 
  * @author Dirk Vaneynde
  * 
  */
 public class FrequencyGauge {
 
+	private static final Logger log = Logger.getLogger(FrequencyGauge.class);
+	private int idxLastSample, nrSamplesPerAverage;
+	private Sample samples[];
+
 	private static class Sample {
 		public Sample() {
 			time = -1L;
 		}
+
 		long time;
 		boolean value;
-		
+
 		@Override
 		public String toString() {
 			return "Sample [time=" + time + ", value=" + value + "]";
 		}
 	}
 
-	private static final Logger log = Logger.getLogger(FrequencyGauge.class);
-		private int idxLastSample, nrSamplesPerAverage;
-	private Sample samples[];
-
-	// private double avgFreq;
-
 	/**
-	 * Use for immediate frequency only. No average frequencies are kept.
-	 */
-	public FrequencyGauge() {
-		this(10);
-	}
-
-	/**
-	 * Use for both immediate and average frequency measurements.
+	 * Constructor.
 	 * 
 	 * @param nrSamplesPerAverage
-	 *            Number of cycles to measure per average.
+	 *            Number of samples to store to measure average.
 	 */
 	public FrequencyGauge(int nrSamplesPerAverage) {
-		if (nrSamplesPerAverage<2)
+		if (nrSamplesPerAverage < 2)
 			throw new IllegalArgumentException("Need at least 2 samples.");
 		// TODO aantal cycles zou in verband moeten staan met sample frequentie
 		// en thresholds
@@ -69,9 +52,13 @@ public class FrequencyGauge {
 	}
 
 	/**
-	 * @return Average frequency over number of samples specified in constructor
-	 *         {@link #FrequencyGauge(int)}.
-	 */
+	 * Average frequency over {@link #getNrSamplesPerAverage()} last samples.
+	 * <p>
+	 * Note that if less than {@link #getNrSamplesPerAverage()} are measured
+	 * since startup, 0.0 is returned.
+	 * 
+	 * @return frequence or 0.0
+	 * */
 	public double getAvgFreq() {
 		if (samples[nrSamplesPerAverage - 1].time == -1L)
 			return 0.0;
@@ -100,6 +87,13 @@ public class FrequencyGauge {
 		else
 			avgFreq = avgFreq / (double) nrTransitions;
 		return avgFreq;
+	}
+
+	/**
+	 * @return Number of last samples stored to calculate average frequency.
+	 */
+	public int getNrSamplesPerAverage() {
+		return nrSamplesPerAverage;
 	}
 
 	/**

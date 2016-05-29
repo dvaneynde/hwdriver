@@ -68,12 +68,12 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			name = atts.getValue("name");
 			Block block2add = blocks.get(name);
 			groupBlocks.add(block2add);
-		} else if (localName.equals("windGauge")) {
+		} else if (localName.equals("windSensor")) {
 			parseBaseBlockWithChannel(atts);
 			int highFreqThreshold = parseIntAttribute("highFreq", atts);
 			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
-			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlertMs", atts);
-			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlertMs", atts);
+			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
+			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
 			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert, lowTimeToResetAlert);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lightGauge")) {
@@ -148,7 +148,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
 		} else if (localName.equals("connect-windsensor")) {
-			parseConnectWindsensor(atts);		
+			parseConnectWindsensor(atts);
 		} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
@@ -298,11 +298,11 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 		try {
 			WindSensor ws = (WindSensor) blocks.get(wsName);
-			Windsensor2Screen ws2s = new Windsensor2Screen(wsName+"_2_"+screenName, desc);
+			Windsensor2Screen ws2s = new Windsensor2Screen(wsName + "_2_" + screenName, desc);
 			ws.registerListener(ws2s);
 			for (Block target : targetBlocks) {
 				ws2s.registerListener((Screen) target);
-			}	
+			}
 		} catch (ClassCastException e) {
 			throw new ConfigurationException("Unsupported type for connect, source=" + wsName + ", screen=" + screenName + ".");
 		}

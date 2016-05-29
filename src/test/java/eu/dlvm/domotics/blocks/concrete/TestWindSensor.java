@@ -40,8 +40,8 @@ public class TestWindSensor implements IThresholdListener {
 	public static final LogCh WINDSENSOR_CH = new LogCh(10);
 	public static int HIGH_FREQ_THRESHOLD = 5;
 	public static int LOW_FREQ_THRESHOLD = 2;
-	public static int HIGH_TIME_BEFORE_ALERT = 1 * 1000;
-	public static int LOW_TIME_TO_RESET_ALERT = 2 * 1000;
+	public static int HIGH_TIME_BEFORE_ALERT = 1;
+	public static int LOW_TIME_TO_RESET_ALERT = 2;
 
 	@Override
 	public void onEvent(Sensor source, EventType event) {
@@ -98,7 +98,7 @@ public class TestWindSensor implements IThresholdListener {
 		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
 
 		log.debug("\n=============\nSTART HIGH FREQ " + HIGH_FREQ_THRESHOLD + "+2 but just not long enough for alarm \n=============");
-		time = simulateWind(HIGH_FREQ_THRESHOLD + 2, HIGH_TIME_BEFORE_ALERT - 100, time);
+		time = simulateWind(HIGH_FREQ_THRESHOLD + 2, HIGH_TIME_BEFORE_ALERT * 1000 - 100, time);
 		Assert.assertEquals(WindSensor.States.HIGH, ws.getState());
 
 		log.debug("\n=============\n LOW FREQ " + LOW_FREQ_THRESHOLD + " FOR 5 SEC\n=============");
@@ -107,11 +107,11 @@ public class TestWindSensor implements IThresholdListener {
 		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
 
 		log.debug("\n=============\nMUST GO TO ALARM HIGH FREQ " + HIGH_FREQ_THRESHOLD + "+2 long enough\n=============");
-		time = simulateWind(HIGH_FREQ_THRESHOLD + 2, HIGH_TIME_BEFORE_ALERT + 1000, time);
+		time = simulateWind(HIGH_FREQ_THRESHOLD + 2, HIGH_TIME_BEFORE_ALERT * 1000 + 1000, time);
 		Assert.assertEquals(WindSensor.States.ALARM, ws.getState());
 
 		log.debug("\n=============\n LOW FREQ " + LOW_FREQ_THRESHOLD + " FOR 5 SEC\n=============");
-		time = simulateWind(LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT - 100, time);
+		time = simulateWind(LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT * 1000 - 100, time);
 		Assert.assertEquals(WindSensor.States.ALARM_BUT_LOW, ws.getState());
 		time = simulateWind(LOW_FREQ_THRESHOLD, 1000, time);
 		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());

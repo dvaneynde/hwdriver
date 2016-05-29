@@ -32,7 +32,7 @@
 	<connect src="GarageAutoUit" target="LichtBadkamer0" />
 
 	<!-- Wind & Licht meter -->
-	<windGauge name="windmeter" highTimeBeforeAlertMs="1000" highFreq="5" lowTimeToResetAlertMs="10000" lowFreq="1" channel="Windmeter" />
+	<windSensor name="windmeter" highTimeBeforeAlert="1" highFreq="5" lowTimeToResetAlert="10" lowFreq="1" channel="Windmeter" />
 	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
 	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
 

@@ -36,13 +36,7 @@
 			<channel channel="1" />
 		</analog-output>
 		<digital-input>
-			<channel channel="0" logical-id="Test10" />
-			<channel channel="1" logical-id="Test11" />
-			<channel channel="2" logical-id="Test12" />
-			<channel channel="3" logical-id="Test13" />
-			<channel channel="4" logical-id="Test14" />
-			<channel channel="5" logical-id="Test15" />
-			<channel channel="6" logical-id="Windmeter" />
+			<channel channel="0" logical-id="Windmeter" />
 			<channel channel="7" logical-id="SchakBuitenTuin" />
 		</digital-input>
 	</dmmat>

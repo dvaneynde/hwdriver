@@ -20,7 +20,7 @@
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
 				<element name="repeatOff" type="tns:repeatOffType" />
-				<element name="windGauge" type="tns:windGaugeType" />
+				<element name="windSensor" type="tns:windSensorType" />
 				<element name="lightGauge" type="tns:lightGaugeType" />
 
 				<!-- actuators -->
@@ -167,13 +167,13 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="windGaugeType">
+	<complexType name="windSensorType">
 		<complexContent>
 			<extension base="tns:blockWithChannelStruct">
 				<attribute name="highFreq" use="required" />
 				<attribute name="lowFreq" use="required" />
-				<attribute name="highTimeBeforeAlertMs" use="required" />
-				<attribute name="lowTimeToResetAlertMs" use="required" />
+				<attribute name="highTimeBeforeAlert" use="required" />
+				<attribute name="lowTimeToResetAlert" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
