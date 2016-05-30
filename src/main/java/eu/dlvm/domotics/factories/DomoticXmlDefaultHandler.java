@@ -25,6 +25,7 @@ import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.connectors.Switch2Screen;
 import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
+import eu.dlvm.domotics.connectors.ThresholdEvent2Screen;
 import eu.dlvm.domotics.controllers.NewYear;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.Timer;
@@ -147,8 +148,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
-		} else if (localName.equals("connect-windsensor")) {
-			parseConnectWindsensor(atts);
+		} else if (localName.equals("connect-alarm-to-screen")) {
+			parseConnectAlarm2Screen(atts);
+		} else if (localName.equals("connect-threshold-to-screen")) {
+			parseConnectThreshold2Screen(atts);
 		} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
@@ -279,8 +282,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		}
 	}
 
-	private void parseConnectWindsensor(Attributes atts) {
-		String wsName = atts.getValue("windsensor");
+	private void parseConnectAlarm2Screen(Attributes atts) {
+		String wsName = atts.getValue("source");
 		String screenName = atts.getValue("screen");
 
 		// Not null in case of UiCapable mapper
@@ -305,6 +308,35 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			}
 		} catch (ClassCastException e) {
 			throw new ConfigurationException("Unsupported type for connect, source=" + wsName + ", screen=" + screenName + ".");
+		}
+	}
+
+	private void parseConnectThreshold2Screen(Attributes atts) {
+		String srcName = atts.getValue("source");
+		String screenName = atts.getValue("screen");
+
+		// Not null in case of UiCapable mapper
+		desc = atts.getValue("desc");
+		ui = atts.getValue("ui");
+
+		List<Block> targetBlocks;
+		Block t = blocks.get(screenName);
+		if (t == null)
+			targetBlocks = group2Blocks.get(screenName);
+		else {
+			targetBlocks = new ArrayList<>(1);
+			targetBlocks.add(t);
+		}
+
+		try {
+			LightSensor ls = (LightSensor) blocks.get(srcName);
+			ThresholdEvent2Screen ws2s = new ThresholdEvent2Screen(srcName + "_2_" + screenName, desc);
+			ls.registerListener(ws2s);
+			for (Block target : targetBlocks) {
+				ws2s.registerListener((Screen) target);
+			}
+		} catch (ClassCastException e) {
+			throw new ConfigurationException("Unsupported type for connect, source=" + srcName + ", screen=" + screenName + ".");
 		}
 	}
 

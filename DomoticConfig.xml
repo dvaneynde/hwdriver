@@ -2,12 +2,6 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
-	<!-- Wind & Licht meter -->
-	<windSensor name="windmeter" highFreq="10" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
-	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
-	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
-
-
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
@@ -205,8 +199,15 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
 
-<!-- Alle screens -->
-	<connect-windsensor screen="Screens" windsensor="windmeter" />
+	<!-- Wind & Licht meter -->
+	<windSensor name="windmeter" highFreq="10" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
+	<lightGauge name="lichtsensorScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
+	<lightGauge name="lichtsensorNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
+
+
+	<!-- Alle screens -->
+	<connect-alarm-to-screen screen="Screens" source="windmeter" />
+	<connect-threshold-to-screen screen="Screens" source="lichtsensorScreen" />
 	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
 		desc="Alle Screens" />
 

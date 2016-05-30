@@ -8,20 +8,20 @@ import org.apache.log4j.Logger;
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.sensors.IAlarmListener;
+import eu.dlvm.domotics.sensors.IThresholdListener;
 
 /**
  * @author dirk vaneynde
  */
-public class AlarmEvent2Screen extends Connector implements IAlarmListener {
+public class ThresholdEvent2Screen extends Connector implements IThresholdListener {
 
-	private static final Logger log = Logger.getLogger(AlarmEvent2Screen.class);
+	private static final Logger log = Logger.getLogger(ThresholdEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*
 	 * Public API
 	 */
-	public AlarmEvent2Screen(String name, String description) {
+	public ThresholdEvent2Screen(String name, String description) {
 		super(name, description, null);
 	}
 
@@ -35,14 +35,14 @@ public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 	@Override
 	public void onEvent(Sensor source, EventType event) {
 		switch (event) {
-		case ALARM:
+		case HIGH:
 			for (Screen screen : screens) {
-				screen.setProtect(true);
+				screen.up();
 			}
 			break;
-		case SAFE:
+		case LOW:
 			for (Screen screen : screens) {
-				screen.setProtect(false);
+				screen.down();
 			}
 			break;
 		default:
@@ -52,6 +52,7 @@ public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 
 	@Override
 	public String toString() {
-		return "AlarmEvent2Screen [screens=" + screens + "]";
+		return "ThresholdEvent2Screen [screens=" + screens + "]";
 	}
+
 }

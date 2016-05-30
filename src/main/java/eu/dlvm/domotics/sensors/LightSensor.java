@@ -32,7 +32,7 @@ public class LightSensor extends Sensor {
 	private long timeCurrentStateStarted;
 
 	// TODO listeners via generic in Sensor basis class
-	private Set<IAlarmListener> listeners = new HashSet<>();
+	private Set<IThresholdListener> listeners = new HashSet<>();
 
 	// ==========
 	// PUBLIC API
@@ -119,7 +119,7 @@ public class LightSensor extends Sensor {
 				state = States.HIGH;
 				timeCurrentStateStarted = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh=" + getHighThreshold());
-				notifyListeners(IAlarmListener.EventType.ALARM);
+				notifyListeners(IThresholdListener.EventType.HIGH);
 			}
 			break;
 		case HIGH:
@@ -136,7 +136,7 @@ public class LightSensor extends Sensor {
 				state = States.LOW;
 				timeCurrentStateStarted = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow=" + getLowThreshold());
-				notifyListeners(IAlarmListener.EventType.SAFE);
+				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;
 		default:
@@ -144,12 +144,12 @@ public class LightSensor extends Sensor {
 		}
 	}
 
-	public void registerListener(IAlarmListener listener) {
+	public void registerListener(IThresholdListener listener) {
 		listeners.add(listener);
 	}
 
-	public void notifyListeners(IAlarmListener.EventType event) {
-		for (IAlarmListener l : listeners)
+	public void notifyListeners(IThresholdListener.EventType event) {
+		for (IThresholdListener l : listeners)
 			l.onEvent(this, event);
 	}
 

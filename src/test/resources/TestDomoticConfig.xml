@@ -31,11 +31,6 @@
 	</repeatOff>
 	<connect src="GarageAutoUit" target="LichtBadkamer0" />
 
-	<!-- Wind & Licht meter -->
-	<windSensor name="windmeter" highTimeBeforeAlert="1" highFreq="5" lowTimeToResetAlert="10" lowFreq="1" channel="Windmeter" />
-	<lightGauge name="lichtmeterScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
-	<lightGauge name="lichtmeterNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
-
 	<!-- Screens -->
 	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" ui="Screens:0" />
 	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100" ui="Screens:1" />
@@ -53,6 +48,17 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
 		desc="Alle Screens" />
-	<connect-windsensor screen="Screens" windsensor="windmeter" />
+	
+	<!-- Wind & Licht meter -->
+	<windSensor name="windmeter" highFreq="10" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
+	<lightGauge name="lichtsensorScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
+	<lightGauge name="lichtsensorNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
+
+
+	<!-- Alle screens -->
+	<connect-alarm-to-screen screen="Screens" source="windmeter" />
+	<connect-threshold-to-screen screen="Screens" source="lichtsensorScreen" />
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
+		desc="Alle Screens" />
 
 </domotic>
