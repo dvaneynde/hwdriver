@@ -6,21 +6,27 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
+import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
+import eu.dlvm.domotics.sensors.IAlarmListener;
 
 public class TestScreensProtection extends TestScreensBase {
 
+	protected AlarmEvent2Screen alarmEvent2Screen;
+	
 	@Before
 	public void init() {
 		super.init();
+		alarmEvent2Screen = new AlarmEvent2Screen("testAlarm", null);
+		alarmEvent2Screen.registerListener(super.sr);
 	}
 
 	@Test
 	public void upAtRestAndProtect() {
 		// rest state
 		loop();
-		assertOpenAndRest();
+		assertRestAndOpen();
 
-		sr.setProtect(true);
+		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.ALARM);
 		loop();
 		assertUpProtected();
 
@@ -31,7 +37,7 @@ public class TestScreensProtection extends TestScreensBase {
 	@Test
 	public void firstDownAndThenProtect_WhileUpDoDownOrUp_ThenUnprotectAndDown() {
 		loop();
-		assertOpenAndRest();
+		assertRestAndOpen();
 
 		sr.down();
 		loop();
@@ -40,7 +46,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(sr.getMotorDnPeriod() * 1000L + 10);
 		assertRestAndClosed();
 		
-		sr.setProtect(true);
+		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.ALARM);
 		loop();
 		assertUpProtected();
 
@@ -55,7 +61,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertOpenInRestProtected();
 		
-		sr.setProtect(false);
+		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.SAFE);
 		loop();
 		sr.down();
 		loop();
@@ -65,7 +71,7 @@ public class TestScreensProtection extends TestScreensBase {
 	@Test
 	public void goDownThenHalfWayProtect_ShouldGoUpAfterDelay() {
 		loop();
-		assertOpenAndRest();
+		assertRestAndOpen();
 
 		sr.down();
 		loop();
@@ -74,7 +80,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(sr.getMotorDnPeriod() * 1000L/2);
 		assertDown();
 
-		sr.setProtect(true);
+		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.ALARM);
 		loop();
 		Assert.assertEquals(Screen.States.DELAY_DOWN_2_UP, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
@@ -100,19 +106,20 @@ public class TestScreensProtection extends TestScreensBase {
 	@Test
 	public void goDownAndThenUpAndHalfWayProtect_ShouldContinueGoingUp() {
 		loop();
-		assertOpenAndRest();
+		assertRestAndOpen();
 		sr.down();
 		loop();
 		assertDown();		
 		loop(sr.getMotorDnPeriod() * 1000L + 10);
 		assertRestAndClosed();
+
 		sr.up();
 		loop();
 		assertUp();	
 		loop(sr.getMotorUpPeriod() * 1000L/2);
 		assertUp();	
 		
-		sr.setProtect(true);
+		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.ALARM);
 		loop();
 		assertUpProtected();	
 		
@@ -125,39 +132,39 @@ public class TestScreensProtection extends TestScreensBase {
 	/*
 	 * Helpers
 	 */
-	private void assertOpenAndRest() {
+	protected void assertRestAndOpen() {
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertEquals(0.0, sr.getRatioClosed());
 		Assert.assertEquals(false, sr.getProtect());
 	}
-	private void assertRestAndClosed() {
+	protected void assertRestAndClosed() {
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertEquals(1.0, sr.getRatioClosed());
 		Assert.assertEquals(false, sr.getProtect());
 	}
-	private void assertDown() {
+	protected void assertDown() {
 		Assert.assertEquals(Screen.States.DOWN, sr.getState());
 		Assert.assertTrue(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertFalse(sr.getProtect());
 	}
-	private void assertUp() {
+	protected void assertUp() {
 		Assert.assertEquals(Screen.States.UP, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertTrue(hw.upRelais);
 		Assert.assertFalse(sr.getProtect());
 	}
-	private void assertUpProtected() {
+	protected void assertUpProtected() {
 		Assert.assertEquals(Screen.States.UP, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertTrue(hw.upRelais);
 		Assert.assertTrue(sr.getProtect());
 	}
-	private void assertOpenInRestProtected() {
+	protected void assertOpenInRestProtected() {
 		Assert.assertEquals(Screen.States.REST_PROTECT, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
