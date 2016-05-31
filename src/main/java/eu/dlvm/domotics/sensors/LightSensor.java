@@ -24,7 +24,8 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class LightSensor extends Sensor {
 
-	private static Logger log = Logger.getLogger(LightSensor.class);
+	private static final Logger log = Logger.getLogger(LightSensor.class);
+	private static final Logger loglight = Logger.getLogger("LIGHT");
 	private int highThreshold;
 	private int lowThreshold;
 	private long thresholdDelayMs;
@@ -102,7 +103,7 @@ public class LightSensor extends Sensor {
 	public void loop(long currentTime, long sequence) {
 		int newInput = getHw().readAnalogInput(getChannel());
 
-		log.debug("LightSensor " + getName() + ": ana in=" + newInput);
+		loglight.info("LightSensor " + getName() + ": ana in=" + newInput);
 
 		switch (state) {
 		case LOW:
