@@ -88,8 +88,9 @@ function refreshActuators() {
 		window.isRefreshing = true;
 		for (i = 0; i < data.length; i++) {
 			act = data[i];
-			// curOn = $("#" + act.name).prop("checked");
-			// act.on = !curOn;
+			
+			// TODO ik heb de if hieronder weggehaald, en ook de refresh; refresh is blijkbaar om dynamisch elementen toe te voegen? als dit werkt verderop ook wegdoen, verklaart misschien teveel events bij DL...
+			//console.log("refreshActuators, name="+act.name+" on="+act.on+" type="+act.type);
 			if (act.type !== "Switch") {	// toegevoegd, omdat het fout gaf (wel raar dat Screen dan geen fout gaf...)
 				$("#" + act.name).prop("checked", act.on).checkboxradio("refresh");
 			}
@@ -132,7 +133,6 @@ function refreshActuators() {
 			}
 		}
 	});
-
 }
 
 $(document).ready(function autorefresh() {

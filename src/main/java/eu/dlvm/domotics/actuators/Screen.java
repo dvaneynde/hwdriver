@@ -260,29 +260,28 @@ public class Screen extends Actuator {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
-		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " !!!" : ""));
+		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " STORM" : ""));
 		return bi;
 	}
 
 	private String asSign() {
 		switch (getState()) {
 		case DOWN:
-			return "vvv";
+			return "vvvv";
 		case UP:
-			return "^^^";
+			return "^^^^";
 		case REST:
+		case REST_PROTECT:
 			if (ratioClosed > 0.90)
-				return "TOE";
+				return "TOE ";
 			else if (ratioClosed < 0.10)
 				return "OPEN";
 			else
 				return "HALF";
 		case DELAY_DOWN_2_UP:
-			return "WACHT";
+			return "WCHT";
 		case DELAY_UP_2_DOWN:
-			return "WACHT";
-		case REST_PROTECT:
-			return "STORM";
+			return "WCHT";
 		}
 		return "ERROR";
 	}

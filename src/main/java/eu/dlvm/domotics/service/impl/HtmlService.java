@@ -26,14 +26,14 @@ import eu.dlvm.domotics.service.BlockInfo;
 @Path("domo")
 public class HtmlService {
 
-	private static Logger Log = Logger.getLogger(RestService.class);
+	private static final Logger log = Logger.getLogger(RestService.class);
 	private static int countInstances = 0;
 
 	private static Data data = null;
 
 	public HtmlService() {
 		countInstances++;
-		Log.info("Count instances: " + countInstances);
+		log.info("Count instances: " + countInstances);
 	}
 
 	public static Map<String, Boolean> getGroup2Status() {
@@ -55,6 +55,7 @@ public class HtmlService {
 					if (a.getUi() == null)
 						continue;
 					StringTokenizer st = new StringTokenizer(a.getUi(), ":");
+					log.info("TEMP ui="+a.getUi());
 					String groupName = st.nextToken();
 					int idx = Integer.parseInt(st.nextToken());
 					if (!groupnames.contains(groupName)) {
@@ -79,7 +80,7 @@ public class HtmlService {
 					}
 					data.getGroupname2infos().put(groupName, newBlockinfos);
 				}
-				Log.info("Web model data first-time initialized. Data=" + data);
+				log.info("Web model data first-time initialized. Data=" + data);
 			} else {
 				for (List<BlockInfo> list : data.groupname2infos.values()) {
 					for (int i = 0; i < list.size(); i++) {
@@ -104,7 +105,7 @@ public class HtmlService {
 			data.setGroupOn(onMap);
 			data.setTitle("Domotica");
 		} catch (Exception e) {
-			Log.error("Unexpected exception.", e);
+			log.error("Unexpected exception.", e);
 			throw new RuntimeException("Server Error - check log.");
 		}
 	}
@@ -113,10 +114,10 @@ public class HtmlService {
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
 	public Viewable viewThuis() {
-		Log.info("viewThuis() opgeroepen");
+		log.info("viewThuis() opgeroepen");
 		ensureModelDataFilledIn();
 		Viewable v = new Viewable("/index", data);
-		Log.info("viewable=" + v);
+		log.info("viewable=" + v);
 
 		return v;
 	}
@@ -125,14 +126,14 @@ public class HtmlService {
 	@Produces("application/javascript")
 	@GET
 	public InputStream serveJs(@PathParam("name") String name) {
-		Log.info("Domotic API: serveJs() called, name=" + name);
+		log.info("Domotic API: serveJs() called, name=" + name);
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("js/" + name);
 		if (is == null) {
 			try {
 				is = new FileInputStream("src/main/resources/js/" + name);
-				Log.warn("serveJs(" + name + "), niet in jar gevonden, maar in src/main/resources/js.");
+				log.warn("serveJs(" + name + "), niet in jar gevonden, maar in src/main/resources/js.");
 			} catch (FileNotFoundException e) {
-				Log.error("Could not find " + name + ", neither in jar or development location.");
+				log.error("Could not find " + name + ", neither in jar or development location.");
 				return null;
 			}
 		}
@@ -143,14 +144,14 @@ public class HtmlService {
 	@Produces("text/css")
 	@GET
 	public InputStream serveCss(@PathParam("name") String name) {
-		Log.info("Domotic API: serveCss() called, name=" + name);
+		log.info("Domotic API: serveCss() called, name=" + name);
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("css/" + name);
 		if (is == null) {
 			try {
 				is = new FileInputStream("src/main/resources/css/" + name);
-				Log.warn("serveCss(" + name + "), niet in jar gevonden, maar in src/main/resources/css.");
+				log.warn("serveCss(" + name + "), niet in jar gevonden, maar in src/main/resources/css.");
 			} catch (FileNotFoundException e) {
-				Log.error("Could not find " + name + ", neither in jar or development location.");
+				log.error("Could not find " + name + ", neither in jar or development location.");
 				return null;
 			}
 		}
@@ -165,9 +166,9 @@ public class HtmlService {
 		if (is == null) {
 			try {
 				is = new FileInputStream("src/main/resources/home2.html");
-				Log.warn("html niet in jar gevonden, maar in src/main/resources/js.");
+				log.warn("html niet in jar gevonden, maar in src/main/resources/js.");
 			} catch (FileNotFoundException e) {
-				Log.error("Could not find html file, neither in jar or development location.");
+				log.error("Could not find html file, neither in jar or development location.");
 				return null;
 			}
 		}

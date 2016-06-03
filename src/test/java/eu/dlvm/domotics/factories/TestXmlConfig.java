@@ -17,6 +17,6 @@ public class TestXmlConfig {
 		cf.configure(ctx);
 		Assert.assertEquals(16, ctx.sensors.size());
 		Assert.assertEquals(6, ctx.actuators.size());
-		Assert.assertEquals(1, ctx.controllers.size());
+		Assert.assertEquals(2, ctx.controllers.size());
 	}
 }

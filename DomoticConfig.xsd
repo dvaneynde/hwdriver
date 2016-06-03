@@ -107,6 +107,18 @@
 						<attribute name="desc" type="string" />
 					</complexType>
 				</element>
+				<!-- <screen-controller name="SchermController" alarmSrc="windmeter" screen="Screens" />  -->
+				<element name="screen-controller">
+					<complexType>
+						<complexContent>
+							<extension base="tns:blockWithChannelStruct">
+								<attribute name="alarmSrc" type="IDREF"></attribute>
+								<attribute name="lightSrc" type="IDREF"></attribute>
+								<attribute name="screen" type="IDREF"></attribute>
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
 			</choice>
 		</complexType>
 	</element>

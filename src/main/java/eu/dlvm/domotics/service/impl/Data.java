@@ -43,4 +43,11 @@ public class Data {
 	public void setGroupOn(Map<String, Boolean> groupOn) {
 		this.groupOn = groupOn;
 	}
+
+	@Override
+	public String toString() {
+		return "Data [title=" + title + ", groupNames=" + groupNames + ", groupname2infos=" + groupname2infos + ", groupOn=" + groupOn + "]";
+	}
+	
+	
 }

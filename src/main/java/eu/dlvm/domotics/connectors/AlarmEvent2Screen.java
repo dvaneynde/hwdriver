@@ -6,8 +6,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.actuators.Screen;
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Connector;
-import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.sensors.IAlarmListener;
 
 /**
@@ -33,7 +33,7 @@ public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 	}
 
 	@Override
-	public void onEvent(Sensor source, EventType event) {
+	public void onEvent(Block source, EventType event) {
 		switch (event) {
 		case ALARM:
 			for (Screen screen : screens) {

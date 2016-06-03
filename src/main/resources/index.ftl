@@ -19,13 +19,6 @@
 
 	<script type="text/javascript" src="js/domo.js"></script>
 </head>
-<!--
-TOOD:
-1. elke 5 seconden een refresh
-2. bij click op checkbox, toggle doorsturen, en refresh
-   function sendToggle(name) {
-   }
--->
 <body>
 	<div data-role="page" id="pageone" data-theme="a">
 		<div data-role="header" >
@@ -83,6 +76,11 @@ TOOD:
 									    <button name="${act.name}" class="ui-btn ui-icon-carat-u ui-btn-icon-notext ui-corner-all" onclick='sendUp(this);'>Up</button>
 									</div>
 								</fieldset>
+							<#elseif act.type = "ScreenController">
+								<label>
+									<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 
+									${act.status}
+								</label>
 							<#else>
 								<label><!-- TODO Flip Switch ipv checkbox -->
 									<input type="checkbox" id="${act.name}" name="${act.name}" value="${act.name}" <#if act.on>checked</#if> onclick='sendToggle(this);'>${act.description}</input> 

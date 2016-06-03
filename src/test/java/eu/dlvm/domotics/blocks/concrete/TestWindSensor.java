@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.IAlarmListener;
@@ -44,11 +44,8 @@ public class TestWindSensor implements IAlarmListener {
 	public static int LOW_TIME_TO_RESET_ALERT = 2;
 
 	@Override
-	public void onEvent(Sensor source, EventType event) {
-		lastEvent = event;
+	public void onEvent(Block source, EventType event) {
 	}
-
-	private IAlarmListener.EventType lastEvent;
 
 	@BeforeClass
 	public static void initLog() {

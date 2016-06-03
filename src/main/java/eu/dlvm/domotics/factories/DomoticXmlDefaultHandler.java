@@ -28,6 +28,7 @@ import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
 import eu.dlvm.domotics.connectors.ThresholdEvent2Screen;
 import eu.dlvm.domotics.controllers.NewYear;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
+import eu.dlvm.domotics.controllers.ScreenController;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -148,15 +149,17 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
-		} else if (localName.equals("connect-alarm-to-screen")) {
+/*		} else if (localName.equals("connect-alarm-to-screen")) {
 			parseConnectAlarm2Screen(atts);
 		} else if (localName.equals("connect-threshold-to-screen")) {
 			parseConnectThreshold2Screen(atts);
-		} else if (localName.equals("newyear")) {
+*/		} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
 			NewYear ny = new NewYearBuilder().build(blocks, start.getTime(), end.getTime(), ctx);
 			blocks.put(ny.getName(), ny);
+		} else if (localName.equals("screen-controller")) {
+			parseScreenController(atts);
 		} else {
 			throw new RuntimeException("Block " + qqName + " not supported.");
 		}
@@ -183,6 +186,37 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else {
 			throw new ConfigurationException("Unsupported type for connect, source=" + srcName + ", target=" + targetName + ", source event=" + srcEventName);
 		}
+	}
+
+	private void parseScreenController(Attributes atts) {
+		parseBaseBlock(atts);
+		ScreenController enabler = new ScreenController(name, desc, ui, ctx);
+
+		String srcAlarmName = atts.getValue("alarmSrc");
+		WindSensor srcAlarm = (WindSensor) blocks.get(srcAlarmName);
+		srcAlarm.registerListener(enabler);
+
+		String srcLightName = atts.getValue("lightSrc");
+		LightSensor lightSensor = (LightSensor) blocks.get(srcLightName);
+		lightSensor.registerListener(enabler);
+		
+		List<Block> targetBlocks;
+		String screenName = atts.getValue("screen");
+		Block t = blocks.get(screenName);
+		if (t == null)
+			targetBlocks = group2Blocks.get(screenName);
+		else {
+			targetBlocks = new ArrayList<>(1);
+			targetBlocks.add(t);
+		}
+		try {
+			for (Block target : targetBlocks) {
+				enabler.registerListener((Screen) target);
+			}
+		} catch (ClassCastException e) {
+			throw new ConfigurationException("Unsupported type for screen-controller, name=" + name + ", screen=" + screenName + ".");
+		}
+		blocks.put(enabler.getName(), enabler);
 	}
 
 	private void handleConnectSwitch2OOT(Switch swtch, String srcEventName, String targetName, String eventName) {

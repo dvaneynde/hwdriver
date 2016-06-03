@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class Controller extends Block implements IDomoticLoop, IUserInterfaceAPI {
 
-	static Logger log = Logger.getLogger(Controller.class);
+	private static final Logger log = Logger.getLogger(Controller.class);
 
 	public Controller(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui);

@@ -38,8 +38,8 @@
 	<switch name="SchakScreenBreedDown" />
 	<switch name="SchakScreenLangUp" />
 	<switch name="SchakScreenLangDown" />
-	<switch name="SchakScreenAllUp" singleClick="false" longClick="true" />
-	<switch name="SchakScreenAllDown" singleClick="false" longClick="true" />
+	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
+	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
 	<group name="Screens">
 		<block name="ScreenBreed" />
 		<block name="ScreenLang" />
@@ -48,16 +48,17 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
 		desc="Alle Screens" />
-	
-	<!-- Wind & Licht meter -->
-	<windSensor name="windmeter" highFreq="10" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
-	<lightGauge name="lichtsensorScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
-	<lightGauge name="lichtsensorNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
 
+	<lightGauge name="LichtsensorNacht" low="3000" high="4000" thresholdTimeMs="2000" channel="AnalogIn" />
+
+	<!-- Zon / Wind Automaat -->
+	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
+	<lightGauge name="LichtsensorScreen" low="1000" high="3000" thresholdTimeMs="2000" channel="AnalogIn" />
+	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtsensorScreen" screen="Screens" ui="Alles:2"/>
+	<connect src="SchakScreenAllDown" src-event="single" target="ZonneAutomaat" event="off" />
+	<connect src="SchakScreenAllUp" src-event="single" target="ZonneAutomaat" event="on" />
 
 	<!-- Alle screens -->
-	<connect-alarm-to-screen screen="Screens" source="windmeter" />
-	<connect-threshold-to-screen screen="Screens" source="lichtsensorScreen" />
 	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
 		desc="Alle Screens" />
 
