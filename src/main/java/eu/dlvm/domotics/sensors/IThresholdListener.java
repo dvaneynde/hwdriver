@@ -2,7 +2,6 @@ package eu.dlvm.domotics.sensors;
 
 import eu.dlvm.domotics.base.Sensor;
 
-@Deprecated
 public interface IThresholdListener {
 
 	public static enum EventType {

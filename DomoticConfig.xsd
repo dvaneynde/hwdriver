@@ -202,7 +202,8 @@
 			<extension base="tns:blockWithChannelStruct">
 				<attribute name="high" use="required" />
 				<attribute name="low" use="required" />
-				<attribute name="thresholdTimeMs" use="required" />
+				<attribute name="low2highTime" use="required" />
+				<attribute name="high2lowTime" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>

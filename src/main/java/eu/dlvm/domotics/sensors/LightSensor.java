@@ -13,48 +13,50 @@ import eu.dlvm.iohardware.LogCh;
 
 /**
  * Measures light via analog input (via
- * {@link IHardwareIO#readAnalogInput(LogCh)}) . If this input value
- * is higher than {@link #getHighThreshold()} for {@link #getHighWaitingTime()}
+ * {@link IHardwareIO#readAnalogInput(LogCh)}) . If this input value is higher
+ * than {@link #getHighThreshold()} for {@link #getHighWaitingTime()}
  * milliseconds a {@link States#HIGH} event is sent once. If lower than
- * {@link #getLowThreshold()} for {@link #getThresholdDelayMs()} milliseconds
- * a {@link States#LOW} event is sent once.
+ * {@link #getLowThreshold()} for {@link #getThresholdDelayMs()} milliseconds a
+ * {@link States#LOW} event is sent once.
  * 
  * @author dirk vaneynde
  * 
  */
 public class LightSensor extends Sensor {
 
+	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
 	private static final Logger log = Logger.getLogger(LightSensor.class);
 	private static final Logger loglight = Logger.getLogger("LIGHT");
-	private int highThreshold;
-	private int lowThreshold;
-	private long thresholdDelayMs;
+	private int highThreshold, lowThreshold;
+	private long lowToHighDelayMs, highToLowDelayMs;
 	private States state;
-	private long timeCurrentStateStarted;
+	private long timeCurrentStateStarted, timeSinceLastEventSent;
 
 	// TODO listeners via generic in Sensor basis class
 	private Set<IThresholdListener> listeners = new HashSet<>();
 
-	// ==========
+	// ===================
 	// PUBLIC API
-	
+
 	public static enum States {
 		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
 	};
 
-	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold, long thresholdDelayMs)
+	public LightSensor(String name, String description, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold, int lowToHighDelaySec, int highToLowDelaySec)
 			throws IllegalConfigurationException {
 		super(name, description, channel, ctx);
-		timeCurrentStateStarted = 0L;
-		state = States.LOW;
 		if ((highThreshold < lowThreshold) || lowThreshold < 0 || highThreshold < 0) {
 			throw new IllegalConfigurationException("Incorrect parameters. Check doc.");
 		}
 		this.lowThreshold = lowThreshold;
 		this.highThreshold = highThreshold;
-		this.thresholdDelayMs = thresholdDelayMs;
-		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low=" + getLowThreshold() + ", time before effective=" + getThresholdDelayMs() + ", channel="
-				+ getChannel());
+		this.lowToHighDelayMs = lowToHighDelaySec * 1000L;
+		this.highToLowDelayMs = highToLowDelaySec * 1000L;
+
+		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
+		state = States.LOW;
+		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low=" + getLowThreshold() + ", low to high delay=" + getLowToHighDelaySec()
+				+ ", high to low delay=" + getHighToLowDelaySec() + " s., channel=" + getChannel());
 	}
 
 	/**
@@ -69,8 +71,7 @@ public class LightSensor extends Sensor {
 
 	/**
 	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(LogCh)})
-	 * for {@link States#HIGH} state. See also {@link #getThresholdDelayMs()}
-	 * .
+	 * for {@link States#HIGH} state. See also {@link #getThresholdDelayMs()}.
 	 * 
 	 * @return low threshold value
 	 */
@@ -79,13 +80,23 @@ public class LightSensor extends Sensor {
 	}
 
 	/**
-	 * Time in ms that a threshold crossing must remain until the new state is
-	 * effective.
+	 * Time that input must remain above {@link #getHighThreshold()} before
+	 * actually going {@link States#HIGH}.
 	 * 
-	 * @return waiting time in milliseconds
+	 * @return time in seconds
 	 */
-	public long getThresholdDelayMs() {
-		return thresholdDelayMs;
+	public int getLowToHighDelaySec() {
+		return (int) lowToHighDelayMs / 1000;
+	}
+
+	/**
+	 * Time that input must remain below {@link #getLowThreshold()} before
+	 * actually going {@link States#LOW}.
+	 * 
+	 * @return time in seconds
+	 */
+	public int getHighToLowDelaySec() {
+		return (int) lowToHighDelayMs / 1000;
 	}
 
 	/**
@@ -95,14 +106,12 @@ public class LightSensor extends Sensor {
 		return state;
 	}
 
-	
-	// ===========
+	// ===================
 	// PRIVATE API
-	
+
 	@Override
 	public void loop(long currentTime, long sequence) {
 		int newInput = getHw().readAnalogInput(getChannel());
-
 		loglight.info("LightSensor " + getName() + ": ana in=" + newInput);
 
 		switch (state) {
@@ -116,9 +125,9 @@ public class LightSensor extends Sensor {
 			if (newInput < getHighThreshold()) {
 				state = States.LOW;
 				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > getThresholdDelayMs()) {
+			} else if ((currentTime - timeCurrentStateStarted) >= lowToHighDelayMs) {
 				state = States.HIGH;
-				timeCurrentStateStarted = currentTime;
+				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + newInput + " > thresholdHigh=" + getHighThreshold());
 				notifyListeners(IThresholdListener.EventType.HIGH);
 			}
@@ -133,15 +142,17 @@ public class LightSensor extends Sensor {
 			if (newInput > getLowThreshold()) {
 				state = States.HIGH;
 				timeCurrentStateStarted = currentTime;
-			} else if ((currentTime - timeCurrentStateStarted) > getThresholdDelayMs()) {
+			} else if ((currentTime - timeCurrentStateStarted) >= highToLowDelayMs) {
 				state = States.LOW;
-				timeCurrentStateStarted = currentTime;
+				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow=" + getLowThreshold());
 				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;
-		default:
-			throw new RuntimeException("Programming Error. Unhandled state.");
+		}
+		if (currentTime - timeSinceLastEventSent >= DEFAULT_REPEAT_EVENT_MS) {
+			notifyListeners((state == States.HIGH || state == States.HIGH2LOW_DELAY) ? IThresholdListener.EventType.HIGH : IThresholdListener.EventType.LOW);
+			timeSinceLastEventSent = currentTime;
 		}
 	}
 

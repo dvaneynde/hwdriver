@@ -82,8 +82,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseBaseBlockWithChannel(atts);
 			int highThreshold = parseIntAttribute("high", atts);
 			int lowThreshold = parseIntAttribute("low", atts);
-			int thresholdTimeMs = parseIntAttribute("thresholdTimeMs", atts);
-			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, (long) thresholdTimeMs);
+			int low2highTime = parseIntAttribute("low2highTime", atts);
+			int high2lowTime = parseIntAttribute("high2lowTime", atts);
+			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, low2highTime, high2lowTime);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
@@ -149,11 +150,12 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			parseConnectDimmer(atts);
 		} else if (localName.equals("connect-screen")) {
 			parseConnectScreen(atts);
-/*		} else if (localName.equals("connect-alarm-to-screen")) {
-			parseConnectAlarm2Screen(atts);
-		} else if (localName.equals("connect-threshold-to-screen")) {
-			parseConnectThreshold2Screen(atts);
-*/		} else if (localName.equals("newyear")) {
+			/*
+			 * } else if (localName.equals("connect-alarm-to-screen")) {
+			 * parseConnectAlarm2Screen(atts); } else if
+			 * (localName.equals("connect-threshold-to-screen")) {
+			 * parseConnectThreshold2Screen(atts);
+			 */} else if (localName.equals("newyear")) {
 			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
 			NewYear ny = new NewYearBuilder().build(blocks, start.getTime(), end.getTime(), ctx);
@@ -199,7 +201,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String srcLightName = atts.getValue("lightSrc");
 		LightSensor lightSensor = (LightSensor) blocks.get(srcLightName);
 		lightSensor.registerListener(enabler);
-		
+
 		List<Block> targetBlocks;
 		String screenName = atts.getValue("screen");
 		Block t = blocks.get(screenName);

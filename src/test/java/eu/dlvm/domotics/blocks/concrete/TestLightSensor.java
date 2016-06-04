@@ -29,81 +29,98 @@ public class TestLightSensor implements IThresholdListener {
 		}
 	};
 
+	private static final long SAMPLE_TIME = 50;
 	private static final LogCh LIGHTSENSOR_CH = new LogCh(10);
 	private Hardware hw = new Hardware();
 	private IDomoticContext ctx = new DomoContextMock(hw);
+	private LightSensor ls;
+	private IThresholdListener.EventType lastEvent;
+	private int nrEvents;
 	private long seq, cur;
+
+	private void loopTo(long targetTime) {
+		for (long time = cur + SAMPLE_TIME; time <= targetTime; time += SAMPLE_TIME) {
+			ls.loop(time, seq++);
+		}
+		cur = targetTime;
+	}
+
+	@Override
+	public void onEvent(Sensor source, EventType event) {
+		lastEvent = event;
+		nrEvents++;
+	}
 
 	@BeforeClass
 	public static void initLog() {
 		BasicConfigurator.configure();
 	}
 
+	private void check(LightSensor.States stateExpected, IThresholdListener.EventType eventExpected, int nrEventsExpected) {
+		Assert.assertEquals(stateExpected, ls.getState());
+		Assert.assertEquals(eventExpected, lastEvent);
+		Assert.assertEquals(nrEventsExpected, nrEvents);
+	}
+
+	// ===============
+	// TESTS
+
 	@Test
 	public final void testInitWrong() {
 		try {
-			LightSensor ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 1000, 100, 500);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 1000, 100, 500, 500);
 			fail("Should fail, since lowThreshold > highThreshold. LightSensor=" + ls);
 		} catch (IllegalConfigurationException e) {
 			;
 		}
 	}
 
-	private void loop200(LightSensor ls) {
-		cur += 200;
-		seq++;
-		ls.loop(cur, seq);
-	}
-
-	@Override
-	public void onEvent(Sensor source, EventType event) {
-		lastEvent = event;
-	}
-	private IThresholdListener.EventType lastEvent;
-
 	@Test
 	public final void testLowHighLow() {
 		try {
-			LightSensor ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 500, 1000, 300);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 500, 1000, 2, 3);
 			ls.registerListener(this);
 
 			seq = cur = 0L;
-			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
+			check(LightSensor.States.LOW, null, 0);
+
 			hw.level = 1100;
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW2HIGH_DELAY, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(100);
+			check(LightSensor.States.LOW2HIGH_DELAY, null, 0);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW2HIGH_DELAY, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(1900);
+			check(LightSensor.States.LOW2HIGH_DELAY, EventType.LOW, 1);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH, ls.getState());
-			Assert.assertEquals(EventType.HIGH, lastEvent);
-			lastEvent = null;
+			loopTo(2100);
+			check(LightSensor.States.HIGH, EventType.HIGH, 3);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(2200);
+			check(LightSensor.States.HIGH, IThresholdListener.EventType.HIGH, 3);
 
+			hw.level = 600;
+			loopTo(3100);
+			check(LightSensor.States.HIGH, IThresholdListener.EventType.HIGH, 4);
+
+			loopTo(6100);
+			check(LightSensor.States.HIGH, IThresholdListener.EventType.HIGH, 7);
+
+			loopTo(6500L - SAMPLE_TIME);
 			hw.level = 400;
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(6500);
+			check(LightSensor.States.HIGH2LOW_DELAY, IThresholdListener.EventType.HIGH, 7);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(7100);
+			check(LightSensor.States.HIGH2LOW_DELAY, IThresholdListener.EventType.HIGH, 8);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
-			Assert.assertEquals(EventType.LOW, lastEvent);
-			lastEvent = null;
+			loopTo(9400);
+			check(LightSensor.States.HIGH2LOW_DELAY, IThresholdListener.EventType.HIGH, 10);
 
-			loop200(ls);
-			Assert.assertEquals(LightSensor.States.LOW, ls.getState());
-			Assert.assertNull(lastEvent);
+			loopTo(9500);
+			check(LightSensor.States.LOW, IThresholdListener.EventType.LOW, 11);
+
+			hw.level = 900;
+			loopTo(11000);
+			check(LightSensor.States.LOW, IThresholdListener.EventType.LOW, 12);
 
 		} catch (IllegalConfigurationException e) {
 			fail(e.getMessage());

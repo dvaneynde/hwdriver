@@ -16,16 +16,18 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class WindSensor extends Sensor {
 
+	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
 	private static final Logger log = Logger.getLogger(WindSensor.class);
 	private static final Logger logwind = Logger.getLogger("WIND");
-	private int highFreqThreshold;
-	private int lowFreqThreshold;
-	private long highTimeBeforeAlertMs;
-	private long lowTimeToResetAlertMs;
-	private Set<IAlarmListener> listeners = new HashSet<>();
+	private int highFreqThreshold, lowFreqThreshold;
+	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
 	private States state;
-	private long timeCurrentStateStarted;
+	private long timeCurrentStateStarted, timeSinceLastEventSent;
+
 	FrequencyGauge gauge; // package scope for unit tests
+
+	// TODO listeners via generic in Sensor basis class
+	private Set<IAlarmListener> listeners = new HashSet<>();
 
 	// ===================
 	// PUBLIC API
@@ -56,13 +58,15 @@ public class WindSensor extends Sensor {
 		this.highTimeBeforeAlertMs = highTimeBeforeAlert * 1000L;
 		this.lowTimeToResetAlertMs = lowTimeToResetAlert * 1000L;
 
-		this.gauge = new FrequencyGauge(25); // TODO parameter? or calculated
-												// from sample time and
-												// lowfreq/highfreq?
+		// TODO 25 below as parameter? or calculated from sample time and
+		// lowfreq/highfreq?
+		this.gauge = new FrequencyGauge(25);
+
+		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
 		this.state = States.NORMAL;
 		// this.lastFrequency = 0L;
-		log.info("Windsensor '" + getName() + "' configured: highFreq=" + getHighFreqThreshold() + ", highTimeBeforeAlert=" + getHighTimeBeforeAlert() / 1000.0 + "(s), lowFreq="
-				+ getLowFreqThreshold() + ", lowTimeToResetAlert=" + getLowTimeToResetAlert() / 1000.0 + "(s).");
+		log.info("Windsensor '" + getName() + "' configured: highFreq=" + getHighFreqThreshold() + ", highTimeBeforeAlert=" + getHighTimeBeforeAlertSec() / 1000.0 + "(s), lowFreq="
+				+ getLowFreqThreshold() + ", lowTimeToResetAlert=" + getLowTimeToResetAlertSec() / 1000.0 + "(s).");
 	}
 
 	/**
@@ -80,16 +84,16 @@ public class WindSensor extends Sensor {
 	}
 
 	/**
-	 * @return the high time after which to raise alarm, in milliseconds
+	 * @return the high time after which to raise alarm, in seconds
 	 */
-	public long getHighTimeBeforeAlert() {
+	public long getHighTimeBeforeAlertSec() {
 		return highTimeBeforeAlertMs;
 	}
 
 	/**
 	 * @return the low time to reset alert, in milliseconds
 	 */
-	public long getLowTimeToResetAlert() {
+	public long getLowTimeToResetAlertSec() {
 		return lowTimeToResetAlertMs;
 	}
 
@@ -119,6 +123,7 @@ public class WindSensor extends Sensor {
 			logwind.info(state + "\ttime=\t" + (currentTime / 1000) % 1000 + "s.\t" + currentTime % 1000 + "ms.\tfreq=" + freq);
 			infoCounter = (infoCounter + 1) % 5;
 		}
+
 		switch (state) {
 		case NORMAL:
 			if (freq >= getHighFreqThreshold()) {
@@ -131,17 +136,17 @@ public class WindSensor extends Sensor {
 			if (freq < getHighFreqThreshold()) {
 				state = States.NORMAL;
 				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor '" + getName() + "': HIGH to NORMAL : freq=" + freq + " < thresholdHigh=" + getHighFreqThreshold());
-			} else if ((currentTime - timeCurrentStateStarted) > getHighTimeBeforeAlert()) {
+				log.debug("WindSensor '" + getName() + "': HIGH to NORMAL : freq=" + freq + " < thresholdHigh=" + getHighFreqThreshold());
+			} else if ((currentTime - timeCurrentStateStarted) > highTimeBeforeAlertMs) {
 				state = States.ALARM;
-				timeCurrentStateStarted = currentTime;
+				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies HIGH event because in ALARM state: freq=" + freq + " > thresholdHigh=" + getHighFreqThreshold() + " for more than "
-						+ getHighTimeBeforeAlert() / 1000 + "sec.");
+						+ getHighTimeBeforeAlertSec() / 1000 + "sec.");
 				notifyListeners(IAlarmListener.EventType.ALARM);
 			}
 			break;
 		case ALARM:
-			if (freq <= getLowFreqThreshold()) {
+			if (freq < getLowFreqThreshold()) {
 				state = States.ALARM_BUT_LOW;
 				timeCurrentStateStarted = currentTime;
 				log.debug("WindSensor '" + getName() + "': ALARM to ALARM_BUT_LOW: freq=" + freq + " <= thresholdLow=" + getLowFreqThreshold());
@@ -152,15 +157,18 @@ public class WindSensor extends Sensor {
 				state = States.ALARM;
 				timeCurrentStateStarted = currentTime;
 				log.debug("WindSensor '" + getName() + "': ALARM_BUT_LOW to ALARM: freq=" + freq + " > thresholdHigh=" + getHighFreqThreshold());
-			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlert()) {
+			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlertSec()) {
 				state = States.NORMAL;
-				timeCurrentStateStarted = currentTime;
+				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies LOW event because wind has been low long enough: freq=" + freq + " < thresholdLow=" + getLowFreqThreshold());
 				notifyListeners(IAlarmListener.EventType.SAFE);
 			}
 			break;
-		default:
-			throw new RuntimeException("Programming Error. Unhandled state.");
+		}
+		if (currentTime - timeSinceLastEventSent >= DEFAULT_REPEAT_EVENT_MS) {
+			notifyListeners((state == States.ALARM || state == States.ALARM_BUT_LOW) ? IAlarmListener.EventType.ALARM : IAlarmListener.EventType.SAFE);
+			timeSinceLastEventSent = currentTime;
+
 		}
 	}
 
