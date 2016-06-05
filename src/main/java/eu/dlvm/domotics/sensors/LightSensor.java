@@ -145,7 +145,7 @@ public class LightSensor extends Sensor {
 			} else if ((currentTime - timeCurrentStateStarted) >= highToLowDelayMs) {
 				state = States.LOW;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
-				log.info("WindSensor -" + getName() + "' notifies back to NORMAL event: freq=" + newInput + " < thresholdLow=" + getLowThreshold());
+				log.info("LightSensor -" + getName() + "' notifies back to NORMAL event: input=" + newInput + " < thresholdLow=" + getLowThreshold());
 				notifyListeners(IThresholdListener.EventType.LOW);
 			}
 			break;

@@ -153,7 +153,7 @@
 
 	<!-- Alle lichten uit -->
 	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
-	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="Alles:0" desc="Alles Uit" />
+	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="SPECIAAL:0" desc="Alles Uit" />
 
 
 	<!-- Screens -->
@@ -199,14 +199,14 @@
 	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
 	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
 	<!-- Alle screens -->
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="SPECIAAL:1"
 		desc="Alle Screens" />
 
 	<!-- Wind & Licht meter -->
-	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="10" channel="Windmeter" />
-	<lightGauge name="LichtsensorScreen" low="1000" high="3000" low2highTime="5" high2lowTime="10" channel="AnalogIn" />
+	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="5" lowTimeToResetAlert="120" channel="Windmeter" />
+	<lightGauge name="LichtsensorScreen" low="1000" high="3000" low2highTime="30" high2lowTime="180" channel="AnalogIn" />
 	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtsensorScreen"
-		screen="Screens" ui="Alles:2" />
+		screen="Screens" ui="SPECIAAL:2" />
 	<connect src="SchakScreenAllDown" src-event="single" target="ZonneAutomaat" event="off" />
 	<connect src="SchakScreenAllUp" src-event="single" target="ZonneAutomaat" event="on" />
 
