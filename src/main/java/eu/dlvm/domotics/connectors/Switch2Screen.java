@@ -48,10 +48,10 @@ public class Switch2Screen extends Connector implements ISwitchListener, IUserIn
 		if (click == clickEvent) {
 			if (source.getName().equals(down.getName()))
 				for (Screen screen : screens)
-					screen.down();
+					screen.toggleDown();
 			else
 				for (Screen screen : screens)
-					screen.up();
+					screen.toggleUp();
 		} else {
 			if (log.isDebugEnabled())
 				log.debug("Switch2Screen " + getName() + ": ignored click event " + click + " from source=" + source);
@@ -73,10 +73,10 @@ public class Switch2Screen extends Connector implements ISwitchListener, IUserIn
 	public void update(String action) {
 		if (action.equals("down")) {
 			for (Screen screen : screens)
-				screen.down();
+				screen.toggleDown();
 		} else if (action.equals("up")) {
 			for (Screen screen : screens)
-				screen.up();
+				screen.toggleUp();
 		} else
 			log.warn("update(), unknown action=" + action + ", on me=" + toString());
 	}

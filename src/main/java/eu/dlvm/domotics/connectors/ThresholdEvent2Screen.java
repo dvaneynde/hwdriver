@@ -37,12 +37,12 @@ public class ThresholdEvent2Screen extends Connector implements IThresholdListen
 		switch (event) {
 		case HIGH:
 			for (Screen screen : screens) {
-				screen.down();
+				screen.toggleDown();
 			}
 			break;
 		case LOW:
 			for (Screen screen : screens) {
-				screen.up();
+				screen.toggleUp();
 			}
 			break;
 		default:

@@ -9,23 +9,40 @@ import eu.dlvm.domotics.actuators.Screen;
 public class TestScreens extends TestScreensBase {
 
 	@Test
+	public void downUsingToggle() {
+		clickAndFullPeriod(true, true);
+	}
+
+	@Test
+	public void upUsingToggle() {
+		clickAndFullPeriod(false, true);
+	}
+
+	@Test
+	public void downLongTimeUsingToggle() {
+		sr.setMotorUpPeriod(30);
+		sr.setMotorDnPeriod(30);
+		clickAndFullPeriod(true, true);
+	}
+
+	@Test
 	public void down() {
-		clickAndFullPeriod(true);
+		clickAndFullPeriod(true, false);
 	}
 
 	@Test
 	public void up() {
-		clickAndFullPeriod(false);
+		clickAndFullPeriod(false, false);
 	}
 
 	@Test
 	public void downLongTime() {
 		sr.setMotorUpPeriod(30);
 		sr.setMotorDnPeriod(30);
-		clickAndFullPeriod(true);
+		clickAndFullPeriod(true, false);
 	}
 
-	private void clickAndFullPeriod(boolean down) {
+	private void clickAndFullPeriod(boolean down, boolean useToggle) {
 		// rest state
 		loop();
 		Assert.assertEquals(Screen.States.REST, sr.getState());
@@ -34,17 +51,22 @@ public class TestScreens extends TestScreensBase {
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
 		// click
-		if (down)
-			sr.down();
-		else
-			sr.up();
+		if (down) {
+			if (useToggle)
+				sr.toggleDown();
+			else
+				sr.down();
+		} else {
+			if (useToggle)
+				sr.toggleUp();
+			else
+				sr.up();
+		}
 		loop();
-		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
-				sr.getState());
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP), sr.getState());
 		Assert.assertTrue(hw.dnRelais == down);
 		Assert.assertTrue(hw.upRelais == !down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
-				&& hw.upRelais);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
 		// TODO verschil down / up
 		loop(sr.getMotorDnPeriod() * 1000L + 10);
 		Assert.assertEquals(Screen.States.REST, sr.getState());
@@ -71,31 +93,32 @@ public class TestScreens extends TestScreensBase {
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 		loop();
 
-		if (down)
-			sr.down();
-		else
-			sr.up();
+		if (down) {
+			sr.toggleDown();
+		} else {
+			sr.toggleUp();
+
+		}
 		loop();
-		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
-				sr.getState());
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP), sr.getState());
 		Assert.assertTrue(hw.dnRelais == down);
 		Assert.assertTrue(hw.upRelais == !down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
-				&& hw.upRelais);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
 		// TODO verschil down / up
 		loop(sr.getMotorUpPeriod() * 1000L / 2);
 		loop();
-		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP),
-				sr.getState());
+		Assert.assertEquals((down ? Screen.States.DOWN : Screen.States.UP), sr.getState());
 		Assert.assertTrue(hw.dnRelais == down);
 		Assert.assertTrue(hw.upRelais == !down);
-		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais
-				&& hw.upRelais);
+		Assert.assertTrue(down ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
 
-		if (down)
-			sr.down();
-		else
-			sr.up();
+		if (down) {
+			sr.toggleDown();
+
+		} else {
+			sr.toggleUp();
+		}
+
 		loop();
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
@@ -124,63 +147,53 @@ public class TestScreens extends TestScreensBase {
 
 		// switch pressed, going
 		if (firstDown)
-			sr.down();
+			sr.toggleDown();
 		else
-			sr.up();
+			sr.toggleUp();
 		loop();
-		Assert.assertEquals(
-				(firstDown ? Screen.States.DOWN : Screen.States.UP),
-				sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DOWN : Screen.States.UP), sr.getState());
 		Assert.assertTrue(hw.dnRelais == firstDown);
 		Assert.assertTrue(hw.upRelais == !firstDown);
-		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
-				: !hw.dnRelais && hw.upRelais);
+		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
 
 		// test halfway
 		// TODO verschil down / up
 		loop(sr.getMotorUpPeriod() * 1000L / 2);
-		Assert.assertEquals(
-				(firstDown ? Screen.States.DOWN : Screen.States.UP),
-				sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DOWN : Screen.States.UP), sr.getState());
 		Assert.assertTrue(hw.dnRelais == firstDown);
 		Assert.assertTrue(hw.upRelais == !firstDown);
-		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais
-				: !hw.dnRelais && hw.upRelais);
+		Assert.assertTrue(firstDown ? hw.dnRelais && !hw.upRelais : !hw.dnRelais && hw.upRelais);
 
 		// halfway, press other key
 		if (firstDown)
-			sr.up();
+			sr.toggleUp();
 		else
-			sr.down();
+			sr.toggleDown();
 		loop();
-		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP
-				: Screen.States.DELAY_UP_2_DOWN), sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP : Screen.States.DELAY_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
-		// check motor switch delay protection, must still not have changed direction
+		// check motor switch delay protection, must still not have changed
+		// direction
 		loop(Screen.MOTOR_SWITCH_DELAY_PROTECTION - 20);
-		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP
-				: Screen.States.DELAY_UP_2_DOWN), sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.DELAY_DOWN_2_UP : Screen.States.DELAY_UP_2_DOWN), sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertTrue(!hw.dnRelais && !hw.upRelais);
 
 		// after motor delay protection, must go in other direction
 		loop(40);
-		Assert.assertEquals(
-				(firstDown ? Screen.States.UP : Screen.States.DOWN),
-				sr.getState());
+		Assert.assertEquals((firstDown ? Screen.States.UP : Screen.States.DOWN), sr.getState());
 		Assert.assertTrue(hw.dnRelais == !firstDown);
 		Assert.assertTrue(hw.upRelais == firstDown);
-		Assert.assertTrue(firstDown ? !hw.dnRelais && hw.upRelais : hw.dnRelais
-				&& !hw.upRelais);
+		Assert.assertTrue(firstDown ? !hw.dnRelais && hw.upRelais : hw.dnRelais && !hw.upRelais);
 
 		if (firstDown)
-			sr.up();
+			sr.toggleUp();
 		else
-			sr.down();
+			sr.toggleDown();
 		loop();
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);

@@ -14,17 +14,28 @@ import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.IThresholdListener;
-import eu.dlvm.domotics.sensors.IThresholdListener.EventType;
 import eu.dlvm.domotics.service.BlockInfo;
 
 /**
  * Enables a source event to go through or not,
+ * <p>
+ * <ul>
+ * <li>When 'on' only the first HIGH or LOW are transmitted, and all ALARM/SAFE
+ * events.</li>
+ * <li>When 'off' all the ALARM/SAFE events are transmitted, but no others.</li>
+ * <li>When going from ALARM to SAFE the next HIGH or LOW must be transmitted
+ * again.</li>
+ * <li></li>
+ * <li></li>
+ * </ul>
  * 
  * @author dirk
  */
 public class ScreenController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUserInterfaceAPI {
 	private static final Logger log = Logger.getLogger(ScreenController.class);
 	private boolean enabled;
+	private IThresholdListener.EventType lastThresholdEvent;
+	private IAlarmListener.EventType lastAlarmEvent;
 	private Set<Screen> screens = new HashSet<>();
 
 	public ScreenController(String name, String description, String ui, IDomoticContext ctx) {
@@ -41,7 +52,7 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 		if (enabled)
 			notifyListeners(event);
 		else
-			log.info(getName() + " has blocked event '" + event.toString() + "' from source '" + source.getName() + "'.");
+			log.debug(getName() + " has blocked event '" + event.toString() + "' from source '" + source.getName() + "'.");
 	}
 
 	@Override
@@ -65,6 +76,7 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 	public void on() {
 		log.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
+		lastThresholdEvent = null;
 	}
 
 	@Override
@@ -113,6 +125,9 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 	}
 
 	public void notifyListeners(IThresholdListener.EventType event) {
+		if (event == lastThresholdEvent)
+			return;
+		log.info("Passing threshold event '" + event.toString() + "' to screens, enabled=" + enabled + ", last event was " + lastThresholdEvent);
 		switch (event) {
 		case HIGH:
 			for (Screen screen : screens) {
@@ -124,12 +139,16 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 				screen.up();
 			}
 			break;
-		default:
-			break;
 		}
+		lastThresholdEvent = event;
 	}
 
 	public void notifyListeners(IAlarmListener.EventType event) {
+		/*
+		 * TODO zou niet moeten voor up, misschien wel voor down? if (event ==
+		 * lastAlarmEvent) return;
+		 */
+		log.debug("Passing alarm event '" + event.toString() + "' to screens, enabled=" + enabled + ", last event was " + lastAlarmEvent);
 		switch (event) {
 		case ALARM:
 			for (Screen screen : screens) {
@@ -140,9 +159,10 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 			for (Screen screen : screens) {
 				screen.setProtect(false);
 			}
-			break;
-		default:
+			if (lastAlarmEvent == IAlarmListener.EventType.ALARM)
+				lastThresholdEvent = null;
 			break;
 		}
+		lastAlarmEvent = event;
 	}
 }

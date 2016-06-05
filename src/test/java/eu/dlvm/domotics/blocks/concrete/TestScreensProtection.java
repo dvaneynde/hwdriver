@@ -11,6 +11,8 @@ import eu.dlvm.domotics.connectors.ThresholdEvent2Screen;
 import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.IThresholdListener;
 
+// TODO vervangen door TestScreenController
+@Deprecated
 public class TestScreensProtection extends TestScreensBase {
 
 	private AlarmEvent2Screen alarmEvent2Screen;
@@ -44,7 +46,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertRestAndOpen();
 
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertDown();
 		
@@ -58,17 +60,17 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(sr.getMotorUpPeriod() * 1000L + 10);
 		assertOpenInRestProtected();
 		
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertOpenInRestProtected();
 		
-		sr.up();
+		sr.toggleUp();
 		loop();
 		assertOpenInRestProtected();
 		
 		alarmEvent2Screen.onEvent(null, IAlarmListener.EventType.SAFE);
 		loop();
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertDown();
 	}
@@ -78,7 +80,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertRestAndOpen();
 
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertDown();
 		
@@ -112,13 +114,13 @@ public class TestScreensProtection extends TestScreensBase {
 	public void goDownAndThenUpAndHalfWayProtect_ShouldContinueGoingUp() {
 		loop();
 		assertRestAndOpen();
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertDown();		
 		loop(sr.getMotorDnPeriod() * 1000L + 10);
 		assertRestAndClosed();
 
-		sr.up();
+		sr.toggleUp();
 		loop();
 		assertUp();	
 		loop(sr.getMotorUpPeriod() * 1000L/2);
@@ -188,7 +190,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertOpenInRestProtected();			
 
-		sr.down();
+		sr.toggleDown();
 		loop();
 		assertOpenInRestProtected();			
 		
