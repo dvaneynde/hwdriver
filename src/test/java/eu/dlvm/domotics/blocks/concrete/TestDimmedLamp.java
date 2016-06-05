@@ -14,6 +14,7 @@ import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
 
+// TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
 public class TestDimmedLamp {
 
 	public static int MAX_OUT = 32;

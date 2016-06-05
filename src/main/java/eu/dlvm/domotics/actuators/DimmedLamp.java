@@ -23,8 +23,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	public static final int DEFAULT_FULL_DIMTIME_MS = 5000; // milliseconds
 
 	static Logger log = Logger.getLogger(DimmedLamp.class);
-	private int level;
-	private int prevOnLevel;
+	private double level, prevOnLevel;
 	private int factorHwOut;
 	private int msTimeFullDim = DEFAULT_FULL_DIMTIME_MS;
 	private long lastUpDnLoopTime;
@@ -117,10 +116,11 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 
 	/**
 	 * Current level of lamp, between 0 and 100. Note that a lamp can be in
-	 * state ON (see {@link #getState()}) and at the same time its level is 0.
+	 * state ON (see {@link #getState()}) and at the same time its level is 0. <br/>
+	 * TODO make double
 	 */
 	public int getLevel() {
-		return level;
+		return (int) level;
 	}
 
 	/**
@@ -168,9 +168,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	/**
-	 * FIXME opsplitsen on/off en setlevel?
-	 * Switch lamp on if necessary, and set level to given percentage (range
-	 * [0..100]).
+	 * FIXME opsplitsen on/off en setlevel? Switch lamp on if necessary, and set
+	 * level to given percentage (range [0..100]).
 	 * 
 	 * @param newLevel
 	 *            Level of lamp as percentage.
@@ -329,7 +328,9 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			 */
 			if (lastUpDnLoopTime != -1) {
 				// This is skipped at the first loop() while UP or DOWN
-				double change = ((double) (current - lastUpDnLoopTime)) * 100 / (double) msTimeFullDim;
+				double change = ((double) (current - lastUpDnLoopTime)) * 100.0d / (double) msTimeFullDim;
+				log.info("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level + ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs="
+						+ msTimeFullDim);
 				if (state == States.UP) {
 					level += change;
 					if (level > 100)
@@ -340,6 +341,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 						level = 0;
 					}
 				}
+				log.info("After change, level =" + level);
 			}
 			// also write if first time up or down, since if the lamp was OFF we
 			// first have to put it to ON.
@@ -358,9 +360,9 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public BlockInfo getBlockInfo() {
 		BlockInfo bi = new BlockInfo(getName(), this.getClass().getSimpleName(), getDescription());
-		//bi.addParm("on", getState() == States.OFF ? "0" : "1");
-		//bi.addParm("level", Integer.toString(getLevel()));
-		bi.setOn(getState()!=States.OFF);
+		// bi.addParm("on", getState() == States.OFF ? "0" : "1");
+		// bi.addParm("level", Integer.toString(getLevel()));
+		bi.setOn(getState() != States.OFF);
 		bi.setLevel(getLevel());
 		return bi;
 	}

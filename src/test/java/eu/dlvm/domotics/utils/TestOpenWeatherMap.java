@@ -22,5 +22,4 @@ public class TestOpenWeatherMap {
 		assertTrue(info.sunrise_sec>notBefore && info.sunrise_sec<notAfter);
 		assertTrue(info.sunset_sec>notBefore && info.sunset_sec<notAfter);
 	}
-
 }
