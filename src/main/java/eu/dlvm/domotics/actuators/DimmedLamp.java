@@ -329,7 +329,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			if (lastUpDnLoopTime != -1) {
 				// This is skipped at the first loop() while UP or DOWN
 				double change = ((double) (current - lastUpDnLoopTime)) * 100.0d / (double) msTimeFullDim;
-				log.info("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level + ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs="
+				log.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level + ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs="
 						+ msTimeFullDim);
 				if (state == States.UP) {
 					level += change;
@@ -341,7 +341,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 						level = 0;
 					}
 				}
-				log.info("After change, level =" + level);
+				log.debug("After change, level =" + level);
 			}
 			// also write if first time up or down, since if the lamp was OFF we
 			// first have to put it to ON.
