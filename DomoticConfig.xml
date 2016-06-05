@@ -203,7 +203,7 @@
 		desc="Alle Screens" />
 
 	<!-- Wind & Licht meter -->
-	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
+	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="10" channel="Windmeter" />
 	<lightGauge name="LichtsensorScreen" low="1000" high="3000" low2highTime="5" high2lowTime="10" channel="AnalogIn" />
 	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtsensorScreen"
 		screen="Screens" ui="Alles:2" />
