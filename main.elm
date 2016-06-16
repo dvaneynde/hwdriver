@@ -1,57 +1,61 @@
 import Html exposing (Html, button, div, text, span, input, label, br)
-import Html.App as Html
+import Html.App
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
+import Http
+import Task exposing (Task)
+import Json.Decode as Decode
 
--- TODO http://192.168.0.10:8080/domo/actuators om actuators op te roepen
+-- Domotics user interface
+
+-- GLOBAL
+
+-- in Safari, Develop, "Disable Cross-Origin Restrictions"
+-- maar als elm op zelfde server wordt aangeboden, misschien geen probleem
+-- anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
+-- dit werkt: url = "http://localhost:8000/main.elm"
+url : String
+url = "http://192.168.0.10:8080/domo/actuators"
 
 main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+  Html.App.program { init = init, view = view, update = update, subscriptions = (always Sub.none) }
 
 
 -- MODEL
 
-type alias Model = { counter:Int, keuken:Bool, badkamer:Bool }
+type alias Model = { actuators:String, keuken:Bool, badkamer:Bool }
 
-model : Model
-model =
-  { counter=0, keuken=False, badkamer=False }
+init : (Model, Cmd Msg)
+init = ( { actuators="Click Status button...", keuken=False, badkamer=False }, Cmd.none )
 
 
 -- UPDATE
 
-type Msg = Increment | Decrement | Reset | CheckActuators | Keuken Bool | Badkamer Bool
+type Msg = CheckActuators | CheckOk String | CheckError Http.Error | Keuken Bool | Badkamer Bool
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Increment -> {model | counter = (up model)}
-    Decrement -> {model | counter = (down model)}
-    Reset -> { model | counter = 0}
-    Keuken checked -> { model | keuken = checked }
-    Badkamer checked -> { model | badkamer = checked }
-    CheckActuators -> model
+    Keuken checked -> ({ model | keuken = checked }, Cmd.none)
+    Badkamer checked -> ({ model | badkamer = checked }, Cmd.none)
+    CheckActuators -> (model, checkCmd)
+    CheckOk text -> ({ model | actuators = text }, Cmd.none)
+    CheckError error -> ({ model | actuators = toString error }, Cmd.none)
 
-up : Model -> Int
-up model =
-  model.counter + 1
-down : Model -> Int
-down model =
-  model.counter - 1
+checkTask : Task Http.Error String
+checkTask = Http.getString url
 
+checkCmd : Cmd Msg
+checkCmd = Task.perform CheckError CheckOk checkTask
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
   div [][
-    div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , text (toString model)
-    , button [ onClick Increment ] [ text "+" ],
-    button [ onClick Reset] [text "Reset"]
-    ],
+    div [] [ text "Actuators: ", text model.actuators ],
     div [] [ text "Check Actuators: " , button [ onClick CheckActuators ] [ text "status"]],
+    div [][ Html.hr [] [] ],
     div []
     [ span [] [text "Domotics"]
     , label []
