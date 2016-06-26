@@ -7,6 +7,7 @@ main =
 type Alarm a = Wind a | Licht a | Onbekend
 
 -- DIT IS HET: return value is Alarm String, zoals Http Msg
+-- runtime gaat dan berichten genereren zoals hieronder 'Wind heel-hard'
 storm : String -> Alarm String
 storm a =
   Wind a
