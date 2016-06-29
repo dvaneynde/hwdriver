@@ -19,14 +19,6 @@ url : String
 --url="http://localhost:8080/domo/actuators"
 url = "http://localhost:8080/domo/screenRobot"
 
-testJson : String
-testJson = """
-{
-  "robotOn": true,
-  "sunLevel": 1000,
-  "windLevel": 3.4
-}
-"""
 
 main =
   Html.App.program { init = init, view = view, update = update, subscriptions = (always Sub.none) }
@@ -40,43 +32,29 @@ init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotO
 
 
 -- UPDATE
-type Msg = CheckActuators | CheckActuatorsOk String | CheckError Http.Error | CheckInfo | CheckInfoOk String
+type Msg = CheckActuators | CheckActuatorsOk String | CheckError Http.Error | CheckInfo | CheckInfoOk DecodedInfo
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    CheckActuators -> (model, checkCmd)
+    CheckActuators -> (model, checkActuatorsCmd)
     CheckActuatorsOk text -> ({ model | actuators = text }, Cmd.none)
-    CheckInfo -> (tmpCheckInfo model, Cmd.none)
-    CheckInfoOk text -> (model, Cmd.none)
+    CheckInfo -> (model, checkInfoCmd)
+    CheckInfoOk info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
     CheckError error -> ({ model | actuators = toString error }, Cmd.none)
 
-checkTask : Task Http.Error String
-checkTask = Http.getString url
-
-checkCmd : Cmd Msg
-checkCmd = Task.perform CheckError CheckActuatorsOk checkTask
+checkActuatorsCmd : Cmd Msg
+checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
 
 type alias DecodedInfo = { robotOn : Bool, sunLevel : Int, windLevel : Float }
 requestDecoder : Decoder DecodedInfo
 requestDecoder =
   object3 DecodedInfo ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
 
-decodeRequest : Result String DecodedInfo
-decodeRequest =
-  decodeString requestDecoder testJson
+checkInfoCmd : Cmd Msg
+checkInfoCmd =
+  Task.perform CheckError CheckInfoOk (Http.get requestDecoder url)
 
-tmpCheckInfo: Model -> Model
-tmpCheckInfo model =
-  case decodeRequest of
-    Ok value -> { model | robotOn = value.robotOn, sunLevel = value.sunLevel, windLevel = value.windLevel }
-    Err error -> { model | errorMsg = error}
-
-{-
-tmpCheckInfo : Model -> Model
-tmpCheckInfo model =
-  { model | windLevel=8, sunLevel = 450}
--}
 
 -- VIEW
 view : Model -> Html Msg
