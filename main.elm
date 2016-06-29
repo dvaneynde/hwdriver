@@ -4,7 +4,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode exposing (Decoder, decodeString, int, float, string, bool, object2, (:=))
+import Json.Decode exposing (Decoder, decodeString, int, float, string, bool, object3, (:=))
 
 -- Domotics user interface
 
@@ -15,13 +15,16 @@ import Json.Decode exposing (Decoder, decodeString, int, float, string, bool, ob
 
 -- GLOBAL
 url : String
-url = "http://192.168.0.10:8080/domo/actuators"
+--url = "http://192.168.0.10:8080/domo/actuators"
+--url="http://localhost:8080/domo/actuators"
+url = "http://localhost:8080/domo/screenRobot"
 
 testJson : String
 testJson = """
 {
-  "sunAuto": true,
-  "sunLevel": 3465
+  "robotOn": true,
+  "sunLevel": 1000,
+  "windLevel": 3.4
 }
 """
 
@@ -30,20 +33,20 @@ main =
 
 
 -- MODEL
-type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, sunScreenAuto: Bool, testje: String }
+type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String }
 
 init : (Model, Cmd Msg)
-init = ( { actuators="Click Status button...", sunLevel=3500, windLevel=1.3, sunScreenAuto=False, testje="Oele..." }, Cmd.none )
+init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries..." }, Cmd.none )
 
 
 -- UPDATE
-type Msg = CheckActuators | CheckOk String | CheckError Http.Error | CheckInfo | CheckInfoOk String
+type Msg = CheckActuators | CheckActuatorsOk String | CheckError Http.Error | CheckInfo | CheckInfoOk String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     CheckActuators -> (model, checkCmd)
-    CheckOk text -> ({ model | actuators = text }, Cmd.none)
+    CheckActuatorsOk text -> ({ model | actuators = text }, Cmd.none)
     CheckInfo -> (tmpCheckInfo model, Cmd.none)
     CheckInfoOk text -> (model, Cmd.none)
     CheckError error -> ({ model | actuators = toString error }, Cmd.none)
@@ -52,22 +55,22 @@ checkTask : Task Http.Error String
 checkTask = Http.getString url
 
 checkCmd : Cmd Msg
-checkCmd = Task.perform CheckError CheckOk checkTask
+checkCmd = Task.perform CheckError CheckActuatorsOk checkTask
 
-type alias InfoDecoderTuple = (Bool, Int)
-requestDecoder : Decoder InfoDecoderTuple
+type alias DecodedInfo = { robotOn : Bool, sunLevel : Int, windLevel : Float }
+requestDecoder : Decoder DecodedInfo
 requestDecoder =
-  object2 (,) ("sunAuto" := bool) ("sunLevel" := int)
+  object3 DecodedInfo ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
 
-decodeRequest : Result String InfoDecoderTuple
+decodeRequest : Result String DecodedInfo
 decodeRequest =
   decodeString requestDecoder testJson
 
 tmpCheckInfo: Model -> Model
 tmpCheckInfo model =
   case decodeRequest of
-    Ok value -> { model | testje = (toString (snd value)) }
-    Err error -> { model | testje = error}
+    Ok value -> { model | robotOn = value.robotOn, sunLevel = value.sunLevel, windLevel = value.windLevel }
+    Err error -> { model | errorMsg = error}
 
 {-
 tmpCheckInfo : Model -> Model
@@ -83,7 +86,8 @@ view model =
     div [] [ text "Check Actuators: " , button [ onClick CheckActuators ] [ text "status"]],
     div [][ Html.hr [] [] ],
     div [] [ button [ onClick CheckInfo ] [text "Check..."]],
-    div [] [text model.testje],
-    div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text (toString (round (toFloat model.sunLevel/3650.0*100))) ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString (round (model.windLevel/15.0*100))) ]
+    div [] [text "Error: ", text model.errorMsg],
+    div [] [ input [ type' "checkbox", checked model.robotOn ] [], text " zonne-automaat" ],
+    div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
+    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ]
   ]
