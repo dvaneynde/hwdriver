@@ -20,6 +20,9 @@ url : String
 --url="http://localhost:8080/domo/actuators"
 url = "http://localhost:8080/domo/screenRobot"
 
+urlPost :  String
+urlPost = "http://localhost:8080/domo/screenRobotUpdate"
+
 
 main =
   Html.App.program { init = init, view = view, update = update, subscriptions = (always Sub.none) }
@@ -33,17 +36,22 @@ init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotO
 
 
 -- UPDATE
-type Msg = CheckActuators | CheckActuatorsOk String | CheckError Http.Error | CheckInfo | CheckInfoOk DecodedInfo | Test
+type Msg = CheckActuators | CheckActuatorsOk String | CheckError Http.Error | CheckErrorRaw Http.RawError| CheckInfo | CheckInfoOk DecodedInfo |
+    RobotClick Bool | Test | ShowResult String | ShowResponse Http.Response
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Test -> ({model | test = (toString(sendInfoEncoded model))}, Cmd.none)
     CheckActuators -> (model, checkActuatorsCmd)
     CheckActuatorsOk text -> ({ model | actuators = text }, Cmd.none)
     CheckInfo -> (model, checkInfoCmd)
     CheckInfoOk info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
     CheckError error -> ({ model | actuators = toString error }, Cmd.none)
+    CheckErrorRaw error -> ({ model | actuators = toString error }, Cmd.none)
+    RobotClick value -> ({ model | robotOn = value}, updateInfoCmd model)
+    Test -> ({model | test = (toString(sendInfoEncoded model))}, Cmd.none)
+    ShowResult value -> ({model | test = value}, Cmd.none)
+    ShowResponse value -> ({model | test = (toString value)}, Cmd.none)
 
 checkActuatorsCmd : Cmd Msg
 checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
@@ -62,11 +70,29 @@ sendInfoEncoded model =
   let info =
     Encode.object [ ("robotOn", Encode.bool model.robotOn)]
   in
-    Encode.encode 4 info
+    Encode.encode 0 info
 
--- hats : Task Error (List String)
--- hats =
---     post (list string) "http://example.com/hat-categories.json" empty
+updateInfoCmd : Model -> Cmd Msg
+updateInfoCmd model =
+  Task.perform CheckErrorRaw ShowResponse (updateInfo model)
+
+--updateInfo: Model -> Task Http.Error String
+--updateInfo model =
+  --Http.post string urlPost (Http.string """{"robotOn": false}""")
+  -- (Http.string ("{ \"robotOn\": " ++ (toString model.robotOn) ++ " }"))
+  -- (Http.string """{ "robotOn": "false" }""")
+  --(Http.string (sendInfoEncoded model))--Http.empty --(Http.string (sendInfoEncoded model))
+updateInfo: Model -> Task Http.RawError Http.Response
+updateInfo model =
+  Http.send Http.defaultSettings
+      { verb = "POST"
+      , headers =
+          [ ( "Content-Type", "application/json" )
+        
+          ]
+      , url = urlPost
+      , body = Http.string (sendInfoEncoded model)
+      }
 
 -- VIEW
 view : Model -> Html Msg
@@ -79,7 +105,7 @@ view model =
     div [][ Html.hr [] [] ],
     div [] [ button [ onClick CheckInfo ] [text "Check..."]],
     div [] [text "Error: ", text model.errorMsg],
-    div [] [ input [ type' "checkbox", checked model.robotOn ] [], text " zonne-automaat" ],
+    div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ]
   ]
