@@ -34,19 +34,19 @@ init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotO
 
 -- UPDATE
 type Msg = CheckError Http.Error | CheckErrorRaw Http.RawError| CheckInfo | CheckInfoOk ReceivedInfoRecord |
-    RobotClick Bool | Test | ShowResult String | ShowResponse Http.Response
+    RobotClick Bool | Test | ShowResult String | DecodeUpdateResponse Http.Response
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Test -> ({model | test = (toString(updateInfoEncoder model))}, Cmd.none)
+    Test -> ({model | test = (toString {model|test=""})}, Cmd.none)
     CheckInfo -> (model, receiveInfoCmd)
     CheckInfoOk info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
     CheckError error -> ({ model | errorMsg = toString error }, Cmd.none)
     CheckErrorRaw error -> ({ model | actuators = toString error }, Cmd.none)
-    RobotClick value -> ({ model | robotOn = value}, updateInfoCmd model)
+    RobotClick value -> ( model, updateInfoCmd value)
     ShowResult value -> ({model | test = value}, Cmd.none)
-    ShowResponse value -> ({model | test = (toString value)}, Cmd.none)
+    DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (decodeUpdateResponse response)}, Cmd.none)
 
 -- checkActuatorsCmd : Cmd Msg
 -- checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
@@ -61,27 +61,33 @@ receiveInfoCmd : Cmd Msg
 receiveInfoCmd =
   Task.perform CheckError CheckInfoOk (Http.get receivedInfoDecoder urlGetRobotInfo)
 
-updateInfoEncoder : Model -> String
-updateInfoEncoder model =
+-- newValue -> [send and recv] -> newValue -> [update model] -> newModel
+
+updateInfoEncoder : Bool -> String
+updateInfoEncoder newState =
   let info =
-    Encode.object [ ("robotOn", Encode.bool model.robotOn)]
+    Encode.object [ ("robotOn", Encode.bool newState)]
   in
     Encode.encode 0 info
 
-updateInfoCmd : Model -> Cmd Msg
-updateInfoCmd model =
+updateInfoCmd : Bool -> Cmd Msg
+updateInfoCmd newState =
   let
-    body = Http.string (updateInfoEncoder model)
     request : Http.Request
     request =
       { verb = "POST"
       , headers = [ ( "Content-Type", "application/json" ) ]
       , url = urlPostRobotUpdate
-      , body = Http.string (updateInfoEncoder model)
+      , body = Http.string (updateInfoEncoder newState)
       }
   in
-    Task.perform CheckErrorRaw ShowResponse (Http.send Http.defaultSettings request)
+    Task.perform CheckErrorRaw DecodeUpdateResponse (Http.send Http.defaultSettings request)
 
+decodeUpdateResponse : Http.Response ->  Bool
+decodeUpdateResponse response =
+  case response.value of
+    Http.Text value -> Result.withDefault False (Decode.decodeString Decode.bool value)
+    Http.Blob blob -> False
 
 -- VIEW
 view : Model -> Html Msg
