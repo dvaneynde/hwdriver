@@ -100,5 +100,14 @@ view model =
     div [] [ button [ onClick CheckInfo ] [text "Check..."]],
     div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ]
-  ]
+    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "Nutsruimtes"]],
+    div [] [input[type' "checkbox"][], text "inkom"],
+    div [] [input[type' "checkbox"][], text "Gang Boven"],
+    div [] [input[type' "checkbox"][], text "Garage (Poort)"],
+    div [] [input[type' "checkbox"][], text "Garage (Tuin)"],
+    div [] [input[type' "checkbox"][], text "Badkamer +1"],
+    div [] [input[type' "checkbox"][], text "Badkamer +0"],
+    div [] [input[type' "checkbox"][], text "WC"]
+    ]
