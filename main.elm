@@ -94,6 +94,10 @@ view : Model -> Html Msg
 view model =
   div [][
     div [] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
+    div [] [
+    -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
+       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] []
+    ],
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
     div [][ Html.hr [] [] ],
