@@ -6,6 +6,11 @@ import Http
 import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, (:=))
 import Json.Encode as Encode
+import Material
+import Material.Button
+import Material.Scheme
+import Material.Options exposing (css)
+import Material.Toggles as Toggles
 
 -- Domotics user interface
 
@@ -26,15 +31,15 @@ main =
 
 
 -- MODEL
-type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String }
+type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String, mdl : Material.Model }
 
 init : (Model, Cmd Msg)
-init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested" }, Cmd.none )
+init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
 
 
 -- UPDATE
 type Msg = CheckError Http.Error | CheckErrorRaw Http.RawError| CheckInfo | CheckInfoOk ReceivedInfoRecord |
-    RobotClick Bool | Test | ShowResult String | DecodeUpdateResponse Http.Response
+    RobotClick Bool | Test | ShowResult String | DecodeUpdateResponse Http.Response | Click Int | MDL Material.Msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -45,8 +50,11 @@ update msg model =
     CheckError error -> ({ model | errorMsg = toString error }, Cmd.none)
     CheckErrorRaw error -> ({ model | actuators = toString error }, Cmd.none)
     RobotClick value -> ( model, updateInfoCmd value)
+    Click nr -> ( model, updateInfoCmd (not model.robotOn))
     ShowResult value -> ({model | test = value}, Cmd.none)
     DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (decodeUpdateResponse response)}, Cmd.none)
+    MDL action' -> Material.update MDL action' model
+
 
 -- checkActuatorsCmd : Cmd Msg
 -- checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
@@ -92,11 +100,15 @@ decodeUpdateResponse response =
 -- VIEW
 view : Model -> Html Msg
 view model =
-  div [][
+  div [ Html.Attributes.style [ ("padding", "2rem") ] ]
+  [
     div [] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
+    div [][ Html.hr [] [] ],
     div [] [
-    -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
-       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] []
+      -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
+      Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
+      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] [],
+      Material.Button.render MDL [0] model.mdl [ Material.Button.ripple, Material.Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
     ],
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
@@ -106,3 +118,4 @@ view model =
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ]
   ]
+  |> Material.Scheme.top
