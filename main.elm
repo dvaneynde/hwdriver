@@ -113,5 +113,27 @@ view model =
     div [] [input[type' "checkbox"][], text "Garage (Tuin)"],
     div [] [input[type' "checkbox"][], text "Badkamer +1"],
     div [] [input[type' "checkbox"][], text "Badkamer +0"],
-    div [] [input[type' "checkbox"][], text "WC"]
+    div [] [input[type' "checkbox"][], text "WC"],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "Beneden"]],
+    div [] [input[type' "checkbox"][], text "Keuken"],
+    div [] [input[type' "checkbox"][], text "Veranda", input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] [] ],
+    div [] [input[type' "checkbox"][], text "Eetkamer", input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] [] ],
+    div [] [input[type' "checkbox"][], text "Circante Tafel"],
+    div [] [input[type' "checkbox"][], text "Zithoek", input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] [] ],
+    div [] [input[type' "checkbox"][], text "Bureau"],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "Kinderen"]],
+    div [] [input[type' "checkbox"][], text "Tomas Spots"],
+    div [] [input[type' "checkbox"][], text "Dries Wand"],
+    div [] [input[type' "checkbox"][], text "Dries Spots"],
+    div [] [input[type' "checkbox"][], text "Roos Wand"],
+    div [] [input[type' "checkbox"][], text "Roos Spots"],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "Buiten"]],
+    div [] [input[type' "checkbox"][], text "Licht terras en zijkant"],
+    div [] [input[type' "checkbox"][], text "Stopcontact buiten"],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "SPECIAAL"]]
+
     ]
