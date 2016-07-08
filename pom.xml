@@ -11,23 +11,11 @@
 		<name>dlv mechanografie bvba</name>
 		<url>http://www.dlvmechanografie.eu</url>
 	</organization>
+
 	<properties>
 		<jackson-2-version>2.3.0</jackson-2-version>
-		<jersey.version>2.5.1</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.glassfish.jersey</groupId>
-				<artifactId>jersey-bom</artifactId>
-				<version>${jersey.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -62,7 +50,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- the core, which includes Streaming API, shared low-level abstractions
+		<!-- the core, which includes Streaming API, shared low-level abstractions 
 			(but NOT data-binding) -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -70,7 +58,7 @@
 			<version>${jackson-2-version}</version>
 		</dependency>
 
-		<!-- Just the annotations; use this dependency if you want to attach annotations
+		<!-- Just the annotations; use this dependency if you want to attach annotations 
 			to classes without connecting them to the code. -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -88,23 +76,47 @@
 			<version>4.2.5</version>
 		</dependency>
 
+		<!-- https://www.javacodegeeks.com/2015/03/creating-web-services-and-a-rest-server-with-jax-rs-and-jetty.html -->
+		<!-- https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey -->
 		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-jdk-http</artifactId>
+			<groupId>org.eclipse.jetty.aggregate</groupId>
+			<artifactId>jetty-all</artifactId>
+			<version>9.3.0.M1</version>
 		</dependency>
+		<!-- <dependency> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-server</artifactId> 
+			<version>9.3.9.v20160517</version> </dependency> -->
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-			<!-- <scope>test</scope> -->
+			<artifactId>jersey-server</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-jetty-http</artifactId>
+			<version>2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-moxy</artifactId>
+			<version>2.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
-			</dependency>
+			<version>2.7</version>
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-mvc-freemarker</artifactId>
+			<version>2.7</version>
 		</dependency>
+
 
 	</dependencies>
 	<build>
@@ -112,15 +124,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -153,7 +164,6 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.7</version>
 				<configuration>
-
 				</configuration>
 			</plugin>
 		</plugins>
