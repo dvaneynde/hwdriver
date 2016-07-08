@@ -3,6 +3,7 @@ package eu.dlvm.domotics.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.inject.Singleton;
 
@@ -12,6 +13,9 @@ import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.service.BlockInfo;
 import eu.dlvm.domotics.service.IDomoticSvc;
+import eu.dlvm.domotics.service.ScreenRobotInfo;
+import eu.dlvm.domotics.service.ScreenRobotUpdateInfo;
+
 
 @Singleton
 public class RestService implements IDomoticSvc {
@@ -31,6 +35,22 @@ public class RestService implements IDomoticSvc {
 	public String getIt() {
 		return "Got it!";
 	}
+
+	
+	@Override
+	public String updateScreenRobot(ScreenRobotUpdateInfo info) {
+		Log.info("Got screenRobot update, info='"+info+"'");
+		return Boolean.toString(info.isRobotOn());
+	}
+
+	@Override
+	public String updateScreenRobot(String info) {
+		Log.info("Got screenRobot update, string='"+info+"'");
+		//return "OK - robot is "+(info.isRobotOn()?"ON":"OFF")+".\n";
+		//return "\"OK, got '"+info+"'\"";
+		return "\"OK\"";
+	}
+
 
 	// TODO rename
 	@Override
@@ -106,6 +126,13 @@ public class RestService implements IDomoticSvc {
 	@Override
 	public String ping(String token) {
 		return token;
+	}
+
+	@Override
+	public ScreenRobotInfo screenRobotInfo() {
+		Random r = new Random();
+		ScreenRobotInfo info = new ScreenRobotInfo(r.nextBoolean(), r.nextInt(4000), r.nextFloat()*15);
+		return info;
 	}
 
 }

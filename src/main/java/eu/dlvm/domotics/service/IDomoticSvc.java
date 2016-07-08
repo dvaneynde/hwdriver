@@ -3,7 +3,9 @@ package eu.dlvm.domotics.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -15,6 +17,23 @@ public interface IDomoticSvc {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getIt();
 
+	@Path("screenRobot")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public ScreenRobotInfo screenRobotInfo();
+	
+	@Path("screenRobotUpdateText")
+	@POST
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String updateScreenRobot(String info);
+	
+	@Path("screenRobotUpdate")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String updateScreenRobot(ScreenRobotUpdateInfo info);
+	
 	@Path("actuators_txt")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
@@ -62,3 +81,4 @@ public interface IDomoticSvc {
 //	public InputStream viewHome();
 //	
 }
+;

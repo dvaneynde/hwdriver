@@ -29,6 +29,7 @@ public class LightSensor extends Sensor {
 	private static final Logger loglight = Logger.getLogger("LIGHT");
 	private int highThreshold, lowThreshold;
 	private long lowToHighDelayMs, highToLowDelayMs;
+	private long lastInfoOnAnalogLevel;
 	private States state;
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
 
@@ -112,7 +113,10 @@ public class LightSensor extends Sensor {
 	@Override
 	public void loop(long currentTime, long sequence) {
 		int newInput = getHw().readAnalogInput(getChannel());
-		loglight.info("LightSensor " + getName() + ": ana in=" + newInput);
+		if (currentTime - lastInfoOnAnalogLevel > 1000L) {
+			loglight.info("LightSensor " + getName() + ": ana in=" + newInput);
+			lastInfoOnAnalogLevel = currentTime;
+		}
 
 		switch (state) {
 		case LOW:
