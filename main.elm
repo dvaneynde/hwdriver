@@ -7,10 +7,12 @@ import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, (:=))
 import Json.Encode as Encode
 import Material
-import Material.Button
-import Material.Scheme
+import Material.Button as Button
+import Material.Scheme as Scheme
 import Material.Options exposing (css)
 import Material.Toggles as Toggles
+import Material.Icon as Icon
+import Material.Color as Color
 
 -- Domotics user interface
 
@@ -98,17 +100,19 @@ decodeUpdateResponse response =
     Http.Blob blob -> False
 
 -- VIEW
+-- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
+-- https://debois.github.io/elm-mdl/
 view : Model -> Html Msg
 view model =
-  div [ Html.Attributes.style [ ("padding", "2rem") ] ]
+  div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
-    div [] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
     div [][ Html.hr [] [] ],
     div [] [
       -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
       Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] [],
-      Material.Button.render MDL [0] model.mdl [ Material.Button.ripple, Material.Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
+      Button.render MDL [0] model.mdl [ Button.ripple, Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
     ],
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
@@ -146,7 +150,7 @@ view model =
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
     div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Bureau"] ],
-    
+
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Kinderen"]],
     div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Tomas Spots"] ],
@@ -159,6 +163,7 @@ view model =
     div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Licht terras en zijkant"] ],
     div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Stopcontact buiten"] ],
     div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "SPECIAAL"]]
+    div [] [Html.h3 [] [text "SPECIAAL"]],
+    div [] [ Button.render MDL [1] model.mdl [ Button.fab, Button.ripple ] [ Icon.i "arrow_downward"] ]
   ]
-  |> Material.Scheme.top
+  |> Scheme.topWithScheme Color.Green Color.Red
