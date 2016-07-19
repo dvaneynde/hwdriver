@@ -1,23 +1,19 @@
-package eu.dlvm.domotics.service.impl;
+package eu.dlvm.domotics.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.inject.Singleton;
-
 import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
-import eu.dlvm.domotics.service.BlockInfo;
-import eu.dlvm.domotics.service.IDomoticSvc;
-import eu.dlvm.domotics.service.ScreenRobotInfo;
-import eu.dlvm.domotics.service.ScreenRobotUpdateInfo;
+import eu.dlvm.domotics.service_impl.Quickie;
+import eu.dlvm.domotics.service_impl.QuickieService;
 
 
-@Singleton
+//@Singleton
 public class RestService implements IDomoticSvc {
 
 	private static Logger Log = Logger.getLogger(RestService.class);

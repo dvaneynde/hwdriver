@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service.impl;
+package eu.dlvm.domotics.service_impl;
 
 import java.util.ArrayList;
 import java.util.List;

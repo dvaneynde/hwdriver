@@ -1,20 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
 	<groupId>eu.dlvm</groupId>
 	<artifactId>domotica</artifactId>
-	<packaging>jar</packaging>
 	<version>0.2</version>
+
+	<packaging>jar</packaging>
+	
 	<name>domotica</name>
 	<description>Domotic system, including Diamond System Hardware support.</description>
 	<organization>
 		<name>dlv mechanografie bvba</name>
 		<url>http://www.dlvmechanografie.eu</url>
 	</organization>
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://repository.jboss.org/licenses/apache-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 	<properties>
-		<jackson-2-version>2.3.0</jackson-2-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jetty-version>9.3.5.v20151012</jetty-version>
+		<jackson-2-version>2.3.0</jackson-2-version>
 	</properties>
 
 	<pluginRepositories>
@@ -32,7 +43,6 @@
 	</pluginRepositories>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -76,15 +86,32 @@
 			<version>4.2.5</version>
 		</dependency>
 
-		<!-- https://www.javacodegeeks.com/2015/03/creating-web-services-and-a-rest-server-with-jax-rs-and-jetty.html -->
-		<!-- https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey -->
 		<dependency>
-			<groupId>org.eclipse.jetty.aggregate</groupId>
-			<artifactId>jetty-all</artifactId>
-			<version>9.3.0.M1</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-server</artifactId> 
-			<version>9.3.9.v20160517</version> </dependency> -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>javax-websocket-server-impl</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-rewrite</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-annotations</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
@@ -100,25 +127,9 @@
 			<artifactId>jersey-container-jetty-http</artifactId>
 			<version>2.7</version>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-moxy</artifactId>
-			<version>2.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>2.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-mvc-freemarker</artifactId>
-			<version>2.7</version>
-		</dependency>
-
 
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

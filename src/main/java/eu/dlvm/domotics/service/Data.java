@@ -1,9 +1,7 @@
-package eu.dlvm.domotics.service.impl;
+package eu.dlvm.domotics.service;
 
 import java.util.List;
 import java.util.Map;
-
-import eu.dlvm.domotics.service.BlockInfo;
 
 public class Data {
 

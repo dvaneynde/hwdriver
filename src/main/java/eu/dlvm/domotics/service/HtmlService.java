@@ -1,29 +1,18 @@
-package eu.dlvm.domotics.service.impl;
+package eu.dlvm.domotics.service;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.mvc.Viewable;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
-import eu.dlvm.domotics.service.BlockInfo;
 
-@Singleton
-@Path("domo")
+//@Singleton
+//@Path("domo")
 public class HtmlService {
 
 	private static final Logger log = Logger.getLogger(RestService.class);
@@ -110,6 +99,7 @@ public class HtmlService {
 		}
 	}
 
+	/*
 	@Path("home")
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
@@ -162,10 +152,10 @@ public class HtmlService {
 	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
 	@GET
 	public InputStream serveHtml() {
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("home2.html");
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("WebSocketTest.html");
 		if (is == null) {
 			try {
-				is = new FileInputStream("src/main/resources/home2.html");
+				is = new FileInputStream("src/main/resources/WebSocketTest.html");
 				log.warn("html niet in jar gevonden, maar in src/main/resources/js.");
 			} catch (FileNotFoundException e) {
 				log.error("Could not find html file, neither in jar or development location.");
@@ -174,5 +164,5 @@ public class HtmlService {
 		}
 		return is;
 	}
-
+*/
 }
