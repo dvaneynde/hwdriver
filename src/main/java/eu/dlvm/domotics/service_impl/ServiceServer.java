@@ -18,7 +18,7 @@ import org.eclipse.jetty.websocket.server.pathmap.ServletPathSpec;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-//import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -87,9 +87,7 @@ public class ServiceServer {
 			services.add(RestService.class);
 			services.add(Resource.class);
 			ResourceConfig config = new ResourceConfig(services);
-			//ResourceConfig config = new ResourceConfig();
-			//config.packages("eu.dlvm.domotics.service");
-			//config.register(JacksonFeature.class);
+			config.register(JacksonFeature.class);
 			ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
 			context.addServlet(jerseyServletHolder, "/rest/*");
 

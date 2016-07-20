@@ -25,6 +25,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jetty-version>9.3.5.v20151012</jetty-version>
+		<jersey-version>2.7</jersey-version>
 		<jackson-2-version>2.3.0</jackson-2-version>
 	</properties>
 
@@ -60,32 +61,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- the core, which includes Streaming API, shared low-level abstractions 
-			(but NOT data-binding) -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson-2-version}</version>
-		</dependency>
-
-		<!-- Just the annotations; use this dependency if you want to attach annotations 
-			to classes without connecting them to the code. -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson-2-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson-2-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.5</version>
-		</dependency>
-
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -115,25 +90,38 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
-			<version>2.7</version>
+			<version>${jersey-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet-core</artifactId>
-			<version>2.7</version>
+			<version>${jersey-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-jetty-http</artifactId>
-			<version>2.7</version>
+			<version>${jersey-version}</version>
 		</dependency>
-		<!-- 
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>2.23.1</version>
+			<version>${jersey-version}</version>
 		</dependency>
-		 -->
+		<!-- Ik had een probleem met jersey-media-json-jackson en jackson-core 
+			hieronder, als versies niet juist zijn lijken ze niet compatibel te zijn. 
+			Ik had 2.23.x voor jersey-json-jackson, maar dat werkte niet. -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson-2-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.5</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
