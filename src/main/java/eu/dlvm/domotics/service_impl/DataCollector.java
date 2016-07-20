@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service;
+package eu.dlvm.domotics.service_impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,17 +10,17 @@ import org.apache.log4j.Logger;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.RestService;
 
-//@Singleton
-//@Path("domo")
-public class HtmlService {
+public class DataCollector {
 
 	private static final Logger log = Logger.getLogger(RestService.class);
 	private static int countInstances = 0;
 
 	private static Data data = null;
 
-	public HtmlService() {
+	public DataCollector() {
 		countInstances++;
 		log.info("Count instances: " + countInstances);
 	}
@@ -98,71 +98,4 @@ public class HtmlService {
 			throw new RuntimeException("Server Error - check log.");
 		}
 	}
-
-	/*
-	@Path("home")
-	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
-	@GET
-	public Viewable viewThuis() {
-		log.info("viewThuis() opgeroepen");
-		ensureModelDataFilledIn();
-		Viewable v = new Viewable("/index", data);
-		log.info("viewable=" + v);
-
-		return v;
-	}
-
-	@Path("js/{name}")
-	@Produces("application/javascript")
-	@GET
-	public InputStream serveJs(@PathParam("name") String name) {
-		log.info("Domotic API: serveJs() called, name=" + name);
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("js/" + name);
-		if (is == null) {
-			try {
-				is = new FileInputStream("src/main/resources/js/" + name);
-				log.warn("serveJs(" + name + "), niet in jar gevonden, maar in src/main/resources/js.");
-			} catch (FileNotFoundException e) {
-				log.error("Could not find " + name + ", neither in jar or development location.");
-				return null;
-			}
-		}
-		return is;
-	}
-
-	@Path("css/{name}")
-	@Produces("text/css")
-	@GET
-	public InputStream serveCss(@PathParam("name") String name) {
-		log.info("Domotic API: serveCss() called, name=" + name);
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("css/" + name);
-		if (is == null) {
-			try {
-				is = new FileInputStream("src/main/resources/css/" + name);
-				log.warn("serveCss(" + name + "), niet in jar gevonden, maar in src/main/resources/css.");
-			} catch (FileNotFoundException e) {
-				log.error("Could not find " + name + ", neither in jar or development location.");
-				return null;
-			}
-		}
-		return is;
-	}
-
-	@Path("test")
-	@Produces({ javax.ws.rs.core.MediaType.TEXT_HTML })
-	@GET
-	public InputStream serveHtml() {
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("WebSocketTest.html");
-		if (is == null) {
-			try {
-				is = new FileInputStream("src/main/resources/WebSocketTest.html");
-				log.warn("html niet in jar gevonden, maar in src/main/resources/js.");
-			} catch (FileNotFoundException e) {
-				log.error("Could not find html file, neither in jar or development location.");
-				return null;
-			}
-		}
-		return is;
-	}
-*/
 }

@@ -1,9 +1,11 @@
-package eu.dlvm.domotics.service;
+package eu.dlvm.domotics.service_impl;
 
 import java.util.List;
 import java.util.Map;
 
-public class Data {
+import eu.dlvm.domotics.service.BlockInfo;
+
+class Data {
 
 	String title;
 	List<String> groupNames;

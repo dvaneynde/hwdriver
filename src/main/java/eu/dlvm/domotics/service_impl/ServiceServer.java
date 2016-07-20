@@ -3,6 +3,8 @@ package eu.dlvm.domotics.service_impl;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
@@ -16,8 +18,12 @@ import org.eclipse.jetty.websocket.server.pathmap.ServletPathSpec;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+//import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+
+import eu.dlvm.domotics.service.Resource;
+import eu.dlvm.domotics.service.RestService;
 
 //@SuppressWarnings("restriction")
 public class ServiceServer {
@@ -63,10 +69,27 @@ public class ServiceServer {
 			// Add time servlet
 			context.addServlet(TimeServlet.class, "/time/");
 
+			// private HttpServer server;
+			// public void start() {
+			// URI baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build();
+			// Set<Class<?>> services = new HashSet<>();
+			// services.add(RestService.class);
+			// services.add(HtmlService.class);
+			// ResourceConfig config = new ResourceConfig(services);
+			// config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
+			// config.register(JacksonFeature.class);
+			// server = JdkHttpServerFactory.createHttpServer(baseUri, config);
+			// log.info("HTTP Server started.");
+
 			// Toevoegen Jersey... spannend !
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
-			ResourceConfig config = new ResourceConfig();
-			config.packages("eu.dlvm.domotics.service"); 
+			Set<Class<?>> services = new HashSet<>();
+			services.add(RestService.class);
+			services.add(Resource.class);
+			ResourceConfig config = new ResourceConfig(services);
+			//ResourceConfig config = new ResourceConfig();
+			//config.packages("eu.dlvm.domotics.service");
+			//config.register(JacksonFeature.class);
 			ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
 			context.addServlet(jerseyServletHolder, "/rest/*");
 
@@ -97,7 +120,7 @@ public class ServiceServer {
 		ss.start();
 		System.out.println(String.format("Server app started.\nHit enter to stop it..."));
 		System.in.read();
-		// ss.stop();
+		ss.stop();
 	}
 
 }
