@@ -2,11 +2,11 @@ package eu.dlvm.domotics.utils;
 
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 public class OnceADayWithinPeriod extends OnceADay {
 
-	private static Logger log = Logger.getLogger(OnceADayWithinPeriod.class);
+	private static Logger log = LoggerFactory.getLogger(OnceADayWithinPeriod.class);
 	private int winStartHour, winStartMinutes, winEndHour, winEndMinutes;
 
 	public OnceADayWithinPeriod(int winStartHour, int winStartMinutes, int winEndHours, int winEndMinutes) {

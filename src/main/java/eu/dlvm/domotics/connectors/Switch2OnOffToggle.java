@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
@@ -32,7 +32,7 @@ import eu.dlvm.domotics.service.BlockInfo;
  */
 public class Switch2OnOffToggle extends Connector implements ISwitchListener, IUserInterfaceAPI {
 
-	static Logger log = Logger.getLogger(Switch2OnOffToggle.class);
+	static Logger log = LoggerFactory.getLogger(Switch2OnOffToggle.class);
 
 	private Map<ClickType, IOnOffToggleCapable.ActionType> mappings;
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();

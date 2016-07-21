@@ -2,9 +2,7 @@ package eu.dlvm.domotics.blocks.concrete;
 
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -49,11 +47,6 @@ public class TestLightSensor implements IThresholdListener {
 	public void onEvent(Sensor source, EventType event) {
 		lastEvent = event;
 		nrEvents++;
-	}
-
-	@BeforeClass
-	public static void initLog() {
-		BasicConfigurator.configure();
 	}
 
 	private void check(LightSensor.States stateExpected, IThresholdListener.EventType eventExpected, int nrEventsExpected) {

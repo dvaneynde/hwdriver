@@ -3,7 +3,7 @@ package eu.dlvm.domotics.connectors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
@@ -15,7 +15,7 @@ import eu.dlvm.domotics.sensors.IAlarmListener;
  */
 public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 
-	private static final Logger log = Logger.getLogger(AlarmEvent2Screen.class);
+	private static final Logger log = LoggerFactory.getLogger(AlarmEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*

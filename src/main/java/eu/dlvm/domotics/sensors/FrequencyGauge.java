@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.sensors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * Measures frequency of a pulse train.
@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
  */
 public class FrequencyGauge {
 
-	private static final Logger log = Logger.getLogger(FrequencyGauge.class);
+	private static final Logger log = LoggerFactory.getLogger(FrequencyGauge.class);
 	private int idxLastSample, nrSamplesPerAverage;
 	private Sample samples[];
 

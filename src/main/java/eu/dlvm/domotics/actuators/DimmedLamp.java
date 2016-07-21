@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.actuators;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -22,7 +22,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 */
 	public static final int DEFAULT_FULL_DIMTIME_MS = 5000; // milliseconds
 
-	static Logger log = Logger.getLogger(DimmedLamp.class);
+	static Logger log = LoggerFactory.getLogger(DimmedLamp.class);
 	private double level, prevOnLevel;
 	private int factorHwOut;
 	private int msTimeFullDim = DEFAULT_FULL_DIMTIME_MS;

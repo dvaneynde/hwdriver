@@ -6,14 +6,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 
 public class XmlDomoticConfigurator {
-	static Logger log = Logger.getLogger(XmlDomoticConfigurator.class);
+	static Logger log = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 	private String cfgFilepath;
 
 	public String getCfgFilepath() {

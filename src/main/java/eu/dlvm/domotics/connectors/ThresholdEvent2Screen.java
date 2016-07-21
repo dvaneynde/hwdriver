@@ -3,7 +3,7 @@ package eu.dlvm.domotics.connectors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Connector;
@@ -15,7 +15,7 @@ import eu.dlvm.domotics.sensors.IThresholdListener;
  */
 public class ThresholdEvent2Screen extends Connector implements IThresholdListener {
 
-	private static final Logger log = Logger.getLogger(ThresholdEvent2Screen.class);
+	private static final Logger log = LoggerFactory.getLogger(ThresholdEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*

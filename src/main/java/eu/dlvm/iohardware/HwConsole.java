@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.BasicConfigurator;
+import ch.qos.logback.classic.LoggerContext;
 import eu.dlvm.domotics.Main;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
@@ -22,7 +22,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 // TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
 public class HwConsole {
 
-    static Logger log = Logger.getLogger(Main.class);
+    static Logger log = LoggerFactory.getLogger(Main.class);
 
     private HardwareIO hw;
 
@@ -265,18 +265,13 @@ public class HwConsole {
     }
 
     public static void main(String[] args) {
-        String logcfgfile = null;
         String hwCfgFile = null;
         String driverHostname = "localhost";
         int driverPort = HwDriverTcpChannel.DEFAULT_DRIVER_PORT;
 
         int i = 0;
         while (i < args.length) {
-            if (args[i].equals("-l")) {
-                if (++i >= args.length)
-                    usage();
-                logcfgfile = args[i++];
-            } else if (args[i].equals("-h")) {
+            if (args[i].equals("-h")) {
                 if (++i >= args.length)
                     usage();
                 driverHostname = args[i++];
@@ -291,12 +286,6 @@ public class HwConsole {
             } else
                 usage();
         }
-        if (logcfgfile == null) {
-            BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(Level.INFO);
-        } else {
-            PropertyConfigurator.configure(logcfgfile);
-        }
 
         try {
             HwConsole c = new HwConsole(hwCfgFile, driverHostname, driverPort);
@@ -309,9 +298,8 @@ public class HwConsole {
     }
 
     private static void usage() {
-        System.out.println("Usage: " + HwConsole.class.getName() + " -c config-file [-l logconfigfile] [-h hostname] [-p port]");
+        System.out.println("Usage: " + HwConsole.class.getName() + " -c config-file [-h hostname] [-p port]");
         System.out.println("\t-c hardware xml configuration file");
-        System.out.println("\t-l log4j configuration file");
         System.out.println("\t-h hostname, default localhost");
         System.out.println("\t-l portnumber, default " + HwDriverTcpChannel.DEFAULT_DRIVER_PORT);
         System.exit(2);

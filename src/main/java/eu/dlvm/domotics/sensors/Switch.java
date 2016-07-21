@@ -3,7 +3,7 @@ package eu.dlvm.domotics.sensors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
@@ -28,7 +28,7 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class Switch extends Sensor {
 
-	static Logger log = Logger.getLogger(Switch.class);
+	static Logger log = LoggerFactory.getLogger(Switch.class);
 
 	public static long DEFAULT_LONG_TIMEOUT = 1200L;
 	public static long DEFAULT_DOUBLE_TIMEOUT = 200L;

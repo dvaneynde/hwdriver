@@ -3,7 +3,7 @@ package eu.dlvm.domotics.sensors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
@@ -25,8 +25,8 @@ import eu.dlvm.iohardware.LogCh;
 public class LightSensor extends Sensor {
 
 	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
-	private static final Logger log = Logger.getLogger(LightSensor.class);
-	private static final Logger loglight = Logger.getLogger("LIGHT");
+	private static final Logger log = LoggerFactory.getLogger(LightSensor.class);
+	private static final Logger loglight = LoggerFactory.getLogger("LIGHT");
 	private int highThreshold, lowThreshold;
 	private long lowToHighDelayMs, highToLowDelayMs;
 	private long lastInfoOnAnalogLevel;

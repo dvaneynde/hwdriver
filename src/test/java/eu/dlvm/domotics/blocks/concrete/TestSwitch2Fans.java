@@ -3,9 +3,6 @@ package eu.dlvm.domotics.blocks.concrete;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +15,7 @@ import eu.dlvm.domotics.connectors.Switch2Fan;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public class TestSwitch2Fans {
 	
@@ -64,7 +62,6 @@ public class TestSwitch2Fans {
 
 	@Before
 	public void init() {
-		BasicConfigurator.configure();
 		cur = 0L;
 		
 		hw = new TestHardware();

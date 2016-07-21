@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.actuators;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -27,7 +27,7 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class Screen extends Actuator {
 
-	private static final Logger log = Logger.getLogger(Screen.class);
+	private static final Logger log = LoggerFactory.getLogger(Screen.class);
 
 	/**
 	 * Delay in ms between switching motors, i.e. period that both motors are

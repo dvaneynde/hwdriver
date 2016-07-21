@@ -1,10 +1,6 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -14,6 +10,7 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public class TestFanNoLamp {
 	public class Hardware extends BaseHardwareMock implements IHardwareIO{
@@ -35,11 +32,6 @@ public class TestFanNoLamp {
 	private Hardware hw;
 	private IDomoticContext ctx;
 	private long current, seq;
-
-	@BeforeClass
-	public static void initLog() {
-		BasicConfigurator.configure();
-	}
 
 	@Before
 	public void init() {

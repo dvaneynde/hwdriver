@@ -3,7 +3,7 @@ package eu.dlvm.iohardware.diamondsys;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.LogCh;
 
@@ -15,7 +15,7 @@ import eu.dlvm.iohardware.LogCh;
  */
 public class ChannelMap {
 
-    static Logger log = Logger.getLogger(ChannelMap.class);
+    static Logger log = LoggerFactory.getLogger(ChannelMap.class);
 
     Map<LogCh, FysCh> map = new HashMap<LogCh, FysCh>();
 

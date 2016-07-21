@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -23,7 +23,7 @@ import eu.dlvm.iohardware.LogCh;
  */
 public abstract class Actuator extends Block implements IDomoticLoop, IUserInterfaceAPI {
 
-	private static Logger log = Logger.getLogger(Actuator.class);
+	private static Logger log = LoggerFactory.getLogger(Actuator.class);
 
 	private LogCh channel;
 	private IDomoticContext ctx;

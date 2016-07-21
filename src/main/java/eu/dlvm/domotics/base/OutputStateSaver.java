@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 public class OutputStateSaver {
 
 	public static final String FILENAME = "DomoticOutputStates.txt";
 
-	static Logger log = Logger.getLogger(OutputStateSaver.class);
+	static Logger log = LoggerFactory.getLogger(OutputStateSaver.class);
 
 	private File outputStatesFile;
 	private boolean alreadyReportedFileNotFound = false;

@@ -2,7 +2,7 @@ package eu.dlvm.domotics.utils;
 
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * Helper, checks that something ('thingie') is done only once a day.
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  */
 public class OnceADay {
 
-	private static Logger log = Logger.getLogger(OnceADay.class);
+	private static Logger log = LoggerFactory.getLogger(OnceADay.class);
 
 	protected Calendar today;
 	protected boolean doneForToday;

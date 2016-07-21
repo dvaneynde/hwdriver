@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.iohardware.LogCh;
 
 public class TestSwitchDedicatedAllOff {
-	static Logger log = Logger.getLogger(TestSwitchDedicatedAllOff.class);
+	static Logger log = LoggerFactory.getLogger(TestSwitchDedicatedAllOff.class);
 	private TestSwitchOrTimer2Lamp.Hardware hw;
 	private Domotic dom;
 	private Switch swLamp, swAllOff;

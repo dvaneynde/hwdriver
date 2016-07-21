@@ -7,7 +7,7 @@ import java.util.Random;
 
 import javax.inject.Singleton;
 
-import org.apache.log4j.Logger;
+
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
@@ -23,11 +23,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Singleton
 @Path("")
 public class RestService {
 
-	private static Logger Log = Logger.getLogger(RestService.class);
+	private static Logger Log = LoggerFactory.getLogger(RestService.class);
 	private static int countInstances = 0;
 	private QuickieService qSvc;
 

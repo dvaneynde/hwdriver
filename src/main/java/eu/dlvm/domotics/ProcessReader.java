@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO move to base, or move base/* to here?
 public class ProcessReader {
-	static Logger log = Logger.getLogger(ProcessReader.class);
-	static Logger logDriver = Logger.getLogger("DRIVER");
+	static Logger log = LoggerFactory.getLogger(ProcessReader.class);
+	static Logger logDriver = LoggerFactory.getLogger("DRIVER");
 
 	private String threadname;
 	private InputStream is;

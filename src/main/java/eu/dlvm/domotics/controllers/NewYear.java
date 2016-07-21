@@ -3,7 +3,7 @@ package eu.dlvm.domotics.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -14,7 +14,7 @@ import eu.dlvm.domotics.service.BlockInfo;
 
 public class NewYear extends Controller implements IOnOffToggleCapable {
 
-	static Logger LOG = Logger.getLogger(NewYear.class);
+	static Logger LOG = LoggerFactory.getLogger(NewYear.class);
 	private long startTimeMs;
 	private long endTimeMs;
 	private boolean running, manual;

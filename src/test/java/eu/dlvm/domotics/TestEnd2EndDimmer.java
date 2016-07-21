@@ -3,11 +3,11 @@ package eu.dlvm.domotics;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
@@ -26,7 +26,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
 
 public class TestEnd2EndDimmer {
 
-	static Logger log = Logger.getLogger(TestEnd2EndDimmer.class);
+	static Logger log = LoggerFactory.getLogger(TestEnd2EndDimmer.class);
 
 	public static final LogCh SW_DN_1 = new LogCh(0);
 	public static final LogCh SW_UP_1 = new LogCh(1);
@@ -54,7 +54,6 @@ public class TestEnd2EndDimmer {
 
 	@Before
 	public void setup() {
-		BasicConfigurator.configure();
 		current = 0L;
 		// Hardware
 		drv = new HwDriverChannelMock();

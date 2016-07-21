@@ -3,7 +3,7 @@ package eu.dlvm.domotics.sensors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
@@ -19,7 +19,7 @@ import eu.dlvm.iohardware.LogCh;
  * @author dirk
  */
 public class DimmerSwitch extends Sensor {
-	static Logger log = Logger.getLogger(DimmerSwitch.class);
+	static Logger log = LoggerFactory.getLogger(DimmerSwitch.class);
 
 	private LogCh channelR;
 	private long leftRESTtime = 0L;

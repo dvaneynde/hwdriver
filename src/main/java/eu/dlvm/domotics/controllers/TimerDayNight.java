@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
@@ -21,7 +21,7 @@ import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
  */
 public class TimerDayNight extends Timer {
 
-	private static Logger log = Logger.getLogger(TimerDayNight.class);
+	private static Logger log = LoggerFactory.getLogger(TimerDayNight.class);
 
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
 	/**

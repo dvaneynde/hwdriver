@@ -9,7 +9,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
 
@@ -21,7 +21,7 @@ import eu.dlvm.iohardware.ChannelFault;
  */
 public class HwDriverTcpChannel implements IHwDriverChannel {
 
-	static Logger log = Logger.getLogger(HwDriverTcpChannel.class);
+	static Logger log = LoggerFactory.getLogger(HwDriverTcpChannel.class);
 
 	public static final int DEFAULT_DRIVER_PORT=4444;
     
@@ -53,7 +53,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 			log.debug("HwDriver socket to communicate with is: "
 					+ socket.toString());
 		} catch (IOException e) {
-			log.fatal("Connecting to " + serverHostname + ':' + serverPort
+			log.error("Connecting to " + serverHostname + ':' + serverPort
 					+ " failed.", e);
 			throw new ChannelFault("Cannot connect to "+serverHostname+':'+serverPort+", probably not recoverable.");
 		}

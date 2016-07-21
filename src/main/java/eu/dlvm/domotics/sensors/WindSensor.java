@@ -3,7 +3,7 @@ package eu.dlvm.domotics.sensors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
@@ -17,8 +17,8 @@ import eu.dlvm.iohardware.LogCh;
 public class WindSensor extends Sensor {
 
 	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
-	private static final Logger log = Logger.getLogger(WindSensor.class);
-	private static final Logger logwind = Logger.getLogger("WIND");
+	private static final Logger log = LoggerFactory.getLogger(WindSensor.class);
+	private static final Logger logwind = LoggerFactory.getLogger("WIND");
 	private int highFreqThreshold, lowFreqThreshold;
 	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
 	private States state;

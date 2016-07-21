@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -32,7 +32,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.Opmm1616BoardWithMsg;
  */
 public class XmlHwConfigurator implements IBoardFactory {
 
-    static Logger log = Logger.getLogger(XmlHwConfigurator.class);
+    static Logger log = LoggerFactory.getLogger(XmlHwConfigurator.class);
     private String cfgFilepath; // TODO File object
 
     int boardNr, address;

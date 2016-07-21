@@ -4,7 +4,7 @@
 
 	<groupId>eu.dlvm</groupId>
 	<artifactId>domotica</artifactId>
-	<version>0.2</version>
+	<version>1.0</version>
 
 	<packaging>jar</packaging>
 
@@ -44,19 +44,15 @@
 	</pluginRepositories>
 
 	<dependencies>
-		<!-- <dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.12</version>
-		</dependency> -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.21</version>
-		</dependency>
+		<!-- <dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> 
+			<version>1.2.12</version> </dependency> <dependency> <groupId>org.slf4j</groupId> 
+			<artifactId>slf4j-log4j12</artifactId> <version>1.7.21</version> </dependency> -->
 		<!-- TODO replace above by below -->
-		<!-- <dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
-			<version>1.0.13</version> </dependency> -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.13</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

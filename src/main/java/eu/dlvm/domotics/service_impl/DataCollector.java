@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
@@ -15,7 +15,7 @@ import eu.dlvm.domotics.service.RestService;
 
 public class DataCollector {
 
-	private static final Logger log = Logger.getLogger(RestService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestService.class);
 	private static int countInstances = 0;
 
 	private static Data data = null;

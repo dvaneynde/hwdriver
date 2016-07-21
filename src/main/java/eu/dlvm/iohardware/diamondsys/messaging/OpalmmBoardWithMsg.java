@@ -2,7 +2,7 @@ package eu.dlvm.iohardware.diamondsys.messaging;
 
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
 
@@ -23,7 +23,7 @@ import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
  */
 public class OpalmmBoardWithMsg extends OpalmmBoard implements IBoardMessaging {
 
-    static Logger log = Logger.getLogger(OpalmmBoardWithMsg.class);
+    static Logger log = LoggerFactory.getLogger(OpalmmBoardWithMsg.class);
 
     // For driver
     private final static char BOARDTYPE_OPALMM = 'O';

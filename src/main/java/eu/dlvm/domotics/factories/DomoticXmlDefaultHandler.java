@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
@@ -40,7 +40,7 @@ import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
-	static Logger log = Logger.getLogger(DomoticXmlDefaultHandler.class);
+	static Logger log = LoggerFactory.getLogger(DomoticXmlDefaultHandler.class);
 
 	private Block block;
 	private Map<String, Block> blocks = new HashMap<>();

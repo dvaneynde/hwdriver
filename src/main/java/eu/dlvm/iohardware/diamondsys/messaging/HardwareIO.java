@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -21,7 +21,7 @@ import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
  */
 public class HardwareIO implements IHardwareIO {
 
-	static Logger log = Logger.getLogger(HardwareIO.class);
+	static Logger log = LoggerFactory.getLogger(HardwareIO.class);
 
 	private List<Board> boards;
 	private ChannelMap channelMap; // logical channel --> physical channel

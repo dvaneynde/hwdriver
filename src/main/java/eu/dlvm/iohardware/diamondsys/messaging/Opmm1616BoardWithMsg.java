@@ -2,7 +2,7 @@ package eu.dlvm.iohardware.diamondsys.messaging;
 
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
 import eu.dlvm.iohardware.diamondsys.Opmm1616Board;
@@ -15,7 +15,7 @@ import eu.dlvm.iohardware.diamondsys.Opmm1616Board;
  */
 public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessaging {
 
-    static Logger log = Logger.getLogger(Opmm1616BoardWithMsg.class);
+    static Logger log = LoggerFactory.getLogger(Opmm1616BoardWithMsg.class);
 
     // For driver
     private final static char BOARDTYPE_OPALMM = 'O';

@@ -7,15 +7,17 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.qos.logback.classic.BasicConfigurator;
+
 public class OpenWeatherMap {
 
-	static Logger log = Logger.getLogger(OpenWeatherMap.class);
+	static Logger log = LoggerFactory.getLogger(OpenWeatherMap.class);
 
 	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=9432e6e90eb0c5c30b4f4c19ba396d37";
 	
@@ -40,7 +42,7 @@ public class OpenWeatherMap {
 		String weather = null;
 		try {
 			HttpResponse response1 = httpclient.execute(httpGet);
-			log.debug(response1.getStatusLine());
+			log.debug("response statusline",response1.getStatusLine());
 			HttpEntity entity = response1.getEntity();
 			weather = EntityUtils.toString(entity);
 			log.debug("http response=" + weather);
@@ -74,7 +76,7 @@ public class OpenWeatherMap {
 	}
 
 	public static void main(String[] args) {
-		BasicConfigurator.configure();
+		//BasicConfigurator.configure();
 		OpenWeatherMap owm = new OpenWeatherMap();
 		OpenWeatherMap.Info info = owm.getWeatherReport();
 		Calendar c = Calendar.getInstance();

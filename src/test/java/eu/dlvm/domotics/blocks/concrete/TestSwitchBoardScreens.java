@@ -5,7 +5,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -113,8 +112,6 @@ public class TestSwitchBoardScreens {
 		
 		cur = 0L;
 		dom.initialize(new HashMap<String, RememberedOutput> (0));
-
-		BasicConfigurator.configure();
 	}
 
 	@Test

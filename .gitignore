@@ -10,3 +10,4 @@ target/
 /hardware.log
 /light.log
 /wind.log
+/logs/

@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
@@ -30,9 +29,9 @@ import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
  */
 public class Main {
 
-	private static Logger log = Logger.getLogger(Main.class);
-	private static Logger logDriver = Logger.getLogger("DRIVER");
-	private static Logger MON = Logger.getLogger("MONITOR");
+	private static Logger log = LoggerFactory.getLogger(Main.class);
+	private static Logger logDriver = LoggerFactory.getLogger("DRIVER");
+	private static Logger MON = LoggerFactory.getLogger("MONITOR");
 
 	private String pid;
 
@@ -97,10 +96,10 @@ public class Main {
 			fw = new FileWriter(f);
 			fw.write(getPid());
 		} catch (FileNotFoundException e) {
-			log.fatal("Cannot start, cannot write pid file.", e);
+			log.error("Cannot start, cannot write pid file.", e);
 			System.exit(2);
 		} catch (IOException e) {
-			log.fatal("Cannot start, cannot write pid file.", e);
+			log.error("Cannot start, cannot write pid file.", e);
 			System.exit(2);
 		} finally {
 			if (fw != null) {
@@ -139,9 +138,9 @@ public class Main {
 					logDriver.info(line);
 				}
 			} catch (IOException e) {
-				log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
+				log.error("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
 			} catch (InterruptedException e) {
-				log.fatal("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
+				log.error("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
 			} finally {
 				t.stop();
 			}
@@ -229,14 +228,6 @@ public class Main {
 			usage();
 		}
 
-		if (logcfgfile == null) {
-			System.out.println("Logging starts, using log4j default configuration.");
-			BasicConfigurator.configure();
-		} else {
-			System.out.println("Logging starts, using log4j configuration from '" + logcfgfile + "'.");
-			PropertyConfigurator.configure(logcfgfile);
-		}
-
 		Main main = new Main();
 		if (domotic) {
 			main.startAndRunDomotic(looptime, path2Driver, logcfgfile, blocksCfgFile, hwCfgFile, hostname, port, simulation);
@@ -249,9 +240,9 @@ public class Main {
 
 	private static void usage() {
 		System.out.println("Usage:\t" + Main.class.getSimpleName()
-				+ " domo [-d path2Driver] [-t looptime] [-l logconfigfile] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
+				+ " domo [-d path2Driver] [-t looptime] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n" + "\t" + Main.class.getSimpleName()
 				+ " hw [-d path2Driver] [-l logconfigfile] [-h hostname] [-p port] -c hardware-config-file\n" + "\t-d path to driver, if it needs to be started and managed by this program\n"
-				+ "\t-t time between loops, in ms\n" + "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n" + "\t-l log4j configuration file\n");
+				+ "\t-t time between loops, in ms\n" + "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n");
 		System.exit(2);
 	}
 

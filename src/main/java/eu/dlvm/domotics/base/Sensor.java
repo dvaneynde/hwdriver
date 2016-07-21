@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
@@ -18,7 +18,7 @@ import eu.dlvm.iohardware.LogCh;
  */
 public abstract class Sensor extends Block implements IDomoticLoop {
 
-	static Logger log = Logger.getLogger(Sensor.class);
+	static Logger log = LoggerFactory.getLogger(Sensor.class);
 
 	private IDomoticContext ctx;
 	private LogCh channel;

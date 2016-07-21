@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.actuators;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
@@ -12,7 +12,7 @@ import eu.dlvm.iohardware.LogCh;
 
 public class Lamp extends Actuator implements IOnOffToggleCapable {
 
-	static Logger log = Logger.getLogger(Lamp.class);
+	static Logger log = LoggerFactory.getLogger(Lamp.class);
 	private boolean outval;
 
 	/**

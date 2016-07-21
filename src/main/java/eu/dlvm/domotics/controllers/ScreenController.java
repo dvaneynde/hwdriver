@@ -3,7 +3,7 @@ package eu.dlvm.domotics.controllers;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
@@ -32,7 +32,7 @@ import eu.dlvm.domotics.service.BlockInfo;
  * @author dirk
  */
 public class ScreenController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUserInterfaceAPI {
-	private static final Logger log = Logger.getLogger(ScreenController.class);
+	private static final Logger log = LoggerFactory.getLogger(ScreenController.class);
 	private boolean enabled;
 	private IThresholdListener.EventType lastThresholdEvent;
 	private IAlarmListener.EventType lastAlarmEvent;

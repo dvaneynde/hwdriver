@@ -3,30 +3,28 @@ package eu.dlvm.domotics.blocks.concrete;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
-import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
-import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
+import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public class TestSwitchBoardDimmers {
 
-	static Logger log = Logger.getLogger(TestSwitchBoardDimmers.class);
+	static Logger log = LoggerFactory.getLogger(TestSwitchBoardDimmers.class);
 
 	public static int LONGCLICKTIMEOUT = 50;
 	public static final int FULL_OUT_VAL = 1024;
@@ -61,15 +59,10 @@ public class TestSwitchBoardDimmers {
 	private DimmerSwitch2Dimmer ds2d;
 	private long cur;
 
-	@BeforeClass
-	public static void initOnce() {
-		BasicConfigurator.configure();
-	}
-
 	@Before
 	public void init() {
 		cur = 0L;
-		
+
 		hw = new Hardware();
 		hw.inputs.put(SW_DN_1, false);
 		hw.inputs.put(SW_UP_1, false);
@@ -84,11 +77,11 @@ public class TestSwitchBoardDimmers {
 		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);
-		
+
 		ds2d = new DimmerSwitch2Dimmer("ds2d", "ds2d");
 		ds2d.setLamp(dl1);
 		dsw1.registerListener(ds2d);
-		
+
 		swAllOnOff = new Switch("swAll", "Switch All On/Off", SW_ALL, dom);
 		swAllOnOff.setDoubleClickEnabled(true);
 		swAllOnOff.setDoubleClickTimeout(400L);
@@ -104,8 +97,8 @@ public class TestSwitchBoardDimmers {
 	@Test
 	public void testFullThenAllOff() {
 		// Initialisatie
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
-		Assert.assertEquals(FULL_OUT_VAL/2, hw.outputs.get(DIMMER1).intValue());
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
+		Assert.assertEquals(FULL_OUT_VAL / 2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);
 		dom.loopOnce(cur += 1);
@@ -135,8 +128,8 @@ public class TestSwitchBoardDimmers {
 	@Test
 	public void testDimUpAndDownDimmer1() {
 		// Initialisatie
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
-		Assert.assertEquals(FULL_OUT_VAL/2, hw.outputs.get(DIMMER1).intValue());
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
+		Assert.assertEquals(FULL_OUT_VAL / 2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);
 		dom.loopOnce(cur += 1);

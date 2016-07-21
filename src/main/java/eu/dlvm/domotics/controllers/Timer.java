@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -21,7 +21,7 @@ import eu.dlvm.domotics.service.BlockInfo;
  */
 public class Timer extends Controller {
 
-	private static Logger log = Logger.getLogger(Timer.class);
+	private static Logger log = LoggerFactory.getLogger(Timer.class);
 	protected int onTime, offTime;
 	protected boolean state;
 	private Set<IOnOffToggleCapable> listeners = new HashSet<>();

@@ -1,12 +1,12 @@
 package eu.dlvm.domotics.controllers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 
 public class RepeatOffAtTimer extends Timer {
-	private static Logger log = Logger.getLogger(RepeatOffAtTimer.class);
+	private static Logger log = LoggerFactory.getLogger(RepeatOffAtTimer.class);
 	private int intervalSec;
 	private long timeLastOffSent;
 

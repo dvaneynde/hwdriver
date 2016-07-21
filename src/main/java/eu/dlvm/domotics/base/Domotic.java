@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.DriverMonitor;
 import eu.dlvm.domotics.service_impl.ServiceServer;
@@ -30,9 +30,9 @@ public class Domotic implements IDomoticContext {
 	public static final int MONITORING_INTERVAL_MS = 5000;
 	public static int RESTART_DRIVER_WAITTIME_MS = 30000;
 
-	private static Logger log = Logger.getLogger(Domotic.class);
+	private static Logger log = LoggerFactory.getLogger(Domotic.class);
 
-	private static Logger MON = Logger.getLogger("MONITOR");
+	private static Logger MON = LoggerFactory.getLogger("MONITOR");
 	private static Domotic singleton;
 
 	private Thread maintThread;

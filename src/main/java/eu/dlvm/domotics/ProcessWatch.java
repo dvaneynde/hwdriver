@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO move to base, or move base/* to here?
 
 public class ProcessWatch {
-	static Logger log = Logger.getLogger(ProcessWatch.class);
+	static Logger log = LoggerFactory.getLogger(ProcessWatch.class);
 
 	private String threadname;
 	private Process process;

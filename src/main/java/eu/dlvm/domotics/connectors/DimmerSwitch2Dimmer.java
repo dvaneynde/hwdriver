@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.connectors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Connector;
@@ -22,7 +22,7 @@ import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
  * @author dirk vaneynde
  */
 public class DimmerSwitch2Dimmer extends Connector implements IDimmerSwitchListener {
-	static Logger log = Logger.getLogger(DimmerSwitch2Dimmer.class);
+	static Logger log = LoggerFactory.getLogger(DimmerSwitch2Dimmer.class);
 
 	private DimmedLamp dimmedLamp;
 

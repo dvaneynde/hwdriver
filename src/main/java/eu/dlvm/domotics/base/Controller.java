@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * Controller drives Actuators, like Sensors, but without access to hardware.
@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class Controller extends Block implements IDomoticLoop, IUserInterfaceAPI {
 
-	private static final Logger log = Logger.getLogger(Controller.class);
+	private static final Logger log = LoggerFactory.getLogger(Controller.class);
 
 	public Controller(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui);

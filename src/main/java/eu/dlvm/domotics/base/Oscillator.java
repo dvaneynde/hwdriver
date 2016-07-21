@@ -1,10 +1,10 @@
 package eu.dlvm.domotics.base;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 public class Oscillator extends Thread {
 
-	static Logger log = Logger.getLogger(Oscillator.class);
+	static Logger log = LoggerFactory.getLogger(Oscillator.class);
 	
 	private Domotic dom;
 	private long tickTimeMs;

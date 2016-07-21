@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.actuators;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -31,7 +31,7 @@ import eu.dlvm.iohardware.LogCh;
 
 public class Fan extends Actuator implements IOnOffToggleCapable {
 
-	static Logger log = Logger.getLogger(Fan.class);
+	static Logger log = LoggerFactory.getLogger(Fan.class);
 
 	/**
 	 * If lamp is used, default time lamp has to be on in seconds before Fan

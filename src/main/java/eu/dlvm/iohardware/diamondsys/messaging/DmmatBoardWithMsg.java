@@ -3,7 +3,7 @@ package eu.dlvm.iohardware.diamondsys.messaging;
 import java.text.ParseException;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.diamondsys.DmmatBoard;
 
@@ -31,7 +31,7 @@ import eu.dlvm.iohardware.diamondsys.DmmatBoard;
  */
 public class DmmatBoardWithMsg extends DmmatBoard implements IBoardMessaging {
 
-    static Logger log = Logger.getLogger(DmmatBoardWithMsg.class);
+    static Logger log = LoggerFactory.getLogger(DmmatBoardWithMsg.class);
 
     // For driver
     private final static char BOARDTYPE_DMMAT = 'D';

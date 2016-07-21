@@ -6,7 +6,8 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -28,7 +29,7 @@ import eu.dlvm.domotics.service.RestService;
 //@SuppressWarnings("restriction")
 public class ServiceServer {
 
-	private static Logger log = Logger.getLogger(ServiceServer.class);
+	private static Logger log = LoggerFactory.getLogger(ServiceServer.class);
 
 	private Server server;
 
@@ -108,7 +109,7 @@ public class ServiceServer {
 		try {
 			server.stop();
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Unexpected exception, ignored.",e);
 		}
 		log.info("HTTP Server stopped.");
 	}

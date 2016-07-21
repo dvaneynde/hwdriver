@@ -1,10 +1,6 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
@@ -13,6 +9,7 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 // TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
 public class TestDimmedLamp {
@@ -34,11 +31,6 @@ public class TestDimmedLamp {
 	private Hardware hw = new Hardware();
 	private IDomoticContext ctx = new DomoContextMock(hw);
 	private long seq;
-
-	@BeforeClass
-	public static void initLog() {
-		BasicConfigurator.configure();
-	}
 
 	@Before
 	public void init() {
