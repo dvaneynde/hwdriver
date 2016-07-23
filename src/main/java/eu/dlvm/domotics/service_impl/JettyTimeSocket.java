@@ -21,6 +21,7 @@ package eu.dlvm.domotics.service_impl;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,8 @@ public class JettyTimeSocket implements Runnable
     @Override
     public void run()
     {
+    	Random random = new Random();
+        
         while (this.session != null)
         {
             try
@@ -60,6 +63,7 @@ public class JettyTimeSocket implements Runnable
                 dateFormat.setTimeZone(timezone);
 
                 String timestamp = dateFormat.format(new Date());
+                timestamp += ","+random.nextFloat();
                 this.session.getRemote().sendString(timestamp);
                 TimeUnit.SECONDS.sleep(1);
             }

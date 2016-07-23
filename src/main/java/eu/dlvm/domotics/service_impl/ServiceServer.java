@@ -52,6 +52,11 @@ public class ServiceServer {
 			// static file serving)
 			Path webRootPath = new File("webapps/static-root/").toPath().toRealPath();
 
+			// TODO html en js embedden?
+			// http://download.eclipse.org/jetty/9.3.9.v20160517/apidocs/org/eclipse/jetty/util/resource/URLResource.html
+			// FileResource
+			// InputStream input = getClass().getResourceAsStream("/classpath/to/my/file");
+			
 			// Setup the basic application "context" for this application at "/"
 			// This is also known as the handler tree (in jetty speak)
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -69,18 +74,6 @@ public class ServiceServer {
 
 			// Add time servlet
 			context.addServlet(TimeServlet.class, "/time/");
-
-			// private HttpServer server;
-			// public void start() {
-			// URI baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build();
-			// Set<Class<?>> services = new HashSet<>();
-			// services.add(RestService.class);
-			// services.add(HtmlService.class);
-			// ResourceConfig config = new ResourceConfig(services);
-			// config.register(org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature.class);
-			// config.register(JacksonFeature.class);
-			// server = JdkHttpServerFactory.createHttpServer(baseUri, config);
-			// log.info("HTTP Server started.");
 
 			// Toevoegen Jersey... spannend !
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
