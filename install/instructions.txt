@@ -1,13 +1,8 @@
-PREPARE
-In domotic java project, doe 'mvn package' om jar aan te maken.
-
-In "install" directory, voer assemble.sh uit.
-
-INSTALLATIE
-Voer install.sh uit.
+INSTALL
+In "install" directory, voer "install.sh <hostname-or-ip>" uit.
 
 HERSTART
-Log in op domotica.
+Log in op domotica systeem.
 Controleer links.
 Herstart, via:
 	sudo /etc/init.d/domotic.sh restart

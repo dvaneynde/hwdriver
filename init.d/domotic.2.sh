@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 # Start domotic system at startup.
-# For version 3.0 (with logback, java 8)
-# 
+#
 # Author:	Dirk Vaneynde
-# Version:	1.0
+#
+# Version:	0.1
 #
 
 #set -x
@@ -38,7 +38,7 @@ d_start() {
 		fi
 	fi
 	cd $DOMDIR
-	/usr/bin/java -jar $DOMDIR/domotic.jar domo -t 20 -l $DOMDIR/log4j.properties -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver >>$BOOTLOG 2>&1 &
+	/usr/bin/java -Dlog4j.debug=true -jar $DOMDIR/domotic.jar domo -t 20 -l $DOMDIR/log4j.properties -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver >>$BOOTLOG 2>&1 &
 	echo "Domotic started." | tee -a $BOOTLOG
 }
 

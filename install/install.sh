@@ -19,8 +19,14 @@ DOMHOST=$1
 
 # Stop on error
 set -e
-pushd /Users/dirk/dev/ws-kepler/domotic-env/install
-pushd /Users/dirk/dev/ws-kepler/domotic
+if [ $(basename $(pwd)) != "install" ]
+then 
+	echo "You must be in domotic-env/install directory to execute this script."
+	exit 2
+fi
+pushd .
+pushd ../../domotic
+
 echo
 echo "BUILD ========================"
 echo
@@ -33,7 +39,7 @@ echo
 ./assemble.sh
 
 echo
-echo "INSTAL  ========================"
+echo "INSTALL ======================"
 echo
 DOMDIR=/home/dirk/domotic
 NEWDIR=$(date +%F_%T)
@@ -45,6 +51,7 @@ export NEWPATH
 #10
 echo Nieuwe directory aanmaken op domotica systeem, $NEWDIR
 ssh dirk@$DOMHOST <<END
+mkdir -p $DOMDIR
 cd $DOMDIR
 mkdir $NEWDIR
 END
