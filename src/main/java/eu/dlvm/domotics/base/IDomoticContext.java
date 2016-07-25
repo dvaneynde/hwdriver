@@ -8,7 +8,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  * 
  * TODO getHw() zou in aparte interface moeten, enkel voor sensors en actuators
  * TODO kan dit niet dynamisch, b.v. addBlock en dan kijkt code zelf of het sensor is, of ui capable is? en hw al dan niet zetten? Factory maken?
- * @author dirkv
+ * @author dirk
  * 
  */
 public interface IDomoticContext {

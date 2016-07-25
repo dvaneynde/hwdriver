@@ -10,7 +10,7 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.controllers.newyear.GSstate;
 import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
 public class NewYear extends Controller implements IOnOffToggleCapable {
 
@@ -135,7 +135,7 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
+	public UiInfo getBlockInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}

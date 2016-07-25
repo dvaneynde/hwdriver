@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -22,6 +20,8 @@ import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.service.Resource;
 import eu.dlvm.domotics.service.RestService;
@@ -36,7 +36,7 @@ public class ServiceServer {
 	public static class TimeSocketCreator implements WebSocketCreator {
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-			return new JettyTimeSocket();
+			return new TimeSocket();
 		}
 	}
 

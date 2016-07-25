@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
+import eu.dlvm.domotics.service_impl.UiInfoSocket;
 import eu.dlvm.iohardware.HwConsole;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
@@ -58,9 +59,10 @@ public class Main {
 			cf.setCfgFilepath(cfgFilename);
 			cf.configure(d);
 			d.setHw(hw);
+			d.setUiUpdator(new UiInfoSocket());
 			return d;
 		} catch (Exception e) {
-			log.error("Cannot configure system, abort. Reason:" + e.getMessage());
+			log.error("Cannot configure system, abort.", e);
 			throw new RuntimeException("Abort. Cannot configure system.");
 		}
 	}

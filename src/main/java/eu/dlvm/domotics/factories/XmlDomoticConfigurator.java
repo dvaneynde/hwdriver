@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.factories;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,14 +15,16 @@ import eu.dlvm.domotics.base.IDomoticContext;
 
 public class XmlDomoticConfigurator {
 	static Logger log = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
-	private String cfgFilepath;
+	private File cfgFile;
 
 	public String getCfgFilepath() {
-		return cfgFilepath;
+		return cfgFile.getAbsolutePath();
 	}
 
 	public void setCfgFilepath(String cfgFilepath) {
-		this.cfgFilepath = cfgFilepath;
+		cfgFile = new File(cfgFilepath);
+		if (!cfgFile.exists())
+			throw new IllegalArgumentException("File '"+cfgFilepath+"' does not exist.");
 	}
 
 	public void configure(IDomoticContext domoCtx) {

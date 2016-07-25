@@ -6,7 +6,7 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -301,8 +301,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
+	public UiInfo getBlockInfo() {
+		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
 		//bi.addParm("on", isOn() ? "1" : "0");
 		bi.setOn(isOn());
 		// TODO time still running, if running

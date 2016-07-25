@@ -7,7 +7,7 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.LogCh;
 
 public class Lamp extends Actuator implements IOnOffToggleCapable {
@@ -115,8 +115,8 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
+	public UiInfo getBlockInfo() {
+		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
 		//ai.addParm("on", isOn() ? "1" : "0");
 		bi.setOn(isOn());
 		return bi;

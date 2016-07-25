@@ -10,7 +10,7 @@ import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * @author dirk Has two per-day times, at {@link #setOnTime(int, int)} an on
@@ -111,7 +111,7 @@ public class Timer extends Controller {
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
+	public UiInfo getBlockInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -6,7 +6,7 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
@@ -358,8 +358,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = new BlockInfo(getName(), this.getClass().getSimpleName(), getDescription());
+	public UiInfo getBlockInfo() {
+		UiInfo bi = new UiInfo(getName(), this.getClass().getSimpleName(), getDescription());
 		// bi.addParm("on", getState() == States.OFF ? "0" : "1");
 		// bi.addParm("level", Integer.toString(getLevel()));
 		bi.setOn(getState() != States.OFF);

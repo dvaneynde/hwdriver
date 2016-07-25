@@ -14,7 +14,7 @@ import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.IThresholdListener;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * Enables a source event to go through or not,
@@ -103,8 +103,8 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = new BlockInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
+	public UiInfo getBlockInfo() {
+		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
 		bi.setOn(isEnabled());
 		bi.setStatus(isEnabled() ? "ON" : "OFF");
 		return bi;

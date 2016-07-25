@@ -3,13 +3,13 @@ package eu.dlvm.domotics.service_impl;
 import java.util.List;
 import java.util.Map;
 
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
+@Deprecated
 class Data {
-
 	String title;
 	List<String> groupNames;
-	Map<String, List<BlockInfo>> groupname2infos;
+	Map<String, List<UiInfo>> groupname2infos;
 	Map<String, Boolean> groupOn;
 
 	public String getTitle() {
@@ -28,11 +28,11 @@ class Data {
 		this.groupNames = groupNames;
 	}
 
-	public Map<String, List<BlockInfo>> getGroupname2infos() {
+	public Map<String, List<UiInfo>> getGroupname2infos() {
 		return groupname2infos;
 	}
 
-	public void setGroupname2infos(Map<String, List<BlockInfo>> groupname2infos) {
+	public void setGroupname2infos(Map<String, List<UiInfo>> groupname2infos) {
 		this.groupname2infos = groupname2infos;
 	}
 
@@ -48,6 +48,4 @@ class Data {
 	public String toString() {
 		return "Data [title=" + title + ", groupNames=" + groupNames + ", groupname2infos=" + groupname2infos + ", groupOn=" + groupOn + "]";
 	}
-	
-	
 }

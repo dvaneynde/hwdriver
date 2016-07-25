@@ -10,7 +10,7 @@ import eu.dlvm.domotics.base.Connector;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * Connects a Down and Up {@link Switch} to one or more {@link Screen}'s to go
@@ -59,11 +59,11 @@ public class Switch2Screen extends Connector implements ISwitchListener, IUserIn
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = null;
+	public UiInfo getBlockInfo() {
+		UiInfo bi = null;
 		if (ui != null) {
 			log.debug("getBlockInfo(), ui='" + ui + "'");
-			bi = new BlockInfo(this.getName(), "DimmerSwitch", this.getDescription());
+			bi = new UiInfo(this.getName(), "DimmerSwitch", this.getDescription());
 		}
 		return bi;
 	}

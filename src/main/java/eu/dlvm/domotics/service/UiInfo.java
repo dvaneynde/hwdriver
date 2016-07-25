@@ -1,7 +1,6 @@
 package eu.dlvm.domotics.service;
 
-
-public class BlockInfo {
+public class UiInfo {
 	private String name;
 	private String type;
 	private String description;
@@ -13,11 +12,11 @@ public class BlockInfo {
 
 	// private Map<String, String> parms;
 
-	public BlockInfo() {
+	public UiInfo() {
 		//parms = new HashMap<>();
 	}
 
-	public BlockInfo(String name, String type, String description) {
+	public UiInfo(String name, String type, String description) {
 		this();
 		this.name = name;
 		this.type = type;
@@ -62,7 +61,7 @@ public class BlockInfo {
 
 	@Override
 	public String toString() {
-		return "BlockInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level=" + level + "]";
+		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level=" + level + "]";
 	}
 
 	public boolean isOn() {

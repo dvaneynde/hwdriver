@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.DriverMonitor;
+import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.domotics.service_impl.ServiceServer;
 import eu.dlvm.domotics.utils.OnceADayWithinPeriod;
 import eu.dlvm.iohardware.ChannelFault;
@@ -31,7 +33,6 @@ public class Domotic implements IDomoticContext {
 	public static int RESTART_DRIVER_WAITTIME_MS = 30000;
 
 	private static Logger log = LoggerFactory.getLogger(Domotic.class);
-
 	private static Logger MON = LoggerFactory.getLogger("MONITOR");
 	private static Domotic singleton;
 
@@ -49,10 +50,11 @@ public class Domotic implements IDomoticContext {
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
+	protected IUIUpdator uiUpdator;
 	protected long loopSequence = -1L;
 
 	private List<IUserInterfaceAPI> uiblocks = new ArrayList<IUserInterfaceAPI>(64);
-	
+
 	public static synchronized Domotic singleton() {
 		if (singleton == null) {
 			singleton = new Domotic();
@@ -89,6 +91,14 @@ public class Domotic implements IDomoticContext {
 		return hw;
 	}
 
+	public IUIUpdator getUiUpdator() {
+		return uiUpdator;
+	}
+
+	public void setUiUpdator(IUIUpdator uiUpdator) {
+		this.uiUpdator = uiUpdator;
+	}
+
 	/**
 	 * Add Sensor to loop set (see {@link #loopOnce()}.
 	 * 
@@ -105,7 +115,7 @@ public class Domotic implements IDomoticContext {
 			}
 		}
 		sensors.add(s);
-		log.debug("Added sensor " + s.getName());
+		log.info("Added sensor " + s.getName());
 	}
 
 	/**
@@ -125,8 +135,8 @@ public class Domotic implements IDomoticContext {
 		}
 		actuators.add(a);
 		if (a instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI)a);
-		log.debug("Added actuator " + a.getName());
+			addUiCapableBlock((IUserInterfaceAPI) a);
+		log.info("Added actuator " + a.getName());
 	}
 
 	// TODO generic
@@ -140,8 +150,8 @@ public class Domotic implements IDomoticContext {
 		}
 		controllers.add(a);
 		if (a instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI)a);
-		log.debug("Added controller " + a.getName());
+			addUiCapableBlock((IUserInterfaceAPI) a);
+		log.info("Added controller " + a.getName());
 	}
 
 	public List<Sensor> getSensors() {
@@ -155,36 +165,45 @@ public class Domotic implements IDomoticContext {
 
 	public IUserInterfaceAPI findUiCapable(String name) {
 		for (IUserInterfaceAPI ui : uiblocks) {
-			if (ui.getName().equals(name))
+			if (ui.getBlockInfo().getName().equals(name))
 				return ui;
 		}
 		return null;
 	}
 
 	/**
-	 * @return all registered {@link Actuator} and {@link Controller} blocks that implement {@link IUserInterfaceAPI}, or those blocks registered explicitly...
+	 * @return all registered {@link Actuator} and {@link Controller} blocks
+	 *         that implement {@link IUserInterfaceAPI}, or those blocks
+	 *         registered explicitly...
 	 */
 	public List<IUserInterfaceAPI> getUiCapableBlocks() {
 		return uiblocks;
 	}
-	
+
 	@Override
 	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
-//		Block block0 = (Block)uiblock0;
-//		for (IUserInterfaceAPI uiblock:uiblocks) {
-//			if (((Block)uiblock).getName().equals(block0.name)) {
-//				log.warn("addUiCapableBlock(): incominb block '"+block0.name+"' already registered - ignored.");
-//				return;
-//			}
-//		}
-		for (IUserInterfaceAPI uiblock:uiblocks) {
-			if (uiblock.getName().equals(uiblock0.getName())) {
-				log.warn("addUiCapableBlock(): incoming UiCapable '"+uiblock0.getName()+"' already registered - ignored.");
+		//		Block block0 = (Block)uiblock0;
+		//		for (IUserInterfaceAPI uiblock:uiblocks) {
+		//			if (((Block)uiblock).getName().equals(block0.name)) {
+		//				log.warn("addUiCapableBlock(): incominb block '"+block0.name+"' already registered - ignored.");
+		//				return;
+		//			}
+		//		}
+		if (uiblock0.getBlockInfo() == null) {
+			// TODO all Controllers zijn nu IUserDinges, maar dat is niet juist.
+			log.warn("Not adding UI info for " + ((Block) uiblock0).getName()
+					+ ". BlockInfo is null - is a bug, refactor code.");
+			return;
+		}
+		for (IUserInterfaceAPI uiblock : uiblocks) {
+			if (uiblock.getBlockInfo().getName().equals(uiblock0.getBlockInfo().getName())) {
+				log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getBlockInfo().getName()
+						+ "' already registered - ignored.");
 				return;
 			}
 		}
 		uiblocks.add(uiblock0);
-		log.debug("Added UiCapableBlock " + uiblock0.getName());
+		log.debug("Added UiCapableBlock " + uiblock0.getBlockInfo().getName());
 	}
 
 	/**
@@ -292,13 +311,13 @@ public class Domotic implements IDomoticContext {
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
 				sleep(MONITORING_INTERVAL_MS); // TODO deze sleep moet
 												// interrupted ! Of heb ik dat
-				// al gedaan?
+												// al gedaan?
 				saveState.writeRememberedOutputs(getActuators());
 
 				long currentLoopSequence = loopSequence;
 				if (currentLoopSequence <= lastLoopSequence) {
-					log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current=" + currentLoopSequence
-							+ ". I'll try to restart driver.");
+					log.error("Domotic does not seem to be looping anymore, last recorded loopsequence="
+							+ lastLoopSequence + ", current=" + currentLoopSequence + ". I'll try to restart driver.");
 					break;
 				}
 				lastLoopSequence = currentLoopSequence;
@@ -306,7 +325,8 @@ public class Domotic implements IDomoticContext {
 					if (driverMonitor.everythingSeemsWorking()) {
 						MON.info("Checked driver sub-process, seems OK.");
 					} else {
-						log.error("Something is wrong with driver subprocess. I'll try to restart.\n" + driverMonitor.report());
+						log.error("Something is wrong with driver subprocess. I'll try to restart.\n"
+								+ driverMonitor.report());
 						break;
 					}
 				}
@@ -363,6 +383,9 @@ public class Domotic implements IDomoticContext {
 			a.loop(currentTime, loopSequence);
 		}
 		hw.refreshOutputs();
+		if (uiUpdator != null && (loopSequence % 10 == 0))
+			uiUpdator.updateUi(this);
+
 		if (loopSequence % 10 == 0)
 			MON.info("loopOnce() done, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 	}
@@ -405,11 +428,13 @@ public class Domotic implements IDomoticContext {
 				driverProcess.destroy();
 				sleep(500);
 				if (driverMonitor.getProcessWatch().isRunning()) {
-					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid() + ". Ignored, you'll see what happens.");
+					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid()
+							+ ". Ignored, you'll see what happens.");
 					// TODO stop domotic?
 				}
 			} else {
-				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode() + ". Now Stopping driver monitor.");
+				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode()
+						+ ". Now Stopping driver monitor.");
 			}
 			driverMonitor.terminate();
 		}
@@ -434,7 +459,8 @@ public class Domotic implements IDomoticContext {
 			}
 		}
 		if (restart)
-			log.info("The time has come to restart the driver. Time=" + cal.get(Calendar.HOUR) + ':' + cal.get(Calendar.MINUTE) + '.');
+			log.info("The time has come to restart the driver. Time=" + cal.get(Calendar.HOUR) + ':'
+					+ cal.get(Calendar.MINUTE) + '.');
 		return restart;
 	}
 

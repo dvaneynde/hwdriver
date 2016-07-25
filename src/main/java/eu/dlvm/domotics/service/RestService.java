@@ -86,7 +86,7 @@ public class RestService {
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
 		for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks())
-			sb.append(a.getName()).append('\n');
+			sb.append(a.getBlockInfo().getName()).append('\n');
 		return sb.toString();
 	}
 
@@ -95,11 +95,11 @@ public class RestService {
 	@Path("actuators")
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
-	public List<BlockInfo> listActuators() {
-		List<BlockInfo> list = new ArrayList<>();
+	public List<UiInfo> listActuators() {
+		List<UiInfo> list = new ArrayList<>();
 		try {
 			for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks()) {
-				BlockInfo aj = a.getBlockInfo();
+				UiInfo aj = a.getBlockInfo();
 				if (aj != null)
 					list.add(aj);
 			}

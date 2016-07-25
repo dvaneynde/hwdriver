@@ -12,7 +12,7 @@ import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.domotics.service.BlockInfo;
+import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * Keeps one or more mappings, each mapping maps one incoming
@@ -66,11 +66,11 @@ public class Switch2OnOffToggle extends Connector implements ISwitchListener, IU
 	}
 
 	@Override
-	public BlockInfo getBlockInfo() {
-		BlockInfo bi = null;
+	public UiInfo getBlockInfo() {
+		UiInfo bi = null;
 		if (ui != null) {
 			log.debug("getBlockInfo(), ui='" + ui + "'");
-			bi = new BlockInfo(this.getName(), "Switch", this.getDescription());
+			bi = new UiInfo(this.getName(), "Switch", this.getDescription());
 		}
 		return bi;
 	}
