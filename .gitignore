@@ -10,3 +10,4 @@ target/
 /light.log
 /wind.log
 /logs/
+/DomoticOutputStates.txt

@@ -1,9 +1,9 @@
 package eu.dlvm.iohardware.diamondsys;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import eu.dlvm.iohardware.Util;
-import eu.dlvm.iohardware.diamondsys.Board;
 
 public class TestUtils {
 

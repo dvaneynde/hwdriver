@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.base;
 
+import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
@@ -37,6 +38,9 @@ public interface IDomoticContext {
 
 	public void addUiCapableBlock(IUserInterfaceAPI uiblock0);
 
+	public void addUiUpdator(IUIUpdator updator);
+	public void removeUiUpdator(IUIUpdator updator);
+	
 	/**
 	 * @return Underlying hardware.
 	 */

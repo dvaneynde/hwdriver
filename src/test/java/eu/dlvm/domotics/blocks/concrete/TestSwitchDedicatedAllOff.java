@@ -2,20 +2,20 @@ package eu.dlvm.domotics.blocks.concrete;
 
 import java.util.HashMap;
 
-import junit.framework.Assert;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
-import eu.dlvm.domotics.sensors.Switch;
+import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
+import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public class TestSwitchDedicatedAllOff {
 	static Logger log = LoggerFactory.getLogger(TestSwitchDedicatedAllOff.class);

@@ -1,12 +1,11 @@
 package eu.dlvm.domotics.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 
 import org.junit.Test;
-
-import eu.dlvm.domotics.utils.OnceADayWithinPeriod;
 
 public class TestOnceADayWithinPeriod {
 

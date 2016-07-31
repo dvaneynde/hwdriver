@@ -1,7 +1,5 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +10,7 @@ import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public class TestDimmerSwitches {
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {

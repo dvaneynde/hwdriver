@@ -35,7 +35,7 @@ var urlWebSocket = window.location.toString().replace('/index.html', '/')
 		+ "time/";
 
 function initWebSocket() {
-	$('#timeWebSocket').text(urlWebSocket);
+	$('#status').text(urlWebSocket);
 	var wsTime = {
 		connect : function() {
 			try {
@@ -50,18 +50,21 @@ function initWebSocket() {
 		},
 
 		_onopen : function() {
-			$('#timeWebSocket').text("opened");
+			$('#status').text("opened");
 		},
 
 		_onerror : function(evt) {
-			$('#timeWebSocket').text("error: " + evt.data);
+			$('#status').text("error: " + evt.data);
 		},
 
 		_onmessage : function(m) {
-			if (m.data) {
+			if (m.data) {				
+				$('#status').text(m.data);
+				/*
 				msgs = m.data.split(',');
 				$('#timeWebSocket').text(msgs[0]);
 				$('#light').attr("value", msgs[1]);
+				*/
 			}
 		},
 
@@ -81,7 +84,7 @@ function initWebSocket() {
 			codeMap[1011] = "(SERVER/UNEXPECTED_CONDITION)";
 			codeMap[1015] = "(INTERNAL/TLS_ERROR)";
 			var codeStr = codeMap[closeEvent.code];
-			$('#timeWebSocket').text(
+			$('#status').text(
 					"closed: " + closeEvent.code + " " + codeStr + " "
 							+ closeEvent.reason);
 		}

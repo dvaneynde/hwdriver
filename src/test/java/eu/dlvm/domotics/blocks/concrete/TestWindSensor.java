@@ -1,20 +1,17 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.IAlarmListener;
-import eu.dlvm.domotics.sensors.IThresholdListener;
-import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.domotics.sensors.WindSensor.States;
 import eu.dlvm.iohardware.IHardwareIO;

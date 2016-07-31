@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration scan="true">
 
 	<property name="DEV_HOME" value="./logs" />
 
@@ -74,21 +74,24 @@
 
 	</appender>
 	
-	<!-- Send logs to both console and file audit -->
+	<!-- Alle errors sowieso naar error.log -->
+	<root level="error">
+		<appender-ref ref="ERROR-LOG" />
+	</root>
+
+	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
 	<logger name="org.eclipse.jetty" level="info"
 		additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 
+	<!-- Domotica zie onder; additivity false anders gaat het ook naar error.log -->
 	<logger name="eu.dlvm" level="info"
 		additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
-
-	<root level="error">
-		<appender-ref ref="ERROR-LOG" />
-	</root>
+	<logger name="eu.dlvm.domotics.service_impl.UiUpdatorSocket" level="debug"/>
 
 </configuration>

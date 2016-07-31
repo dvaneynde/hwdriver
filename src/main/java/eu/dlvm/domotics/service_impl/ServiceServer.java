@@ -23,14 +23,14 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.service.Resource;
 import eu.dlvm.domotics.service.RestService;
 
 //@SuppressWarnings("restriction")
 public class ServiceServer {
 
-	private static Logger log = LoggerFactory.getLogger(ServiceServer.class);
-
+	private static final Logger log = LoggerFactory.getLogger(ServiceServer.class);
 	private Server server;
 
 	public static class TimeSocketCreator implements WebSocketCreator {
@@ -40,8 +40,22 @@ public class ServiceServer {
 		}
 	}
 
-	public void start() {
-		Server server = new Server();
+	public static class UiSocketCreator implements WebSocketCreator {
+		private IDomoticContext domoContext;
+
+		public UiSocketCreator(IDomoticContext domoContext) {
+			this.domoContext = domoContext;
+		}
+
+		@Override
+		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+			UiUpdatorSocket uiUpdatorSocket = new UiUpdatorSocket(domoContext);
+			return uiUpdatorSocket;
+		}
+	}
+
+	public void start(IDomoticContext domoContext) {
+		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8080);
 		server.addConnector(connector);
@@ -56,7 +70,7 @@ public class ServiceServer {
 			// http://download.eclipse.org/jetty/9.3.9.v20160517/apidocs/org/eclipse/jetty/util/resource/URLResource.html
 			// FileResource
 			// InputStream input = getClass().getResourceAsStream("/classpath/to/my/file");
-			
+
 			// Setup the basic application "context" for this application at "/"
 			// This is also known as the handler tree (in jetty speak)
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -65,12 +79,21 @@ public class ServiceServer {
 			context.setWelcomeFiles(new String[] { "index.html" });
 			server.setHandler(context);
 
+			/*
+			 * // Add the websocket filter WebSocketUpgradeFilter wsfilter =
+			 * WebSocketUpgradeFilter.configureContext(context); // Configure
+			 * websocket behavior
+			 * wsfilter.getFactory().getPolicy().setIdleTimeout(5000); // Add
+			 * websocket mapping wsfilter.addMapping(new
+			 * ServletPathSpec("/time/"), new TimeSocketCreator());
+			 */
+
 			// Add the websocket filter
 			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(context);
 			// Configure websocket behavior
-			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
+			wsfilter.getFactory().getPolicy().setIdleTimeout(50000); // TODO default seems to be 5000
 			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/time/"), new TimeSocketCreator());
+			wsfilter.addMapping(new ServletPathSpec("/time/"), new UiSocketCreator(domoContext));
 
 			// Add time servlet
 			context.addServlet(TimeServlet.class, "/time/");
@@ -91,7 +114,7 @@ public class ServiceServer {
 			context.addServlet(holderDefault, "/*");
 
 			server.start();
-			server.join();
+			//server.join();
 		} catch (Throwable t) {
 			t.printStackTrace(System.err);
 		}
@@ -102,14 +125,14 @@ public class ServiceServer {
 		try {
 			server.stop();
 		} catch (Exception e) {
-			log.error("Unexpected exception, ignored.",e);
+			log.error("Unexpected exception, ignored.", e);
 		}
 		log.info("HTTP Server stopped.");
 	}
 
 	public static void main(String[] args) throws IOException, Exception {
 		ServiceServer ss = new ServiceServer();
-		ss.start();
+		ss.start(null);
 		System.out.println(String.format("Server app started.\nHit enter to stop it..."));
 		System.in.read();
 		ss.stop();

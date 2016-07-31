@@ -1,7 +1,5 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +8,7 @@ import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
 import eu.dlvm.domotics.connectors.ThresholdEvent2Screen;
 import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.IThresholdListener;
+import junit.framework.Assert;
 
 // TODO vervangen door TestScreenController
 @Deprecated

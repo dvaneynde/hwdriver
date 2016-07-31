@@ -3,6 +3,7 @@ package eu.dlvm.domotics.base;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -26,6 +27,8 @@ import eu.dlvm.iohardware.IHardwareIO;
  * 
  * @author dirk vaneynde
  * 
+ * TODO veel te veel methodes, opsplitsen - maar hoe?
+ * TODO monitoring en restart werkte niet, weggooien?
  */
 public class Domotic implements IDomoticContext {
 
@@ -50,7 +53,7 @@ public class Domotic implements IDomoticContext {
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
-	protected IUIUpdator uiUpdator;
+	protected List<IUIUpdator> uiUpdators;
 	protected long loopSequence = -1L;
 
 	private List<IUserInterfaceAPI> uiblocks = new ArrayList<IUserInterfaceAPI>(64);
@@ -78,6 +81,7 @@ public class Domotic implements IDomoticContext {
 	private Domotic() {
 		super();
 		saveState = new OutputStateSaver();
+		uiUpdators = new LinkedList<>();
 		// TODO configurable via xml !
 		restartOnceADay = new OnceADayWithinPeriod(23, 00, 23, 10);
 	}
@@ -91,31 +95,25 @@ public class Domotic implements IDomoticContext {
 		return hw;
 	}
 
-	public IUIUpdator getUiUpdator() {
-		return uiUpdator;
-	}
-
-	public void setUiUpdator(IUIUpdator uiUpdator) {
-		this.uiUpdator = uiUpdator;
-	}
-
 	/**
 	 * Add Sensor to loop set (see {@link #loopOnce()}.
 	 * 
-	 * @param s
+	 * @param sensor
 	 *            Added, if not already present. Each Sensor can be present no
 	 *            more than once.
 	 */
-	public void addSensor(Sensor s) {
-		for (Sensor ss : sensors) {
-			if (ss == s) {
-				log.warn("Sensor already added, ignored: " + s);
-				assert (false);
-				return;
-			}
+	public void addSensor(Sensor sensor) {
+		if (sensors.contains(sensor)) {
+			log.warn("Sensor already added, ignored: " + sensor);
+			assert (false);
+			return;
 		}
-		sensors.add(s);
-		log.info("Added sensor " + s.getName());
+		sensors.add(sensor);
+		log.info("Added sensor " + sensor.getName());
+	}
+
+	public List<Sensor> getSensors() {
+		return sensors;
 	}
 
 	/**
@@ -125,59 +123,33 @@ public class Domotic implements IDomoticContext {
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
-	public void addActuator(Actuator a) {
-		for (IUserInterfaceAPI aa : actuators) {
-			if (aa == a) {
-				log.warn("Actuator already added, ignored: " + a);
-				assert (false);
-				return;
-			}
+	public void addActuator(Actuator actuator) {
+		if (actuators.contains(actuator)) {
+			log.warn("Actuator already added, ignored: " + actuator);
+			assert (false);
+			return;
 		}
-		actuators.add(a);
-		if (a instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI) a);
-		log.info("Added actuator " + a.getName());
-	}
-
-	// TODO generic
-	public void addController(Controller a) {
-		for (Controller aa : controllers) {
-			if (aa == a) {
-				log.warn("Controller already added, ignored: " + a);
-				assert (false);
-				return;
-			}
-		}
-		controllers.add(a);
-		if (a instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI) a);
-		log.info("Added controller " + a.getName());
-	}
-
-	public List<Sensor> getSensors() {
-		// TODO copy of list?
-		return sensors;
+		actuators.add(actuator);
+		if (actuator instanceof IUserInterfaceAPI)
+			addUiCapableBlock((IUserInterfaceAPI) actuator);
+		log.info("Added actuator " + actuator.getName());
 	}
 
 	public List<Actuator> getActuators() {
 		return actuators;
 	}
 
-	public IUserInterfaceAPI findUiCapable(String name) {
-		for (IUserInterfaceAPI ui : uiblocks) {
-			if (ui.getBlockInfo().getName().equals(name))
-				return ui;
-		}
-		return null;
-	}
 
-	/**
-	 * @return all registered {@link Actuator} and {@link Controller} blocks
-	 *         that implement {@link IUserInterfaceAPI}, or those blocks
-	 *         registered explicitly...
-	 */
-	public List<IUserInterfaceAPI> getUiCapableBlocks() {
-		return uiblocks;
+	public void addController(Controller controller) {
+		if (controllers.contains(controller)) {
+			log.warn("Controller already added, ignored: " + controller);
+			assert (false);
+			return;
+		}
+		controllers.add(controller);
+		if (controller instanceof IUserInterfaceAPI)
+			addUiCapableBlock((IUserInterfaceAPI) controller);
+		log.info("Added controller " + controller.getName());
 	}
 
 	@Override
@@ -205,6 +177,36 @@ public class Domotic implements IDomoticContext {
 		uiblocks.add(uiblock0);
 		log.debug("Added UiCapableBlock " + uiblock0.getBlockInfo().getName());
 	}
+
+	public IUserInterfaceAPI findUiCapable(String name) {
+		for (IUserInterfaceAPI ui : uiblocks) {
+			if (ui.getBlockInfo().getName().equals(name))
+				return ui;
+		}
+		return null;
+	}
+
+	/**
+	 * @return all registered {@link Actuator} and {@link Controller} blocks
+	 *         that implement {@link IUserInterfaceAPI}, or those blocks
+	 *         registered explicitly...
+	 */
+	public List<IUserInterfaceAPI> getUiCapableBlocks() {
+		return uiblocks;
+	}
+
+	@Override
+	public void addUiUpdator(IUIUpdator updator) {
+		uiUpdators.add(updator);
+		log.info("Added new UI updator id=" + updator.getId());
+	}
+
+	@Override
+	public void removeUiUpdator(IUIUpdator updator) {
+		boolean removed = uiUpdators.remove(updator);
+		log.info("Removing updator id=" + updator.getId() + " (listener was found and thus removed: " + removed + ")");
+	}
+
 
 	/**
 	 * Initializes {@link IHardwareIO} and Domotic {@link Actuator} blocks.
@@ -273,13 +275,16 @@ public class Domotic implements IDomoticContext {
 	 *            'localhost' is passed to it as an argument. Otherwise that
 	 *            driver should be started separately, after this one shows
 	 *            "START" in the log.
+	 * @param monitorDriver
+	 *            if true, driver is monitored and if not working for
+	 *            {@link #MONITORING_INTERVAL_MS} it tries to restart the driver
 	 */
-	public void runDomotic(int looptime, String pathToDriver) {
+	public void runDomotic(int looptime, String pathToDriver, boolean checkDriverAndRestartOnError) {
 		addShutdownHook(this);
 		this.maintThread = Thread.currentThread();
 
 		ServiceServer server = new ServiceServer();
-		server.start();
+		server.start(this);
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
@@ -297,36 +302,33 @@ public class Domotic implements IDomoticContext {
 			// Rare is wel dat de lampen blijven branden als er geen connectie
 			// is met driver - ik dacht dat dan alles zou uitgaan. Maar ook als
 			// driver process weg is blijven lampen branden.
-			// if (!restartDriverRequested.get()) {
 			log.info("Initialize domotic system.");
 			initialize(saveState.readRememberedOutputs());
-			// }
 
 			log.info("Start Domotic thread 'Oscillator'.");
 			Oscillator osc = new Oscillator(this, looptime);
 			osc.start();
 
-			log.info("Everything started, now monitoring...");
+			log.info("Everything started, now watching...");
 			long lastLoopSequence = -1;
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
-				sleep(MONITORING_INTERVAL_MS); // TODO deze sleep moet
-												// interrupted ! Of heb ik dat
-												// al gedaan?
+				sleepSafe(MONITORING_INTERVAL_MS); // TODO deze sleep moet
+													// interrupted ! Of heb ik dat
+													// al gedaan?
 				saveState.writeRememberedOutputs(getActuators());
 
 				long currentLoopSequence = loopSequence;
-				if (currentLoopSequence <= lastLoopSequence) {
+				if ((currentLoopSequence <= lastLoopSequence) && checkDriverAndRestartOnError) {
 					log.error("Domotic does not seem to be looping anymore, last recorded loopsequence="
 							+ lastLoopSequence + ", current=" + currentLoopSequence + ". I'll try to restart driver.");
 					break;
 				}
 				lastLoopSequence = currentLoopSequence;
-				if (pathToDriver != null) {
+				if (pathToDriver != null && checkDriverAndRestartOnError) {
 					if (driverMonitor.everythingSeemsWorking()) {
 						MON.info("Checked driver sub-process, seems OK.");
 					} else {
-						log.error("Something is wrong with driver subprocess. I'll try to restart.\n"
-								+ driverMonitor.report());
+						log.error("Something is wrong with driver subprocess. Report:\n" + driverMonitor.report());
 						break;
 					}
 				}
@@ -337,11 +339,12 @@ public class Domotic implements IDomoticContext {
 				// if (restartDriverRequested.get())
 				// restartOnceADay.markDoneForToday();
 			}
+			boolean restartRequested = !stopRequested.get() && !fatalError;
 			// shutdown
 			stopDriverOscilatorAndMonitor(pathToDriver, osc);
-			if (!stopRequested.get() && !fatalError) {
+			if (restartRequested) {
 				log.info("Will restart driver in " + RESTART_DRIVER_WAITTIME_MS / 1000 + " seconds...");
-				sleep(RESTART_DRIVER_WAITTIME_MS);
+				sleepSafe(RESTART_DRIVER_WAITTIME_MS);
 			}
 		}
 		server.stop();
@@ -383,8 +386,11 @@ public class Domotic implements IDomoticContext {
 			a.loop(currentTime, loopSequence);
 		}
 		hw.refreshOutputs();
-		if (uiUpdator != null && (loopSequence % 10 == 0))
+
+		//if (loopSequence % 10 == 0) {
+		for (IUIUpdator uiUpdator : uiUpdators)
 			uiUpdator.updateUi(this);
+		//}
 
 		if (loopSequence % 10 == 0)
 			MON.info("loopOnce() done, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
@@ -404,7 +410,7 @@ public class Domotic implements IDomoticContext {
 		int maxTries = 5000 / 200;
 		int trial = 0;
 		while ((trial++ < maxTries) && driverMonitor.driverNotReady()) {
-			sleep(200);
+			sleepSafe(200);
 		}
 		if (trial >= maxTries) {
 			log.warn("Couldn't see startup message from HwDriver to be started, but I'll assume it started.");
@@ -417,16 +423,16 @@ public class Domotic implements IDomoticContext {
 	private void stopDriverOscilatorAndMonitor(String pathToDriver, Oscillator osc) {
 		osc.requestStop();
 		// TODO 50 vervangen door tick time variable
-		sleep(50);
+		sleepSafe(50);
 		// Zend STOP naar driver
 		hw.stop();
 		if (pathToDriver != null) {
 			// Zeker zijn dat STOP verwerkt is
-			sleep(500);
+			sleepSafe(500);
 			if (driverMonitor.getProcessWatch().isRunning()) {
 				log.warn("STOP command to driver did not work, stop forcibly...");
 				driverProcess.destroy();
-				sleep(500);
+				sleepSafe(500);
 				if (driverMonitor.getProcessWatch().isRunning()) {
 					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid()
 							+ ". Ignored, you'll see what happens.");
@@ -464,7 +470,7 @@ public class Domotic implements IDomoticContext {
 		return restart;
 	}
 
-	private static void sleep(long millis) {
+	private static void sleepSafe(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {

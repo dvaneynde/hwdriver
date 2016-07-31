@@ -3,11 +3,10 @@ package eu.dlvm.iohardware.diamondsys;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import eu.dlvm.domotics.HwDriverChannelMock;
 import eu.dlvm.iohardware.ChannelType;
@@ -22,8 +21,7 @@ public class TestXmlHwConfigurator {
 
 	@Test
 	public void testConfigBoardCreation() {
-		XmlHwConfigurator xhc = new XmlHwConfigurator();
-		xhc.setCfgFilepath("src/test/resources/TestDiamondHwConfig1.xml");
+		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig1.xml");
 		List<Board> boards = new ArrayList<Board>();
 		ChannelMap map = new ChannelMap();
 		xhc.configure(boards, map);
@@ -55,8 +53,7 @@ public class TestXmlHwConfigurator {
 
 	@Test
 	public void testComplexConfiguration() {
-		XmlHwConfigurator xhc = new XmlHwConfigurator();
-		xhc.setCfgFilepath("src/test/resources/TestDiamondHwConfig2.xml");
+		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig2.xml");
 		List<Board> boards = new ArrayList<Board>();
 		ChannelMap map = new ChannelMap();
 		xhc.configure(boards, map);
@@ -125,8 +122,7 @@ public class TestXmlHwConfigurator {
 	public void testComplexConfigurationAndMessagesOfInputStates() {
 		// Hardware
 		HwDriverChannelMock drv = new HwDriverChannelMock();
-		XmlHwConfigurator xhc = new XmlHwConfigurator();
-		xhc.setCfgFilepath("src/test/resources/TestDiamondHwConfig2.xml");
+		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig2.xml");
 		IHardwareIO hw = new HardwareIO(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "INP_O 0x310 127\nINP_D 0x400 - 0 0\nINP_D 0x410 46 - -\nINP_D 0x420 255 0 0";
@@ -140,8 +136,7 @@ public class TestXmlHwConfigurator {
 	public void testComplexConfigurationAndOutputMessages() {
 		// Hardware
 		HwDriverChannelMock drv = new HwDriverChannelMock();
-		XmlHwConfigurator xhc = new XmlHwConfigurator();
-		xhc.setCfgFilepath("src/test/resources/TestDiamondHwConfig2.xml");
+		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig2.xml");
 		IHardwareIO hw = new HardwareIO(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "";

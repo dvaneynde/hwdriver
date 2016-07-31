@@ -1,6 +1,8 @@
 package eu.dlvm.domotics.controllers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -9,8 +11,6 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
-import eu.dlvm.domotics.controllers.Timer;
 
 public class TestRepeatOffAtTimer {
 	boolean lastOffCalled = false;

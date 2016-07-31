@@ -1,8 +1,8 @@
 package eu.dlvm.domotics;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class Misc {
 

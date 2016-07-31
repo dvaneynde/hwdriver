@@ -1,10 +1,9 @@
 package eu.dlvm.domotics.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import eu.dlvm.domotics.utils.OpenWeatherMap;
 
 public class TestOpenWeatherMap {
 

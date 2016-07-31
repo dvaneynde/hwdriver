@@ -8,6 +8,7 @@ import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUserInterfaceAPI;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.iohardware.IHardwareIO;
 
 public class DomoContextMock implements IDomoticContext {
@@ -65,5 +66,13 @@ public class DomoContextMock implements IDomoticContext {
 
 	@Override
 	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
+	}
+
+	@Override
+	public void addUiUpdator(IUIUpdator updator) {
+	}
+
+	@Override
+	public void removeUiUpdator(IUIUpdator updator) {
 	}
 }

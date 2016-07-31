@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.dlvm.iohardware.ChannelType;
-import eu.dlvm.iohardware.diamondsys.FysCh;
 
 public class TestFysCh {
 	@Test

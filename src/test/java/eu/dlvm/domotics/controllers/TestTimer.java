@@ -1,6 +1,7 @@
 package eu.dlvm.domotics.controllers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -8,7 +9,6 @@ import java.util.GregorianCalendar;
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.controllers.Timer;
 
 public class TestTimer {
 

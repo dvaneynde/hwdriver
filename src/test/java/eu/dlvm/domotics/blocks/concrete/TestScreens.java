@@ -1,10 +1,9 @@
 package eu.dlvm.domotics.blocks.concrete;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
+import junit.framework.Assert;
 
 public class TestScreens extends TestScreensBase {
 

@@ -2,8 +2,6 @@ package eu.dlvm.iohardware.diamondsys;
 
 import org.junit.Test;
 
-import eu.dlvm.iohardware.diamondsys.DigiIn;
-import eu.dlvm.iohardware.diamondsys.DigiOut;
 import junit.framework.Assert;
 
 public class TestDigiInOut {

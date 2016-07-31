@@ -1,11 +1,9 @@
 package eu.dlvm.domotics.factories;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
+import junit.framework.Assert;
 
 public class TestXmlConfig {
 

@@ -1,11 +1,11 @@
 package eu.dlvm.domotics.blocks;
 
-import junit.framework.Assert;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.LogCh;
+import junit.framework.Assert;
 
 public abstract class BaseHardwareMock implements IHardwareIO {
 
