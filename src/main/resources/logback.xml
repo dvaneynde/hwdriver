@@ -92,6 +92,6 @@
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
-	<logger name="eu.dlvm.domotics.service_impl.UiUpdatorSocket" level="debug"/>
+	<!-- logger name="eu.dlvm.domotics.service_impl.UiUpdatorSocket" level="debug"/ -->
 
 </configuration>

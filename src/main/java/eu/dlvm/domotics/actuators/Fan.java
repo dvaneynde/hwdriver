@@ -301,7 +301,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
 		//bi.addParm("on", isOn() ? "1" : "0");
 		bi.setOn(isOn());

@@ -6,7 +6,7 @@ import java.util.List;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -40,7 +40,7 @@ public class DomoContextMock implements IDomoticContext {
 
 	@Override
 	public void addActuator(Actuator a) {
-		for (IUserInterfaceAPI aa : actuators) {
+		for (Actuator aa : actuators) {
 			if (aa == a) {
 				assert (false);
 				return;
@@ -64,9 +64,9 @@ public class DomoContextMock implements IDomoticContext {
 		return 0;
 	}
 
-	@Override
-	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
-	}
+//	@Override
+//	public void addUiCapableBlock(IUiCapableBlock uiblock0) {
+//	}
 
 	@Override
 	public void addUiUpdator(IUIUpdator updator) {

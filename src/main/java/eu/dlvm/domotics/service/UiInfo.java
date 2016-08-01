@@ -1,21 +1,24 @@
 package eu.dlvm.domotics.service;
 
+import eu.dlvm.domotics.base.Block;
+
 public class UiInfo {
 	private String name;
 	private String type;
 	private String description;
-	// TODO wordt dat nu gebruikt, groupName?
 	private String groupName;
 	private boolean on;
 	private int level;
 	private String status;
 
-	// private Map<String, String> parms;
 
 	public UiInfo() {
-		//parms = new HashMap<>();
 	}
 
+	public UiInfo(Block block) { 
+		this(block.getName(), block.getClass().getSimpleName(), block.getDescription());
+	}
+	
 	public UiInfo(String name, String type, String description) {
 		this();
 		this.name = name;
@@ -39,18 +42,6 @@ public class UiInfo {
 		this.type = type;
 	}
 
-	// public Map<String, String> getParms() {
-	// return parms;
-	// }
-	//
-	// public void setParms(Map<String, String> parms) {
-	// this.parms = parms;
-	// }
-	//
-	// public void addParm(String key, String value) {
-	// parms.put(key, value);
-	// }
-
 	public String getDescription() {
 		return description;
 	}
@@ -61,7 +52,8 @@ public class UiInfo {
 
 	@Override
 	public String toString() {
-		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level=" + level + "]";
+		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on
+				+ ", level=" + level + "]";
 	}
 
 	public boolean isOn() {
@@ -79,11 +71,11 @@ public class UiInfo {
 	public void setLevel(int level) {
 		this.level = level;
 	}
-	
+
 	public String getStatus() {
 		return status;
 	}
-	
+
 	public void setStatus(String status) {
 		this.status = status;
 	}

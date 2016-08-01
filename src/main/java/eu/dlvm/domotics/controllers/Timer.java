@@ -111,7 +111,7 @@ public class Timer extends Controller {
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}

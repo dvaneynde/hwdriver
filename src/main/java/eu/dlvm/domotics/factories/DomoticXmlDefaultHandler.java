@@ -76,7 +76,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
 			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
 			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-			block = new WindSensor(name, desc, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert, lowTimeToResetAlert);
+			block = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert, lowTimeToResetAlert);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lightGauge")) {
 			parseBaseBlockWithChannel(atts);
@@ -84,7 +84,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int lowThreshold = parseIntAttribute("low", atts);
 			int low2highTime = parseIntAttribute("low2highTime", atts);
 			int high2lowTime = parseIntAttribute("high2lowTime", atts);
-			block = new LightSensor(name, desc, channel, ctx, lowThreshold, highThreshold, low2highTime, high2lowTime);
+			block = new LightSensor(name, desc, ui, channel, ctx, lowThreshold, highThreshold, low2highTime, high2lowTime);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("switch")) {
 			parseBaseBlockWithChannel(atts);
@@ -235,10 +235,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocks.get(s2ootName);
 		if (s2oot == null) {
 			s2oot = new Switch2OnOffToggle(s2ootName, (desc == null ? "Switch " + swtch.getName() + " connected to " + targetName : desc), ui);
-			if (ui != null && ui.length() > 0) {
-				// TODO algemenere oplossing...
-				ctx.addUiCapableBlock(s2oot);
-			}
+//			if (ui != null && ui.length() > 0) {
+//				// TODO algemenere oplossing...
+//				ctx.addUiCapableBlock(s2oot);
+//			}
 			blocks.put(s2ootName, s2oot);
 		}
 
@@ -307,10 +307,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		Switch up = (Switch) blocks.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
 		Switch2Screen s2s = new Switch2Screen(csName, desc, ui, down, up, click);
-		if (ui != null && ui.length() > 0) {
-			// TODO algemenere oplossing...
-			ctx.addUiCapableBlock(s2s);
-		}
+//		if (ui != null && ui.length() > 0) {
+//			// TODO algemenere oplossing...
+//			ctx.addUiCapableBlock(s2s);
+//		}
 		blocks.put(s2s.getName(), s2s);
 
 		for (Block target : targetBlocks) {

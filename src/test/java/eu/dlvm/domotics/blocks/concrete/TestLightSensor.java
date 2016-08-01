@@ -61,7 +61,7 @@ public class TestLightSensor implements IThresholdListener {
 	@Test
 	public final void testInitWrong() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 1000, 100, 500, 500);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 100, 500, 500);
 			fail("Should fail, since lowThreshold > highThreshold. LightSensor=" + ls);
 		} catch (IllegalConfigurationException e) {
 			;
@@ -71,7 +71,7 @@ public class TestLightSensor implements IThresholdListener {
 	@Test
 	public final void testLowHighLow() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", LIGHTSENSOR_CH, ctx, 500, 1000, 2, 3);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 500, 1000, 2, 3);
 			ls.registerListener(this);
 
 			seq = cur = 0L;

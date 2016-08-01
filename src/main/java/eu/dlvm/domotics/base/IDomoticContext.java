@@ -36,7 +36,8 @@ public interface IDomoticContext {
 
 	public void addController(Controller a);
 
-	public void addUiCapableBlock(IUserInterfaceAPI uiblock0);
+	// TODO onderstaande wordt rechtstreeks aangeroepen vanuit Handler, naast intern in Domotic...
+	//public void addUiCapableBlock(IUiCapableBlock uiblock0);
 
 	public void addUiUpdator(IUIUpdator updator);
 	public void removeUiUpdator(IUIUpdator updator);

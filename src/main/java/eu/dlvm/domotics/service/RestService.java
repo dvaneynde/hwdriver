@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service_impl.DataCollector;
 import eu.dlvm.domotics.service_impl.Quickie;
 import eu.dlvm.domotics.service_impl.QuickieService;
@@ -85,8 +85,8 @@ public class RestService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
-		for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks())
-			sb.append(a.getBlockInfo().getName()).append('\n');
+		for (IUiCapableBlock a : Domotic.singleton().getUiCapableBlocks())
+			sb.append(a.getUiInfo().getName()).append('\n');
 		return sb.toString();
 	}
 
@@ -98,8 +98,8 @@ public class RestService {
 	public List<UiInfo> listActuators() {
 		List<UiInfo> list = new ArrayList<>();
 		try {
-			for (IUserInterfaceAPI a : Domotic.singleton().getUiCapableBlocks()) {
-				UiInfo aj = a.getBlockInfo();
+			for (IUiCapableBlock a : Domotic.singleton().getUiCapableBlocks()) {
+				UiInfo aj = a.getUiInfo();
 				if (aj != null)
 					list.add(aj);
 			}
@@ -130,7 +130,7 @@ public class RestService {
 	public void updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
 		// TODO debug
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
-		IUserInterfaceAPI act = Domotic.singleton().findUiCapable(name);
+		IUiCapableBlock act = Domotic.singleton().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
 			Log.warn("Could not find actuator " + name);

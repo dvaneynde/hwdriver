@@ -287,7 +287,7 @@ public class Screen extends Actuator {
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
 		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " STORM" : ""));
 		return bi;

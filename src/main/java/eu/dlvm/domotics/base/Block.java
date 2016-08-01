@@ -32,7 +32,7 @@ public abstract class Block {
 		return description;
 	}
 
-	public String getUi() {
+	public String getUiPositionOnScreen() {
 		return ui;
 	}
 }

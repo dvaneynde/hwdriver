@@ -9,7 +9,7 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.sensors.IAlarmListener;
@@ -31,7 +31,7 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author dirk
  */
-public class ScreenController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUserInterfaceAPI {
+public class ScreenController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUiCapableBlock {
 	private static final Logger log = LoggerFactory.getLogger(ScreenController.class);
 	private boolean enabled;
 	private IThresholdListener.EventType lastThresholdEvent;
@@ -103,7 +103,7 @@ public class ScreenController extends Controller implements IOnOffToggleCapable,
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
 		bi.setOn(isEnabled());
 		bi.setStatus(isEnabled() ? "ON" : "OFF");

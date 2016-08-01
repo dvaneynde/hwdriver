@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.domotics.service.RestService;
 
@@ -34,17 +34,17 @@ public class DataCollector {
 		try {
 			if (data == null) {
 				data = new Data();
-				List<IUserInterfaceAPI> actuators = Domotic.singleton().getUiCapableBlocks();
+				List<IUiCapableBlock> actuators = Domotic.singleton().getUiCapableBlocks();
 				List<String> groupnames = new ArrayList<>();
 				Map<String, List<UiInfo>> groupname2blockinfos = new HashMap<>();
 				data.setGroupNames(groupnames);
 				data.setGroupname2infos(groupname2blockinfos);
 				// Opbouw structuren
-				for (IUserInterfaceAPI a : actuators) {
-					if (a.getUi() == null)
+				for (IUiCapableBlock a : actuators) {
+					if (a.getUiPositionOnScreen() == null)
 						continue;
-					StringTokenizer st = new StringTokenizer(a.getUi(), ":");
-					log.info("TEMP ui="+a.getUi());
+					StringTokenizer st = new StringTokenizer(a.getUiPositionOnScreen(), ":");
+					log.info("TEMP ui="+a.getUiPositionOnScreen());
 					String groupName = st.nextToken();
 					int idx = Integer.parseInt(st.nextToken());
 					if (!groupnames.contains(groupName)) {
@@ -55,9 +55,9 @@ public class DataCollector {
 					if (idx >= blockinfos.size()) {
 						for (int i = blockinfos.size(); i < idx; i++)
 							blockinfos.add(null);
-						blockinfos.add(a.getBlockInfo());
+						blockinfos.add(a.getUiInfo());
 					} else {
-						blockinfos.add(idx, a.getBlockInfo());
+						blockinfos.add(idx, a.getUiInfo());
 					}
 				}
 				// Opkuis structuren, d.i. null eruithalen
@@ -73,8 +73,8 @@ public class DataCollector {
 			} else {
 				for (List<UiInfo> list : data.groupname2infos.values()) {
 					for (int i = 0; i < list.size(); i++) {
-						IUserInterfaceAPI act = Domotic.singleton().findUiCapable(list.get(i).getName());
-						list.set(i, act.getBlockInfo());
+						IUiCapableBlock act = Domotic.singleton().findUiCapable(list.get(i).getName());
+						list.set(i, act.getUiInfo());
 					}
 				}
 			}

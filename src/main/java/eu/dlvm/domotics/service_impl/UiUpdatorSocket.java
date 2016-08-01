@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
@@ -74,10 +74,10 @@ public class UiUpdatorSocket implements IUIUpdator {
 
 	private List<UiInfo> createUiInfos() {
 		List<UiInfo> uiInfos = new ArrayList<>();
-		for (IUserInterfaceAPI ui : Domotic.singleton().getUiCapableBlocks()) {
-			if (ui.getUi() == null)
+		for (IUiCapableBlock ui : Domotic.singleton().getUiCapableBlocks()) {
+			if (ui.getUiPositionOnScreen() == null)
 				continue;
-			uiInfos.add(ui.getBlockInfo());
+			uiInfos.add(ui.getUiInfo());
 		}
 		return uiInfos;
 	}

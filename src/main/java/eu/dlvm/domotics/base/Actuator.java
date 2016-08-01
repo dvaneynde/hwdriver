@@ -21,7 +21,7 @@ import eu.dlvm.iohardware.LogCh;
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends Block implements IDomoticLoop, IUserInterfaceAPI {
+public abstract class Actuator extends Block implements IDomoticLoop, IUiCapableBlock {
 
 	private static Logger log = LoggerFactory.getLogger(Actuator.class);
 

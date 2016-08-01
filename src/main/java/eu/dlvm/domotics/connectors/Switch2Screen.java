@@ -7,7 +7,7 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Connector;
-import eu.dlvm.domotics.base.IUserInterfaceAPI;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.service.UiInfo;
@@ -23,7 +23,7 @@ import eu.dlvm.domotics.service.UiInfo;
  *         maar dat kan in xml handler; wel probleem met UI; en alles kan dan
  *         hermaakt naar Translator en Connector
  */
-public class Switch2Screen extends Connector implements ISwitchListener, IUserInterfaceAPI {
+public class Switch2Screen extends Connector implements ISwitchListener, IUiCapableBlock {
 
 	static Logger log = LoggerFactory.getLogger(Switch2Screen.class);
 
@@ -59,11 +59,11 @@ public class Switch2Screen extends Connector implements ISwitchListener, IUserIn
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		UiInfo bi = null;
 		if (ui != null) {
 			log.debug("getBlockInfo(), ui='" + ui + "'");
-			bi = new UiInfo(this.getName(), "DimmerSwitch", this.getDescription());
+			bi = new UiInfo(this.getName(), "Switch2Screen", this.getDescription());
 		}
 		return bi;
 	}

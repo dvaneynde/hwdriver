@@ -31,7 +31,11 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	 * @param description
 	 */
 	public Sensor(String name, String description, LogCh channel, IDomoticContext ctx) {
-		super(name, description, null);
+		this(name, description, null, channel, ctx);
+	}
+
+	public Sensor(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+		super(name, description, ui);
 		this.ctx = ctx;
 		this.channel = channel;
 		ctx.addSensor(this);

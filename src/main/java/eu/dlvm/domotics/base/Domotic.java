@@ -27,8 +27,8 @@ import eu.dlvm.iohardware.IHardwareIO;
  * 
  * @author dirk vaneynde
  * 
- * TODO veel te veel methodes, opsplitsen - maar hoe?
- * TODO monitoring en restart werkte niet, weggooien?
+ *         TODO veel te veel methodes, opsplitsen - maar hoe? TODO monitoring en
+ *         restart werkte niet, weggooien?
  */
 public class Domotic implements IDomoticContext {
 
@@ -56,7 +56,7 @@ public class Domotic implements IDomoticContext {
 	protected List<IUIUpdator> uiUpdators;
 	protected long loopSequence = -1L;
 
-	private List<IUserInterfaceAPI> uiblocks = new ArrayList<IUserInterfaceAPI>(64);
+	private List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
 
 	public static synchronized Domotic singleton() {
 		if (singleton == null) {
@@ -130,15 +130,12 @@ public class Domotic implements IDomoticContext {
 			return;
 		}
 		actuators.add(actuator);
-		if (actuator instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI) actuator);
 		log.info("Added actuator " + actuator.getName());
 	}
 
 	public List<Actuator> getActuators() {
 		return actuators;
 	}
-
 
 	public void addController(Controller controller) {
 		if (controllers.contains(controller)) {
@@ -147,40 +144,12 @@ public class Domotic implements IDomoticContext {
 			return;
 		}
 		controllers.add(controller);
-		if (controller instanceof IUserInterfaceAPI)
-			addUiCapableBlock((IUserInterfaceAPI) controller);
 		log.info("Added controller " + controller.getName());
 	}
 
-	@Override
-	public void addUiCapableBlock(IUserInterfaceAPI uiblock0) {
-		//		Block block0 = (Block)uiblock0;
-		//		for (IUserInterfaceAPI uiblock:uiblocks) {
-		//			if (((Block)uiblock).getName().equals(block0.name)) {
-		//				log.warn("addUiCapableBlock(): incominb block '"+block0.name+"' already registered - ignored.");
-		//				return;
-		//			}
-		//		}
-		if (uiblock0.getBlockInfo() == null) {
-			// TODO all Controllers zijn nu IUserDinges, maar dat is niet juist.
-			log.warn("Not adding UI info for " + ((Block) uiblock0).getName()
-					+ ". BlockInfo is null - is a bug, refactor code.");
-			return;
-		}
-		for (IUserInterfaceAPI uiblock : uiblocks) {
-			if (uiblock.getBlockInfo().getName().equals(uiblock0.getBlockInfo().getName())) {
-				log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getBlockInfo().getName()
-						+ "' already registered - ignored.");
-				return;
-			}
-		}
-		uiblocks.add(uiblock0);
-		log.debug("Added UiCapableBlock " + uiblock0.getBlockInfo().getName());
-	}
-
-	public IUserInterfaceAPI findUiCapable(String name) {
-		for (IUserInterfaceAPI ui : uiblocks) {
-			if (ui.getBlockInfo().getName().equals(name))
+	public IUiCapableBlock findUiCapable(String name) {
+		for (IUiCapableBlock ui : uiblocks) {
+			if (ui.getUiInfo().getName().equals(name))
 				return ui;
 		}
 		return null;
@@ -188,10 +157,10 @@ public class Domotic implements IDomoticContext {
 
 	/**
 	 * @return all registered {@link Actuator} and {@link Controller} blocks
-	 *         that implement {@link IUserInterfaceAPI}, or those blocks
+	 *         that implement {@link IUiCapableBlock}, or those blocks
 	 *         registered explicitly...
 	 */
-	public List<IUserInterfaceAPI> getUiCapableBlocks() {
+	public List<IUiCapableBlock> getUiCapableBlocks() {
 		return uiblocks;
 	}
 
@@ -207,14 +176,10 @@ public class Domotic implements IDomoticContext {
 		log.info("Removing updator id=" + updator.getId() + " (listener was found and thus removed: " + removed + ")");
 	}
 
-
 	/**
-	 * Initializes {@link IHardwareIO} and Domotic {@link Actuator} blocks.
-	 * Initializing the Actuators implies that the hardware outputs are set in
-	 * line with the Actuator output state.
+	 * Initializes Domotic system, after all Blocks ({@link Block}) were added.
 	 * <p>
-	 * Note that this happens before - and does not need -
-	 * {@link #loopOnce(long)}.
+	 * Specifically, hardware outputs are set correctly, and UI blocks are gathered from allready registered blocks.
 	 * <p>
 	 * Must be called before {@link #loopOnce(long)} or {@link #stop}.
 	 * 
@@ -235,7 +200,39 @@ public class Domotic implements IDomoticContext {
 			a.initializeOutput(ro);
 		}
 		hw.refreshOutputs();
+		for (Block b : sensors)
+			registerIfUiCapable(b);
+		for (Block b : controllers)
+			registerIfUiCapable(b);
+		for (Block b : actuators)
+			registerIfUiCapable(b);
+			
 	}
+
+	private void registerIfUiCapable(Block b) {
+		if (b  instanceof IUiCapableBlock)
+			addUiCapableBlock((IUiCapableBlock) b);
+	}
+	
+	//@Override
+	private void addUiCapableBlock(IUiCapableBlock uiblock0) {
+		if (uiblock0.getUiInfo() == null) {
+			// TODO all Controllers zijn nu IUserDinges, maar dat is niet juist.
+			log.warn("Not adding UI info for " + ((Block) uiblock0).getName()
+					+ ". BlockInfo is null - is a bug, refactor code.");
+			return;
+		}
+		for (IUiCapableBlock uiblock : uiblocks) {
+			if (uiblock.getUiInfo().getName().equals(uiblock0.getUiInfo().getName())) {
+				log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getUiInfo().getName()
+						+ "' already registered - ignored.");
+				return;
+			}
+		}
+		uiblocks.add(uiblock0);
+		log.debug("Added UiCapableBlock " + uiblock0.getUiInfo().getName());
+	}
+
 
 	private void addShutdownHook(Domotic dom) {
 		Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
@@ -275,9 +272,7 @@ public class Domotic implements IDomoticContext {
 	 *            'localhost' is passed to it as an argument. Otherwise that
 	 *            driver should be started separately, after this one shows
 	 *            "START" in the log.
-	 * @param monitorDriver
-	 *            if true, driver is monitored and if not working for
-	 *            {@link #MONITORING_INTERVAL_MS} it tries to restart the driver
+	 * @param checkDriverAndRestartOnError
 	 */
 	public void runDomotic(int looptime, String pathToDriver, boolean checkDriverAndRestartOnError) {
 		addShutdownHook(this);

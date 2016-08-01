@@ -135,7 +135,7 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public UiInfo getBlockInfo() {
+	public UiInfo getUiInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
