@@ -21,14 +21,6 @@ import eu.dlvm.domotics.service.UiInfo;
  * corresponding event is sent to all listeners.
  * 
  * @author dirkv
- * 
- *         TODO die mappers zijn eigenlijk low-level mechanismes; een all on/off
- *         is hoger niveau en kan makkelijk met <group> gemaakt worden, maar als
- *         je UI ziet... dus hoe kan dat algemeen opgelost? AllOnOff als apart
- *         element - maar wat dan? We lijken terug naar switchboards te gaan...
- *         Of Mapper heeft in- en output events, geen loop(), maar eventueel wel
- *         IUiCapable? En ook registreren bij Domotic, maar meestal niks
- *         bijhouden tenzij IUiCapable?
  */
 public class Switch2OnOffToggle extends Connector implements ISwitchListener, IUiCapableBlock {
 

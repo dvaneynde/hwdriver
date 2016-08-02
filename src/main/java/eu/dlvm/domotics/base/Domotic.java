@@ -20,10 +20,15 @@ import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
- * Makes the {@link Block} do something, that have to be registered here, and
- * then will be triggered multiple times a second via {@link #loopOnce()}.
- * <p>
- * You need something else that calls {@link #loopOnce()} regularly.
+ * Central singleton in domotic system.
+ * <p>Overview of methods:<ol>
+ * <li>{@link #singleton(IHardwareIO)} creates singleton and accepts hardware driver connection</li>
+ * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to construct the domotic system</li>
+ * <li>{@link #initialize(Map)} should then be called to do some one-time initialization</li>
+ * <li>{@link #runDomotic(int, String, boolean)} will then start the system by calling {@link #loopOnce(long)} regularly, and monitor everything </li>
+ * </ol>
+ * <p>{@link #requestStop()} will halt domotic system.
+ * <p>{@link #loopOnce()} is the key method that drives every input to an output.
  * 
  * @author dirk vaneynde
  * 
@@ -264,8 +269,7 @@ public class Domotic implements IDomoticContext {
 	/**
 	 * Runs it.
 	 * 
-	 * @param osc
-	 *            Drives the Domotic system, and references it.
+	 * @param looptime
 	 * @param pathToDriver
 	 *            If non-null, attempts to start the HwDriver executable at that
 	 *            path. Note that this driver must be on the same host, since
@@ -347,20 +351,17 @@ public class Domotic implements IDomoticContext {
 	}
 
 	/**
-	 * Some external clock must regularly call this method, to let the Blocks
-	 * 'work'.
-	 * <p>
 	 * This is what happens:
 	 * <ol>
 	 * <li>{@link IHardwareIO#refreshInputs()} is called, so that hardware layer
 	 * inputs are refreshed.</li>
 	 * <li>All registered Sensors have their {@link Sensor#loop()} run to read
-	 * input and/or check timeouts etc. This typically triggers some Boards that
-	 * in turn trigger some Actuators.</li>
+	 * input and/or check timeouts etc. This typically triggers Actuators. Same happens for Controllers.</li>
 	 * <li>Then any registered Actuators have their {@link Actuator#loop()}
-	 * executed, so they can check timeouts etc.</li>
+	 * executed, so they can update hardware output state.</li>
 	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>
+	 * <li>Finally any {@link IUIUpdator}s are called to update model state of connected client UIs.
 	 * </ol>
 	 * 
 	 * @param currentTime

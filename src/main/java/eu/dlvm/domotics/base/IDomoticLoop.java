@@ -3,11 +3,7 @@ package eu.dlvm.domotics.base;
 public interface IDomoticLoop {
 
 	/**
-	 * Called regularly by {@link Domotic}, so that concrete actuators can check
-	 * timeouts etc.
-	 * <p>
-	 * To be enabled this Actuator must first have been registered with
-	 * {@link Domotic#addActuator(Actuator)}.
+	 * Called regularly from {@link Domotic} so that concrete implementing blocks can do their thing. See {@link Domotic#loopOnce(long)}.
 	 * 
 	 * @param currentTime
 	 *            Timestamp at which this loop is called. The same for each

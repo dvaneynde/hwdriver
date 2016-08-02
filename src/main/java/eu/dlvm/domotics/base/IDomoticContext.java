@@ -22,6 +22,7 @@ public interface IDomoticContext {
 	 *            Added, if not already present. Each Sensor can be present no
 	 *            more than once.
 	 */
+	// TODO addBlock
 	public void addSensor(Sensor s);
 
 	/**
@@ -32,8 +33,10 @@ public interface IDomoticContext {
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
+	// TODO addBlock
 	public void addActuator(Actuator a);
 
+	// TODO addBlock
 	public void addController(Controller a);
 
 	// TODO onderstaande wordt rechtstreeks aangeroepen vanuit Handler, naast intern in Domotic...
@@ -44,6 +47,7 @@ public interface IDomoticContext {
 	
 	/**
 	 * @return Underlying hardware.
+	 * TODO waarom?
 	 */
 	public IHardwareIO getHw();
 }

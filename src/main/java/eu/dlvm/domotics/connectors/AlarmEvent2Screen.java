@@ -15,7 +15,7 @@ import eu.dlvm.domotics.sensors.IAlarmListener;
  */
 public class AlarmEvent2Screen extends Connector implements IAlarmListener {
 
-	private static final Logger log = LoggerFactory.getLogger(AlarmEvent2Screen.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AlarmEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*

@@ -4,7 +4,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -13,11 +14,12 @@ import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
- * @author dirk Has two per-day times, at {@link #setOnTime(int, int)} an on
- *         signal is sent, at {@link #setOffTime(int, int)} an off signal is
- *         sent.
- *         <p>
- *         Targets {@link IOnOffToggleCapable} listeners.
+ * Has two per-day times, at {@link #setOnTime(int, int)} an on signal is sent,
+ * at {@link #setOffTime(int, int)} an off signal is sent.
+ * <p>
+ * Targets {@link IOnOffToggleCapable} listeners.
+ * 
+ * @author dirk
  */
 public class Timer extends Controller {
 

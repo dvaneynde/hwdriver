@@ -1,8 +1,7 @@
 package eu.dlvm.domotics.sensors;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
-
-import eu.dlvm.domotics.base.IUiCapableBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Measures frequency of a pulse train.

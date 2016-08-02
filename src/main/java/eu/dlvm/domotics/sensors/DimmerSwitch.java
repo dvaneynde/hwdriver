@@ -3,17 +3,22 @@ package eu.dlvm.domotics.sensors;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * Events: a) single click, links of rechts, op neergaande flank b) ingedrukt
- * houden, links of rechts c) ingedrukt houden links, klik rechts opgaande flank
- * - of andersom d) beide gelijktijdig ingedrukt
- * 
+ * Events:
+ * <ul>
+ * <li>a) single click, links of rechts, op neergaande flank</li>
+ * <li>b) ingedrukt houden, links of rechts</li>
+ * <li>c) ingedrukt houden links, klik rechts opgaande flank - of andersom</li>
+ * <li>d) beide gelijktijdig ingedrukt</li>
+ * </ol>
+ * <p>
  * Dimmer: a (aan/uit), b (dimmen), c(halve kracht), d(volle kracht)
  * 
  * @author dirk
@@ -26,7 +31,7 @@ public class DimmerSwitch extends Sensor {
 	private boolean firstPressedLeft;
 	private long clickTimeout = 400L;
 	private Set<IDimmerSwitchListener> listeners = new HashSet<>();
-	
+
 	public enum States {
 		REST, DOWN_SHORT, DOWN_LONG, BOTH_DOWN
 	};
@@ -45,6 +50,7 @@ public class DimmerSwitch extends Sensor {
 
 	/**
 	 * Creates a DimmerSwitches.
+	 * 
 	 * @param name
 	 * @param description
 	 * @param channelLeft
@@ -64,20 +70,12 @@ public class DimmerSwitch extends Sensor {
 	public void registerListener(IDimmerSwitchListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public void notifyListeners(IDimmerSwitchListener.ClickType click) {
-		for (IDimmerSwitchListener sl:listeners)
+		for (IDimmerSwitchListener sl : listeners)
 			sl.onEvent(this, click);
 	}
-	
 
-	/**
-	 * Signal from hardware received on given channel.
-	 * <p>
-	 * Houdt voorlopig geen rekening met dender !
-	 * <p>
-	 * <strong>Currently ClickType.Simultaneous is not supported!</strong>
-	 */
 	@Override
 	public void loop(long currentTime, long sequence) {
 		boolean newInputLeft = getHw().readDigitalInput(getChannel());
@@ -93,23 +91,27 @@ public class DimmerSwitch extends Sensor {
 				state = States.DOWN_SHORT;
 				firstPressedLeft = false;
 				leftRESTtime = currentTime;
-			}// otherwise ignore
+			} // otherwise ignore
 			break;
 		case DOWN_SHORT:
 			if ((currentTime - leftRESTtime) >= getClickedTimeoutMS()) {
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_HOLD_DOWN : IDimmerSwitchListener.ClickType.RIGHT_HOLD_DOWN);
+				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_HOLD_DOWN
+						: IDimmerSwitchListener.ClickType.RIGHT_HOLD_DOWN);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.DOWN_LONG;
 				break;
 			} else if ((firstPressedLeft && !newInputLeft) || (!firstPressedLeft && !newInputRight)) {
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_CLICK : IDimmerSwitchListener.ClickType.RIGHT_CLICK);
+				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_CLICK
+						: IDimmerSwitchListener.ClickType.RIGHT_CLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK : IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
+				IDimmerSwitchListener.ClickType ct = (firstPressedLeft
+						? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK
+						: IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.BOTH_DOWN;
@@ -118,13 +120,16 @@ public class DimmerSwitch extends Sensor {
 		case DOWN_LONG:
 			if ((firstPressedLeft && !newInputLeft) || (!firstPressedLeft && !newInputRight)) {
 				// Released the key being hold
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_RELEASED : IDimmerSwitchListener.ClickType.RIGHT_RELEASED);
+				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_RELEASED
+						: IDimmerSwitchListener.ClickType.RIGHT_RELEASED);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK : IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
+				IDimmerSwitchListener.ClickType ct = (firstPressedLeft
+						? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK
+						: IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.BOTH_DOWN;

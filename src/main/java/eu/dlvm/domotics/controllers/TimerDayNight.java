@@ -17,7 +17,7 @@ import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
  * these for setting lamps off and on respectively. <br/>
  * 30 minutes is subtracted or added to account for shimmer.
  * 
- * @author dirkv
+ * @author dirk
  */
 public class TimerDayNight extends Timer {
 

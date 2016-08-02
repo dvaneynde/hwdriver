@@ -7,7 +7,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
@@ -24,7 +25,7 @@ public class XmlDomoticConfigurator {
 	public void setCfgFilepath(String cfgFilepath) {
 		cfgFile = new File(cfgFilepath);
 		if (!cfgFile.exists())
-			throw new IllegalArgumentException("File '"+cfgFilepath+"' does not exist.");
+			throw new IllegalArgumentException("File '" + cfgFilepath + "' does not exist.");
 	}
 
 	public void configure(IDomoticContext domoCtx) {
@@ -35,14 +36,8 @@ public class XmlDomoticConfigurator {
 			SAXParser p = f.newSAXParser();
 			DefaultHandler2 h = new DomoticXmlDefaultHandler(domoCtx);
 			p.parse(getCfgFilepath(), h);
-		} catch (ParserConfigurationException e) {
-			log.error("Configuration Failed: ",e);
-			throw new ConfigurationException(e.getMessage());
-		} catch (SAXException e) {
-			log.error("Configuration Failed: ",e);
-			throw new ConfigurationException(e.getMessage());
-		} catch (IOException e) {
-			log.error("Configuration Failed: ",e);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			log.error("Configuration Failed: ", e);
 			throw new ConfigurationException(e.getMessage());
 		}
 

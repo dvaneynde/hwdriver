@@ -8,7 +8,7 @@ import eu.dlvm.iohardware.diamondsys.OpalmmBoard;
 import eu.dlvm.iohardware.diamondsys.Opmm1616Board;
 
 /**
- * Visitor to {@link Opmm1616Board}, to add messaging protocol with hardware driver.
+ * Decorator to {@link Opmm1616Board}, to add messaging protocol with hardware driver.
  * 
  * @author dirk vaneynde
  * 

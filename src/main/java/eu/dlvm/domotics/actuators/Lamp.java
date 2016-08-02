@@ -15,14 +15,6 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	static Logger log = LoggerFactory.getLogger(Lamp.class);
 	private boolean outval;
 
-	/**
-	 * Constructor. Output is set to false, and transferred to hardware.
-	 * <p>
-	 * See {@link Actuator#Actuator(String, String, LogCh)} for most parameters.
-	 * 
-	 * @param hardware
-	 *            Hardware to set output value(s).
-	 */
 	public Lamp(String name, String description, LogCh channel, IDomoticContext ctx) {
 		super(name, description, null, channel, ctx);
 		this.outval = false;

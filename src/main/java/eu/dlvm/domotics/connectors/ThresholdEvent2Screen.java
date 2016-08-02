@@ -15,7 +15,7 @@ import eu.dlvm.domotics.sensors.IThresholdListener;
  */
 public class ThresholdEvent2Screen extends Connector implements IThresholdListener {
 
-	private static final Logger log = LoggerFactory.getLogger(ThresholdEvent2Screen.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ThresholdEvent2Screen.class);
 	private Set<Screen> screens = new HashSet<>();
 
 	/*

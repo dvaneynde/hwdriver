@@ -11,8 +11,6 @@ import eu.dlvm.iohardware.diamondsys.messaging.DmmatBoardWithMsg;
 import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
 
 /**
- * TODO moet naar subpackage factories.
- * 
  * @author dirk
  * 
  */
