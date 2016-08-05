@@ -6,6 +6,7 @@ import Http
 import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, (:=))
 import Json.Encode as Encode
+import WebSocket
 import Material
 import Material.Button as Button
 import Material.Scheme as Scheme
@@ -13,6 +14,10 @@ import Material.Options exposing (css)
 import Material.Toggles as Toggles
 import Material.Icon as Icon
 import Material.Color as Color
+
+{-
+TODO update to MDL 7.0.0
+-}
 
 -- Domotics user interface
 
@@ -22,26 +27,34 @@ import Material.Color as Color
 -}
 
 -- GLOBAL
-urlBase = "http://localhost:8080/domo/"
---url = "http://192.168.0.10:8080/domo/actuators"
---url="http://localhost:8080/domo/actuators"
-urlGetRobotInfo = urlBase ++ "screenRobot"
-urlPostRobotUpdate = urlBase ++ "screenRobotUpdate"
+urlBase = "http://localhost:8080/"
+urlGetRobotInfo = urlBase ++ "rest/screenRobot"
+urlPostRobotUpdate = urlBase ++ "rest/screenRobotUpdate"
+wsStatus = "ws://localhost:8080/" ++ "time/"
 
 main =
-  Html.App.program { init = init, view = view, update = update, subscriptions = (always Sub.none) }
+  Html.App.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
 -- MODEL
-type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String, mdl : Material.Model }
+type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String, statusAsString: String, mdl : Material.Model }
 
 init : (Model, Cmd Msg)
-init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
+init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested", statusAsString="nothing yet...", mdl=Material.model }, Cmd.none )
 
 
 -- UPDATE
-type Msg = CheckError Http.Error | CheckErrorRaw Http.RawError| CheckInfo | CheckInfoOk ReceivedInfoRecord |
-    RobotClick Bool | Test | ShowResult String | DecodeUpdateResponse Http.Response | Click Int | MDL Material.Msg
+type Msg = CheckError Http.Error
+          | CheckErrorRaw Http.RawError
+          | CheckInfo
+          | CheckInfoOk ReceivedInfoRecord
+          | RobotClick Bool
+          | Test
+          | ShowResult String
+          | DecodeUpdateResponse Http.Response
+          | Click Int
+          | MDL Material.Msg
+          | NewStatus String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -56,6 +69,7 @@ update msg model =
     ShowResult value -> ({model | test = value}, Cmd.none)
     DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (decodeUpdateResponse response)}, Cmd.none)
     MDL action' -> Material.update MDL action' model
+    NewStatus str -> ({model | statusAsString = str}, Cmd.none)
 
 
 -- checkActuatorsCmd : Cmd Msg
@@ -99,6 +113,14 @@ decodeUpdateResponse response =
     Http.Text value -> Result.withDefault False (Decode.decodeString Decode.bool value)
     Http.Blob blob -> False
 
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  WebSocket.listen wsStatus NewStatus
+
+
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
 -- https://debois.github.io/elm-mdl/
@@ -106,6 +128,7 @@ view : Model -> Html Msg
 view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Status: " , text model.statusAsString],
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
     div [][ Html.hr [] [] ],
     div [] [
@@ -121,6 +144,6 @@ view model =
     div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ],
-    div [] [ Button.render MDL [0] model.mdl [ Button.fab, Button.ripple ] [ Icon.i "arrow_downward"] ]
+    div [] [ Button.render MDL [0] model.mdl [ Button.fab, Button.ripple, Color.background (Color.color Color.Blue Color.S100) ] [ Icon.i "arrow_downward"] ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
