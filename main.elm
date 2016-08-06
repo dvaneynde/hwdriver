@@ -44,10 +44,10 @@ init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotO
 
 
 -- UPDATE
-type Msg = CheckError Http.Error
-          | CheckErrorRaw Http.RawError
-          | CheckInfo
-          | CheckInfoOk ReceivedInfoRecord
+type Msg = HandleRestError Http.Error
+          | HandleRawRestError Http.RawError
+          | RequestSubStatusViaRest
+          | DecodeSubStatusViaRest SubStatusRecord
           | RobotClick Bool
           | Test
           | ShowResult String
@@ -60,55 +60,55 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Test -> ({model | test = (toString {model|test=""})}, Cmd.none)
-    CheckInfo -> (model, receiveInfoCmd)
-    CheckInfoOk info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
-    CheckError error -> ({ model | errorMsg = toString error }, Cmd.none)
-    CheckErrorRaw error -> ({ model | actuators = toString error }, Cmd.none)
-    RobotClick value -> ( model, updateInfoCmd value)
-    Click nr -> ( model, updateInfoCmd (not model.robotOn))
+    RequestSubStatusViaRest -> (model, getSubStatusViaRestCmd)
+    DecodeSubStatusViaRest info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
+    HandleRestError error -> ({ model | errorMsg = toString error }, Cmd.none)
+    HandleRawRestError error -> ({ model | actuators = toString error }, Cmd.none)
+    RobotClick value -> ( model, robotUpdateCmd value)
+    Click nr -> ( model, robotUpdateCmd (not model.robotOn))
     ShowResult value -> ({model | test = value}, Cmd.none)
-    DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (decodeUpdateResponse response)}, Cmd.none)
-    MDL action' -> Material.update MDL action' model
+    DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (robotUpdateResponseDecoder response)}, Cmd.none)
     NewStatus str -> ({model | statusAsString = str}, Cmd.none)
+    MDL action' -> Material.update MDL action' model
 
 
 -- checkActuatorsCmd : Cmd Msg
--- checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
+-- checkActuatorsCmd = Task.perform HandleRestError CheckActuatorsOk (Http.getString url)
 
-type alias ReceivedInfoRecord = { robotOn : Bool, sunLevel : Int, windLevel : Float }
+type alias SubStatusRecord = { robotOn : Bool, sunLevel : Int, windLevel : Float }
 
-receivedInfoDecoder : Decoder ReceivedInfoRecord
-receivedInfoDecoder =
-  object3 ReceivedInfoRecord ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
+subStatusDecoder : Decoder SubStatusRecord
+subStatusDecoder =
+  object3 SubStatusRecord ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
 
-receiveInfoCmd : Cmd Msg
-receiveInfoCmd =
-  Task.perform CheckError CheckInfoOk (Http.get receivedInfoDecoder urlGetRobotInfo)
+getSubStatusViaRestCmd : Cmd Msg
+getSubStatusViaRestCmd =
+  Task.perform HandleRestError DecodeSubStatusViaRest (Http.get subStatusDecoder urlGetRobotInfo)
 
 -- newValue -> [send and recv] -> newValue -> [update model] -> newModel
 
-updateInfoEncoder : Bool -> String
-updateInfoEncoder newState =
+robotUpdateEncoder : Bool -> String
+robotUpdateEncoder newState =
   let info =
     Encode.object [ ("robotOn", Encode.bool newState)]
   in
     Encode.encode 0 info
 
-updateInfoCmd : Bool -> Cmd Msg
-updateInfoCmd newState =
+robotUpdateCmd : Bool -> Cmd Msg
+robotUpdateCmd newState =
   let
     request : Http.Request
     request =
       { verb = "POST"
       , headers = [ ( "Content-Type", "application/json" ) ]
       , url = urlPostRobotUpdate
-      , body = Http.string (updateInfoEncoder newState)
+      , body = Http.string (robotUpdateEncoder newState)
       }
   in
-    Task.perform CheckErrorRaw DecodeUpdateResponse (Http.send Http.defaultSettings request)
+    Task.perform HandleRawRestError DecodeUpdateResponse (Http.send Http.defaultSettings request)
 
-decodeUpdateResponse : Http.Response ->  Bool
-decodeUpdateResponse response =
+robotUpdateResponseDecoder : Http.Response ->  Bool
+robotUpdateResponseDecoder response =
   case response.value of
     Http.Text value -> Result.withDefault False (Decode.decodeString Decode.bool value)
     Http.Blob blob -> False
@@ -129,6 +129,7 @@ view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Status: " , text model.statusAsString],
+    div [][ Html.hr [] [] ],
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
     div [][ Html.hr [] [] ],
     div [] [
@@ -140,7 +141,7 @@ view model =
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
     div [][ Html.hr [] [] ],
-    div [] [ button [ onClick CheckInfo ] [text "Check..."]],
+    div [] [ button [ onClick RequestSubStatusViaRest ] [text "Check..."]],
     div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ],
