@@ -15,9 +15,6 @@ import Material.Toggles as Toggles
 import Material.Icon as Icon
 import Material.Color as Color
 
-{-
-TODO update to MDL 7.0.0
--}
 
 -- Domotics user interface
 
@@ -53,7 +50,7 @@ type Msg = HandleRestError Http.Error
           | ShowResult String
           | DecodeUpdateResponse Http.Response
           | Click Int
-          | MDL Material.Msg
+          | Mdl (Material.Msg Msg)
           | NewStatus String
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -69,7 +66,8 @@ update msg model =
     ShowResult value -> ({model | test = value}, Cmd.none)
     DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (robotUpdateResponseDecoder response)}, Cmd.none)
     NewStatus str -> ({model | statusAsString = str}, Cmd.none)
-    MDL action' -> Material.update MDL action' model
+    Mdl message' ->
+      Material.update message' model
 
 
 -- checkActuatorsCmd : Cmd Msg
@@ -134,9 +132,9 @@ view model =
     div [][ Html.hr [] [] ],
     div [] [
       -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
-      Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
+      Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] [],
-      Button.render MDL [0] model.mdl [ Button.ripple, Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
+      Button.render Mdl [0] model.mdl [ Button.ripple, Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
     ],
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
@@ -145,6 +143,6 @@ view model =
     div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ],
-    div [] [ Button.render MDL [0] model.mdl [ Button.fab, Button.ripple, Color.background (Color.color Color.Blue Color.S100) ] [ Icon.i "arrow_downward"] ]
+    div [] [ Button.render Mdl [0] model.mdl [ Button.fab, Button.ripple, Color.background (Color.color Color.Blue Color.S100) ] [ Icon.i "arrow_downward"] ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
