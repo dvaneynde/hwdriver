@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "GUI to dlvm's domotics system.",
-    "repository": "git@github.com:dvaneynde/elm-domotica-ui.git",
+    "repository": "https://github.com/dvaneynde/elm-domotica-ui.git",
     "license": "BSD3",
     "source-directories": [
         "."
