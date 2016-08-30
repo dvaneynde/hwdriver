@@ -36,10 +36,10 @@ main =
 -- MODEL
 type alias StatusRecord = { name: String, kind: String, on: Bool, level: Int }
 
-type alias Model = { statuses: List StatusRecord, actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String, statusAsString: String, mdl : Material.Model }
+type alias Model = { statuses: List StatusRecord, errorMsg: String, test: String, mdl : Material.Model }
 
 init : (Model, Cmd Msg)
-init = ( { statuses=[], actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested", statusAsString="nothing yet...", mdl=Material.model }, Cmd.none )
+init = ( { statuses=[], errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
 
 initialStatus : StatusRecord
 initialStatus = { name="", kind="", on=False, level=0 }
@@ -54,15 +54,7 @@ statusByName name listOfRecords =
 
 
 -- UPDATE
-type Msg = HandleRestError Http.Error
-          | HandleRawRestError Http.RawError
-          | RequestSubStatusViaRest
-          | DecodeSubStatusViaRest SubStatusRecord
-          | RobotClick Bool
-          | PutModelInTestAsString
-          | ShowResult String
-          | DecodeUpdateResponse Http.Response
-          | Click Int
+type Msg = PutModelInTestAsString
           | Mdl (Material.Msg Msg)
           | NewStatus String
 
@@ -70,14 +62,6 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     PutModelInTestAsString -> ({model | test = (toString {model|test=""})}, Cmd.none)
-    RequestSubStatusViaRest -> (model, getSubStatusViaRestCmd)
-    DecodeSubStatusViaRest info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
-    HandleRestError error -> ({ model | errorMsg = toString error }, Cmd.none)
-    HandleRawRestError error -> ({ model | actuators = toString error }, Cmd.none)
-    RobotClick value -> ( model, robotUpdateCmd value)
-    Click nr -> ( model, robotUpdateCmd (not model.robotOn))
-    ShowResult value -> ({model | test = value}, Cmd.none)
-    DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (robotUpdateResponseDecoder response)}, Cmd.none)
     -- NewStatus str -> ({model | statusAsString = str}, Cmd.none)
     NewStatus str ->
         ({ model | statuses = (decodeStatuses str) }, Cmd.none)
@@ -104,49 +88,6 @@ statusDecoder =
     ("on" := bool)
     ("level" := int)
 
--- checkActuatorsCmd : Cmd Msg
--- checkActuatorsCmd = Task.perform HandleRestError CheckActuatorsOk (Http.getString url)
-
-type alias SubStatusRecord = { robotOn : Bool, sunLevel : Int, windLevel : Float }
-
--- Decodeert {"robotOn":false,"sunLevel":2867,"windLevel":12.394734}
-subStatusDecoder : Decoder SubStatusRecord
-subStatusDecoder =
-  object3 SubStatusRecord ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
-
--- Typisch antwoord: {"robotOn":false,"sunLevel":2867,"windLevel":12.394734}
-getSubStatusViaRestCmd : Cmd Msg
-getSubStatusViaRestCmd =
-  Task.perform HandleRestError DecodeSubStatusViaRest (Http.get subStatusDecoder urlGetRobotInfo)
-
--- newValue -> [send and recv] -> newValue -> [update model] -> newModel
-
-robotUpdateEncoder : Bool -> String
-robotUpdateEncoder newState =
-  let info =
-    Encode.object [ ("robotOn", Encode.bool newState)]
-  in
-    Encode.encode 0 info
-
-robotUpdateCmd : Bool -> Cmd Msg
-robotUpdateCmd newState =
-  let
-    request : Http.Request
-    request =
-      { verb = "POST"
-      , headers = [ ( "Content-Type", "application/json" ) ]
-      , url = urlPostRobotUpdate
-      , body = Http.string (robotUpdateEncoder newState)
-      }
-  in
-    Task.perform HandleRawRestError DecodeUpdateResponse (Http.send Http.defaultSettings request)
-
-robotUpdateResponseDecoder : Http.Response ->  Bool
-robotUpdateResponseDecoder response =
-  case response.value of
-    Http.Text value -> Result.withDefault False (Decode.decodeString Decode.bool value)
-    Http.Blob blob -> False
-
 
 -- SUBSCRIPTIONS
 
@@ -163,29 +104,14 @@ view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
-      text "Websocket Status: " ,
-      text model.statusAsString ],
+      text "Model: ", text (toString model.statuses) ],
     div [][ Html.hr [] [] ],
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
       button [ onClick PutModelInTestAsString ] [ text "Test"],
       text model.test ],
     div [][ Html.hr [] [] ],
-    div [] [
-      -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
-      Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
-      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] [],
-      Button.render Mdl [0] model.mdl [ Button.ripple, Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
-    ],
-    div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
-    div [][ Html.hr [] [] ],
-    div [] [ button [ onClick RequestSubStatusViaRest ] [text "Check..."]],
-    div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
-    {--div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString (zonnesterkte model)) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString (windsterkte model)) ] [], text (toString model.windLevel) ],
-    --}
-    div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString (10 * (statusByName "LichtScreen" model.statuses).level)) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString (statusByName "Windmeter" model.statuses).level) ] [], text (toString model.windLevel) ],
-    div [] [ Button.render Mdl [0] model.mdl [ Button.fab, Button.ripple, Color.background (Color.color Color.Blue Color.S100) ] [ Icon.i "arrow_downward"] ]
+    div [] [text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (toString (statusByName "LichtScreen" model.statuses).level) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%") ],
+    div [] [text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (toString (statusByName "Windmeter" model.statuses).level) ] [], text (toString (statusByName "Windmeter" model.statuses).level) ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
