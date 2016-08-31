@@ -4,8 +4,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, (:=))
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, object4, (:=))
 import Json.Encode as Encode
+import WebSocket
 import Material
 import Material.Button as Button
 import Material.Scheme as Scheme
@@ -13,6 +14,7 @@ import Material.Options exposing (css)
 import Material.Toggles as Toggles
 import Material.Icon as Icon
 import Material.Color as Color
+
 
 -- Domotics user interface
 
@@ -22,82 +24,79 @@ import Material.Color as Color
 -}
 
 -- GLOBAL
-urlBase = "http://192.168.0.184:8080/domo/"
---url = "http://192.168.0.10:8080/domo/actuators"
---url="http://localhost:8080/domo/actuators"
-urlGetRobotInfo = urlBase ++ "screenRobot"
-urlPostRobotUpdate = urlBase ++ "screenRobotUpdate"
+urlBase = "http://localhost:8080/"
+urlGetRobotInfo = urlBase ++ "rest/screenRobot"
+urlPostRobotUpdate = urlBase ++ "rest/screenRobotUpdate"
+wsStatus = "ws://localhost:8080/" ++ "time/"
 
 main =
-  Html.App.program { init = init, view = view, update = update, subscriptions = (always Sub.none) }
+  Html.App.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
 -- MODEL
-type alias Model = { actuators: String, sunLevel: Int, windLevel: Float, robotOn: Bool, errorMsg: String, test: String, mdl : Material.Model }
+type alias StatusRecord = { name: String, kind: String, on: Bool, level: Int }
+
+type alias Model = { statuses: List StatusRecord, errorMsg: String, test: String, robotOn: Bool, mdl : Material.Model }
 
 init : (Model, Cmd Msg)
-init = ( { actuators="Click Status button...", sunLevel=0, windLevel=0.0, robotOn=False, errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
+init = ( { statuses=[], errorMsg="No worries...", test="nothing tested", robotOn=True, mdl=Material.model }, Cmd.none )
+
+initialStatus : StatusRecord
+initialStatus = { name="", kind="", on=False, level=0 }
+
+statusByName : String -> List StatusRecord -> StatusRecord
+statusByName name listOfRecords =
+  let
+    checkName = (\rec -> rec.name == name)
+    filteredList = List.filter checkName listOfRecords
+  in
+    Maybe.withDefault initialStatus (List.head filteredList)
 
 
 -- UPDATE
-type Msg = CheckError Http.Error | CheckErrorRaw Http.RawError| CheckInfo | CheckInfoOk ReceivedInfoRecord |
-    RobotClick Bool | Test | ShowResult String | DecodeUpdateResponse Http.Response | Click Int | MDL Material.Msg
+type Msg = PutModelInTestAsString
+          | Mdl (Material.Msg Msg)
+          | NewStatus String
+          | Click Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Test -> ({model | test = (toString {model|test=""})}, Cmd.none)
-    CheckInfo -> (model, receiveInfoCmd)
-    CheckInfoOk info -> ({ model | robotOn = info.robotOn, sunLevel = info.sunLevel, windLevel = info.windLevel }, Cmd.none)
-    CheckError error -> ({ model | errorMsg = toString error }, Cmd.none)
-    CheckErrorRaw error -> ({ model | actuators = toString error }, Cmd.none)
-    RobotClick value -> ( model, updateInfoCmd value)
-    Click nr -> ( model, updateInfoCmd (not model.robotOn))
-    ShowResult value -> ({model | test = value}, Cmd.none)
-    DecodeUpdateResponse response -> ({model | test = (toString response.value), robotOn = (decodeUpdateResponse response)}, Cmd.none)
-    MDL action' -> Material.update MDL action' model
+    PutModelInTestAsString -> ({model | test = (toString {model|test=""})}, Cmd.none)
+    Click nr -> ( model, Cmd.none)
+    -- NewStatus str -> ({model | statusAsString = str}, Cmd.none)
+    NewStatus str ->
+        ({ model | statuses = (decodeStatuses str) }, Cmd.none)
+    Mdl message' -> Material.update message' model
 
-
--- checkActuatorsCmd : Cmd Msg
--- checkActuatorsCmd = Task.perform CheckError CheckActuatorsOk (Http.getString url)
-
-type alias ReceivedInfoRecord = { robotOn : Bool, sunLevel : Int, windLevel : Float }
-
-receivedInfoDecoder : Decoder ReceivedInfoRecord
-receivedInfoDecoder =
-  object3 ReceivedInfoRecord ("robotOn" := bool) ("sunLevel" := int) ("windLevel" := float)
-
-receiveInfoCmd : Cmd Msg
-receiveInfoCmd =
-  Task.perform CheckError CheckInfoOk (Http.get receivedInfoDecoder urlGetRobotInfo)
-
--- newValue -> [send and recv] -> newValue -> [update model] -> newModel
-
-updateInfoEncoder : Bool -> String
-updateInfoEncoder newState =
-  let info =
-    Encode.object [ ("robotOn", Encode.bool newState)]
-  in
-    Encode.encode 0 info
-
-updateInfoCmd : Bool -> Cmd Msg
-updateInfoCmd newState =
+-- TODO tuple teruggeven dat fout bevat, en dan met (value,error)=... en dan in model.error dat zetten als nodig
+decodeStatuses : String -> List StatusRecord
+decodeStatuses strJson =
   let
-    request : Http.Request
-    request =
-      { verb = "POST"
-      , headers = [ ( "Content-Type", "application/json" ) ]
-      , url = urlPostRobotUpdate
-      , body = Http.string (updateInfoEncoder newState)
-      }
+    result = decodeString statusesDecoder strJson
   in
-    Task.perform CheckErrorRaw DecodeUpdateResponse (Http.send Http.defaultSettings request)
+    case result of
+      Ok value -> value
+      Err error -> []
 
-decodeUpdateResponse : Http.Response ->  Bool
-decodeUpdateResponse response =
-  case response.value of
-    Http.Text value -> Result.withDefault False (Decode.decodeString Decode.bool value)
-    Http.Blob blob -> False
+statusesDecoder : Decoder (List StatusRecord)
+statusesDecoder = Decode.list statusDecoder
+
+statusDecoder : Decoder StatusRecord
+statusDecoder =
+  object4 StatusRecord
+    ("name" := string)
+    ("type" := string)
+    ("on" := bool)
+    ("level" := int)
+
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  WebSocket.listen wsStatus NewStatus
+
 
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
@@ -106,64 +105,63 @@ view : Model -> Html Msg
 view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
-    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [ text "Test: " , button [ onClick Test ] [ text "Test"], text model.test],
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
+      text "Model: ", text (toString model.statuses) ],
     div [][ Html.hr [] [] ],
-    div [] [
-      -- http://stackoverflow.com/questions/33857602/how-to-implement-a-slider-in-elm bevat ook eventhanlder
-      Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [ text "Switch" ],
-      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "3800",Html.Attributes.value "2500"] [],
-      Button.render MDL [0] model.mdl [ Button.ripple, Button.colored, css "margin" "0 24px" ] [text "ALLES UIT!"]
-    ],
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
+      button [ onClick PutModelInTestAsString ] [ text "Test"],
+      text model.test ],
     div [][ Html.hr [] [] ],
     div [] [text "Error: ", text model.errorMsg],
+    div [] [ button [ onClick (Click 0) ] [text "Check..."]],
     div [][ Html.hr [] [] ],
-    div [] [ button [ onClick CheckInfo ] [text "Check..."]],
-    div [] [ input [ type' "checkbox", checked model.robotOn, onCheck RobotClick ] [], text " zonne-automaat" ],
-    div [] [text "Zon: ", meter [ Html.Attributes.min "0", Html.Attributes.max "3800", Html.Attributes.value (toString model.sunLevel) ] [], text ((toString (round (toFloat model.sunLevel/3650.0*100)))++"%") ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", Html.Attributes.max "8.5", Html.Attributes.value (toString model.windLevel) ] [], text (toString model.windLevel) ],
+    div [] [Html.h3 [] [text "SPECIAAL"]],
+    div [] [ Button.render Mdl [1] model.mdl [ Button.fab, Button.ripple ] [ Icon.i "arrow_downward"] ],
+    div [] [text "-"],
+    div [] [text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (toString (statusByName "LichtScreen" model.statuses).level) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%") ],
+    div [] [text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (toString (statusByName "Windmeter" model.statuses).level) ] [], text (toString (statusByName "Windmeter" model.statuses).level) ],
+    div [] [ input [ type' "checkbox", checked model.robotOn {-, onCheck (Click 0)-} ] [], text " zonne-automaat" ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Nutsruimtes"]],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Inkom"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Gang Boven"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Garage (Poort)"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Garage (Tuin)"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Badkamer +1"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Badkamer"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "WC"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Inkom"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Gang Boven"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Garage (Poort)"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Garage (Tuin)"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Badkamer +1"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Badkamer"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "WC"] ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Beneden"]],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Keuken"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Keuken"] ],
     div [] [
        input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
     div [] [
-      Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Veranda"] ,
+      Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Veranda"] ,
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
     div [] [
-      Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Eetkamer"],
+      Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Eetkamer"],
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Circante Tafel"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Circante Tafel"] ],
     div [] [
-      Toggles.switch MDL [0] model.mdl [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Zithoek"] ,
+      Toggles.switch Mdl [0] model.mdl [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Zithoek"] ,
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Bureau"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Bureau"] ],
 
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Kinderen"]],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Tomas Spots"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Dries Wand"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Dries Spots"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Roos Wand"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Roos Spots"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Tomas Spots"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Dries Wand"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Dries Spots"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Roos Wand"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Roos Spots"] ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Buiten"]],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Licht terras en zijkant"] ],
-    div [] [ Toggles.switch MDL [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Stopcontact buiten"] ],
-    div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "SPECIAAL"]],
-    div [] [ Button.render MDL [1] model.mdl [ Button.fab, Button.ripple ] [ Icon.i "arrow_downward"] ]
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Licht terras en zijkant"] ],
+    div [] [ Toggles.switch Mdl [0] model.mdl  [ Toggles.onClick (Click 0), Toggles.value model.robotOn ] [text "Stopcontact buiten"] ],
+    div [][ Html.hr [] [] ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
