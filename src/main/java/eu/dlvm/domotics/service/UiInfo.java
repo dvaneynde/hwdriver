@@ -5,11 +5,11 @@ import eu.dlvm.domotics.base.Block;
 public class UiInfo {
 	private String name;
 	private String type;
-	private String description;
-	private String groupName;
+	private String description="";
+	private String groupName="";
 	private boolean on;
 	private int level;
-	private String status;
+	private String status="";
 
 
 	public UiInfo() {

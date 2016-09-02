@@ -6,7 +6,11 @@ import eu.dlvm.iohardware.ChannelFault;
 
 public interface IHwDriverChannel {
 
-	public abstract void connect() throws ChannelFault;
+	public enum Reason {
+		INIT, INPUT, OUTPUT, STOP
+	}
+
+	void connect() throws ChannelFault;
 
 	/**
 	 * Sends a string and then receives one.
@@ -17,8 +21,8 @@ public interface IHwDriverChannel {
 	 * @return List of received lines. Can be empty list, meaning driver had
 	 *         nothing to tell and is waiting for more food.
 	 */
-	public abstract List<String> sendAndRecv(String stringToSend) throws ChannelFault;
+	List<String> sendAndRecv(String stringToSend, Reason reason) throws ChannelFault;
 
-	public abstract void disconnect();
+	void disconnect();
 
 }

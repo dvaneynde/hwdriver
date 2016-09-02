@@ -2,6 +2,10 @@
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
 
+	<!-- Lichten en Stopcontacten, incl. All On/Off -->
+	<switch name="SchakLichtInkom" longClick="true" />
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
+
 	<!-- Screens -->
 	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0" />
 		<switch name="SchakScreenKeukenUp" />

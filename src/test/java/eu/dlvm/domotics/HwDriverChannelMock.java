@@ -36,7 +36,7 @@ public class HwDriverChannelMock implements IHwDriverChannel {
 	}
 
 	@Override
-	public List<String> sendAndRecv(String stringToSend) {
+	public List<String> sendAndRecv(String stringToSend, Reason reason) {
 		List<String> result;
 		if (counter % 2 == 0) {
 			this.sentToDriver0 = stringToSend;

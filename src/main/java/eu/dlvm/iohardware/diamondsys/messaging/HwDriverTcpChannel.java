@@ -63,7 +63,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#sendAndRecv(java.lang.String)
 	 */
 	@Override
-	public List<String> sendAndRecv(String stringToSend) throws ChannelFault {
+	public List<String> sendAndRecv(String stringToSend, Reason reason) throws ChannelFault {
 		try {
 			List<String> recvd = new ArrayList<String>();
 			// Send stringToSend to Hardware Driver

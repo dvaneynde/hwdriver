@@ -13,6 +13,7 @@ import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
 import eu.dlvm.iohardware.diamondsys.FysCh;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
+import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel.Reason;
 
 /**
  * Diamond-systems specific implementation of {@link IHardwareIO}.
@@ -55,7 +56,7 @@ public class HardwareIO implements IHardwareIO {
 		sb.append('\n');
 
 		List<String> recvdLines;
-		recvdLines = driverChannel.sendAndRecv(sb.toString());
+		recvdLines = driverChannel.sendAndRecv(sb.toString(), Reason.INIT);
 
 		handleRecvdErrorsOnly(recvdLines);
 	}
@@ -74,9 +75,9 @@ public class HardwareIO implements IHardwareIO {
 
 		List<String> recvdLines;
 		try {
-			recvdLines = driverChannel.sendAndRecv(sb.toString());
+			recvdLines = driverChannel.sendAndRecv(sb.toString(), Reason.INPUT);
 		} catch (ChannelFault e) {
-			log.error("Error communicating with driver, ignored. Some input changes may be lost.");
+			log.error("Error communicating with driver, ignored. Some input changes may be lost. Detail:"+e.getMessage());
 			return;
 		}
 
@@ -112,7 +113,7 @@ public class HardwareIO implements IHardwareIO {
 
 		List<String> recvdLines;
 		try {
-			recvdLines = driverChannel.sendAndRecv(sb.toString());
+			recvdLines = driverChannel.sendAndRecv(sb.toString(), Reason.OUTPUT);
 		} catch (ChannelFault e) {
 			log.error("Error communicating with driver, ignored. Some output changes may be lost.");
 			return;
@@ -128,7 +129,7 @@ public class HardwareIO implements IHardwareIO {
 		 */
 		String lines2Send = GeneralMsg.constructQUIT() + '\n';
 		try {
-			List<String> recvdLines = driverChannel.sendAndRecv(lines2Send);
+			List<String> recvdLines = driverChannel.sendAndRecv(lines2Send, Reason.STOP);
 			handleRecvdErrorsOnly(recvdLines);
 		} catch (ChannelFault e) {
 			log.warn("STOP command to driver gives error. Will try to properly close TCP connection. Message: " + e.getMessage());

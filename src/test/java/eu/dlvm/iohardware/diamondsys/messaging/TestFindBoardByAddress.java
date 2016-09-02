@@ -13,13 +13,13 @@ import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
 
 public class TestFindBoardByAddress {
 
-    class Dummy implements IHwDriverChannel {
+    class HwDriverChannelMock implements IHwDriverChannel {
         @Override
         public void connect() {
         }
 
         @Override
-        public List<String> sendAndRecv(String stringToSend) {
+        public List<String> sendAndRecv(String stringToSend, Reason reason) {
             return null;
         }
 
@@ -45,7 +45,7 @@ public class TestFindBoardByAddress {
     @Test
     public void test() {
         BoardsFactory bf = new BoardsFactory();
-        HardwareIO hw = new HardwareIO(bf, new Dummy());
+        HardwareIO hw = new HardwareIO(bf, new HwDriverChannelMock());
 
         assertEquals(null, hw.findBoardBy(0x26f));
         assertEquals(0x270, hw.findBoardBy(0x270).getAddress());
