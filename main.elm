@@ -4,7 +4,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object3, object4, (:=))
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object4, object5, (:=))
 import Json.Encode as Encode
 import WebSocket
 import Material
@@ -25,7 +25,7 @@ import Material.Color as Color
 
 -- GLOBAL
 urlBase = "http://localhost:8080/"
-urlGetActuators = urlBase ++ "rest/actuators"
+-- urlGetActuators = urlBase ++ "rest/actuators"
 -- /rest/act/{name}/{action}
 urlUpdateActuators = urlBase ++ "rest/act/"
 wsStatus = "ws://localhost:8080/" ++ "time/"
@@ -37,10 +37,10 @@ main =
 -- MODEL
 type alias StatusRecord = { name: String, kind: String, on: Bool, level: Int }
 
-type alias Model = { statuses: List StatusRecord, errorMsg: String, test: String, robotOn: Bool, mdl : Material.Model }
+type alias Model = { statuses: List StatusRecord, errorMsg: String, test: String, mdl : Material.Model }
 
 init : (Model, Cmd Msg)
-init = ( { statuses=[], errorMsg="No worries...", test="nothing tested", robotOn=True, mdl=Material.model }, Cmd.none )
+init = ( { statuses=[], errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
 
 initialStatus : StatusRecord
 initialStatus = { name="", kind="", on=False, level=0 }
@@ -58,7 +58,8 @@ statusByName name listOfRecords =
 type Msg = PutModelInTestAsString
           | Mdl (Material.Msg Msg)
           | NewStatus String
-          | Click String
+          | Clicked String
+          | Checked String Bool
           | Check
           | RestError Http.Error
           | RestStatus (List StatusRecord)
@@ -66,10 +67,10 @@ type Msg = PutModelInTestAsString
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    Check -> ( model, Cmd.none)
     PutModelInTestAsString -> ({model | test = (toString {model|test=""})}, Cmd.none)
-    -- Click what -> ( { model | robotOn = (not model.robotOn) }, Cmd.none)
-    Click what -> ( model, updateStatusViaRestCmd what (inverseState what model))
-    Check -> ( {model | errorMsg = toString (inverseState "LichtInkom" model)}, Cmd.none)
+    Clicked what -> ( model, updateStatusViaRestCmd what (inverseState what model))
+    Checked what value -> ( model, updateStatusViaRestCmd what value)
     -- NewStatus str -> ({model | statusAsString = str}, Cmd.none)
     NewStatus str ->
         ({ model | statuses = (decodeStatuses str) }, Cmd.none)
@@ -124,7 +125,14 @@ levelByName name model = (toString (statusByName name model.statuses).level)
 
 isOnByName : String -> Model -> Bool
 isOnByName name model = (statusByName name model.statuses).on
-
+{--
+screenStatus : String -> Model -> String
+screenStatus name model =
+  let
+    status = (statusByName name model.statuses).status
+  in
+    (toString status)
+--}
 view : Model -> Html Msg
 view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
@@ -139,53 +147,62 @@ view model =
     div [] [text "Error: ", text model.errorMsg],
     div [] [ button [ onClick Check ] [text "Check..."]],
     div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "SPECIAAL"]],
-    div [] [ Button.render Mdl [0] model.mdl [ Button.fab, Button.ripple ] [ Icon.i "arrow_downward"] ],
+    div [] [Html.h3 [] [text "Automaat"]],
     div [] [text "-"],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (levelByName "Windmeter" model) ] [], text (toString (statusByName "Windmeter" model.statuses).level) ],
-    div [] [ input [ type' "checkbox", checked model.robotOn {-, onCheck (Click 0)-} ] [], text " zonne-automaat" ],
+    div [] [ input [ type' "checkbox", checked (isOnByName "ZonneAutomaat" model), onCheck (Checked "ZonneAutomaat") ] [], text " zonne-automaat" ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Nutsruimtes"]],
-    div [] [ Toggles.switch Mdl [1] model.mdl  [ Toggles.onClick (Click "LichtInkom"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Inkom"] ],
-    div [] [ Toggles.switch Mdl [2] model.mdl  [ Toggles.onClick (Click "Gang Boven"), Toggles.value model.robotOn ] [text "Gang Boven"] ],
-    div [] [ Toggles.switch Mdl [3] model.mdl  [ Toggles.onClick (Click "Garage (Poort)"), Toggles.value model.robotOn ] [text "Garage (Poort)"] ],
-    div [] [ Toggles.switch Mdl [4] model.mdl  [ Toggles.onClick (Click "Garage (Tuin)"), Toggles.value model.robotOn ] [text "Garage (Tuin)"] ],
-    div [] [ Toggles.switch Mdl [5] model.mdl  [ Toggles.onClick (Click "Badkamer +1"), Toggles.value model.robotOn ] [text "Badkamer +1"] ],
-    div [] [ Toggles.switch Mdl [6] model.mdl  [ Toggles.onClick (Click "Badkamer"), Toggles.value model.robotOn ] [text "Badkamer"] ],
-    div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Click "WC"), Toggles.value model.robotOn ] [text "WC"] ],
+    div [] [ Toggles.switch Mdl [1] model.mdl  [ Toggles.onClick (Clicked "LichtInkom"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Inkom"] ],
+    div [] [ Toggles.switch Mdl [2] model.mdl  [ Toggles.onClick (Clicked "Gang Boven"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Gang Boven"] ],
+    div [] [ Toggles.switch Mdl [3] model.mdl  [ Toggles.onClick (Clicked "Garage (Poort)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Poort)"] ],
+    div [] [ Toggles.switch Mdl [4] model.mdl  [ Toggles.onClick (Clicked "Garage (Tuin)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Tuin)"] ],
+    div [] [ Toggles.switch Mdl [5] model.mdl  [ Toggles.onClick (Clicked "Badkamer +1"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer +1"] ],
+    div [] [ Toggles.switch Mdl [6] model.mdl  [ Toggles.onClick (Clicked "Badkamer"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer"] ],
+    div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Clicked "WC"), Toggles.value (isOnByName "LichtInkom" model) ] [text "WC"] ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Beneden"]],
-    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Click "ScreenKeuken"), Toggles.value (isOnByName "ScreenKeuken" model) ] [text "Keuken"] ],
+    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Keuken"] ],
     div [] [
        input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
     div [] [
-      Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Veranda"] ,
+      Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"] ,
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
     div [] [
-      Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Eetkamer"],
+      Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"],
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
-    div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Circante Tafel"] ],
+    div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Circante Tafel"] ],
     div [] [
-      Toggles.switch Mdl [0] model.mdl [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Zithoek"] ,
+      Toggles.switch Mdl [0] model.mdl [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Zithoek"] ,
       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
     ],
-    div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Bureau"] ],
+    div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Bureau"] ],
 
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Kinderen"]],
-    div [] [ Toggles.switch Mdl [13] model.mdl  [ Toggles.onClick (Click ""), Toggles.value model.robotOn ] [text "Tomas Spots"] ],
-    div [] [ Toggles.switch Mdl [14] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Dries Wand"] ],
-    div [] [ Toggles.switch Mdl [15] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Dries Spots"] ],
-    div [] [ Toggles.switch Mdl [16] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Roos Wand"] ],
-    div [] [ Toggles.switch Mdl [17] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Roos Spots"] ],
+    div [] [ Toggles.switch Mdl [13] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Tomas Spots"] ],
+    div [] [ Toggles.switch Mdl [14] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Dries Wand"] ],
+    div [] [ Toggles.switch Mdl [15] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Dries Spots"] ],
+    div [] [ Toggles.switch Mdl [16] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Wand"] ],
+    div [] [ Toggles.switch Mdl [17] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Spots"] ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Buiten"]],
-    div [] [ Toggles.switch Mdl [18] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Licht terras en zijkant"] ],
-    div [] [ Toggles.switch Mdl [19] model.mdl  [ Toggles.onClick (Click "0"), Toggles.value model.robotOn ] [text "Stopcontact buiten"] ],
+    div [] [ Toggles.switch Mdl [18] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Licht terras en zijkant"] ],
+    div [] [ Toggles.switch Mdl [19] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Stopcontact buiten"] ],
+    div [][ Html.hr [] [] ],
+    div [] [Html.h3 [] [text "Screens"]],
+    div [ ]
+    [
+      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple ] [ Icon.i "arrow_downward"],
+      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple ] [ Icon.i "arrow_upward"],
+      --text (screenStatus "ScreenKeuken" model),
+      text " | Screen Keuken"
+      ],
+    --div [] [ Toggles.switch Mdl [20] model.mdl  [  ] [text (screenStatus "ScreenKeuken" model), text "Screen Keuken"] ],
     div [][ Html.hr [] [] ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
