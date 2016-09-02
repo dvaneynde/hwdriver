@@ -35,7 +35,7 @@ main =
 
 
 -- MODEL
-type alias StatusRecord = { name: String, kind: String, on: Bool, level: Int }
+type alias StatusRecord = { name: String, kind: String, on: Bool, level: Int, status: String }
 
 type alias Model = { statuses: List StatusRecord, errorMsg: String, test: String, mdl : Material.Model }
 
@@ -43,7 +43,7 @@ init : (Model, Cmd Msg)
 init = ( { statuses=[], errorMsg="No worries...", test="nothing tested", mdl=Material.model }, Cmd.none )
 
 initialStatus : StatusRecord
-initialStatus = { name="", kind="", on=False, level=0 }
+initialStatus = { name="", kind="", on=False, level=0, status="" }
 
 statusByName : String -> List StatusRecord -> StatusRecord
 statusByName name listOfRecords =
@@ -60,6 +60,8 @@ type Msg = PutModelInTestAsString
           | NewStatus String
           | Clicked String
           | Checked String Bool
+          | Down String
+          | Up String
           | Check
           | RestError Http.Error
           | RestStatus (List StatusRecord)
@@ -69,18 +71,15 @@ update msg model =
   case msg of
     Check -> ( model, Cmd.none)
     PutModelInTestAsString -> ({model | test = (toString {model|test=""})}, Cmd.none)
-    Clicked what -> ( model, updateStatusViaRestCmd what (inverseState what model))
-    Checked what value -> ( model, updateStatusViaRestCmd what value)
-    -- NewStatus str -> ({model | statusAsString = str}, Cmd.none)
+    Clicked what -> ( model, toggleBlock what model )
+    Checked what value -> ( model, updateStatusViaRestCmd what (if value then "on" else "off"))
+    Down what -> ( model, updateStatusViaRestCmd what "down" )
+    Up what -> ( model, updateStatusViaRestCmd what "up" )
     NewStatus str ->
         ({ model | statuses = (decodeStatuses str) }, Cmd.none)
     RestStatus statuses' -> ( {model | statuses = statuses', errorMsg="OK"}, Cmd.none)
     RestError error -> ({ model | errorMsg = toString error }, Cmd.none)
     Mdl message' -> Material.update message' model
-
-inverseState : String -> Model -> Bool
-inverseState what model =
-  (not (statusByName what model.statuses).on)
 
 -- TODO tuple teruggeven dat fout bevat, en dan met (value,error)=... en dan in model.error dat zetten als nodig
 decodeStatuses : String -> List StatusRecord
@@ -97,16 +96,25 @@ statusesDecoder = Decode.list statusDecoder
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-  object4 StatusRecord
+  object5 StatusRecord
     ("name" := string)
     ("type" := string)
     ("on" := bool)
     ("level" := int)
+    ("status" := string)
 
-updateStatusViaRestCmd : String -> Bool -> Cmd Msg
-updateStatusViaRestCmd name onOff =
-  Task.perform RestError RestStatus (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ (if onOff then "on" else "off")))
---  Task.perform RestError RestStatus (Http.get statusesDecoder urlGetActuators)
+toggleBlock: String -> Model -> Cmd Msg
+toggleBlock what model =
+  let
+    onOff = not (statusByName what model.statuses).on
+    onOffText = if onOff then "on" else "off"
+  in
+    updateStatusViaRestCmd what onOffText
+
+
+updateStatusViaRestCmd : String -> String -> Cmd Msg
+updateStatusViaRestCmd name value =
+  Task.perform RestError RestStatus (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ value))
 
 
 -- SUBSCRIPTIONS
@@ -125,14 +133,14 @@ levelByName name model = (toString (statusByName name model.statuses).level)
 
 isOnByName : String -> Model -> Bool
 isOnByName name model = (statusByName name model.statuses).on
-{--
+
 screenStatus : String -> Model -> String
 screenStatus name model =
   let
     status = (statusByName name model.statuses).status
   in
     (toString status)
---}
+
 view : Model -> Html Msg
 view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
@@ -197,9 +205,9 @@ view model =
     div [] [Html.h3 [] [text "Screens"]],
     div [ ]
     [
-      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple ] [ Icon.i "arrow_downward"],
-      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple ] [ Icon.i "arrow_upward"],
-      --text (screenStatus "ScreenKeuken" model),
+      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down "ScreenKeuken") ] [ Icon.i "arrow_downward"],
+      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up "ScreenKeuken") ] [ Icon.i "arrow_upward"],
+      text (screenStatus "ScreenKeuken" model),
       text " | Screen Keuken"
       ],
     --div [] [ Toggles.switch Mdl [20] model.mdl  [  ] [text (screenStatus "ScreenKeuken" model), text "Screen Keuken"] ],
