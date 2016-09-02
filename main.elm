@@ -76,20 +76,23 @@ update msg model =
     Down what -> ( model, updateStatusViaRestCmd what "down" )
     Up what -> ( model, updateStatusViaRestCmd what "up" )
     NewStatus str ->
-        ({ model | statuses = (decodeStatuses str) }, Cmd.none)
+      let
+        (newStatuses, error) = decodeStatuses str
+      in
+        ({ model | statuses = newStatuses, errorMsg = error }, Cmd.none)
     RestStatus statuses' -> ( {model | statuses = statuses', errorMsg="OK"}, Cmd.none)
     RestError error -> ({ model | errorMsg = toString error }, Cmd.none)
     Mdl message' -> Material.update message' model
 
 -- TODO tuple teruggeven dat fout bevat, en dan met (value,error)=... en dan in model.error dat zetten als nodig
-decodeStatuses : String -> List StatusRecord
+decodeStatuses : String -> (List StatusRecord, String)
 decodeStatuses strJson =
   let
     result = decodeString statusesDecoder strJson
   in
     case result of
-      Ok value -> value
-      Err error -> []
+      Ok value -> (value, "")
+      Err error -> ([], error)
 
 statusesDecoder : Decoder (List StatusRecord)
 statusesDecoder = Decode.list statusDecoder
