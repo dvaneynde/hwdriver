@@ -3,18 +3,8 @@ package eu.dlvm.domotics.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.inject.Singleton;
-
-
-
-import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IUiCapableBlock;
-import eu.dlvm.domotics.service_impl.DataCollector;
-import eu.dlvm.domotics.service_impl.Quickie;
-import eu.dlvm.domotics.service_impl.QuickieService;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,6 +15,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.service_impl.DataCollector;
+import eu.dlvm.domotics.service_impl.Quickie;
+import eu.dlvm.domotics.service_impl.QuickieService;
 
 @Singleton
 @Path("")
@@ -57,15 +53,6 @@ public class RestService {
 	public void shutdown() {
 		Domotic.singleton().requestStop();
 		Log.info("Shutdown of domotic requested.");
-	}
-
-	@Path("screenRobotUpdate")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String updateScreenRobot(ScreenRobotUpdateInfo info) {
-		Log.info("Got screenRobot update, info='" + info + "'");
-		return Boolean.toString(info.isRobotOn());
 	}
 
 	@Path("screenRobotUpdateText")
@@ -160,15 +147,6 @@ public class RestService {
 		} else
 			Log.warn("Domotic API: quickie '" + name + "' not found.");
 
-	}
-
-	@Path("screenRobot")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public ScreenRobotInfo screenRobotInfo() {
-		Random r = new Random();
-		ScreenRobotInfo info = new ScreenRobotInfo(r.nextBoolean(), r.nextInt(4000), r.nextFloat() * 15);
-		return info;
 	}
 
 }
