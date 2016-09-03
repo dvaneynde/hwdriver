@@ -1,8 +1,6 @@
 package eu.dlvm.domotics.service_impl;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +9,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.PathResource;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 import org.eclipse.jetty.websocket.server.pathmap.ServletPathSpec;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
@@ -24,21 +22,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.service.Resource;
 import eu.dlvm.domotics.service.RestService;
 
-//@SuppressWarnings("restriction")
+/**
+ * Serves whatever stuff via http (rest) or websocket.
+ * 
+ * @author dirk
+ *
+ */
 public class ServiceServer {
 
 	private static final Logger log = LoggerFactory.getLogger(ServiceServer.class);
 	private Server server;
-
-	public static class TimeSocketCreator implements WebSocketCreator {
-		@Override
-		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-			return new TimeSocket();
-		}
-	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
 		private IDomoticContext domoContext;
@@ -61,34 +56,14 @@ public class ServiceServer {
 		server.addConnector(connector);
 
 		try {
-
-			// The location of the webapp base resource (for resources and
-			// static file serving)
-			Path webRootPath = new File("src/main/resources/static-root/").toPath().toRealPath();
-			//Path webRootPath = new File("src/main/resources/static-root/").toPath().toRealPath();
-			//Path webRootPath = new File("webapps/static-root/").toPath().toRealPath();
-
-			// TODO html en js embedden?
-			// http://download.eclipse.org/jetty/9.3.9.v20160517/apidocs/org/eclipse/jetty/util/resource/URLResource.html
-			// FileResource
-			// InputStream input = getClass().getResourceAsStream("/classpath/to/my/file");
-
 			// Setup the basic application "context" for this application at "/"
 			// This is also known as the handler tree (in jetty speak)
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			context.setContextPath("/");
-			context.setBaseResource(new PathResource(webRootPath));
+			Resource staticRoot = Resource.newClassPathResource("static-root");
+			context.setBaseResource(staticRoot);
 			context.setWelcomeFiles(new String[] { "index.html" });
 			server.setHandler(context);
-
-			/*
-			 * // Add the websocket filter WebSocketUpgradeFilter wsfilter =
-			 * WebSocketUpgradeFilter.configureContext(context); // Configure
-			 * websocket behavior
-			 * wsfilter.getFactory().getPolicy().setIdleTimeout(5000); // Add
-			 * websocket mapping wsfilter.addMapping(new
-			 * ServletPathSpec("/time/"), new TimeSocketCreator());
-			 */
 
 			// Add the websocket filter
 			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(context);
@@ -97,14 +72,9 @@ public class ServiceServer {
 			// Add websocket mapping
 			wsfilter.addMapping(new ServletPathSpec("/time/"), new UiSocketCreator(domoContext));
 
-			// Add time servlet
-			context.addServlet(TimeServlet.class, "/time/");
-
-			// Toevoegen Jersey... spannend !
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
 			Set<Class<?>> services = new HashSet<>();
 			services.add(RestService.class);
-			services.add(Resource.class);
 			ResourceConfig config = new ResourceConfig(services);
 			config.register(JacksonFeature.class);
 			ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
@@ -118,7 +88,7 @@ public class ServiceServer {
 			server.start();
 			//server.join();
 		} catch (Throwable t) {
-			t.printStackTrace(System.err);
+			log.error("Error starting server.", t);
 		}
 	}
 
