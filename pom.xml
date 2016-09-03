@@ -124,6 +124,17 @@
 	</dependencies>
 
 	<build>
+		<!-- 
+		<resources>
+			<resource>
+				<directory>src/my-resources</directory>
+				<includes>
+					<include>**/*.txt</include>
+					<include>**/*.rtf</include>
+				</includes>
+			</resource>
+		</resources>
+		 -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

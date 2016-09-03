@@ -64,7 +64,9 @@ public class ServiceServer {
 
 			// The location of the webapp base resource (for resources and
 			// static file serving)
-			Path webRootPath = new File("webapps/static-root/").toPath().toRealPath();
+			Path webRootPath = new File("src/main/resources/static-root/").toPath().toRealPath();
+			//Path webRootPath = new File("src/main/resources/static-root/").toPath().toRealPath();
+			//Path webRootPath = new File("webapps/static-root/").toPath().toRealPath();
 
 			// TODO html en js embedden?
 			// http://download.eclipse.org/jetty/9.3.9.v20160517/apidocs/org/eclipse/jetty/util/resource/URLResource.html
