@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
+
+	<!-- Lichten en Stopcontacten, incl. All On/Off -->
+	<switch name="SchakLichtInkom" longClick="true" />
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
+
+	<!-- Screens -->
+	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0" />
+		<switch name="SchakScreenKeukenUp" />
+	<switch name="SchakScreenKeukenDown" />
+	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
+	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
+	<group name="Screens">
+		<block name="ScreenKeuken" />
+	</group>
+	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
+	
+	<!-- Alle screens -->
+	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="SPECIAAL:1"
+		desc="Alle Screens" />
+
+	<!-- Wind & Licht meter -->
+	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="5" lowTimeToResetAlert="120" channel="Windmeter" ui="SPECIAAL:2"/>
+	<lightGauge name="LichtScreen" low="3500" high="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3"/>
+	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtScreen"
+		screen="Screens" ui="SPECIAAL:2" />
+	<connect src="SchakScreenAllDown" src-event="single" target="ZonneAutomaat" event="off" />
+	<connect src="SchakScreenAllUp" src-event="single" target="ZonneAutomaat" event="on" />
+
+</domotic>

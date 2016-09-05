@@ -85,7 +85,7 @@ public class TestEnd2EndDimmer {
 		// was 0% and state OFF, now ON and 50%. So set off.
 		dl.off();
 		Assert.assertEquals(DimmedLamp.States.OFF, dl.getState());
-		Assert.assertEquals(0, dl.getLevel());
+		Assert.assertEquals(50, dl.getLevel());
 
 		// Start long-click up
 		// Negative logic ! Input channel 1 must go up.
@@ -97,7 +97,7 @@ public class TestEnd2EndDimmer {
 		Assert.assertEquals("SET_OUT 0x380 O 0\nSET_OUT 0x300 D 0 0 0\n\n", drv.sentToDriver1);
 		Assert.assertEquals(DimmerSwitch.States.DOWN_SHORT, dsw.getState());
 		Assert.assertEquals(DimmedLamp.States.OFF, dl.getState());
-		Assert.assertEquals(0, dl.getLevel());
+		Assert.assertEquals(50, dl.getLevel());
 
 		// Just loop...
 		drv.reset("\n","\n");
@@ -106,7 +106,7 @@ public class TestEnd2EndDimmer {
 				+ drv.sentToDriver0 + "\nsendOutputUsed:\n"+drv.sentToDriver1+"---");
 		Assert.assertEquals(DimmerSwitch.States.DOWN_SHORT, dsw.getState());
 		Assert.assertEquals(DimmedLamp.States.OFF, dl.getState());
-		Assert.assertEquals(0, dl.getLevel());
+		Assert.assertEquals(50, dl.getLevel());
 
 		// Wait long enough to make it a long click
 		// Should go up now

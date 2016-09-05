@@ -42,28 +42,11 @@ public class RestService {
 		return "Got it! This is the prefix for all REST functions.";
 	}
 
-	@Path("ping/{token}")
-	@GET
-	public String ping(@PathParam("token") String token) {
-		return token + " - " + new java.util.Date();
-	}
-
 	@Path("shutdown")
 	@GET
 	public void shutdown() {
 		Domotic.singleton().requestStop();
 		Log.info("Shutdown of domotic requested.");
-	}
-
-	@Path("screenRobotUpdateText")
-	@POST
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String updateScreenRobot(String info) {
-		Log.info("Got screenRobot update, string='" + info + "'");
-		//return "OK - robot is "+(info.isRobotOn()?"ON":"OFF")+".\n";
-		//return "\"OK, got '"+info+"'\"";
-		return "\"OK\"";
 	}
 
 	// TODO rename
@@ -78,7 +61,6 @@ public class RestService {
 	}
 
 	// TODO rename
-	// TODO zou het kunnen dat getBlockInfo 2 keer per browser refresh wordt opgeroepen? 2 verschillende threads...
 	@Path("actuators")
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET

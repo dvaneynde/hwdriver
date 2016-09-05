@@ -42,7 +42,7 @@ public class TestDimmedLamp {
 	public void testToggleAndOnAndOff() {
 		int cur = 0;
 		lamp.loop(cur, seq++);
-		assertOff();
+		assertOff(100);
 
 		lamp.on(50);
 		lamp.loop(cur += 100, seq++);
@@ -50,7 +50,7 @@ public class TestDimmedLamp {
 
 		lamp.toggle();
 		lamp.loop(cur += 100, seq++);
-		assertOff();
+		assertOff(50);
 
 		lamp.toggle();
 		lamp.loop(cur += 100, seq++);
@@ -58,7 +58,7 @@ public class TestDimmedLamp {
 
 		lamp.off();
 		lamp.loop(cur += 100, seq++);
-		assertOff();
+		assertOff(50);
 
 		lamp.on();
 		lamp.loop(cur += 100, seq++);
@@ -69,7 +69,7 @@ public class TestDimmedLamp {
 	public void dimUpAndDown() {
 		int cur = 0;
 		lamp.loop(cur += 1, seq++);
-		assertOff();
+		assertOff(100);
 
 		lamp.up(true);
 		lamp.loop(cur += 1000, seq++);
@@ -99,9 +99,9 @@ public class TestDimmedLamp {
 		assertOn(0);
 	}
 
-	private void assertOff() {
+	private void assertOff(int lvl) {
 		Assert.assertEquals(DimmedLamp.States.OFF, lamp.getState());
-		Assert.assertEquals(0, lamp.getLevel());
+		Assert.assertEquals(lvl, lamp.getLevel());
 		Assert.assertEquals(0, hw.level);
 	}
 

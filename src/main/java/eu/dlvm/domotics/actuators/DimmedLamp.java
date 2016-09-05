@@ -1,6 +1,7 @@
 package eu.dlvm.domotics.actuators;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -47,7 +48,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, LogCh channel,
+			IDomoticContext ctx) {
 		super(name, description, ui, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
@@ -55,7 +57,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		prevOnLevel = 100;
 	}
 
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel, IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel,
+			IDomoticContext ctx) {
 		this(name, description, null, outputValueHardwareIfFull, channel, ctx);
 	}
 
@@ -74,7 +77,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 *            Link to underlying hardware layer.
 	 * @deprecated
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel,
+			IDomoticContext ctx) {
 		this(name, description, null, outputValueHardwareIfFull, new LogCh(channel), ctx);
 	}
 
@@ -116,11 +120,15 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 
 	/**
 	 * Current level of lamp, between 0 and 100. Note that a lamp can be in
-	 * state ON (see {@link #getState()}) and at the same time its level is 0. <br/>
+	 * state ON (see {@link #getState()}) and at the same time its level is 0.
+	 * <br/>
 	 * TODO make double
 	 */
 	public int getLevel() {
-		return (int) level;
+		if (getState() == States.OFF)
+			return (int) prevOnLevel;
+		else
+			return (int) level;
 	}
 
 	/**
@@ -329,8 +337,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			if (lastUpDnLoopTime != -1) {
 				// This is skipped at the first loop() while UP or DOWN
 				double change = ((double) (current - lastUpDnLoopTime)) * 100.0d / (double) msTimeFullDim;
-				log.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level + ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs="
-						+ msTimeFullDim);
+				log.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level
+						+ ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs=" + msTimeFullDim);
 				if (state == States.UP) {
 					level += change;
 					if (level > 100)
