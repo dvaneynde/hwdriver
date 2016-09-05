@@ -148,58 +148,60 @@ level : String -> Model -> Float
 level name model =
   (toFloat (statusByName name model.statuses).level)
 
-sliderWithDisable : String -> Model -> Html Msg
-sliderWithDisable name model =
+toggleDiv : String -> Int -> Model -> Html Msg
+toggleDiv name nr model =
+  div [] [ Toggles.switch Mdl [nr] model.mdl  [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [text name] ]
+
+toggleWithSliderDiv : String -> Int -> Model -> Html Msg
+toggleWithSliderDiv name nr model =
+  div [style [("display", "table-cell")]] [
+    --Toggles.switch Mdl [21] model.mdl [ Toggles.onClick (Clicked "LichtZithoek"), Toggles.value (isOnByName "LichtZithoek" model) ] [text "Zithoek"] ,
+  Toggles.switch Mdl [nr] model.mdl  [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [text name],
   Slider.view (
     [ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
-    ++ (if (isOnByName name model) then [] else [Slider.disabled])
-  )
+    ++ (if (isOnByName name model) then [] else [Slider.disabled]))
+  ]
+
+screenDiv : String -> Int -> Model -> Html Msg
+screenDiv name nr model =
+  div [] [
+    Button.render Mdl [nr] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down name) ] [ Icon.i "arrow_downward"],
+    Button.render Mdl [nr] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up name) ] [ Icon.i "arrow_upward"],
+    text (screenStatus name model),
+    text (" | " ++ name)
+  ]
 
 
 view : Model -> Html Msg
 view model =
   div [ Html.Attributes.style [ ("padding", "2rem"), ("background", "azure") ] ]
   [
-    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
-      text "Model: ", text (toString model.statuses) ],
     div [][ Html.hr [] [] ],
-    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
-      button [ onClick PutModelInTestAsString ] [ text "Test"],
-      text model.test ],
-    div [][ Html.hr [] [] ],
-    div [] [text "Error: ", text model.errorMsg],
-    div [] [ button [ onClick Check ] [text "Check..."]],
-    div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "Automaat"]],
-    div [] [text "-"],
+    div [] [Html.h3 [] [text "Screens"]],
     div [] [text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%") ],
     div [] [text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (levelByName "Windmeter" model) ] [], text (toString (statusByName "Windmeter" model.statuses).level) ],
     div [] [ input [ type' "checkbox", checked (isOnByName "ZonneAutomaat" model), onCheck (Checked "ZonneAutomaat") ] [], text " zonne-automaat" ],
+    screenDiv "ScreenKeuken" 20 model,
+    -- TODO andere screens
+
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Nutsruimtes"]],
-    div [] [ Toggles.switch Mdl [1] model.mdl  [ Toggles.onClick (Clicked "LichtInkom"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Inkom"] ],
+    --div [] [ Toggles.switch Mdl [1] model.mdl  [ Toggles.onClick (Clicked "LichtInkom"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Inkom"] ],
+    toggleDiv "LichtInkom" 1 model,
     div [] [ Toggles.switch Mdl [2] model.mdl  [ Toggles.onClick (Clicked "Gang Boven"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Gang Boven"] ],
     div [] [ Toggles.switch Mdl [3] model.mdl  [ Toggles.onClick (Clicked "Garage (Poort)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Poort)"] ],
     div [] [ Toggles.switch Mdl [4] model.mdl  [ Toggles.onClick (Clicked "Garage (Tuin)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Tuin)"] ],
     div [] [ Toggles.switch Mdl [5] model.mdl  [ Toggles.onClick (Clicked "Badkamer +1"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer +1"] ],
     div [] [ Toggles.switch Mdl [6] model.mdl  [ Toggles.onClick (Clicked "Badkamer"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer"] ],
     div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Clicked "WC"), Toggles.value (isOnByName "LichtInkom" model) ] [text "WC"] ],
-    div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "Beneden"]],
-    div [] [
-      Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Keuken"]
-    ],
-    div [] [
-      Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"]
-    ],
-    div [] [
-      Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"]
-    ],
+
+    div [] [ Html.hr [] [] ],
+    div [] [ Html.h3 [] [text "Beneden"]],
+    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "Keuken" model) ] [text "Keuken"] ],
+    div [] [ Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"] ],
+    div [] [ Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"] ],
     div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Circante Tafel"] ],
-    div [style [("display", "table-cell")]] [
-      Toggles.switch Mdl [21] model.mdl [ Toggles.onClick (Clicked "LichtZithoek"), Toggles.value (isOnByName "LichtZithoek" model) ] [text "Zithoek"] ,
-      sliderWithDisable "LichtZithoek" model
-    ],
+    toggleWithSliderDiv "LichtZithoek" 21 model,
     div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Bureau"] ],
 
     div [][ Html.hr [] [] ],
@@ -209,20 +211,22 @@ view model =
     div [] [ Toggles.switch Mdl [15] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Dries Spots"] ],
     div [] [ Toggles.switch Mdl [16] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Wand"] ],
     div [] [ Toggles.switch Mdl [17] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Spots"] ],
+
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Buiten"]],
     div [] [ Toggles.switch Mdl [18] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Licht terras en zijkant"] ],
     div [] [ Toggles.switch Mdl [19] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Stopcontact buiten"] ],
+
     div [][ Html.hr [] [] ],
-    div [] [Html.h3 [] [text "Screens"]],
-    div [ ]
-    [
-      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down "ScreenKeuken") ] [ Icon.i "arrow_downward"],
-      Button.render Mdl [20] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up "ScreenKeuken") ] [ Icon.i "arrow_upward"],
-      text (screenStatus "ScreenKeuken" model),
-      text " | Screen Keuken"
-      ],
-    --div [] [ Toggles.switch Mdl [20] model.mdl  [  ] [text (screenStatus "ScreenKeuken" model), text "Screen Keuken"] ],
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
+      text "Model: ", text (toString model.statuses) ],
+    div [][ Html.hr [] [] ],
+    div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
+      button [ onClick PutModelInTestAsString ] [ text "Test"],
+      text model.test ],
+    div [] [text "Error: ", text model.errorMsg],
+    div [] [ button [ onClick Check ] [text "Check..."]],
+
     div [][ Html.hr [] [] ]
   ]
   |> Scheme.topWithScheme Color.Green Color.Red
