@@ -14,7 +14,7 @@ import Material.Options exposing (css)
 import Material.Toggles as Toggles
 import Material.Icon as Icon
 import Material.Color as Color
-
+import Material.Slider as Slider
 
 -- Domotics user interface
 
@@ -62,6 +62,7 @@ type Msg = PutModelInTestAsString
           | Checked String Bool
           | Down String
           | Up String
+          | SliderMsg String Float
           | Check
           | RestError Http.Error
           | RestStatus (List StatusRecord)
@@ -75,6 +76,7 @@ update msg model =
     Checked what value -> ( model, updateStatusViaRestCmd what (if value then "on" else "off"))
     Down what -> ( model, updateStatusViaRestCmd what "down" )
     Up what -> ( model, updateStatusViaRestCmd what "up" )
+    SliderMsg what level -> ( model, updateStatusViaRestCmd what (toString level) )
     NewStatus str ->
       let
         (newStatuses, error) = decodeStatuses str
@@ -114,7 +116,6 @@ toggleBlock what model =
   in
     updateStatusViaRestCmd what onOffText
 
-
 updateStatusViaRestCmd : String -> String -> Cmd Msg
 updateStatusViaRestCmd name value =
   Task.perform RestError RestStatus (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ value))
@@ -143,6 +144,17 @@ screenStatus name model =
     status = (statusByName name model.statuses).status
   in
     (toString status)
+level : String -> Model -> Float
+level name model =
+  (toFloat (statusByName name model.statuses).level)
+
+sliderWithDisable : String -> Model -> Html Msg
+sliderWithDisable name model =
+  Slider.view (
+    [ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
+    ++ (if (isOnByName name model) then [] else [Slider.disabled])
+  )
+
 
 view : Model -> Html Msg
 view model =
@@ -174,22 +186,19 @@ view model =
     div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Clicked "WC"), Toggles.value (isOnByName "LichtInkom" model) ] [text "WC"] ],
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Beneden"]],
-    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Keuken"] ],
     div [] [
-       input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
+      Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Keuken"]
     ],
     div [] [
-      Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"] ,
-      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
+      Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"]
     ],
     div [] [
-      Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"],
-      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
+      Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"]
     ],
     div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Circante Tafel"] ],
-    div [] [
-      Toggles.switch Mdl [0] model.mdl [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Zithoek"] ,
-      input [ type' "range", Html.Attributes.min "0", Html.Attributes.max "100",Html.Attributes.value "25"] []
+    div [style [("display", "table-cell")]] [
+      Toggles.switch Mdl [21] model.mdl [ Toggles.onClick (Clicked "LichtZithoek"), Toggles.value (isOnByName "LichtZithoek" model) ] [text "Zithoek"] ,
+      sliderWithDisable "LichtZithoek" model
     ],
     div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Bureau"] ],
 
