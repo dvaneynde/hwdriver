@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -56,7 +54,7 @@ public class RestService {
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
 		for (IUiCapableBlock a : Domotic.singleton().getUiCapableBlocks())
-			sb.append(a.getUiInfo().getName()).append('\n');
+			sb.append(a.getUiInfo().getName()).append(" - ").append(a.getUiInfo().getDescription()).append('\n');
 		return sb.toString();
 	}
 
