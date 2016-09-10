@@ -148,6 +148,10 @@ level : String -> Model -> Float
 level name model =
   (toFloat (statusByName name model.statuses).level)
 
+toggle : String -> Int -> Model -> Html Msg
+toggle name nr model =
+  Toggles.switch Mdl [nr] model.mdl  [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [text name]
+
 toggleDiv : String -> Int -> Model -> Html Msg
 toggleDiv name nr model =
   div [] [ Toggles.switch Mdl [nr] model.mdl  [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [text name] ]
@@ -178,9 +182,12 @@ view model =
   [
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Screens"]],
-    div [] [text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%") ],
-    div [] [text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (levelByName "Windmeter" model) ] [], text (toString (statusByName "Windmeter" model.statuses).level) ],
-    div [] [ input [ type' "checkbox", checked (isOnByName "ZonneAutomaat" model), onCheck (Checked "ZonneAutomaat") ] [], text " zonne-automaat" ],
+    div [style [("display", "inline")]] [
+        toggle "ZonneAutomaat" 30 model,
+        text "Zon: ", meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] [], text ((toString (statusByName "LichtScreen" model.statuses).level)++"%"),
+        text "Wind: ", meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (levelByName "Windmeter" model) ] [], text (toString (statusByName "Windmeter" model.statuses).level)
+    ],
+    --div [] [ input [ type' "checkbox", checked (isOnByName "ZonneAutomaat" model), onCheck (Checked "ZonneAutomaat") ] [], text " zonne-automaat" ],
     screenDiv "ScreenKeuken" 20 model,
     -- TODO andere screens
 
@@ -188,34 +195,34 @@ view model =
     div [] [Html.h3 [] [text "Nutsruimtes"]],
     --div [] [ Toggles.switch Mdl [1] model.mdl  [ Toggles.onClick (Clicked "LichtInkom"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Inkom"] ],
     toggleDiv "LichtInkom" 1 model,
-    div [] [ Toggles.switch Mdl [2] model.mdl  [ Toggles.onClick (Clicked "Gang Boven"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Gang Boven"] ],
-    div [] [ Toggles.switch Mdl [3] model.mdl  [ Toggles.onClick (Clicked "Garage (Poort)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Poort)"] ],
-    div [] [ Toggles.switch Mdl [4] model.mdl  [ Toggles.onClick (Clicked "Garage (Tuin)"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Garage (Tuin)"] ],
-    div [] [ Toggles.switch Mdl [5] model.mdl  [ Toggles.onClick (Clicked "Badkamer +1"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer +1"] ],
-    div [] [ Toggles.switch Mdl [6] model.mdl  [ Toggles.onClick (Clicked "Badkamer"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Badkamer"] ],
-    div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Clicked "WC"), Toggles.value (isOnByName "LichtInkom" model) ] [text "WC"] ],
+    div [] [ Toggles.switch Mdl [2] model.mdl  [ Toggles.onClick (Clicked "LichtGangBoven"), Toggles.value (isOnByName "LichtGangBoven" model) ] [text "Licht Gang Boven"] ],
+    div [] [ Toggles.switch Mdl [3] model.mdl  [ Toggles.onClick (Clicked "LichtGaragePoort"), Toggles.value (isOnByName "LichtGaragePoort" model) ] [text "Licht Garage (Poort)"] ],
+    div [] [ Toggles.switch Mdl [4] model.mdl  [ Toggles.onClick (Clicked "LichtGarageTuin"), Toggles.value (isOnByName "LichtGarageTuin" model) ] [text "Licht Garage (Tuin)"] ],
+    div [] [ Toggles.switch Mdl [5] model.mdl  [ Toggles.onClick (Clicked "LichtBadk1"), Toggles.value (isOnByName "LichtBadk1" model) ] [text "Licht Badkamer Boven"] ],
+    div [] [ Toggles.switch Mdl [6] model.mdl  [ Toggles.onClick (Clicked "LichtBadk0"), Toggles.value (isOnByName "LichtBadk0" model) ] [text "Licht Badkamer Beneden"] ],
+    div [] [ Toggles.switch Mdl [7] model.mdl  [ Toggles.onClick (Clicked "LichtWC0"), Toggles.value (isOnByName "LichtWC0" model) ] [text "Licht WC Beneden"] ],
 
     div [] [ Html.hr [] [] ],
     div [] [ Html.h3 [] [text "Beneden"]],
-    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "Keuken"), Toggles.value (isOnByName "Keuken" model) ] [text "Keuken"] ],
-    div [] [ Toggles.switch Mdl [9] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Veranda"] ],
-    div [] [ Toggles.switch Mdl [10] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Eetkamer"] ],
-    div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Circante Tafel"] ],
+    div [] [ Toggles.switch Mdl [8] model.mdl  [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [text "Keuken"] ],
+    toggleWithSliderDiv "LichtVeranda" 9 model,
+    toggleWithSliderDiv "LichtCircanteRondom" 10 model,
+    div [] [ Toggles.switch Mdl [11] model.mdl  [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [text "Circante Tafel"] ],
     toggleWithSliderDiv "LichtZithoek" 21 model,
-    div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Bureau"] ],
+    div [] [ Toggles.switch Mdl [12] model.mdl  [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [text "Bureau"] ],
 
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Kinderen"]],
-    div [] [ Toggles.switch Mdl [13] model.mdl  [ Toggles.onClick (Clicked ""), Toggles.value (isOnByName "LichtInkom" model) ] [text "Tomas Spots"] ],
-    div [] [ Toggles.switch Mdl [14] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Dries Wand"] ],
-    div [] [ Toggles.switch Mdl [15] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Dries Spots"] ],
-    div [] [ Toggles.switch Mdl [16] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Wand"] ],
-    div [] [ Toggles.switch Mdl [17] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Roos Spots"] ],
+    div [] [ Toggles.switch Mdl [13] model.mdl  [ Toggles.onClick (Clicked "LichtTomasSpots"), Toggles.value (isOnByName "LichtTomasSpots" model) ] [text "Tomas Spots"] ],
+    div [] [ Toggles.switch Mdl [14] model.mdl  [ Toggles.onClick (Clicked "LichtDriesWand"), Toggles.value (isOnByName "LichtDriesWand" model) ] [text "Dries Wand"] ],
+    div [] [ Toggles.switch Mdl [15] model.mdl  [ Toggles.onClick (Clicked "LichtDries"), Toggles.value (isOnByName "LichtDries" model) ] [text "Dries Spots"] ],
+    div [] [ Toggles.switch Mdl [16] model.mdl  [ Toggles.onClick (Clicked "LichtRoosWand"), Toggles.value (isOnByName "LichtRoosWand" model) ] [text "Roos Wand"] ],
+    div [] [ Toggles.switch Mdl [17] model.mdl  [ Toggles.onClick (Clicked "LichtRoos"), Toggles.value (isOnByName "LichtRoos" model) ] [text "Roos Spots"] ],
 
     div [][ Html.hr [] [] ],
     div [] [Html.h3 [] [text "Buiten"]],
-    div [] [ Toggles.switch Mdl [18] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Licht terras en zijkant"] ],
-    div [] [ Toggles.switch Mdl [19] model.mdl  [ Toggles.onClick (Clicked "0"), Toggles.value (isOnByName "LichtInkom" model) ] [text "Stopcontact buiten"] ],
+    div [] [ Toggles.switch Mdl [18] model.mdl  [ Toggles.onClick (Clicked "LichtTerras"), Toggles.value (isOnByName "LichtTerras" model) ] [text "Licht terras en zijkant"] ],
+    div [] [ Toggles.switch Mdl [19] model.mdl  [ Toggles.onClick (Clicked "StopkBuiten"), Toggles.value (isOnByName "StopkBuiten" model) ] [text "Stopcontact buiten"] ],
 
     div [][ Html.hr [] [] ],
     div [Html.Attributes.style[ ("background","DarkSlateGrey"), ("color","white")]] [
