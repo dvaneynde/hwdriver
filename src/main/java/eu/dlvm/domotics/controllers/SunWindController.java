@@ -31,14 +31,14 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author dirk
  */
-public class ScreenController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUiCapableBlock {
-	private static final Logger log = LoggerFactory.getLogger(ScreenController.class);
+public class SunWindController extends Controller implements IOnOffToggleCapable, IAlarmListener, IThresholdListener, IUiCapableBlock {
+	private static final Logger log = LoggerFactory.getLogger(SunWindController.class);
 	private boolean enabled;
 	private IThresholdListener.EventType lastThresholdEvent;
 	private IAlarmListener.EventType lastAlarmEvent;
 	private Set<Screen> screens = new HashSet<>();
 
-	public ScreenController(String name, String description, String ui, IDomoticContext ctx) {
+	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui, ctx);
 	}
 

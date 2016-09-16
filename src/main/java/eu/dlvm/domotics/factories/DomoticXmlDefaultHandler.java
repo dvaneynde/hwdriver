@@ -28,7 +28,7 @@ import eu.dlvm.domotics.connectors.AlarmEvent2Screen;
 import eu.dlvm.domotics.connectors.ThresholdEvent2Screen;
 import eu.dlvm.domotics.controllers.NewYear;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
-import eu.dlvm.domotics.controllers.ScreenController;
+import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -192,7 +192,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 	private void parseScreenController(Attributes atts) {
 		parseBaseBlock(atts);
-		ScreenController enabler = new ScreenController(name, desc, ui, ctx);
+		SunWindController enabler = new SunWindController(name, desc, ui, ctx);
 
 		String srcAlarmName = atts.getValue("alarmSrc");
 		WindSensor srcAlarm = (WindSensor) blocks.get(srcAlarmName);

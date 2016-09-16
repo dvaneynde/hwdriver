@@ -2,28 +2,33 @@ package eu.dlvm.domotics.service;
 
 import eu.dlvm.domotics.base.Block;
 
+/**
+ * Data to update UI.
+ * 
+ * @author dirk
+ *
+ */
 public class UiInfo {
 	private String name;
 	private String type;
-	private String description="";
-	private String groupName="";
+	private String description = "";
+	private String groupName = "";
 	private boolean on;
 	private int level;
-	private String status="";
-
+	private String status = "";
 
 	public UiInfo() {
 	}
 
-	public UiInfo(Block block) { 
+	public UiInfo(Block block) {
 		this(block.getName(), block.getClass().getSimpleName(), block.getDescription());
 	}
-	
+
 	public UiInfo(String name, String type, String description) {
 		this();
-		this.name = name;
-		this.type = type;
-		this.description = description;
+		setName(name);
+		setType(type);
+		setDescription(description);
 	}
 
 	public String getName() {
@@ -47,13 +52,7 @@ public class UiInfo {
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override
-	public String toString() {
-		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on
-				+ ", level=" + level + "]";
+		this.description = (description == null ? "" : description);
 	}
 
 	public boolean isOn() {
@@ -77,7 +76,7 @@ public class UiInfo {
 	}
 
 	public void setStatus(String status) {
-		this.status = status;
+		this.status = (status == null ? "" : status);
 	}
 
 	public String getGroupName() {
@@ -85,6 +84,12 @@ public class UiInfo {
 	}
 
 	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+		this.groupName = (groupName == null ? "" : groupName);
+	}
+	
+	@Override
+	public String toString() {
+		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level="
+				+ level + "]";
 	}
 }

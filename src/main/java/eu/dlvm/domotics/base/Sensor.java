@@ -22,6 +22,7 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 
 	private IDomoticContext ctx;
 	private LogCh channel;
+	
 
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.

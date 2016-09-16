@@ -1,6 +1,5 @@
 package eu.dlvm.domotics.service;
 
-@Deprecated
 public class GroupInfo {
 	private String name;
 	private boolean on;

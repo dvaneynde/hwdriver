@@ -34,12 +34,13 @@ public class HwDriverChannelSimulator implements IHwDriverChannel {
 				directionLight = 1;
 			levelLight += 10 * directionLight;
 
+			// 50 ms is 20 keer per seconde
 			responses.add("INP_D 0x300 " + inputWind + " - -");
 			if (ctrWind % modWind == 0)
 				inputWind = (inputWind == 0 ? 1 : 0);
-			if (ctrWind % 100 == 0)
-				modWind = (modWind == 5 ? 13 : 5);
-			ctrWind++;
+/*			if (ctrWind % 10000 == 0)
+				modWind = (modWind == 5 ? 20 : 5);
+*/			ctrWind++;
 		}
 		return responses;
 	}

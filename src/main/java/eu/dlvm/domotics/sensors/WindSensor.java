@@ -22,11 +22,16 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
 	private static final Logger log = LoggerFactory.getLogger(WindSensor.class);
 	private static final Logger logwind = LoggerFactory.getLogger("WIND");
+	private static final Logger dumpFreq = LoggerFactory.getLogger("FREQ");
 	private int highFreqThreshold, lowFreqThreshold;
 	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
 	private States state;
 	private double freq;
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
+
+	// TODO Buffer gebruiken
+	double[] measurements;
+	int idxLastMeasurement;
 
 	FrequencyGauge gauge; // package scope for unit tests
 
@@ -72,6 +77,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		// TODO 25 below as parameter? or calculated from sample time and
 		// lowfreq/highfreq?
 		this.gauge = new FrequencyGauge(25);
+		measurements = new double[17];
 
 		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
 		this.state = States.NORMAL;
@@ -133,6 +139,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	public UiInfo getUiInfo() {
 		UiInfo uiInfo = new UiInfo(this);
 		uiInfo.setLevel(getFreqTimesTen());
+		uiInfo.setStatus(state.name());
 		return uiInfo;
 	}
 
@@ -150,13 +157,37 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	// ===================
 	// INTERNAL API
 
+	private double avg() {
+		double avg = 0.0d;
+		for (double m : measurements) {
+			avg += m;
+		}
+		avg /= (double) measurements.length;
+		return avg;
+	}
+
+	private String dumpMeasurements(double avg) {
+		StringBuffer sb = new StringBuffer(String.format("avg=%5f | ", avg));
+		int idx = idxLastMeasurement;
+		do {
+			idx = (idx + 1) % measurements.length;
+			sb.append(String.format("%5f | ", measurements[idx]));
+		} while (idx != idxLastMeasurement);
+		return sb.toString();
+	}
+
 	private int infoCounter = 0;
 
 	@Override
 	public void loop(long currentTime, long sequence) {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
-		freq = gauge.getAvgFreq();
+		double measurement = gauge.getMeasurement();
+		idxLastMeasurement = (idxLastMeasurement + 1) % measurements.length;
+		measurements[idxLastMeasurement] = measurement;
+		freq = avg();
+		if (dumpFreq.isInfoEnabled())
+			dumpFreq.info(dumpMeasurements(freq));
 
 		if (infoCounter == 4 && currentTime % 1000 < 250)
 			infoCounter = 0;
