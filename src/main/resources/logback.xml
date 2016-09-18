@@ -98,10 +98,11 @@
 		<appender-ref ref="ERROR-LOG" />
 	</root>
 
+<!--
 	<logger name="FREQ" level="debug">
 		<appender-ref ref="FREQFILE" />
 	</logger>
-	
+-->	
 	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
 	<logger name="org.eclipse.jetty" level="info"
 		additivity="false">

@@ -88,7 +88,6 @@ public class TestWindSensor implements IAlarmListener {
 	// ===============
 	// TESTS
 
-	@Ignore
 	@Test
 	public final void simpleTest() {
 		int HIGH_FREQ_THRESHOLD = 5;
