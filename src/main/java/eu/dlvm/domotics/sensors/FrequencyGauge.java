@@ -1,7 +1,5 @@
 package eu.dlvm.domotics.sensors;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +16,13 @@ public class FrequencyGauge {
 
 	private static final Logger log = LoggerFactory.getLogger(FrequencyGauge.class);
 	private static final Logger dumpFreq = LoggerFactory.getLogger("FREQ");
-	private int idxLastSample, nrSamplesPerMeasurement;
-	private Sample samples[];
-
-	private int testCtr;
+	private int nrSamplesPerMeasurement;
+	private RingBuffer<Sample> samples;
 
 	private static class Sample {
-		public Sample() {
-			time = -1L;
+		public Sample(long time, boolean value) {
+			this.time = time;
+			this.value = value;
 		}
 
 		long time;
@@ -50,11 +47,7 @@ public class FrequencyGauge {
 		// TODO aantal cycles zou in verband moeten staan met sample frequentie
 		// en thresholds
 		this.nrSamplesPerMeasurement = nrSamplesPerAverage;
-		idxLastSample = -1;
-		samples = new Sample[nrSamplesPerAverage];
-		for (int i = 0; i < nrSamplesPerAverage; i++) {
-			samples[i] = new Sample();
-		}
+		samples = new RingBuffer<Sample>(nrSamplesPerAverage);
 		log.info("Frequency gauge configured: means calculated from " + nrSamplesPerAverage + " samples.");
 	}
 
@@ -67,31 +60,26 @@ public class FrequencyGauge {
 	 * @return frequence or 0.0
 	 */
 	public double getMeasurement() {
-		testCtr++;
-		if (samples[nrSamplesPerMeasurement - 1].time == -1L) {
-			if (testCtr > 100)
-				throw new RuntimeException("Unexpected !" + this.toString());
-			return 0.0;
-		}
 		double avgFreq = 0.0;
 		int nrTransitions = 0;
 
-		int idx = (idxLastSample + 1) % nrSamplesPerMeasurement;
-		Sample last = samples[idx];
-		boolean firstTransitionFound = false;
-		do {
-			idx = (idx + 1) % nrSamplesPerMeasurement;
-			if (samples[idx].value != last.value) {
-				/*
-				 * if (!firstTransitionFound) { last = samples[idx];
-				 * firstTransitionFound = true; } else {
-				 */ double freq = 1000.0 / (2.0 * ((double) Math.abs(samples[idx].time - last.time)));
-				avgFreq += freq;
-				nrTransitions++;
-				last = samples[idx];
-				//}
+		Sample last = null;
+		boolean gotFirst = false;
+		for (Sample sample : samples) {
+			if (last == null)
+				last = sample;
+			else if (sample.value != last.value) {
+				if (gotFirst) {
+					double freq = 1000.0 / (2.0 * ((double) Math.abs(sample.time - last.time)));
+					avgFreq += freq;
+					nrTransitions++;
+				} else {
+					gotFirst = true;
+				}
+				last = sample;
 			}
-		} while (idx != idxLastSample);
+		}
+
 		if (nrTransitions == 0)
 			avgFreq = 0.0;
 		else
@@ -117,9 +105,8 @@ public class FrequencyGauge {
 	 *            Sampled input value.
 	 */
 	public void sample(long currentTimeMs, boolean inputval) {
-		idxLastSample = (idxLastSample + 1) % nrSamplesPerMeasurement;
-		samples[idxLastSample].time = currentTimeMs;
-		samples[idxLastSample].value = inputval;
+		Sample sample = new Sample(currentTimeMs, inputval);
+		samples.add(sample);
 	}
 
 	public static String timeMsFormat(long timeMs) {
@@ -128,18 +115,10 @@ public class FrequencyGauge {
 
 	public String dumpSamples(double avgFreq) {
 		StringBuffer sb = new StringBuffer(String.format("%5f - ", avgFreq));
-		int idx = (idxLastSample + 1) % nrSamplesPerMeasurement;
-		do {
-			sb.append(String.format("%5d %1d|", samples[idx].time % 10000, samples[idx].value ? 1 : 0));
-			idx = (idx + 1) % nrSamplesPerMeasurement;
-		} while (idx != idxLastSample);
+		for (Sample sample : samples) {
+			sb.append(String.format("%5d %1d | ", sample.time % 10000, sample.value ? 1 : 0));
+		}
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "FrequencyGauge [ nrSamplesPerAverage=" + nrSamplesPerMeasurement + ", idxLastSample=" + idxLastSample
-				+ ", samples=" + Arrays.toString(samples) + ", testCtr=" + testCtr + "]";
 	}
 
 }

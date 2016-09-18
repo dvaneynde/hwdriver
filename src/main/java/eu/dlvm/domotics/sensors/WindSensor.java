@@ -29,10 +29,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private double freq;
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
 
-	// TODO Buffer gebruiken
-	double[] measurements;
-	int idxLastMeasurement;
-
 	FrequencyGauge gauge; // package scope for unit tests
 
 	// TODO listeners via generic in Sensor basis class
@@ -77,7 +73,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		// TODO 25 below as parameter? or calculated from sample time and
 		// lowfreq/highfreq?
 		this.gauge = new FrequencyGauge(25);
-		measurements = new double[17];
 
 		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
 		this.state = States.NORMAL;
@@ -122,8 +117,8 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		return state;
 	}
 
-	public int getFreqTimesTen() {
-		return (int) (freq * 10);
+	public int getFreqTimesHundred() {
+		return (int) (freq * 100);
 	}
 
 	public void registerListener(IAlarmListener listener) {
@@ -138,7 +133,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo uiInfo = new UiInfo(this);
-		uiInfo.setLevel(getFreqTimesTen());
+		uiInfo.setLevel(getFreqTimesHundred());
 		uiInfo.setStatus(state.name());
 		return uiInfo;
 	}
@@ -157,38 +152,13 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	// ===================
 	// INTERNAL API
 
-	private double avg() {
-		double avg = 0.0d;
-		for (double m : measurements) {
-			avg += m;
-		}
-		avg /= (double) measurements.length;
-		return avg;
-	}
-
-	private String dumpMeasurements(double avg) {
-		StringBuffer sb = new StringBuffer(String.format("avg=%5f | ", avg));
-		int idx = idxLastMeasurement;
-		do {
-			idx = (idx + 1) % measurements.length;
-			sb.append(String.format("%5f | ", measurements[idx]));
-		} while (idx != idxLastMeasurement);
-		return sb.toString();
-	}
-
 	private int infoCounter = 0;
 
 	@Override
 	public void loop(long currentTime, long sequence) {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
-		double measurement = gauge.getMeasurement();
-		idxLastMeasurement = (idxLastMeasurement + 1) % measurements.length;
-		measurements[idxLastMeasurement] = measurement;
-		freq = avg();
-		if (dumpFreq.isInfoEnabled())
-			dumpFreq.info(dumpMeasurements(freq));
-
+		freq = gauge.getMeasurement();
 		if (infoCounter == 4 && currentTime % 1000 < 250)
 			infoCounter = 0;
 		if (log.isDebugEnabled())

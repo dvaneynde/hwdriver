@@ -73,9 +73,9 @@ public class TestWindSensor implements IAlarmListener {
 				val = !val;
 				nrTransitions++;
 				nextTransitionTime = beginTime + nrTransitions * transitionPeriodMs;
+				hw.writeDigitalOutput(WINDSENSOR_CH, val);
 			}
 			ws.loop(time, 0);
-			hw.writeDigitalOutput(WINDSENSOR_CH, val);
 		}
 	}
 
@@ -143,18 +143,23 @@ public class TestWindSensor implements IAlarmListener {
 		check(WindSensor.States.NORMAL, null, 0);
 
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 500);
+		log.info("600? "+ ws.getFreqTimesHundred());
 		check(States.HIGH, null, 0);
 
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 4000);
+		log.info("600? "+ ws.getFreqTimesHundred());
 		check(States.HIGH, EventType.SAFE, 4);
 
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 1000);
+		log.info("600? "+ ws.getFreqTimesHundred());
 		check(States.ALARM, EventType.ALARM, 6);
 
 		simulateWind(HIGH_FREQ_THRESHOLD - 1, 1000);
+		log.info("600? "+ ws.getFreqTimesHundred());
 		check(States.ALARM, EventType.ALARM, 7);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 2000);
+		log.info("600? "+ ws.getFreqTimesHundred());
 		check(States.ALARM_BUT_LOW, EventType.ALARM, 9);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 27000);

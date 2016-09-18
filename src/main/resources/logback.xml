@@ -4,7 +4,7 @@
 	<property name="DEV_HOME" value="./logs" />
 
 
-	<appender name="FREQDUMP" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="FREQCONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
 				%d{yyyy-MM-dd HH:mm:ss} %msg%n
@@ -20,6 +20,16 @@
 		</layout>
 	</appender>
 	
+	  <appender name="FREQFILE" class="ch.qos.logback.core.FileAppender">
+    <file>freqFile.log</file>
+    <append>true</append>
+    <encoder>
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %msg%n
+			</Pattern>
+    </encoder>
+  </appender>
+ 
 	<appender name="DOMOTICA-LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${DEV_HOME}/domotica.log</file>
@@ -88,8 +98,8 @@
 		<appender-ref ref="ERROR-LOG" />
 	</root>
 
-	<logger name="FREQ" level="info">
-		<appender-ref ref="FREQDUMP" />
+	<logger name="FREQ" level="debug">
+		<appender-ref ref="FREQFILE" />
 	</logger>
 	
 	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
