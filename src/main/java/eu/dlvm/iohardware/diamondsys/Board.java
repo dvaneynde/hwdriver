@@ -54,7 +54,6 @@ public abstract class Board {
      * and/or inputs to their defaults values.
      * <p>
      * It also must be called before {{@link #outputStateHasChanged()} can be used reliably.
-     * <p>TODO lijkt niet meer aangeroepen te worden ???
      */
     public abstract void init();
 

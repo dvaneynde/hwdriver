@@ -10,6 +10,6 @@ public class TestLogFysChannelAndMapping {
 	@Test
 	@Ignore
 	public final void testMapping() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented");
 	}
 }

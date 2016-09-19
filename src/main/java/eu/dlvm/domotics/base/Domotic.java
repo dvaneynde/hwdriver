@@ -87,6 +87,7 @@ public class Domotic implements IDomoticContext {
 		super();
 		saveState = new OutputStateSaver();
 		uiUpdators = new LinkedList<>();
+		// TODO does this actually do something?
 		// TODO configurable via xml !
 		restartOnceADay = new OnceADayWithinPeriod(23, 00, 23, 10);
 	}

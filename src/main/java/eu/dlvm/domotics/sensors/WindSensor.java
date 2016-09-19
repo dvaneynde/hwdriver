@@ -13,7 +13,7 @@ import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.LogCh;
 
 /**
- * TODO document
+ * DOC document
  * 
  * @author Dirk Vaneynde
  */

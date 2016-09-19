@@ -1,13 +1,7 @@
 target/
 /domotic.pid
-/jersey.log.1
 /jersey.log.lck
 /target
-/domotic.log
-/driver.log
-/monitor.log
-/hardware.log
-/light.log
-/wind.log
 /logs/
+*.log
 /DomoticOutputStates.txt

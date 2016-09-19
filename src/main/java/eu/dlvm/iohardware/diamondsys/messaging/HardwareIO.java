@@ -92,8 +92,6 @@ public class HardwareIO implements IHardwareIO {
 					Board b = findBoardBy(address);
 					((IBoardMessaging) b).parseInputResult(cmd, address, st);
 				}
-				// TODO JDK 1.7 only } catch (NumberFormatException |
-				// ParseException e) {
 			} catch (Exception e) {
 				log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
 			}

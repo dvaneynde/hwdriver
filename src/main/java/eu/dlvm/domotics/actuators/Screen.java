@@ -56,7 +56,6 @@ public class Screen extends Actuator {
 		this.chUp = chUp;
 	}
 
-	// TODO see bug 80
 	public enum States {
 		REST, UP, DELAY_DOWN_2_UP, DELAY_UP_2_DOWN, DOWN, REST_PROTECT;
 	};

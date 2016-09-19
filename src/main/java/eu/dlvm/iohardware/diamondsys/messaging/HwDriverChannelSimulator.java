@@ -35,12 +35,13 @@ public class HwDriverChannelSimulator implements IHwDriverChannel {
 			levelLight += 10 * directionLight;
 
 			// 50 ms is 20 keer per seconde.
-			// Als modWind==5, dan elke 250ms transitie, dus 500ms golflengte, dus 2hz
+			// Als modWind==5, dan elke 250ms transitie, dus 500ms golflengte, dus 2Hz
+			// Als modWind==1, dan elke 50ms transitie, dus 100ms golflengte, dus 10Hz
 			responses.add("INP_D 0x300 " + inputWind + " - -");
 			if (ctrWind % modWind == 0)
 				inputWind = (inputWind == 0 ? 1 : 0);
-			if (ctrWind % 60 == 0)
-				modWind = (modWind == 5 ? 11 : 5);
+			if (ctrWind % 120 == 0)
+				modWind = (modWind == 5 ? 1 : 5);
 			ctrWind++;
 		}
 		return responses;

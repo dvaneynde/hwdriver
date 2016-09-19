@@ -81,9 +81,9 @@ public class Opmm1616BoardWithMsg extends Opmm1616Board implements IBoardMessagi
      * <p>
      * <code>INP_O address:int val:int\n</code>
      * <p>
-     * Input response: TODO
+     * Input response: DOC
      * <p>
-     * Output set: TODO
+     * Output set: DOC
      * <p>
      * Where:
      * <dl>
