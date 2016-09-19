@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object4, object5, (:=))
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object6, (:=))
 import Json.Encode as Encode
 import WebSocket
 import Material
@@ -20,17 +20,17 @@ import Material.Slider as Slider
 
 
 -- Domotics user interface
-
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
    -- maar als elm op zelfde server wordt aangeboden, misschien geen probleem
    -- anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
-
-
 -- GLOBAL
+
 
 urlBase =
     "http://localhost:8080/"
+
+
 
 -- urlGetActuators = urlBase ++ "rest/actuators"
 -- /rest/act/{name}/{action}
@@ -53,7 +53,7 @@ main =
 
 
 type alias StatusRecord =
-    { name : String, kind : String, on : Bool, level : Int, status : String }
+    { name : String, kind : String, description : String, on : Bool, level : Int, status : String }
 
 
 type alias Model =
@@ -67,7 +67,7 @@ init =
 
 initialStatus : StatusRecord
 initialStatus =
-    { name = "", kind = "", on = False, level = 0, status = "" }
+    { name = "", kind = "", description = "", on = False, level = 0, status = "" }
 
 
 statusByName : String -> List StatusRecord -> StatusRecord
@@ -173,9 +173,10 @@ statusesDecoder =
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-    object5 StatusRecord
+    object6 StatusRecord
         ("name" := string)
         ("type" := string)
+        ("description" := string)
         ("on" := bool)
         ("level" := int)
         ("status" := string)
@@ -245,15 +246,15 @@ toggle name nr model =
     Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text name ]
 
 
-toggleDiv : String -> Int -> Model -> Html Msg
-toggleDiv name nr model =
-    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text name ] ]
+toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
+toggleDiv ( name, desc ) nr model =
+    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ] ]
 
 
-toggleWithSliderDiv : String -> Int -> Model -> Html Msg
-toggleWithSliderDiv name nr model =
+toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
+toggleWithSliderDiv ( name, desc ) nr model =
     div [ style [ ( "display", "table-cell" ) ] ]
-        [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text name ]
+        [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ]
         , Slider.view
             ([ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
                 ++ (if (isOnByName name model) then
@@ -265,13 +266,13 @@ toggleWithSliderDiv name nr model =
         ]
 
 
-screenDiv : String -> Int -> Model -> Html Msg
-screenDiv name nr model =
+screenDiv : ( String, String ) -> Int -> Model -> Html Msg
+screenDiv ( name, desc ) nr model =
     div []
         [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down name) ] [ Icon.i "arrow_downward" ]
         , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up name) ] [ Icon.i "arrow_upward" ]
         , text (screenStatus name model)
-        , text (" | " ++ name)
+        , text (" | " ++ desc)
         ]
 
 
@@ -280,51 +281,53 @@ view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
         [ div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Screens" ] ]
-        , div [ style [ ( "display", "inline-block" ) ] ]
-            [ toggle "ZonneAutomaat" 30 model
-            , text "Zon: "
-            , meter [ Html.Attributes.min "0", (attribute "low" "20"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] []
-            , text ((toString (statusByName "LichtScreen" model.statuses).level) ++ "%")
-            , text "Wind: "
-            , meter [ Html.Attributes.min "0", (attribute "low" "5"), (attribute "high" "15"), Html.Attributes.max "20", Html.Attributes.value (levelByName "Windmeter" model) ] []
-            , text (toString (statusByName "Windmeter" model.statuses).level)
+        , toggleDiv ( "ZonneAutomaat", "Zon Wind Automaat" ) 30 model
+        , div [{- style [ ( "display", "inline-block" ) ] -}]
+            [ text "Zon: "
+            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] []
+            , text ((toString (statusByName "LichtScreen" model.statuses).level) ++ "% - " ++ (toString (statusByName "LichtScreen" model.statuses).status))
             ]
-        , screenDiv "ScreenKeuken" 20 model
-        , screenDiv "ScreenTomas" 22 model
-        , screenDiv "ScreenDriesTuin" 24 model
-        , screenDiv "ScreenDriesOpzij" 26 model
-        , screenDiv "ScreenRoos" 28 model
-        , screenDiv "ScreenBreed" 30 model
-        , screenDiv "ScreenLang" 32 model
+        , div [{- style [ ( "display", "inline-block" ) ] -}]
+            [ text "Wind: "
+            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
+            , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+            ]
+        , screenDiv ( "ScreenKeuken", "Keuken" ) 20 model
+        , screenDiv ( "ScreenTomas", "Tomas" ) 22 model
+        , screenDiv ( "ScreenDriesTuin", "Dries Tuin" ) 24 model
+        , screenDiv ( "ScreenDriesOpzij", "Dries Opzij" ) 26 model
+        , screenDiv ( "ScreenRoos", "Roos" ) 28 model
+        , screenDiv ( "ScreenBreed", "Breed" ) 30 model
+        , screenDiv ( "ScreenLang", "Smal" ) 32 model
         , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Nutsruimtes" ] ]
-          toggleDiv "LichtInkom" 1 model
-        , div [] [ Toggles.switch Mdl [ 2 ] model.mdl [ Toggles.onClick (Clicked "LichtGangBoven"), Toggles.value (isOnByName "LichtGangBoven" model) ] [ text "Licht Gang Boven" ] ]
-        , div [] [ Toggles.switch Mdl [ 3 ] model.mdl [ Toggles.onClick (Clicked "LichtGaragePoort"), Toggles.value (isOnByName "LichtGaragePoort" model) ] [ text "Licht Garage (Poort)" ] ]
-        , div [] [ Toggles.switch Mdl [ 4 ] model.mdl [ Toggles.onClick (Clicked "LichtGarageTuin"), Toggles.value (isOnByName "LichtGarageTuin" model) ] [ text "Licht Garage (Tuin)" ] ]
-        , div [] [ Toggles.switch Mdl [ 5 ] model.mdl [ Toggles.onClick (Clicked "LichtBadk1"), Toggles.value (isOnByName "LichtBadk1" model) ] [ text "Licht Badkamer Boven" ] ]
-        , div [] [ Toggles.switch Mdl [ 6 ] model.mdl [ Toggles.onClick (Clicked "LichtBadk0"), Toggles.value (isOnByName "LichtBadk0" model) ] [ text "Licht Badkamer Beneden" ] ]
-        , div [] [ Toggles.switch Mdl [ 7 ] model.mdl [ Toggles.onClick (Clicked "LichtWC0"), Toggles.value (isOnByName "LichtWC0" model) ] [ text "Licht WC Beneden" ] ]
+        , toggleDiv ( "LichtInkom", "Inkom" ) 1 model
+        , toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
+        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
+        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
+        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
+        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
+        , toggleDiv ( "LichtWC0", "WC" ) 7 model
         , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Beneden" ] ]
         , div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
-        , toggleWithSliderDiv "LichtVeranda" 9 model
+        , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
         , div [] []
-        , toggleWithSliderDiv "LichtCircanteRondom" 10 model
+        , toggleWithSliderDiv ( "LichtCircanteRondom", "Circante Tafel" ) 10 model
         , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
-        , toggleWithSliderDiv "LichtZithoek" 21 model
+        , toggleWithSliderDiv ( "LichtZithoek", "Bureau" ) 21 model
         , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
         , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Kinderen" ] ]
-        , div [] [ Toggles.switch Mdl [ 13 ] model.mdl [ Toggles.onClick (Clicked "LichtTomasSpots"), Toggles.value (isOnByName "LichtTomasSpots" model) ] [ text "Tomas Spots" ] ]
-        , div [] [ Toggles.switch Mdl [ 14 ] model.mdl [ Toggles.onClick (Clicked "LichtDriesWand"), Toggles.value (isOnByName "LichtDriesWand" model) ] [ text "Dries Wand" ] ]
-        , div [] [ Toggles.switch Mdl [ 15 ] model.mdl [ Toggles.onClick (Clicked "LichtDries"), Toggles.value (isOnByName "LichtDries" model) ] [ text "Dries Spots" ] ]
-        , div [] [ Toggles.switch Mdl [ 16 ] model.mdl [ Toggles.onClick (Clicked "LichtRoosWand"), Toggles.value (isOnByName "LichtRoosWand" model) ] [ text "Roos Wand" ] ]
-        , div [] [ Toggles.switch Mdl [ 17 ] model.mdl [ Toggles.onClick (Clicked "LichtRoos"), Toggles.value (isOnByName "LichtRoos" model) ] [ text "Roos Spots" ] ]
+        , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
+        , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
+        , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
+        , toggleDiv ( "LichtRoosWand", "Roos Wand" ) 16 model
+        , toggleDiv ( "LichtRoos", "Roos Spots" ) 17 model
         , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Buiten" ] ]
-        , div [] [ Toggles.switch Mdl [ 18 ] model.mdl [ Toggles.onClick (Clicked "LichtTerras"), Toggles.value (isOnByName "LichtTerras" model) ] [ text "Licht terras en zijkant" ] ]
-        , div [] [ Toggles.switch Mdl [ 19 ] model.mdl [ Toggles.onClick (Clicked "StopkBuiten"), Toggles.value (isOnByName "StopkBuiten" model) ] [ text "Stopcontact buiten" ] ]
+        , toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
+        , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
         , div [] [ Html.hr [] [] ]
         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
             [ text "Model: "
