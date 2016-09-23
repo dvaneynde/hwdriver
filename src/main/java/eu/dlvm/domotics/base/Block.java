@@ -11,17 +11,21 @@ public abstract class Block {
 
 	protected String name;
 	protected String description;
-	protected String ui;
+	protected String uiPosition;
 
-	public Block(String name, String description, String ui) {
+	public Block(String name, String description) {
 		this.name = name;
 		this.description = description;
-		this.ui = ui;
+	}
+
+	public Block(String name, String description, String ui) {
+		this(name, description);
+		this.uiPosition = ui;
 	}
 
 	@Override
 	public String toString() {
-		return "Block name='" + name + ", ui=" + ui;
+		return "Block name='" + name + ", ui-position=" + uiPosition;
 	}
 
 	public String getName() {
@@ -32,7 +36,7 @@ public abstract class Block {
 		return description;
 	}
 
-	public String getUiPositionOnScreen() {
-		return ui;
+	public String getUiPosition() {
+		return uiPosition;
 	}
 }

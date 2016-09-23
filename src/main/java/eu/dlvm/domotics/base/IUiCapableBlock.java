@@ -19,7 +19,7 @@ public interface IUiCapableBlock {
 	 * For UI only, where to position on screen. E.g. "Nutsruimtes:6" means
 	 * group Nutsruimtes, and 6th index therein.
 	 */
-	public String getUiPositionOnScreen();
+	public String getUiPosition();
 
 	/**
 	 * Update a Block through UI.

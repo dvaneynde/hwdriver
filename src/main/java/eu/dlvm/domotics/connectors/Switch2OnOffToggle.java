@@ -60,8 +60,8 @@ public class Switch2OnOffToggle extends Connector implements ISwitchListener, IU
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo bi = null;
-		if (ui != null) {
-			log.debug("getBlockInfo(), ui='" + ui + "'");
+		if (getUiPosition() != null) {
+			log.debug("getBlockInfo(), ui='" + getUiPosition() + "'");
 			bi = new UiInfo(this.getName(), "Switch", this.getDescription());
 		}
 		return bi;
