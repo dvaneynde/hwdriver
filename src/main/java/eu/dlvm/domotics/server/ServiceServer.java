@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.service.RestService;
+import eu.dlvm.domotics.service.UiStateUpdatorSocket;
 
 /**
  * Serves whatever stuff via http (rest) or websocket.
@@ -72,6 +73,7 @@ public class ServiceServer {
 			// Add websocket mapping
 			wsfilter.addMapping(new ServletPathSpec("/time/"), new UiSocketCreator(domoContext));
 
+			// Add REST interface handler
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
 			Set<Class<?>> services = new HashSet<>();
 			services.add(RestService.class);
@@ -109,5 +111,4 @@ public class ServiceServer {
 		System.in.read();
 		ss.stop();
 	}
-
 }

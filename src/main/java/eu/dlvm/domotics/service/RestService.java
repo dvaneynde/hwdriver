@@ -75,16 +75,7 @@ public class RestService {
 		return list;
 	}
 
-	@Path("groups")
-	@Produces(MediaType.APPLICATION_JSON)
-	@GET
-	public Map<String, Boolean> getGroups2Status() {
-		return DataCollector.getGroup2Status();
-	}
-
 	/**
-	 * TODO return result must be new state of Block
-	 * 
 	 * @param name
 	 * @param action
 	 *            on, off or integer which is level
@@ -123,7 +114,6 @@ public class RestService {
 			}
 		} else
 			Log.warn("Domotic API: quickie '" + name + "' not found.");
-
 	}
 
 }
