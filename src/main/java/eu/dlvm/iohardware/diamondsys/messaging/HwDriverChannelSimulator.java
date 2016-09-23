@@ -40,7 +40,7 @@ public class HwDriverChannelSimulator implements IHwDriverChannel {
 			responses.add("INP_D 0x300 " + inputWind + " - -");
 			if (ctrWind % modWind == 0)
 				inputWind = (inputWind == 0 ? 1 : 0);
-			if (ctrWind % 120 == 0)
+			if (ctrWind % 500 == 0)
 				modWind = (modWind == 5 ? 1 : 5);
 			ctrWind++;
 		}

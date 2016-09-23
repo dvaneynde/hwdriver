@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.qos.logback.classic.BasicConfigurator;
-
 public class OpenWeatherMap {
 
 	static Logger log = LoggerFactory.getLogger(OpenWeatherMap.class);
