@@ -1,6 +1,5 @@
 package eu.dlvm.domotics.base;
 
-import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
@@ -42,8 +41,8 @@ public interface IDomoticContext {
 	// TODO onderstaande wordt rechtstreeks aangeroepen vanuit Handler, naast intern in Domotic...
 	//public void addUiCapableBlock(IUiCapableBlock uiblock0);
 
-	public void addUiUpdator(IUIUpdator updator);
-	public void removeUiUpdator(IUIUpdator updator);
+	public void addStateChangedListener(IStateChangedListener updator);
+	public void removeStateChangedListener(IStateChangedListener updator);
 	
 	/**
 	 * @return Underlying hardware.

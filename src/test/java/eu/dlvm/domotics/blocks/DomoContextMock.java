@@ -6,9 +6,9 @@ import java.util.List;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IStateChangedListener;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.service_impl.IUIUpdator;
 import eu.dlvm.iohardware.IHardwareIO;
 
 public class DomoContextMock implements IDomoticContext {
@@ -69,10 +69,10 @@ public class DomoContextMock implements IDomoticContext {
 //	}
 
 	@Override
-	public void addUiUpdator(IUIUpdator updator) {
+	public void addStateChangedListener(IStateChangedListener updator) {
 	}
 
 	@Override
-	public void removeUiUpdator(IUIUpdator updator) {
+	public void removeStateChangedListener(IStateChangedListener updator) {
 	}
 }

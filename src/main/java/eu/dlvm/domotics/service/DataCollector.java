@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service_impl;
+package eu.dlvm.domotics.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +10,6 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUiCapableBlock;
-import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.domotics.service.RestService;
 
 public class DataCollector {
 

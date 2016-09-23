@@ -1,11 +1,8 @@
-package eu.dlvm.domotics.service_impl;
+package eu.dlvm.domotics.service;
 
 import java.util.List;
 import java.util.Map;
 
-import eu.dlvm.domotics.service.UiInfo;
-
-@Deprecated
 class Data {
 	String title;
 	List<String> groupNames;

@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service_impl;
+package eu.dlvm.domotics.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IStateChangedListener;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.UiInfo;
 
@@ -23,20 +24,34 @@ import eu.dlvm.domotics.service.UiInfo;
  * multiple clients connnect at same time, multiple are created.<br/>
  */
 @WebSocket
-public class UiUpdatorSocket implements IUIUpdator {
+public class UiStateUpdatorSocket implements IStateChangedListener {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UiUpdatorSocket.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UiStateUpdatorSocket.class);
 	private static int COUNT = 0;
 	private ObjectMapper objectMapper;
 	private int id;
 	private IDomoticContext context;
 	private Session savedSession;
 
-	public UiUpdatorSocket(IDomoticContext context) {
+	public UiStateUpdatorSocket(IDomoticContext context) {
 		this.context = context;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;
-		LOG.info("Created UiUpdatorSocket, id=" + id);
+		LOG.info("Created UiStateUpdatorSocket, id=" + id);
+	}
+
+	@OnWebSocketConnect
+	public void onOpen(Session session) {
+		this.savedSession = session;
+		context.addStateChangedListener(this);
+		LOG.info("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
+	}
+
+	@OnWebSocketClose
+	public void onClose(int closeCode, String closeReasonPhrase) {
+		this.savedSession = null;
+		context.removeStateChangedListener(this);
+		LOG.info("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
 	}
 
 	@Override
@@ -44,22 +59,8 @@ public class UiUpdatorSocket implements IUIUpdator {
 		return id;
 	}
 	
-	@OnWebSocketConnect
-	public void onOpen(Session session) {
-		this.savedSession = session;
-		context.addUiUpdator(this);
-		LOG.info("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
-	}
-
-	@OnWebSocketClose
-	public void onClose(int closeCode, String closeReasonPhrase) {
-		this.savedSession = null;
-		context.removeUiUpdator(this);
-		LOG.info("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
-	}
-
 	@Override
-	public void updateUi(Domotic domotic) {
+	public void updateUi() {
 		LOG.debug("updateUI called on websocket id=" + id + ", session=" + savedSession);
 		if (savedSession == null)
 			return;

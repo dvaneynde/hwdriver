@@ -13,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.DriverMonitor;
-import eu.dlvm.domotics.service_impl.IUIUpdator;
-import eu.dlvm.domotics.service_impl.ServiceServer;
+import eu.dlvm.domotics.server.ServiceServer;
 import eu.dlvm.domotics.utils.OnceADayWithinPeriod;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -58,7 +57,7 @@ public class Domotic implements IDomoticContext {
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
-	protected List<IUIUpdator> uiUpdators;
+	protected List<IStateChangedListener> stateChangeListeners;
 	protected long loopSequence = -1L;
 
 	private List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
@@ -86,7 +85,7 @@ public class Domotic implements IDomoticContext {
 	private Domotic() {
 		super();
 		saveState = new OutputStateSaver();
-		uiUpdators = new LinkedList<>();
+		stateChangeListeners = new LinkedList<>();
 		// TODO does this actually do something?
 		// TODO configurable via xml !
 		restartOnceADay = new OnceADayWithinPeriod(23, 00, 23, 10);
@@ -171,14 +170,14 @@ public class Domotic implements IDomoticContext {
 	}
 
 	@Override
-	public void addUiUpdator(IUIUpdator updator) {
-		uiUpdators.add(updator);
+	public void addStateChangedListener(IStateChangedListener updator) {
+		stateChangeListeners.add(updator);
 		log.info("Added new UI updator id=" + updator.getId());
 	}
 
 	@Override
-	public void removeUiUpdator(IUIUpdator updator) {
-		boolean removed = uiUpdators.remove(updator);
+	public void removeStateChangedListener(IStateChangedListener updator) {
+		boolean removed = stateChangeListeners.remove(updator);
 		log.info("Removing updator id=" + updator.getId() + " (listener was found and thus removed: " + removed + ")");
 	}
 
@@ -362,7 +361,7 @@ public class Domotic implements IDomoticContext {
 	 * executed, so they can update hardware output state.</li>
 	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>
-	 * <li>Finally any {@link IUIUpdator}s are called to update model state of connected client UIs.
+	 * <li>Finally any {@link IStateChangedListener}s are called to update model state of connected client UIs.
 	 * </ol>
 	 * 
 	 * @param currentTime
@@ -385,8 +384,8 @@ public class Domotic implements IDomoticContext {
 		hw.refreshOutputs();
 
 		//if (loopSequence % 10 == 0) {
-		for (IUIUpdator uiUpdator : uiUpdators)
-			uiUpdator.updateUi(this);
+		for (IStateChangedListener uiUpdator : stateChangeListeners)
+			uiUpdator.updateUi();
 		//}
 
 		if (loopSequence % 10 == 0)

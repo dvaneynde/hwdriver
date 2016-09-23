@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUiCapableBlock;
-import eu.dlvm.domotics.service_impl.DataCollector;
-import eu.dlvm.domotics.service_impl.Quickie;
-import eu.dlvm.domotics.service_impl.QuickieService;
 
 @Singleton
 @Path("")

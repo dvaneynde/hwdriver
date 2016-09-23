@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service_impl;
+package eu.dlvm.domotics.server;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -44,8 +44,8 @@ public class ServiceServer {
 
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-			UiUpdatorSocket uiUpdatorSocket = new UiUpdatorSocket(domoContext);
-			return uiUpdatorSocket;
+			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(domoContext);
+			return uiStateUpdatorSocket;
 		}
 	}
 
