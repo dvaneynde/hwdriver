@@ -28,20 +28,16 @@ import Material.Slider as Slider
 
 
 urlBase =
-    "http://localhost:8080/"
-
-
-
--- urlGetActuators = urlBase ++ "rest/actuators"
--- /rest/act/{name}/{action}
+    "localhost:8080"
+    --"192.168.0.10:8080"
 
 
 urlUpdateActuators =
-    urlBase ++ "rest/act/"
+    "http://" ++ urlBase ++ "/rest/act/"
 
 
 wsStatus =
-    "ws://localhost:8080/" ++ "time/"
+    "ws://"++ urlBase ++ "/time/"
 
 
 main =
@@ -95,7 +91,6 @@ type Msg
     | Down String
     | Up String
     | SliderMsg String Float
-    | Check
     | RestError Http.Error
     | RestStatus (List StatusRecord)
 
@@ -103,9 +98,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Check ->
-            ( model, Cmd.none )
-
         PutModelInTestAsString ->
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
 
@@ -284,7 +276,7 @@ view model =
         , toggleDiv ( "ZonneAutomaat", "Zon Wind Automaat" ) 30 model
         , div [{- style [ ( "display", "inline-block" ) ] -}]
             [ text "Zon: "
-            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "80"), Html.Attributes.max "120", Html.Attributes.value (levelByName "LichtScreen" model) ] []
+            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "LichtScreen" model) ] []
             , text ((toString (statusByName "LichtScreen" model.statuses).level) ++ "% - " ++ (toString (statusByName "LichtScreen" model.statuses).status))
             ]
         , div [{- style [ ( "display", "inline-block" ) ] -}]
@@ -300,25 +292,25 @@ view model =
         , screenDiv ( "ScreenBreed", "Breed" ) 30 model
         , screenDiv ( "ScreenLang", "Smal" ) 32 model
         , div [] [ Html.hr [] [] ]
-        , div [] [ Html.h3 [] [ text "Nutsruimtes" ] ]
-        , toggleDiv ( "LichtInkom", "Inkom" ) 1 model
-        , toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
-        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
-        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
-        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
-        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
-        , toggleDiv ( "LichtWC0", "WC" ) 7 model
-        , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Beneden" ] ]
         , div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
         , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
         , div [] []
-        , toggleWithSliderDiv ( "LichtCircanteRondom", "Circante Tafel" ) 10 model
+        , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
         , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
-        , toggleWithSliderDiv ( "LichtZithoek", "Bureau" ) 21 model
+        , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
         , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
         , div [] [ Html.hr [] [] ]
+        , div [] [ Html.h3 [] [ text "Nutsruimtes" ] ]
+        , toggleDiv ( "LichtInkom", "Inkom" ) 1 model
+        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
+        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
+        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
+        , toggleDiv ( "LichtWC0", "WC" ) 7 model
+        , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Kinderen" ] ]
+        , toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
+        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
         , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
         , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
         , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
@@ -329,17 +321,17 @@ view model =
         , toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
         , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
         , div [] [ Html.hr [] [] ]
+        {--
         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
             [ text "Model: "
             , text (toString model.statuses)
-            ]
+            ] --}
         , div [] [ Html.hr [] [] ]
+        , div [] [ text "Error: ", text model.errorMsg ]
         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
             [ button [ onClick PutModelInTestAsString ] [ text "Test" ]
             , text model.test
             ]
-        , div [] [ text "Error: ", text model.errorMsg ]
-        , div [] [ button [ onClick Check ] [ text "Check..." ] ]
         , div [] [ Html.hr [] [] ]
         ]
         |> Scheme.topWithScheme Color.Green Color.Red
