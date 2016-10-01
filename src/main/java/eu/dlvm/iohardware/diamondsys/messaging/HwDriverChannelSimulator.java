@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HwDriverChannelSimulator implements IHwDriverChannel {
 
-	private int levelLight = 0;
+	private int levelLight = 3000;
 	private int directionLight = 1;
 	private int inputWind = 0;
 	private int ctrWind = 0;
@@ -30,9 +30,9 @@ public class HwDriverChannelSimulator implements IHwDriverChannel {
 			responses.add("INP_D 0x330 0 " + levelLight + " -");
 			if (levelLight == 4000) {
 				directionLight = -1;
-			} else if (levelLight == 0)
+			} else if (levelLight == 3000)
 				directionLight = 1;
-			levelLight += 10 * directionLight;
+			levelLight += 1 * directionLight;
 
 			// 50 ms is 20 keer per seconde.
 			// Als modWind==5, dan elke 250ms transitie, dus 500ms golflengte, dus 2Hz

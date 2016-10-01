@@ -110,6 +110,13 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
+	 * @return Last level, as given by hardware (thus hardware dependent).
+	 */
+	public int getLevel() {
+		return measuredLevel;
+	}
+
+	/**
 	 * @return Last level as percentage, where 100 corresponds to {@link #getHighThreshold()}, so [0..100..]. So 0..100 or more.
 	 */
 	public int getLevelAsPct() {
@@ -129,7 +136,8 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo uiInfo = new UiInfo(this);
-		uiInfo.setLevel(getLevelAsPct());
+		//uiInfo.setLevel(getLevelAsPct());
+		uiInfo.setLevel(getLevel());
 		uiInfo.setStatus(state.name());
 		return uiInfo;
 	}

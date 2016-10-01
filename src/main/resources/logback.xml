@@ -1,8 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-	<property name="DEV_HOME" value="./logs" />
+	<property name="LOG_HOME" value="./logs" />
 
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ERROR-LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/error.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOG_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+
+	<appender name="DOMOTICA-LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/domotica.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOG_HOME}/archived/domotica.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
 
 	<appender name="FREQCONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
@@ -11,49 +60,20 @@
 			</Pattern>
 		</layout>
 	</appender>
-	
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-			</Pattern>
-		</layout>
-	</appender>
-	
-	  <appender name="FREQFILE" class="ch.qos.logback.core.FileAppender">
-    <file>freqFile.log</file>
-    <append>true</append>
-    <encoder>
+
+	<appender name="FREQFILE" class="ch.qos.logback.core.FileAppender">
+		<file>${LOG_HOME}/freqFile.log</file>
+		<append>true</append>
+		<encoder>
 			<Pattern>
 				%d{yyyy-MM-dd HH:mm:ss} %msg%n
 			</Pattern>
-    </encoder>
-  </appender>
- 
-	<appender name="DOMOTICA-LOG"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${DEV_HOME}/domotica.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-			</Pattern>
 		</encoder>
-
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- rollover daily -->
-			<fileNamePattern>${DEV_HOME}/archived/domotica.%d{yyyy-MM-dd}.%i.log
-                        </fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-
 	</appender>
 
 	<appender name="HARDWARE-LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${DEV_HOME}/hardware.log</file>
+		<file>${LOG_HOME}/hardware.log</file>
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<Pattern>
 				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
@@ -62,60 +82,34 @@
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>${DEV_HOME}/archived/hardware.%d{yyyy-MM-dd}.%i.log
-                        </fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/archived/hardware.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
-
 	</appender>
 
-	<appender name="ERROR-LOG"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${DEV_HOME}/error.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-			</Pattern>
-		</encoder>
 
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- rollover daily -->
-			<fileNamePattern>${DEV_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
-                        </fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-
-	</appender>
-	
 	<!-- Alle errors sowieso naar error.log -->
-	<root level="error">
+	<root level="warn">
 		<appender-ref ref="ERROR-LOG" />
+		<appender-ref ref="STDOUT" />
 	</root>
 
-<!--
-	<logger name="FREQ" level="debug">
-		<appender-ref ref="FREQFILE" />
-	</logger>
--->	
+	<!-- <logger name="FREQ" level="debug"> <appender-ref ref="FREQFILE" /> 
+		</logger> -->
 	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
-	<logger name="org.eclipse.jetty" level="info"
-		additivity="false">
+	<logger name="org.eclipse.jetty" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 
 	<!-- Domotica zie onder; additivity false anders gaat het ook naar error.log -->
-	<logger name="eu.dlvm" level="info"
-		additivity="false">
+	<logger name="eu.dlvm" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
-	<!-- logger name="eu.dlvm.domotics.service_impl.UiUpdatorSocket" level="debug"/ -->
-
+	
 </configuration>

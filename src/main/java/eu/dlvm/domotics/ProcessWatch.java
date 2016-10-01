@@ -67,7 +67,7 @@ public class ProcessWatch {
 			pid += new String(cbuf,0, len);
 		}
 		if (log.isDebugEnabled())
-			log.debug("getPidOfProcess(), found pid=" + pid + ", process exitvalue=" + p.exitValue());
+			log.debug("getPidOfProcess(), found pid=" + pid);
 		return pid;
 	}
 
