@@ -4,42 +4,24 @@
 	<property name="LOG_HOME" value="./logs" />
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
+		<encoder>
+			<pattern>
 				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
 				%msg%n
-			</Pattern>
-		</layout>
-	</appender>
-
-	<appender name="ERROR-LOG"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/error.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n
-			</Pattern>
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
-
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- rollover daily -->
-			<fileNamePattern>${LOG_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
-			</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
 	</appender>
-
 
 	<appender name="DOMOTICA-LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${LOG_HOME}/domotica.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-			</Pattern>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -53,36 +35,77 @@
 		</rollingPolicy>
 	</appender>
 
-	<appender name="FREQCONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} %msg%n
-			</Pattern>
-		</layout>
+	<appender name="ERROR-LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>warn</level>
+		</filter>
+		<file>${LOG_HOME}/error.log</file>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOG_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
 	</appender>
 
 	<appender name="FREQFILE" class="ch.qos.logback.core.FileAppender">
 		<file>${LOG_HOME}/freqFile.log</file>
 		<append>true</append>
 		<encoder>
-			<Pattern>
+			<pattern>
 				%d{yyyy-MM-dd HH:mm:ss} %msg%n
-			</Pattern>
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
 	</appender>
 
-	<appender name="HARDWARE-LOG"
+	<appender name="MONITOR-LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/hardware.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-			</Pattern>
+		<file>${LOG_HOME}/monitor.log</file>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>${LOG_HOME}/archived/hardware.%d{yyyy-MM-dd}.%i.log
+			<fileNamePattern>${LOG_HOME}/archived/monitor.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="DRIVER-LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/driver.log</file>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOG_HOME}/archived/driver.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -92,24 +115,31 @@
 	</appender>
 
 
-	<!-- Alle errors sowieso naar error.log -->
-	<root level="warn">
-		<appender-ref ref="ERROR-LOG" />
+	<root>
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ERROR-LOG"/>
 	</root>
 
-	<!-- <logger name="FREQ" level="debug"> <appender-ref ref="FREQFILE" /> 
-		</logger> -->
-	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
-	<logger name="org.eclipse.jetty" level="info" additivity="false">
-		<appender-ref ref="DOMOTICA-LOG" />
-		<appender-ref ref="STDOUT" />
+	<logger name="FREQ" level="off" />
+	<logger name="WIND" level="off" />
+	<logger name="LIGHT" level="off" />
+	<logger name="DRIVER" level="warn" additivity="false">
+		<appender-ref ref="DRIVER=LOG" />
+	</logger>
+	<logger name="MONITOR" level="warn" additivity="false">
+		<appender-ref ref="MONITOR-LOG" />
 	</logger>
 
 	<!-- Domotica zie onder; additivity false anders gaat het ook naar error.log -->
 	<logger name="eu.dlvm" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ERROR-LOG"/>
 	</logger>
-	
+
+	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
+	<logger name="org.eclipse.jetty" level="info" additivity="false">
+		<appender-ref ref="DOMOTICA-LOG" />
+		<appender-ref ref="ERROR-LOG"/>
+	</logger>
+
 </configuration>

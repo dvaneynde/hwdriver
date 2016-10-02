@@ -18,7 +18,7 @@ public class OpenWeatherMap {
 	static Logger log = LoggerFactory.getLogger(OpenWeatherMap.class);
 
 	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=9432e6e90eb0c5c30b4f4c19ba396d37";
-	
+
 	public class Info {
 		public long sunrise_sec;
 		public long sunset_sec;
@@ -28,7 +28,7 @@ public class OpenWeatherMap {
 		Info info = null;
 		String report = getJsonWeatherReport();
 		if (report != null) {
-			 info = parseWeatherReport(report);
+			info = parseWeatherReport(report);
 		}
 		return info;
 	}
@@ -40,15 +40,14 @@ public class OpenWeatherMap {
 		String weather = null;
 		try {
 			HttpResponse response1 = httpclient.execute(httpGet);
-			log.debug("response statusline",response1.getStatusLine());
+			log.debug("response statusline", response1.getStatusLine());
 			HttpEntity entity = response1.getEntity();
 			weather = EntityUtils.toString(entity);
 			log.debug("http response=" + weather);
 			EntityUtils.consume(entity);
 			return weather;
 		} catch (Exception e) {
-			log.warn("Contacting openweathermap.org, no result, got exception:"
-					+ e.getMessage(),e);
+			log.warn("Contacting openweathermap.org, no result, got exception:" + e.getMessage(), e);
 		} finally {
 			httpGet.releaseConnection();
 		}
@@ -61,15 +60,22 @@ public class OpenWeatherMap {
 		try {
 			rootNode = mapper.readValue(jsonWeather, JsonNode.class);
 		} catch (Exception e) {
-			log.warn("Parsing openweathermap.org response failed, got exception: "
-					+ e.getMessage());
+			log.warn("Parsing openweathermap.org response failed, got exception: " + e.getMessage());
 			return null;
 		}
 
-		Info info = new Info();
-		info.sunset_sec = rootNode.get("sys").get("sunset").asLong();
-		info.sunrise_sec = rootNode.get("sys").get("sunrise").asLong();
-
+		Info info = null;
+		JsonNode sys;
+		sys = rootNode.get("sys");
+		if (sys != null) {
+			JsonNode sunset = sys.get("sunset");
+			JsonNode sunrise = sys.get("sunrise");
+			if (sunset != null && sunrise != null) {
+				info = new Info();
+				info.sunset_sec = sunset.asLong();
+				info.sunrise_sec = sunrise.asLong();
+			}
+		}
 		return info;
 	}
 
@@ -78,7 +84,8 @@ public class OpenWeatherMap {
 		OpenWeatherMap owm = new OpenWeatherMap();
 		OpenWeatherMap.Info info = owm.getWeatherReport();
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(info.sunset_sec*1000L);
-		System.out.println("Sunrise="+info.sunrise_sec+", calendar sunrise="+c.get(Calendar.HOUR_OF_DAY)+"h"+c.get(Calendar.MINUTE)+"m");
+		c.setTimeInMillis(info.sunset_sec * 1000L);
+		System.out.println("Sunrise=" + info.sunrise_sec + ", calendar sunrise=" + c.get(Calendar.HOUR_OF_DAY) + "h"
+				+ c.get(Calendar.MINUTE) + "m");
 	}
 }

@@ -2,11 +2,9 @@ package eu.dlvm.domotics.base;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -14,20 +12,27 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.DriverMonitor;
 import eu.dlvm.domotics.server.ServiceServer;
-import eu.dlvm.domotics.utils.OnceADayWithinPeriod;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
  * Central singleton in domotic system.
- * <p>Overview of methods:<ol>
- * <li>{@link #singleton(IHardwareIO)} creates singleton and accepts hardware driver connection</li>
- * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to construct the domotic system</li>
- * <li>{@link #initialize(Map)} should then be called to do some one-time initialization</li>
- * <li>{@link #runDomotic(int, String, boolean)} will then start the system by calling {@link #loopOnce(long)} regularly, and monitor everything </li>
+ * <p>
+ * Overview of methods:
+ * <ol>
+ * <li>{@link #singleton(IHardwareIO)} creates singleton and accepts hardware
+ * driver connection</li>
+ * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to
+ * construct the domotic system</li>
+ * <li>{@link #initialize(Map)} should then be called to do some one-time
+ * initialization</li>
+ * <li>{@link #runDomotic(int, String, boolean)} will then start the system by
+ * calling {@link #loopOnce(long)} regularly, and monitor everything</li>
  * </ol>
- * <p>{@link #requestStop()} will halt domotic system.
- * <p>{@link #loopOnce()} is the key method that drives every input to an output.
+ * <p>
+ * {@link #requestStop()} will halt domotic system.
+ * <p>
+ * {@link #loopOnce()} is the key method that drives every input to an output.
  * 
  * @author dirk vaneynde
  * 
@@ -47,7 +52,6 @@ public class Domotic implements IDomoticContext {
 	private DriverMonitor driverMonitor;
 	private Process driverProcess;
 	private OutputStateSaver saveState;
-	private OnceADayWithinPeriod restartOnceADay;
 
 	private AtomicBoolean stopRequested = new AtomicBoolean();
 	private AtomicBoolean restartDriverRequested = new AtomicBoolean();
@@ -86,9 +90,6 @@ public class Domotic implements IDomoticContext {
 		super();
 		saveState = new OutputStateSaver();
 		stateChangeListeners = new LinkedList<>();
-		// TODO does this actually do something?
-		// TODO configurable via xml !
-		restartOnceADay = new OnceADayWithinPeriod(23, 00, 23, 10);
 	}
 
 	public void setHw(IHardwareIO hw) {
@@ -184,7 +185,8 @@ public class Domotic implements IDomoticContext {
 	/**
 	 * Initializes Domotic system, after all Blocks ({@link Block}) were added.
 	 * <p>
-	 * Specifically, hardware outputs are set correctly, and UI blocks are gathered from allready registered blocks.
+	 * Specifically, hardware outputs are set correctly, and UI blocks are
+	 * gathered from allready registered blocks.
 	 * <p>
 	 * Must be called before {@link #loopOnce(long)} or {@link #stop}.
 	 * 
@@ -211,14 +213,14 @@ public class Domotic implements IDomoticContext {
 			registerIfUiCapable(b);
 		for (Block b : actuators)
 			registerIfUiCapable(b);
-			
+
 	}
 
 	private void registerIfUiCapable(Block b) {
-		if (b  instanceof IUiCapableBlock)
+		if (b instanceof IUiCapableBlock)
 			addUiCapableBlock((IUiCapableBlock) b);
 	}
-	
+
 	//@Override
 	private void addUiCapableBlock(IUiCapableBlock uiblock0) {
 		if (uiblock0.getUiInfo() == null) {
@@ -237,7 +239,6 @@ public class Domotic implements IDomoticContext {
 		uiblocks.add(uiblock0);
 		log.debug("Added UiCapableBlock " + uiblock0.getUiInfo().getName());
 	}
-
 
 	private void addShutdownHook(Domotic dom) {
 		Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
@@ -317,10 +318,17 @@ public class Domotic implements IDomoticContext {
 				saveState.writeRememberedOutputs(getActuators());
 
 				long currentLoopSequence = loopSequence;
-				if ((currentLoopSequence <= lastLoopSequence) && checkDriverAndRestartOnError) {
-					log.error("Domotic does not seem to be looping anymore, last recorded loopsequence="
-							+ lastLoopSequence + ", current=" + currentLoopSequence + ". I'll try to restart driver.");
-					break;
+				if (currentLoopSequence <= lastLoopSequence) {
+					if (checkDriverAndRestartOnError) {
+						log.error("Domotic does not seem to be looping anymore, last recorded loopsequence="
+								+ lastLoopSequence + ", current=" + currentLoopSequence
+								+ ". I'll try to restart driver.");
+						break;
+					} else {
+						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence="
+								+ lastLoopSequence + ", current=" + currentLoopSequence
+								+ ". I'll ignore it since flag to restart is not set.");
+					}
 				}
 				lastLoopSequence = currentLoopSequence;
 				if (pathToDriver != null && checkDriverAndRestartOnError) {
@@ -331,12 +339,6 @@ public class Domotic implements IDomoticContext {
 						break;
 					}
 				}
-
-				// TODO werkt niet, process gaat in TIME_WAIT; so_reuseaddr in
-				// hwdriver toegevoegd, maar dan had ik er 2 draaien...
-				// restartDriverRequested.set(checkIfDriverRestartTimeHasCome(osc.getLastCurrentTime()));
-				// if (restartDriverRequested.get())
-				// restartOnceADay.markDoneForToday();
 			}
 			boolean restartRequested = !stopRequested.get() && !fatalError;
 			// shutdown
@@ -356,12 +358,14 @@ public class Domotic implements IDomoticContext {
 	 * <li>{@link IHardwareIO#refreshInputs()} is called, so that hardware layer
 	 * inputs are refreshed.</li>
 	 * <li>All registered Sensors have their {@link Sensor#loop()} run to read
-	 * input and/or check timeouts etc. This typically triggers Actuators. Same happens for Controllers.</li>
+	 * input and/or check timeouts etc. This typically triggers Actuators. Same
+	 * happens for Controllers.</li>
 	 * <li>Then any registered Actuators have their {@link Actuator#loop()}
 	 * executed, so they can update hardware output state.</li>
 	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>
-	 * <li>Finally any {@link IStateChangedListener}s are called to update model state of connected client UIs.
+	 * <li>Finally any {@link IStateChangedListener}s are called to update model
+	 * state of connected client UIs.
 	 * </ol>
 	 * 
 	 * @param currentTime
@@ -443,27 +447,6 @@ public class Domotic implements IDomoticContext {
 		driverMonitor = null;
 		driverProcess = null;
 		log.info("Stopped hardware, oscillator and monitor.");
-	}
-
-	// TODO Werkt niet wegens TIME_WAIT, server zou even moeten wachten of select() doen - volgend leven
-	@SuppressWarnings("unused")
-	private boolean checkIfDriverRestartTimeHasCome(long lastCurrentTime) {
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Brussels"));
-		cal.setTimeInMillis(lastCurrentTime);
-		boolean restart = false;
-		if (restartOnceADay.canCheckForToday(lastCurrentTime)) {
-			log.debug("checkIfDriverRestartTimeHasCome() cancheck=true; now see if already done.");
-			if (!restartOnceADay.checkDoneForToday(lastCurrentTime)) {
-				log.debug("checkIfDriverRestartTimeHasCome() cancheck=true, checkDone=false, so RESTART !");
-				restart = true;
-			} else {
-				log.debug("checkIfDriverRestartTimeHasCome() cancheck and already done, so no restart.");
-			}
-		}
-		if (restart)
-			log.info("The time has come to restart the driver. Time=" + cal.get(Calendar.HOUR) + ':'
-					+ cal.get(Calendar.MINUTE) + '.');
-		return restart;
 	}
 
 	private static void sleepSafe(long millis) {

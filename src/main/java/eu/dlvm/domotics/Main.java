@@ -59,7 +59,7 @@ public class Main {
 	}
 
 	private void startAndRunDomotic(int looptime, String path2Driver, String blocksCfgFile, String hwCfgFile,
-			String hostname, int port, boolean simulation) {
+			String hostname, int port, boolean simulation, boolean restartOnProblems) {
 		PidSave pidSave = new PidSave(new File("./domotic.pid"));
 		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime
 				+ "ms\n\thardware cfg:\t" + hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t"
@@ -69,7 +69,7 @@ public class Main {
 		IHardwareIO hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
 
 		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
-		dom.runDomotic(looptime, path2Driver, !simulation);
+		dom.runDomotic(looptime, path2Driver, restartOnProblems);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -126,6 +126,7 @@ public class Main {
 		}
 		boolean domotic = false;
 		boolean simulation = false;
+		boolean restartIfProblems = false;
 		if (args[0].equalsIgnoreCase("domo"))
 			domotic = true;
 		else if (!args[0].equalsIgnoreCase("hw"))
@@ -143,6 +144,9 @@ public class Main {
 			} else if (args[i].equals("-s")) {
 				i++;
 				simulation = true;
+			} else if (args[i].equals("-r")) {
+				i++;
+				restartIfProblems = true;
 			} else if (args[i].equals("-b")) {
 				if (++i >= args.length)
 					usage();
@@ -175,9 +179,13 @@ public class Main {
 			usage();
 		}
 
+		log.error("TEST error message.");
+		log.warn("TEST warn message.");
+		log.info("TEST info message.");
+		log.debug("TEST debug message.");
 		Main main = new Main();
 		if (domotic) {
-			main.startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, simulation);
+			main.startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, simulation, restartIfProblems);
 		} else {
 			main.runHwConsole(hwCfgFile, hostname, port, path2Driver);
 		}
@@ -187,10 +195,11 @@ public class Main {
 
 	private static void usage() {
 		System.out.println("Usage:\t" + Main.class.getSimpleName()
-				+ " domo [-s] [-d path2Driver] [-t looptime] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n"
+				+ " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n"
 				+ "\t" + Main.class.getSimpleName()
 				+ " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file\n"
 				+ "\t-s simulate hardware driver (domotic only, for testing and development)\n"
+				+ "\t-r restart (or try to) if something is wrong with driver or loopsequence\n"
 				+ "\t-d path to driver, if it needs to be started and managed by this program\n"
 				+ "\t-t time between loops, in ms; defaults to " + DEFAULT_LOOP_TIME_MS + " ms.\n"
 				+ "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n"
