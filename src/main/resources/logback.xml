@@ -114,10 +114,9 @@
 		</rollingPolicy>
 	</appender>
 
-
+	<!-- Catch un-configured stuff in STDOUT. If stuff in there, need to configure it below (like Jetty). -->
 	<root>
 		<appender-ref ref="STDOUT" />
-		<appender-ref ref="ERROR-LOG"/>
 	</root>
 
 	<logger name="FREQ" level="off" />
@@ -130,13 +129,11 @@
 		<appender-ref ref="MONITOR-LOG" />
 	</logger>
 
-	<!-- Domotica zie onder; additivity false anders gaat het ook naar error.log -->
 	<logger name="eu.dlvm" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="ERROR-LOG"/>
 	</logger>
 
-	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
 	<logger name="org.eclipse.jetty" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="ERROR-LOG"/>
