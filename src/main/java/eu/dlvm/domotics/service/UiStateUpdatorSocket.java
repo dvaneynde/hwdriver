@@ -66,9 +66,8 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 		try {
 			String json = objectMapper.writeValueAsString(createUiInfos());
 			savedSession.getRemote().sendString(json);
-		} catch (IOException e) {
-			// TODO too many messages if goes wrong...
-			LOG.warn("Cannot send state to client.", e);
+		} catch (Exception e) {
+			LOG.warn("Cannot send state to client. Perhaps race condition, i.e. closed in parallel to update?", e);
 		}
 	}
 

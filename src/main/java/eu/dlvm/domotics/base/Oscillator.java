@@ -57,9 +57,9 @@ public class Oscillator extends Thread {
 			if (stopRequested())
 				log.info("Oscillator stops since so requested.");
 			else
-				log.error("Oh oh... oscillator has stopped for no apparent reason. Should not happen. Nothing done for now.");
+				log.error("Oh oh... oscillator has stopped for no apparent reason. Should not happen.");
 		} catch (Exception e) {
-			log.error("Oh oh... oscillator has stopped. Nothing done further, should restart or something...", e);
+			log.error("Oh oh... oscillator has stopped. Exception detail follows.", e);
 		}
 	}
 
