@@ -178,6 +178,10 @@ public class Main {
 					.println("Both blocks-config-file and hardware-config-file must be specified for domotic system.");
 			usage();
 		}
+		if (simulation && path2Driver != null) {
+			System.err.println("Cannot have both simulation and a path to the hardware driver.");
+			usage();
+		}
 
 		log.error("TEST error message.");
 		log.warn("TEST warn message.");

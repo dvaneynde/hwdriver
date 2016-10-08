@@ -6,8 +6,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
-				%msg%n
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
@@ -18,8 +17,7 @@
 		<file>${LOG_HOME}/domotica.log</file>
 		<encoder>
 			<pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
-				%msg%n
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
@@ -75,8 +73,7 @@
 		<file>${LOG_HOME}/monitor.log</file>
 		<encoder>
 			<pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
-				%msg%n
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
@@ -97,8 +94,7 @@
 		<file>${LOG_HOME}/driver.log</file>
 		<encoder>
 			<pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
-				%msg%n
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 			<outputPatternAsHeader>true</outputPatternAsHeader>
 		</encoder>
@@ -114,29 +110,36 @@
 		</rollingPolicy>
 	</appender>
 
-	<!-- Catch un-configured stuff in STDOUT. If stuff in there, need to configure it below (like Jetty). -->
+
 	<root>
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ERROR-LOG"/>
 	</root>
 
 	<logger name="FREQ" level="off" />
 	<logger name="WIND" level="off" />
 	<logger name="LIGHT" level="off" />
-	<logger name="DRIVER" level="warn" additivity="false">
-		<appender-ref ref="DRIVER=LOG" />
+	<logger name="DRIVER" level="info" additivity="false">
+		<appender-ref ref="DRIVER-LOG" />
 	</logger>
-	<logger name="MONITOR" level="warn" additivity="false">
+	<logger name="MONITOR" level="info" additivity="false">
 		<appender-ref ref="MONITOR-LOG" />
 	</logger>
 
+	<!-- Domotica zie onder; additivity false anders gaat het ook naar error.log -->
 	<logger name="eu.dlvm" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="ERROR-LOG"/>
+		<appender-ref ref="STDOUT" />
 	</logger>
 
+	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
 	<logger name="org.eclipse.jetty" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="ERROR-LOG"/>
 	</logger>
 
+	<logger name="eu.dlvm.iohardware.diamondsys.messaging" level="debug" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
 </configuration>

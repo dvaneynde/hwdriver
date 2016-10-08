@@ -1,6 +1,5 @@
 package eu.dlvm.domotics;
 
-// TODO move to base, or move base/* to here?
 public class DriverMonitor {
 
 	private ProcessWatch prWatch;

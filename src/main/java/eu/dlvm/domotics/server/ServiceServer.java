@@ -69,7 +69,7 @@ public class ServiceServer {
 			// Add the websocket filter
 			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(context);
 			// Configure websocket behavior
-			wsfilter.getFactory().getPolicy().setIdleTimeout(50000); // TODO default seems to be 5000
+			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
 			wsfilter.addMapping(new ServletPathSpec("/time/"), new UiSocketCreator(domoContext));
 
