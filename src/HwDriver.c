@@ -72,6 +72,12 @@ void setupAsServer() {
 	/* Create socket for incoming connections */
 	if ((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		perror("socket() failed");
+	// Ik had een TIME_WAIT bij herstart driver vanuit Java programma, daarom SO_REUSEADDR (http://hea-www.harvard.edu/~fine/Tech/addrinuse.html)
+	// Alternatief is eerst select() hier om te zien of client geclosed heeft, maar dat heb ik niet geprobeerd.
+	int on = 1;
+	if (setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+		perror("setsockopt(SO_REUSEADDR) failed");
+	}
 	bzero((char *) &servAddr, sizeof(servAddr));
 	servAddr.sin_family = AF_INET; /* Internet address family */
 	servAddr.sin_addr.s_addr = ((struct in_addr *) (hp->h_addr))->s_addr;
@@ -162,7 +168,7 @@ int stringToCommand(char* sCmd) {
 int parseRecvdParams(char* text, char** parms) {
 	int parmsLen = 0;
 	char* parm;
-	while ((parm = strtok(text, " ")) != NULL ) {
+	while ((parm = strtok(text, " ")) != NULL) {
 		text = NULL;
 		parms[parmsLen] = malloc(strlen(parm) + 1);
 		strcpy(parms[parmsLen], parm);
@@ -182,7 +188,8 @@ void parseRecvdMsgLine(char* line) {
 	sCmd = strtok(line, " ");
 	sprintf(logmsg, "Command: \'%s\'", sCmd);
 	mylog(MYLOG_DEBUG, logmsg);
-	if ((sCmd == NULL )|| (strlen(sCmd) == 0))return;
+	if ((sCmd == NULL) || (strlen(sCmd) == 0))
+		return;
 	int cmd = stringToCommand(sCmd);
 
 	char* parms = strtok(NULL, "");
@@ -251,7 +258,6 @@ void parseRecvdMsgLine(char* line) {
 		break;
 	case QUIT:
 		mylog(MYLOG_INFO, "\nQUIT command - 't is gedaan!\n");
-		close(clntSock);
 		endDiamondDriver();
 		// TODO close boards properly ? Set stop flag so that run() can stop properly?
 		// TODO end opalmm by calling closeOpalmm()
@@ -269,7 +275,7 @@ void parseRecvdMsg() {
 	int nrLines, parmsLen, j;
 
 	nrLines = parseStringbyLines(msgIn, &lines);
-	if (nrLines==0) {
+	if (nrLines == 0) {
 		mylog(MYLOG_DEBUG, "Empty line received, nothing to do.\n");
 		return;
 	}
@@ -314,7 +320,7 @@ void runAsServer() {
 		}
 		msgCounter++;
 	}
-
+	close(servSock);
 }
 
 /*
