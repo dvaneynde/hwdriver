@@ -387,10 +387,10 @@ public class Domotic implements IDomoticContext {
 		}
 		hw.refreshOutputs();
 
-		//if (loopSequence % 10 == 0) {
-		for (IStateChangedListener uiUpdator : stateChangeListeners)
-			uiUpdator.updateUi();
-		//}
+		if (loopSequence % 10 == 0) {
+			for (IStateChangedListener uiUpdator : stateChangeListeners)
+				uiUpdator.updateUi();
+		}
 
 		if (loopSequence % 10 == 0)
 			MON.info("loopOnce() done, loopSequence=" + loopSequence + ", currentTime=" + currentTime);

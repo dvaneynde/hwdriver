@@ -27,6 +27,7 @@ public class HardwareIO implements IHardwareIO {
 	private List<Board> boards;
 	private ChannelMap channelMap; // logical channel --> physical channel
 	private IHwDriverChannel driverChannel;
+	private int errorCount = 0;
 
 	/**
 	 * Create a Diamond Systems hardware configuration.
@@ -91,9 +92,12 @@ public class HardwareIO implements IHardwareIO {
 					Integer address = Integer.parseInt(st.nextToken().substring(2), 16);
 					Board b = findBoardBy(address);
 					((IBoardMessaging) b).parseInputResult(cmd, address, st);
+					errorCount = 0;
 				}
 			} catch (Exception e) {
 				log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
+				if (errorCount ++ > 5)
+					System.exit(1);
 			}
 		}
 	}
@@ -112,8 +116,11 @@ public class HardwareIO implements IHardwareIO {
 		List<String> recvdLines;
 		try {
 			recvdLines = driverChannel.sendAndRecv(sb.toString(), Reason.OUTPUT);
+			errorCount = 0;
 		} catch (ChannelFault e) {
 			log.error("Error communicating with driver, ignored. Some output changes may be lost.");
+			if (errorCount ++ > 5)
+				System.exit(1);	// TODO specific exception so outputs can be saved and then exit...
 			return;
 		}
 
