@@ -32,9 +32,9 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 
 	/**
 	 * 
-	 * @param serverHostname
-	 * @param serverPort
-	 * @param readTimeout
+	 * @param serverHostname Host of hardware driver, typically localhost
+	 * @param serverPort Port on which hardware driver communicates, default is {@link #DEFAULT_DRIVER_PORT}
+	 * @param readTimeout Should be less than looptime
 	 */
 	public HwDriverTcpChannel(String serverHostname, int serverPort, int readTimeout) {
 		this.serverHostname = serverHostname;
@@ -42,7 +42,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		this.readTimeout = readTimeout;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#connect()
 	 */
 	@Override
@@ -59,7 +59,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#sendAndRecv(java.lang.String)
 	 */
 	@Override
@@ -93,7 +93,7 @@ public class HwDriverTcpChannel implements IHwDriverChannel {
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel#disconnect()
 	 */
 	@Override
