@@ -59,6 +59,8 @@ char errormsg[1024];
 #define REQ_INP	2
 #define SET_OUT	4
 #define QUIT	6
+#define PING	7
+#define UNKNOWN	99
 
 void setupAsServer() {
 
@@ -156,9 +158,10 @@ int stringToCommand(char* sCmd) {
 		return SET_OUT;
 	case 'Q':
 		return QUIT;
+	case 'P':
+		return PING;
 	default:
-		mylog(MYLOG_WARN, "Unknown command received.");
-		exit(2);
+		return UNKNOWN;
 	}
 }
 
@@ -199,10 +202,18 @@ void parseRecvdMsgLine(char* line) {
 	int address, bVal;
 	char* lineParms[128];
 	char oneLine[80];
-	int nrParms;
+	int nrParms = -1;
 	char type;
 
 	switch (cmd) {
+	case PING:
+		sprintf(msgOut, "PING echo=%s\n", parms);
+		break;
+	case UNKNOWN:
+		sprintf(logmsg, "Unknown command received: line='%s'\n", line);
+		mylog(MYLOG_WARN, logmsg);
+		sprintf(msgOut, "Unknown command '%s', ignored.\n", line);
+		break;
 	case INIT:
 		// Initialisatie I/O bordjes
 		initDiamondDriver();
@@ -221,9 +232,6 @@ void parseRecvdMsgLine(char* line) {
 		} else if (type == 'O') {
 			opalmmInit(address);
 		}
-		// Free up
-		for (i = 0; i < nrParms; i++)
-			free(lineParms[i]);
 		break;
 	case REQ_INP:
 		nrParms = parseRecvdParams(parms, lineParms);
@@ -263,6 +271,11 @@ void parseRecvdMsgLine(char* line) {
 		// TODO end opalmm by calling closeOpalmm()
 		keepOnGoing = 0;
 		break;
+	}
+	if (nrParms != -1) {
+		// Free up
+		for (i = 0; i < nrParms; i++)
+			free(lineParms[i]);
 	}
 }
 
@@ -314,7 +327,7 @@ void runAsServer() {
 		sprintf(logmsg, "Answering with:\n%s-----", msgOut);
 		mylog(MYLOG_DEBUG, logmsg);
 		sendMsg(msgOut);
-		if ((msgCounter % (20 * 60)) == 0) { // elke minuut
+		if ((msgCounter % (50 * 60)) == 0) { // elke minuut
 			sprintf(logmsg, "Still alive, msgCounter=%ld.", msgCounter);
 			mylog(MYLOG_INFO, logmsg);
 		}
@@ -344,7 +357,6 @@ void writePidToFile() {
  */
 int main(int argc, char *argv[]) {
 	int i;
-	int debug = 0; /* Value for the "-d" optional argument. */
 	if (argc < 2) {
 		printf(
 				"Usage: %s [-d] hostname\n\t-d: debug\n\thostname: ip or hostname (caller must use same, e.g. 0.0.0.0).\n\n",
