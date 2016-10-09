@@ -373,7 +373,7 @@ public class Domotic implements IDomoticContext {
 	 */
 	public synchronized void loopOnce(long currentTime) {
 		loopSequence++;
-		if (loopSequence % 100 == 0)
+		if (loopSequence % 10 == 0)
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {

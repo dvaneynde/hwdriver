@@ -3,7 +3,7 @@ package eu.dlvm.domotics.base;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
- * Actuator, controller, sensor en IUiCapable blocks moeten zich kunnen
+ * Actuator, controller, sensor and IUiCapable blocks moeten zich kunnen
  * registreren. En geeft toegang tot hardware.
  * 
  * TODO getHw() zou in aparte interface moeten, enkel voor sensors en actuators

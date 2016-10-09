@@ -139,7 +139,9 @@
 		<appender-ref ref="ERROR-LOG"/>
 	</logger>
 
+<!-- 
 	<logger name="eu.dlvm.iohardware.diamondsys.messaging" level="debug" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
+	 -->
 </configuration>
