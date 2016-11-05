@@ -373,7 +373,7 @@ public class Domotic implements IDomoticContext {
 	 */
 	public synchronized void loopOnce(long currentTime) {
 		loopSequence++;
-		if (loopSequence % 10 == 0)
+		if (loopSequence % 100 == 0)
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
@@ -390,10 +390,10 @@ public class Domotic implements IDomoticContext {
 		{
 			// TODO must be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
-			if (loopSequence % 10 == 0) {
+			//if (loopSequence % 10 == 0) {
 				for (IStateChangedListener uiUpdator : stateChangeListeners)
 					uiUpdator.updateUi();
-			}
+			//}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
 			if (tookMs >= 20)
 				log.error("Updating websockets took more than 19 ms!\nTotal=" + tookMs + " ms.");

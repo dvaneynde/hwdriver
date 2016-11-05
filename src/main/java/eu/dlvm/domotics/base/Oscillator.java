@@ -37,7 +37,8 @@ public class Oscillator extends Thread {
 			dom.loopOnce(currentTime);
 			avgLong.add(System.currentTimeMillis() - currentTime);
 			if (avgLong.enoughSamples())
-				log.info("Loops took on average "+avgLong.avgAndClear()+" ms.");
+				avgLong.avgAndClear();
+				//log.info("Loops took on average "+avgLong.avgAndClear()+" ms.");
 			// FIXME must be tick - time-passed !!!
 			try {
 				Thread.sleep(tickTimeMs);
