@@ -71,7 +71,7 @@ public class ServiceServer {
 			// Configure websocket behavior
 			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/time/"), new UiSocketCreator(domoContext));
+			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(domoContext));
 
 			// Add REST interface handler
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey

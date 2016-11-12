@@ -35,8 +35,8 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUiCapable
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
-		super(name, description, ui);
+	public Actuator(String name, String description, String uiGroup, LogCh channel, IDomoticContext ctx) {
+		super(name, description, uiGroup);
 		this.ctx = ctx;
 		this.channel = channel;
 		ctx.addActuator(this);
@@ -77,7 +77,8 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUiCapable
 
 	@Override
 	public String toString() {
-		return "Actuator name='" + name + "', ch=" + getChannel() + ", description='" + description + "'";
+		return "Actuator [channel=" + channel + ", ctx=" + ctx + ", name=" + name + ", description=" + description
+				+ ", uiGroup=" + uiGroup + "]";
 	}
 
 }

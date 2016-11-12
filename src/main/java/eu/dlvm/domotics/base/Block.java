@@ -4,28 +4,21 @@ package eu.dlvm.domotics.base;
  * A block is a building block for anything from switches to lamps.
  * 
  * @author dirk vaneynde
- * 
- * TODO ui must go out here
  */
 public abstract class Block {
 
 	protected String name;
 	protected String description;
-	protected String uiPosition;
+	protected String uiGroup;
 
-	public Block(String name, String description) {
+	private Block(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}
 
-	public Block(String name, String description, String ui) {
+	public Block(String name, String description, String uiGroup) {
 		this(name, description);
-		this.uiPosition = ui;
-	}
-
-	@Override
-	public String toString() {
-		return "Block name='" + name + ", ui-position=" + uiPosition;
+		this.uiGroup = uiGroup;
 	}
 
 	public String getName() {
@@ -36,7 +29,13 @@ public abstract class Block {
 		return description;
 	}
 
-	public String getUiPosition() {
-		return uiPosition;
+	public String getUiGroup() {
+		return uiGroup;
 	}
+
+	@Override
+	public String toString() {
+		return "Block [name=" + name + ", description=" + description + ", uiGroup=" + uiGroup + "]";
+	}
+	
 }

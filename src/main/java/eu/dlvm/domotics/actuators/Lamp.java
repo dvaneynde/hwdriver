@@ -108,7 +108,7 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), this.getDescription());
+		UiInfo bi = new UiInfo(this);
 		//ai.addParm("on", isOn() ? "1" : "0");
 		bi.setOn(isOn());
 		return bi;

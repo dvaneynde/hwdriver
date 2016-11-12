@@ -61,9 +61,9 @@ public class Switch2Screen extends Connector implements ISwitchListener, IUiCapa
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo bi = null;
-		if (getUiPosition() != null) {
-			log.debug("getBlockInfo(), ui='" + getUiPosition() + "'");
-			bi = new UiInfo(this.getName(), "Switch2Screen", this.getDescription());
+		if (getUiGroup() != null) {
+			log.debug("getBlockInfo(), ui='" + getUiGroup() + "'");
+			bi = new UiInfo(this);
 		}
 		return bi;
 	}

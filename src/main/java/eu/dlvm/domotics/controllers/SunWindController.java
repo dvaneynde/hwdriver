@@ -104,7 +104,7 @@ public class SunWindController extends Controller implements IOnOffToggleCapable
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this.getName(), this.getClass().getSimpleName(), getDescription());
+		UiInfo bi = new UiInfo(this);
 		bi.setOn(isEnabled());
 		bi.setStatus(isEnabled() ? "ON" : "OFF");
 		return bi;

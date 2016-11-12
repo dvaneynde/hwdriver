@@ -21,13 +21,14 @@ public class UiInfo {
 	}
 
 	public UiInfo(Block block) {
-		this(block.getName(), block.getClass().getSimpleName(), block.getDescription());
+		this(block.getName(), block.getClass().getSimpleName(), block.getUiGroup(), block.getDescription());
 	}
 
-	public UiInfo(String name, String type, String description) {
+	public UiInfo(String name, String type, String uiGroup, String description) {
 		this();
 		setName(name);
 		setType(type);
+		setGroupName(uiGroup);
 		setDescription(description);
 	}
 

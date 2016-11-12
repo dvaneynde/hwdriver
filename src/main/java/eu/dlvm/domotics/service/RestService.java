@@ -2,7 +2,6 @@ package eu.dlvm.domotics.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -44,8 +43,7 @@ public class RestService {
 		Log.info("Shutdown of domotic requested.");
 	}
 
-	// TODO rename
-	@Path("actuators_txt")
+	@Path("statuses_txt")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String listActuatorsTxt() {
@@ -55,8 +53,7 @@ public class RestService {
 		return sb.toString();
 	}
 
-	// TODO rename
-	@Path("actuators")
+	@Path("statuses")
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	public List<UiInfo> listActuators() {
