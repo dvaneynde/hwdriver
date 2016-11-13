@@ -114,13 +114,10 @@ public class Timer extends Controller {
 
 	@Override
 	public UiInfo getUiInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void update(String action) {
-		// TODO Auto-generated method stub
-
 	}
 }

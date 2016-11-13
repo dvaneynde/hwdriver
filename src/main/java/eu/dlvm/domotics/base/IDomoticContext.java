@@ -7,7 +7,6 @@ import eu.dlvm.iohardware.IHardwareIO;
  * registreren. En geeft toegang tot hardware.
  * 
  * TODO getHw() zou in aparte interface moeten, enkel voor sensors en actuators
- * TODO kan dit niet dynamisch, b.v. addBlock en dan kijkt code zelf of het sensor is, of ui capable is? en hw al dan niet zetten? Factory maken?
  * @author dirk
  * 
  */
@@ -21,7 +20,6 @@ public interface IDomoticContext {
 	 *            Added, if not already present. Each Sensor can be present no
 	 *            more than once.
 	 */
-	// TODO addBlock
 	public void addSensor(Sensor s);
 
 	/**
@@ -32,14 +30,9 @@ public interface IDomoticContext {
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
-	// TODO addBlock
 	public void addActuator(Actuator a);
 
-	// TODO addBlock
 	public void addController(Controller a);
-
-	// TODO onderstaande wordt rechtstreeks aangeroepen vanuit Handler, naast intern in Domotic...
-	//public void addUiCapableBlock(IUiCapableBlock uiblock0);
 
 	public void addStateChangedListener(IStateChangedListener updator);
 	public void removeStateChangedListener(IStateChangedListener updator);

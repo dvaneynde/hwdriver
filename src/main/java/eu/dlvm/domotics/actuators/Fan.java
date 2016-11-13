@@ -311,8 +311,6 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	@Override
 	public void update(String action) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void writeOutput(boolean val) {

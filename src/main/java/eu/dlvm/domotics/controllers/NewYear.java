@@ -136,14 +136,11 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 
 	@Override
 	public UiInfo getUiInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void update(String action) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -312,9 +312,8 @@ public class Domotic implements IDomoticContext {
 			log.info("Everything started, now watching...");
 			long lastLoopSequence = -1;
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
-				sleepSafe(MONITORING_INTERVAL_MS); // TODO deze sleep moet
-													// interrupted ! Of heb ik dat
-													// al gedaan?
+				// TODO deze sleep moet interrupted ! Of heb ik dat al gedaan?
+				sleepSafe(MONITORING_INTERVAL_MS); 
 				saveState.writeRememberedOutputs(getActuators());
 
 				long currentLoopSequence = loopSequence;
