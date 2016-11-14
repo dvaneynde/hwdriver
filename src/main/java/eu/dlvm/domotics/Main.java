@@ -1,16 +1,12 @@
 package eu.dlvm.domotics;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
-import eu.dlvm.iohardware.HwConsole;
 import eu.dlvm.iohardware.IHardwareIO;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
@@ -27,11 +23,9 @@ import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
 public class Main {
 
 	public static final int DEFAULT_LOOP_TIME_MS = 20;
+	public static final Logger logDriver = LoggerFactory.getLogger("DRIVER");
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
-	private static final Logger logDriver = LoggerFactory.getLogger("DRIVER");
-	@SuppressWarnings("unused")
-	private static final Logger MON = LoggerFactory.getLogger("MONITOR");
 
 	public IHardwareIO setupHardware(String cfgFile, String host, int port, int readTimeout, boolean simulated) {
 		XmlHwConfigurator xhc = new XmlHwConfigurator(cfgFile);
@@ -46,12 +40,9 @@ public class Main {
 
 	public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
 		try {
-			Domotic d = Domotic.singleton();
-			XmlDomoticConfigurator cf = new XmlDomoticConfigurator();
-			cf.setCfgFilepath(cfgFilename);
-			cf.configure(d);
-			d.setHw(hw);
-			return d;
+			Domotic domotic = Domotic.createSingleton(hw);
+			XmlDomoticConfigurator.configure(cfgFilename, domotic);
+			return domotic;
 		} catch (Exception e) {
 			log.error("Cannot configure system, abort.", e);
 			throw new RuntimeException("Abort. Cannot configure system.");
@@ -61,50 +52,15 @@ public class Main {
 	private void startAndRunDomotic(int looptime, String path2Driver, String blocksCfgFile, String hwCfgFile,
 			String hostname, int port, boolean simulation, boolean restartOnProblems) {
 		PidSave pidSave = new PidSave(new File("./domotic.pid"));
+		String pid = pidSave.getPidFromCurrentProcessAndStoreToFile();
 		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime
 				+ "ms\n\thardware cfg:\t" + hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t"
-				+ pidSave.getPidFromCurrentProcess());
+				+ pid);
 		
-		pidSave.storePid();
 		IHardwareIO hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
-
 		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
+		
 		dom.runDomotic(looptime, path2Driver, restartOnProblems);
-	}
-
-	@SuppressWarnings("deprecation")
-	public void runHwConsole(final String cfgFilename, final String hostname, final int port, String pathToDriver) {
-		if (pathToDriver == null) {
-			HwConsole hc = new HwConsole(cfgFilename, hostname, port);
-			hc.processCommands();
-		} else {
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					HwConsole hc = new HwConsole(cfgFilename, hostname, port);
-					hc.processCommands();
-				}
-			};
-			Thread t = new Thread(r, "HwConsole");
-			try {
-				log.info("Start HwDriver, wait for 5 seconds...");
-				ProcessBuilder pb = new ProcessBuilder(pathToDriver, "localhost");
-				Process process = pb.start();
-				Thread.sleep(5000);
-				t.start();
-				BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line;
-				while ((line = br.readLine()) != null) {
-					logDriver.info(line);
-				}
-			} catch (IOException e) {
-				log.error("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
-			} catch (InterruptedException e) {
-				log.error("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);
-			} finally {
-				t.stop();
-			}
-		}
 	}
 
 	/**
@@ -183,15 +139,10 @@ public class Main {
 			usage();
 		}
 
-		log.error("TEST error message.");
-		log.warn("TEST warn message.");
-		log.info("TEST info message.");
-		log.debug("TEST debug message.");
-		Main main = new Main();
 		if (domotic) {
-			main.startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, simulation, restartIfProblems);
+			new Main().startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, simulation, restartIfProblems);
 		} else {
-			main.runHwConsole(hwCfgFile, hostname, port, path2Driver);
+			new HwConsoleRunner().run(hwCfgFile, hostname, port, path2Driver);
 		}
 
 		log.info("ENDED normally Domotic system.");

@@ -15,32 +15,30 @@ import org.xml.sax.ext.DefaultHandler2;
 import eu.dlvm.domotics.base.IDomoticContext;
 
 public class XmlDomoticConfigurator {
-	static Logger log = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
-	private File cfgFile;
 
-	public String getCfgFilepath() {
-		return cfgFile.getAbsolutePath();
-	}
+	private static Logger log = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 
-	public void setCfgFilepath(String cfgFilepath) {
-		cfgFile = new File(cfgFilepath);
-		if (!cfgFile.exists())
-			throw new IllegalArgumentException("File '" + cfgFilepath + "' does not exist.");
-	}
-
-	public void configure(IDomoticContext domoCtx) {
+	public static void configure(String cfgFilepath, IDomoticContext domoCtx) {
 		try {
+			File cfgFile = convertCfgFilepath(cfgFilepath);
+
 			SAXParserFactory f = SAXParserFactory.newInstance();
 			f.setValidating(true);
 			f.setNamespaceAware(true);
 			SAXParser p = f.newSAXParser();
 			DefaultHandler2 h = new DomoticXmlDefaultHandler(domoCtx);
-			p.parse(getCfgFilepath(), h);
+			p.parse(cfgFile, h);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			log.error("Configuration Failed: ", e);
 			throw new ConfigurationException(e.getMessage());
 		}
+	}
 
+	private static File convertCfgFilepath(String cfgFilepath) {
+		File cfgFile = new File(cfgFilepath);
+		if (!cfgFile.exists())
+			throw new IllegalArgumentException("File '" + cfgFilepath + "' does not exist.");
+		return cfgFile;
 	}
 
 }

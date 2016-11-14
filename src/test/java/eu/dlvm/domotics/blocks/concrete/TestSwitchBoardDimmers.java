@@ -73,7 +73,7 @@ public class TestSwitchBoardDimmers {
 		hw.outputs.put(DIMMER2, 0);
 
 		Domotic.resetSingleton();
-		dom = Domotic.singleton(hw);
+		dom = Domotic.createSingleton(hw);
 		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);

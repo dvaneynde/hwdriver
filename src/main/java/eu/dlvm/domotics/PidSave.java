@@ -16,26 +16,30 @@ public class PidSave {
 	private File pidPath;
 
 	/**
-	 * Find PID of current process and save it to file.
-	 * @param path to save pid in
+	 * @param fileToSavePid
 	 */
 	public PidSave(File fileToSavePid) {
 		this.pidPath = fileToSavePid;
 	}
 
-	public String getPidFromCurrentProcess() {
+	/**
+	 * Find PID of current process (once) and save it to file (once).
+	 */
+	public synchronized String getPidFromCurrentProcessAndStoreToFile() {
 		if (pid == null) {
 			String fullpid = ManagementFactory.getRuntimeMXBean().getName();
 			pid = fullpid.substring(0, fullpid.indexOf('@'));
+			storePid();
+			log.info("Stored pid " + pid + " of current process to file" + pidPath.getAbsolutePath() + '.');
 		}
 		return pid;
 	}
 
-	public void storePid() {
+	private void storePid() {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(pidPath);
-			fw.write(getPidFromCurrentProcess());
+			fw.write(getPidFromCurrentProcessAndStoreToFile());
 		} catch (FileNotFoundException e) {
 			log.error("Cannot start, cannot write pid file.", e);
 			System.exit(2);
@@ -50,6 +54,5 @@ public class PidSave {
 				}
 			}
 		}
-		log.info("Stored pid " + pid + " of current process to file"+pidPath.getAbsolutePath()+'.');
 	}
 }

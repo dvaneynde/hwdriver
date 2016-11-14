@@ -73,7 +73,7 @@ public class TestEnd2EndSwitchLamp {
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
 		Domotic.resetSingleton();
-		dom = Domotic.singleton(hw);
+		dom = Domotic.createSingleton(hw);
 		s = new Switch(IO.S_KEUKENLICHT.name(), IO.S_KEUKENLICHT.desc(),
 				IO.S_KEUKENLICHT.ch(), dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), IO.L_KEUKEN.ch(),

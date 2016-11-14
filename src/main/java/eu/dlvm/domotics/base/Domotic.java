@@ -16,11 +16,12 @@ import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
+ * 
  * Central singleton in domotic system.
  * <p>
  * Overview of methods:
  * <ol>
- * <li>{@link #singleton(IHardwareIO)} creates singleton and accepts hardware
+ * <li>{@link #createSingleton(IHardwareIO)} creates singleton and accepts hardware
  * driver connection</li>
  * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to
  * construct the domotic system</li>
@@ -67,13 +68,10 @@ public class Domotic implements IDomoticContext {
 	private List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
 
 	public static synchronized Domotic singleton() {
-		if (singleton == null) {
-			singleton = new Domotic();
-		}
 		return singleton;
 	}
 
-	public static synchronized Domotic singleton(IHardwareIO hw) {
+	public static synchronized Domotic createSingleton(IHardwareIO hw) {
 		if (singleton == null) {
 			singleton = new Domotic();
 			singleton.setHw(hw);
@@ -85,14 +83,13 @@ public class Domotic implements IDomoticContext {
 		singleton = null;
 	}
 
-	// Forceer singleton
 	private Domotic() {
 		super();
 		saveState = new OutputStateSaver();
 		stateChangeListeners = new LinkedList<>();
 	}
 
-	public void setHw(IHardwareIO hw) {
+	private void setHw(IHardwareIO hw) {
 		this.hw = hw;
 	}
 
@@ -118,10 +115,10 @@ public class Domotic implements IDomoticContext {
 		log.info("Added sensor " + sensor.getName());
 	}
 
-	public List<Sensor> getSensors() {
+/*	public List<Sensor> getSensors() {
 		return sensors;
 	}
-
+*/
 	/**
 	 * Add Actuator to loop set (see {@link #loopOnce()}.
 	 * 
@@ -139,11 +136,11 @@ public class Domotic implements IDomoticContext {
 		log.info("Added actuator " + actuator.getName());
 	}
 
-	public List<Actuator> getActuators() {
+/*	public List<Actuator> getActuators() {
 		return actuators;
 	}
 
-	public void addController(Controller controller) {
+*/	public void addController(Controller controller) {
 		if (controllers.contains(controller)) {
 			log.warn("Controller already added, ignored: " + controller);
 			assert (false);
@@ -314,7 +311,7 @@ public class Domotic implements IDomoticContext {
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
 				// TODO deze sleep moet interrupted ! Of heb ik dat al gedaan?
 				sleepSafe(MONITORING_INTERVAL_MS); 
-				saveState.writeRememberedOutputs(getActuators());
+				saveState.writeRememberedOutputs(actuators);
 
 				long currentLoopSequence = loopSequence;
 				if (currentLoopSequence <= lastLoopSequence) {
@@ -341,6 +338,7 @@ public class Domotic implements IDomoticContext {
 			}
 			boolean restartRequested = !stopRequested.get() && !fatalError;
 			// shutdown
+			// FIXME must do exit(1) to have it restarted
 			stopDriverOscilatorAndMonitor(pathToDriver, osc);
 			if (restartRequested) {
 				log.info("Will restart driver in " + RESTART_DRIVER_WAITTIME_MS / 1000 + " seconds...");

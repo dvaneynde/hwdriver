@@ -74,7 +74,7 @@ public class TestSwitchOrTimer2Lamp {
 		hw.out(11, false);
 
 		Domotic.resetSingleton();
-		dom = Domotic.singleton(hw);
+		dom = Domotic.createSingleton(hw);
 
 		sw1 = new Switch("Switch1", "Switch1", new LogCh(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", new LogCh(1), dom);

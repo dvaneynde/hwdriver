@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO move to base, or move base/* to here?
+// TODO move to eu.dlvm.domotics.processwatch
 
 public class ProcessWatch {
 	static Logger log = LoggerFactory.getLogger(ProcessWatch.class);
@@ -42,7 +42,8 @@ public class ProcessWatch {
 						exitcode = process.waitFor();
 						running = false;
 					} catch (InterruptedException e) {
-						log.info("process.waitFor() interrupted, will continue. Thread=" + Thread.currentThread().getName(), e);
+						log.info("process.waitFor() interrupted, will continue. Thread="
+								+ Thread.currentThread().getName(), e);
 					}
 				}
 			}
@@ -55,7 +56,7 @@ public class ProcessWatch {
 		if (log.isDebugEnabled())
 			log.debug("getPidOfProcess(), search pid of process with name=" + name);
 		//ProcessBuilder pb = new ProcessBuilder("/bin/ps", "-C ", name, "-o", "pid", "--noheading");
-		ProcessBuilder pb = new ProcessBuilder("/bin/bash","-c", "ps -C "+name+" -o pid --noheading");
+		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", "ps -C " + name + " -o pid --noheading");
 		Process p = pb.start();
 		BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String pid = "";
@@ -63,8 +64,8 @@ public class ProcessWatch {
 		int len;
 		while ((len = br.read(cbuf, 0, cbuf.length)) != -1) {
 			if (log.isDebugEnabled())
-				log.debug("getPidOfProcess(), line=" + new String(cbuf,0, len));
-			pid += new String(cbuf,0, len);
+				log.debug("getPidOfProcess(), line=" + new String(cbuf, 0, len));
+			pid += new String(cbuf, 0, len);
 		}
 		if (log.isDebugEnabled())
 			log.debug("getPidOfProcess(), found pid=" + pid);
@@ -74,7 +75,7 @@ public class ProcessWatch {
 	public String getPid() {
 		return pid;
 	}
-	
+
 	public boolean isRunning() {
 		log.debug("thread.isAlive()=" + thread == null ? "null" : thread.isAlive() + ", running=" + running);
 		return running;
@@ -91,6 +92,7 @@ public class ProcessWatch {
 
 	@Override
 	public String toString() {
-		return "ProcessWatch [threadname=" + threadname + ", process=" + process + ", running=" + running + ", exitcode=" + exitcode + "]";
+		return "ProcessWatch [threadname=" + threadname + ", process=" + process + ", running=" + running
+				+ ", exitcode=" + exitcode + "]";
 	}
 }

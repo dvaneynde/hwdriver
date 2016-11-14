@@ -69,7 +69,7 @@ public class TestSwitch2Fans {
 		hw.in(1, false);
 		
 		Domotic.resetSingleton();
-		dom = Domotic.singleton(hw);
+		dom = Domotic.createSingleton(hw);
 		sw1 = new Switch("Switch1", "Switch1", new LogCh(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", new LogCh(1), dom);
 		l1 = new Lamp("Lamp1", "Lamp1", new LogCh(LAMP1_OUT), dom);

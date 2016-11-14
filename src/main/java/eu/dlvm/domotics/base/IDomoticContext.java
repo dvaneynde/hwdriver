@@ -3,18 +3,17 @@ package eu.dlvm.domotics.base;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
- * Actuator, controller, sensor and IUiCapable blocks moeten zich kunnen
- * registreren. En geeft toegang tot hardware.
- * 
- * TODO getHw() zou in aparte interface moeten, enkel voor sensors en actuators
+ * General context, to pass around stuff easily.
+ * TODO use Java injection instead of these?
+ *  
  * @author dirk
  * 
  */
 public interface IDomoticContext {
 
 	/**
-	 * Add Sensor to loop set (see {@link #loopOnce()}. Not essential, just to
-	 * make code more robust by registering itself in constructor.
+	 * Add Sensor. Not essential, just to make code more robust by registering
+	 * itself in constructor.
 	 * 
 	 * @param s
 	 *            Added, if not already present. Each Sensor can be present no
@@ -23,8 +22,8 @@ public interface IDomoticContext {
 	public void addSensor(Sensor s);
 
 	/**
-	 * Add Actuator to loop set (see {@link #loopOnce()}. Not essential, just to
-	 * make code more robust by registering itself in constructor.
+	 * Add Actuator. Not essential, just to make code more robust by registering
+	 * itself in constructor.
 	 * 
 	 * @param s
 	 *            Added, if not already present. Each Actuator can be present no
@@ -32,14 +31,24 @@ public interface IDomoticContext {
 	 */
 	public void addActuator(Actuator a);
 
+	/**
+	 * Add Controller. Not essential, just to make code more robust by
+	 * registering itself in constructor.
+	 * 
+	 * @param s
+	 *            Added, if not already present. Each Actuator can be present no
+	 *            more than once.
+	 */
 	public void addController(Controller a);
 
+	// TODO observable
 	public void addStateChangedListener(IStateChangedListener updator);
+	// TODO observable
 	public void removeStateChangedListener(IStateChangedListener updator);
-	
+
 	/**
+	 * TODO should be separate interfaces, read and write, and sensors only have read and actuators only have write
 	 * @return Underlying hardware.
-	 * TODO waarom?
 	 */
 	public IHardwareIO getHw();
 }

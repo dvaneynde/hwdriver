@@ -8,7 +8,8 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO move to base, or move base/* to here?
+// TODO move to eu.dlvm.domotics.processwatch
+
 public class ProcessReader {
 	static Logger log = LoggerFactory.getLogger(ProcessReader.class);
 	static Logger logDriver = LoggerFactory.getLogger("DRIVER");
