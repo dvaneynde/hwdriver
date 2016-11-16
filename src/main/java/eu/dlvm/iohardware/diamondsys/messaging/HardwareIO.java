@@ -95,9 +95,9 @@ public class HardwareIO implements IHardwareIO {
 					errorCount = 0;
 				}
 			} catch (Exception e) {
-				log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
 				if (errorCount ++ > 5)
 					System.exit(1);
+				log.warn("Error in line received from Hardware Driver, IGNORED. Line=" + line, e);
 			}
 		}
 	}

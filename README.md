@@ -2,6 +2,7 @@
 Domotica Main
 
 TODO
+- HardwareIO heeft al exit 1 !!!
 - xml resources in src/main/resources, as default
 - logging config in src/main/resources, as default
 - logging.properties ook op bordje, en -D bij domotic.sh
