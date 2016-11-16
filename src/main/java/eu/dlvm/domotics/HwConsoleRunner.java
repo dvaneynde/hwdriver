@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.iohardware.HwConsole;
+import eu.dlvm.iohardware.diamondsys.HwConsole;
 
 public class HwConsoleRunner {
 

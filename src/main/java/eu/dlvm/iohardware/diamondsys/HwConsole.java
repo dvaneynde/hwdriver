@@ -1,4 +1,4 @@
-package eu.dlvm.iohardware;
+package eu.dlvm.iohardware.diamondsys;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.Main;
-import eu.dlvm.iohardware.diamondsys.Board;
+import eu.dlvm.iohardware.ChannelFault;
+import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
