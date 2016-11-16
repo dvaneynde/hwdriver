@@ -9,7 +9,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestFanWithLamp {
@@ -18,11 +17,10 @@ public class TestFanWithLamp {
 		public boolean fanStatus;
 
 		@Override
-		public void writeDigitalOutput(LogCh ch, boolean value)
-				throws IllegalArgumentException {
-			if (ch.id() == FAN_OUT.id()) {
+		public void writeDigitalOutput(String ch, boolean value) throws IllegalArgumentException {
+			if (ch.equals(FAN_OUT)) {
 				fanStatus = value;
-			} else if (ch.id() == LAMP_OUT.id()) {
+			} else if (ch.equals(LAMP_OUT)) {
 				lampStatus = value;
 			} else {
 				Assert.fail();
@@ -30,8 +28,8 @@ public class TestFanWithLamp {
 		}
 	};
 
-	private static final LogCh FAN_OUT = new LogCh(10);
-	private static final LogCh LAMP_OUT = new LogCh(11);
+	private static final String FAN_OUT = Integer.toString(10);
+	private static final String LAMP_OUT = Integer.toString(11);
 	private Fan fan;
 	private Lamp lamp;
 	private Hardware hw;
@@ -171,7 +169,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedRun();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayPeriodSec()*1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayPeriodSec() * 1000 + 10), seq++);
 		assertRunLampOn();
 		// Toggle off, but lamp still on, so goes immediately to Delayed Run
 		fan.toggle();
@@ -193,7 +191,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedRun();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayPeriodSec()*1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayPeriodSec() * 1000 + 10), seq++);
 		assertRunLampOn();
 		// Lamp off
 		lamp.setOn(false);
@@ -229,7 +227,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedRun();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayPeriodSec()*1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayPeriodSec() * 1000 + 10), seq++);
 		assertRunLampOn();
 		// Toggle off, but lamp still on, so goes immediately to Delayed Run
 		fan.turnOffUntilLampOff();
@@ -251,7 +249,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedRun();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayPeriodSec()*1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayPeriodSec() * 1000 + 10), seq++);
 		assertRunLampOn();
 		// Toggle off, but lamp still on, so goes immediately to Delayed Run
 		fan.turnOffUntilLampOff();

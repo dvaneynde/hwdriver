@@ -10,7 +10,7 @@ package eu.dlvm.iohardware;
  * {@link #refreshInputs()} and {@link #refreshOutputs()} the inputs and outputs
  * will be in line with the real hardware.
  * <p>
- * A channel is identified by {@link LogCh}, essentially an integer number.
+ * A channel is identified by {@link String}, essentially an integer number.
  * Channel numbering needs not be consecutive. Input channels and output
  * (logical) channels are different; so channel '0' can be used twice, once for
  * input and once for output.
@@ -18,10 +18,10 @@ package eu.dlvm.iohardware;
  * Typical sequence:
  * <ol>
  * <li>{@link #initialize()}</li>
- * <li>{@link #refreshInputs()}, then 0 or more {@link #readAnalogInput(LogCh)}
- * or {@link #readDigitalInput(LogCh)}</li>
- * <li>then 0 or more {@link #writeDigitalOutput(LogCh, boolean)} or
- * {@link #writeAnalogOutput(LogCh, int)}, followed by {@link #refreshOutputs()}
+ * <li>{@link #refreshInputs()}, then 0 or more {@link #readAnalogInput(String)}
+ * or {@link #readDigitalInput(String)}</li>
+ * <li>then 0 or more {@link #writeDigitalOutput(String, boolean)} or
+ * {@link #writeAnalogOutput(String, int)}, followed by {@link #refreshOutputs()}
  * </li>
  * <li>back to step 2...</li>
  * </ol>
@@ -59,7 +59,7 @@ public interface IHardwareIO {
 	 * @throws IllegalArgumentException
 	 *             Logical channel does not have a physical one.
 	 */
-	public boolean readDigitalInput(LogCh channel)
+	public boolean readDigitalInput(String channel)
 			throws IllegalArgumentException;
 
 	/**
@@ -70,7 +70,7 @@ public interface IHardwareIO {
 	 * @throws IllegalArgumentException
 	 *             Logical channel does not have a physical one.
 	 */
-	public int readAnalogInput(LogCh channel) throws IllegalArgumentException;
+	public int readAnalogInput(String channel) throws IllegalArgumentException;
 
 	/**
 	 * Outputs given boolean value on given channel.
@@ -83,7 +83,7 @@ public interface IHardwareIO {
 	 * @throws IllegalArgumentException
 	 *             Logical channel does not have a physical one.
 	 */
-	public void writeDigitalOutput(LogCh channel, boolean value)
+	public void writeDigitalOutput(String channel, boolean value)
 			throws IllegalArgumentException;
 
 	/**
@@ -99,7 +99,7 @@ public interface IHardwareIO {
 	 *             Value not within range, or logical channel does not have a
 	 *             physical one.
 	 */
-	public void writeAnalogOutput(LogCh channel, int value)
+	public void writeAnalogOutput(String channel, int value)
 			throws IllegalArgumentException;
 
 }

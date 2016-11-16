@@ -36,7 +36,6 @@ import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.WindSensor;
-import eu.dlvm.iohardware.LogCh;
 
 class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
@@ -48,7 +47,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	private Map<String, List<Block>> group2Blocks = new HashMap<>();
 	private IDomoticContext ctx;
 	private String name, desc, ui;
-	private LogCh channel;
+	private String channel;
 
 	public DomoticXmlDefaultHandler(IDomoticContext ctx) {
 		super();
@@ -113,9 +112,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("dimmerSwitches")) {
 			parseBaseBlock(atts);
 			String s = atts.getValue("channelDown");
-			LogCh channelDown = (s == null ? new LogCh(name + "Down") : new LogCh(s));
+			String channelDown = (s == null ? new String(name + "Down") : new String(s));
 			s = atts.getValue("channelUp");
-			LogCh channelUp = (s == null ? new LogCh(name + "Up") : new LogCh(s));
+			String channelUp = (s == null ? new String(name + "Up") : new String(s));
 			block = new DimmerSwitch(name, desc, channelDown, channelUp, ctx);
 			blocks.put(block.getName(), block);
 		} else if (localName.equals("lamp")) {
@@ -135,9 +134,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("screen")) {
 			parseBaseBlock(atts);
 			String s = atts.getValue("channelDown");
-			LogCh channelDown = (s == null ? new LogCh(name + "Down") : new LogCh(s));
+			String channelDown = (s == null ? new String(name + "Down") : new String(s));
 			s = atts.getValue("channelUp");
-			LogCh channelUp = (s == null ? new LogCh(name + "Up") : new LogCh(s));
+			String channelUp = (s == null ? new String(name + "Up") : new String(s));
 			block = new Screen(name, desc, ui, channelDown, channelUp, ctx);
 			if (atts.getValue("motor-up-time") != null)
 				((Screen) block).setMotorUpPeriod(Integer.parseInt(atts.getValue("motor-up-time")));
@@ -381,7 +380,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		String s = atts.getValue("channel");
 		if (s == null)
 			s = name;
-		channel = new LogCh(s);
+		channel = new String(s);
 	}
 
 	private void parseBaseBlock(Attributes atts) {

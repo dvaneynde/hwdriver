@@ -15,7 +15,6 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
-import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
 import eu.dlvm.iohardware.diamondsys.FysCh;
@@ -28,9 +27,9 @@ public class TestEnd2EndDimmer {
 
 	static Logger log = LoggerFactory.getLogger(TestEnd2EndDimmer.class);
 
-	public static final LogCh SW_DN_1 = new LogCh(0);
-	public static final LogCh SW_UP_1 = new LogCh(1);
-	public static final LogCh DIMMER1 = new LogCh(100);
+	public static final String SW_DN_1 = "0";
+	public static final String SW_UP_1 = "1";
+	public static final String DIMMER1 = "100";
 
 	HardwareIO hw;
 	HwDriverChannelMock drv;

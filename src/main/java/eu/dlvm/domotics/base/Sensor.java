@@ -1,9 +1,9 @@
 package eu.dlvm.domotics.base;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Sensors sense input from hardware.
@@ -21,8 +21,7 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	static Logger log = LoggerFactory.getLogger(Sensor.class);
 
 	private IDomoticContext ctx;
-	private LogCh channel;
-	
+	private String channel;
 
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
@@ -31,11 +30,11 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	 * @param name
 	 * @param description
 	 */
-	public Sensor(String name, String description, LogCh channel, IDomoticContext ctx) {
+	public Sensor(String name, String description, String channel, IDomoticContext ctx) {
 		this(name, description, null, channel, ctx);
 	}
 
-	public Sensor(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+	public Sensor(String name, String description, String ui, String channel, IDomoticContext ctx) {
 		super(name, description, ui);
 		this.ctx = ctx;
 		this.channel = channel;
@@ -46,7 +45,7 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	 * @return Logical channel that this Sensor is connected on. TODO move to
 	 *         IHardwareAccess
 	 */
-	public LogCh getChannel() {
+	public String getChannel() {
 		return channel;
 	}
 

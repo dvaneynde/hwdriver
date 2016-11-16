@@ -1,6 +1,7 @@
 package eu.dlvm.domotics.actuators;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
@@ -8,19 +9,18 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.iohardware.LogCh;
 
 public class Lamp extends Actuator implements IOnOffToggleCapable {
 
 	static Logger log = LoggerFactory.getLogger(Lamp.class);
 	private boolean outval;
 
-	public Lamp(String name, String description, LogCh channel, IDomoticContext ctx) {
+	public Lamp(String name, String description, String channel, IDomoticContext ctx) {
 		super(name, description, null, channel, ctx);
 		this.outval = false;
 	}
 
-	public Lamp(String name, String description, String ui, LogCh channel, IDomoticContext ctx) {
+	public Lamp(String name, String description, String ui, String channel, IDomoticContext ctx) {
 		super(name, description, ui, channel, ctx);
 		this.outval = false;
 	}
@@ -29,7 +29,7 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 * @deprecated
 	 */
 	public Lamp(String name, String description, int channel, IDomoticContext ctx) {
-		this(name, description, new LogCh(channel), ctx);
+		this(name, description, Integer.toString(channel), ctx);
 	}
 
 	@Override

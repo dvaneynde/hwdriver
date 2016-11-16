@@ -22,38 +22,37 @@ import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestSwitchOrTimer2Lamp {
 	public static class Hardware extends BaseHardwareMock implements IHardwareIO {
-		private Map<LogCh, Boolean> inputs = new HashMap<LogCh, Boolean>();
-		private Map<LogCh, Boolean> outputs = new HashMap<LogCh, Boolean>();
+		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
+		private Map<String, Boolean> outputs = new HashMap<String, Boolean>();
 
 		@Override
-		public void writeDigitalOutput(LogCh channel, boolean value) throws IllegalArgumentException {
+		public void writeDigitalOutput(String channel, boolean value) throws IllegalArgumentException {
 			outputs.put(channel, value);
 		}
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
+		public boolean readDigitalInput(String channel) {
 			return inputs.get(channel);
 		}
 
 		public void out(int ch, boolean val) {
-			outputs.put(new LogCh(ch), val);
+			outputs.put(Integer.toString(ch), val);
 		}
 
 		public boolean out(int ch) {
-			return outputs.get(new LogCh(ch));
+			return outputs.get(Integer.toString(ch));
 		}
 
 		public void in(int ch, boolean val) {
-			inputs.put(new LogCh(ch), val);
+			inputs.put(Integer.toString(ch), val);
 		}
 
 		public boolean in(int ch) {
-			return inputs.get(new LogCh(ch));
+			return inputs.get(Integer.toString(ch));
 		}
 	};
 
@@ -76,10 +75,10 @@ public class TestSwitchOrTimer2Lamp {
 		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 
-		sw1 = new Switch("Switch1", "Switch1", new LogCh(0), dom);
-		sw2 = new Switch("Switch2", "Switch2", new LogCh(1), dom);
-		o1 = new Lamp("Lamp1", "Lamp1", new LogCh(10), dom);
-		o2 = new Lamp("Lamp2", "Lamp2", new LogCh(11), dom);
+		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), dom);
+		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), dom);
+		o1 = new Lamp("Lamp1", "Lamp1", Integer.toString(10), dom);
+		o2 = new Lamp("Lamp2", "Lamp2", Integer.toString(11), dom);
 
 		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		sw1.registerListener(sct1);

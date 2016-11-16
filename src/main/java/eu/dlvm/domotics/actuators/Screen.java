@@ -7,7 +7,6 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Represents two Screen relays, one for the motor lifting a screen, the second
@@ -40,7 +39,7 @@ public class Screen extends Actuator {
 	 */
 	public static final long DEFAULT_MOTOR_ON_PERIOD_SEC = 30;
 
-	private LogCh chUp;
+	private String chUp;
 	private long motorUpPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long motorDnPeriodMs = DEFAULT_MOTOR_ON_PERIOD_SEC * 1000L;
 	private long timeStateStart;
@@ -51,7 +50,7 @@ public class Screen extends Actuator {
 	/*
 	 * Public API
 	 */
-	public Screen(String name, String description, String ui, LogCh chDown, LogCh chUp, IDomoticContext ctx) {
+	public Screen(String name, String description, String ui, String chDown, String chUp, IDomoticContext ctx) {
 		super(name, description, ui, chDown, ctx);
 		this.chUp = chUp;
 	}

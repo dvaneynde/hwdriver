@@ -8,7 +8,6 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
 import eu.dlvm.iohardware.diamondsys.FysCh;
@@ -156,7 +155,7 @@ public class HardwareIO implements IHardwareIO {
 	}
 
 	@Override
-	public boolean readDigitalInput(LogCh lc) {
+	public boolean readDigitalInput(String lc) {
 		FysCh fc = channelMap.fysCh(lc);
 		log.debug("readDigitalInput(), for LogCh=" + lc + ", got FysCh=" + fc);
 		if (fc == null)
@@ -166,7 +165,7 @@ public class HardwareIO implements IHardwareIO {
 	}
 
 	@Override
-	public void writeDigitalOutput(LogCh lc, boolean val) {
+	public void writeDigitalOutput(String lc, boolean val) {
 		FysCh fc = channelMap.fysCh(lc);
 		if (fc == null)
 			return; // TODO correct oplossen...
@@ -175,7 +174,7 @@ public class HardwareIO implements IHardwareIO {
 	}
 
 	@Override
-	public int readAnalogInput(LogCh lc) {
+	public int readAnalogInput(String lc) {
 		FysCh fc = channelMap.fysCh(lc);
 		if (fc == null)
 			return 0; // TODO correct oplossen...
@@ -184,7 +183,7 @@ public class HardwareIO implements IHardwareIO {
 	}
 
 	@Override
-	public void writeAnalogOutput(LogCh lc, int value) {
+	public void writeAnalogOutput(String lc, int value) {
 		FysCh fc = channelMap.fysCh(lc);
 		if (fc == null)
 			return; // TODO correct oplossen...

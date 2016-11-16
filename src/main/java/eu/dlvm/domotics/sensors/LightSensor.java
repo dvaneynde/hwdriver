@@ -11,11 +11,10 @@ import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Measures light via analog input (via
- * {@link IHardwareIO#readAnalogInput(LogCh)}) . If this input value is higher
+ * {@link IHardwareIO#readAnalogInput(String)}) . If this input value is higher
  * than {@link #getHighThreshold()} for {@link #getHighWaitingTime()}
  * milliseconds a {@link States#HIGH} event is sent once. If lower than
  * {@link #getLowThreshold()} for {@link #getThresholdDelayMs()} milliseconds a
@@ -45,7 +44,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
 	};
 
-	public LightSensor(String name, String description, String ui, LogCh channel, IDomoticContext ctx, int lowThreshold, int highThreshold, int lowToHighDelaySec, int highToLowDelaySec)
+	public LightSensor(String name, String description, String ui, String channel, IDomoticContext ctx, int lowThreshold, int highThreshold, int lowToHighDelaySec, int highToLowDelaySec)
 			throws IllegalConfigurationException {
 		super(name, description, ui, channel, ctx);
 		if ((highThreshold < lowThreshold) || lowThreshold < 0 || highThreshold < 0) {
@@ -63,7 +62,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
-	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(LogCh)})
+	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(String)})
 	 * for {@link States#HIGH} state. See also {@link #getHighWaitingTime()}.
 	 * 
 	 * @return high threshold value
@@ -73,7 +72,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
-	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(LogCh)})
+	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(String)})
 	 * for {@link States#HIGH} state. See also {@link #getThresholdDelayMs()}.
 	 * 
 	 * @return low threshold value

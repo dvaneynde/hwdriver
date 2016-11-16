@@ -8,7 +8,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 // TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
@@ -20,13 +19,13 @@ public class TestDimmedLamp {
 		public int level;
 
 		@Override
-		public void writeAnalogOutput(LogCh channel, int value) throws IllegalArgumentException {
-			Assert.assertTrue(channel == LAMP_CH);
+		public void writeAnalogOutput(String channel, int value) throws IllegalArgumentException {
+			Assert.assertTrue(channel.equals(LAMP_CH));
 			level = value;
 		}
 	};
 
-	private static final LogCh LAMP_CH = new LogCh(10);
+	private static final String LAMP_CH = Integer.toString(10);
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
 	private IDomoticContext ctx = new DomoContextMock(hw);
@@ -107,8 +106,8 @@ public class TestDimmedLamp {
 
 	private void assertUp(int lvl) {
 		Assert.assertEquals(DimmedLamp.States.UP, lamp.getState());
-		Assert.assertEquals(lvl,lamp.getLevel());
-		Assert.assertEquals(MAX_OUT * lvl/100, hw.level);
+		Assert.assertEquals(lvl, lamp.getLevel());
+		Assert.assertEquals(MAX_OUT * lvl / 100, hw.level);
 	}
 
 	private void assertDown() {

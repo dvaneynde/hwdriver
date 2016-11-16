@@ -10,7 +10,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * DOC document
@@ -53,13 +52,13 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 * @param lowTimeToResetAlert
 	 *            Unit is seconds.
 	 */
-	public WindSensor(String name, String description, LogCh channel, IDomoticContext ctx, int highFreqThreshold,
+	public WindSensor(String name, String description, String channel, IDomoticContext ctx, int highFreqThreshold,
 			int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		this(name, description, null, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,
 				lowTimeToResetAlert);
 	}
 
-	public WindSensor(String name, String description, String ui, LogCh channel, IDomoticContext ctx,
+	public WindSensor(String name, String description, String ui, String channel, IDomoticContext ctx,
 			int highFreqThreshold, int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
 		super(name, description, ui, channel, ctx);
 		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far'

@@ -19,7 +19,6 @@ import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestSwitchBoardDimmers {
@@ -28,25 +27,25 @@ public class TestSwitchBoardDimmers {
 
 	public static int LONGCLICKTIMEOUT = 50;
 	public static final int FULL_OUT_VAL = 1024;
-	public static final LogCh SW_DN_1 = new LogCh(0);
-	public static final LogCh SW_UP_1 = new LogCh(1);
-	public static final LogCh SW_DN_2 = new LogCh(2);
-	public static final LogCh SW_UP_2 = new LogCh(3);
-	public static final LogCh SW_ALL = new LogCh(4);
-	public static final LogCh DIMMER1 = new LogCh(10);
-	public static final LogCh DIMMER2 = new LogCh(11);
+	public static final String SW_DN_1 = Integer.toString(0);
+	public static final String SW_UP_1 = Integer.toString(1);
+	public static final String SW_DN_2 = Integer.toString(2);
+	public static final String SW_UP_2 = Integer.toString(3);
+	public static final String SW_ALL = Integer.toString(4);
+	public static final String DIMMER1 = Integer.toString(10);
+	public static final String DIMMER2 = Integer.toString(11);
 
 	public static class Hardware extends BaseHardwareMock implements IHardwareIO {
-		private Map<LogCh, Boolean> inputs = new HashMap<LogCh, Boolean>();
-		private Map<LogCh, Integer> outputs = new HashMap<LogCh, Integer>();
+		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
+		private Map<String, Integer> outputs = new HashMap<String, Integer>();
 
 		@Override
-		public void writeAnalogOutput(LogCh channel, int value) throws IllegalArgumentException {
+		public void writeAnalogOutput(String channel, int value) throws IllegalArgumentException {
 			outputs.put(channel, value);
 		}
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
+		public boolean readDigitalInput(String channel) {
 			return inputs.get(channel);
 		}
 	};

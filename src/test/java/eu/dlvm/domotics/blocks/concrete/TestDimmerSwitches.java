@@ -9,7 +9,6 @@ import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestDimmerSwitches {
@@ -17,8 +16,8 @@ public class TestDimmerSwitches {
 		public boolean inLeft, inRight;
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
-			return (channel.id().equals("0") ? inLeft : inRight);
+		public boolean readDigitalInput(String channel) {
+			return (channel.equals("0") ? inLeft : inRight);
 		}
 	};
 
@@ -36,7 +35,7 @@ public class TestDimmerSwitches {
 
 	@Before
 	public void init() {
-		ds = new DimmerSwitch("TestDimmerSwitches", "Unit Test DimmerSwitches", new LogCh(0), new LogCh(1), ctx);
+		ds = new DimmerSwitch("TestDimmerSwitches", "Unit Test DimmerSwitches", Integer.toString(0), Integer.toString(1), ctx);
 		lastEvent = null;
 		ds.registerListener(dsListener);
 		seq = (cur = 0L);

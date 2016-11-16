@@ -14,7 +14,6 @@ import eu.dlvm.domotics.connectors.Switch2Screen;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestSwitchBoardScreens {
@@ -30,34 +29,33 @@ public class TestSwitchBoardScreens {
 	public static final int REL_UP_2 = 13;
 
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
-		private Map<LogCh, Boolean> inputs = new HashMap<LogCh, Boolean>();
-		private Map<LogCh, Boolean> outputs = new HashMap<LogCh, Boolean>();
+		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
+		private Map<String, Boolean> outputs = new HashMap<String, Boolean>();
 
 		@Override
-		public void writeDigitalOutput(LogCh channel, boolean value)
-				throws IllegalArgumentException {
+		public void writeDigitalOutput(String channel, boolean value) throws IllegalArgumentException {
 			outputs.put(channel, value);
 		}
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
+		public boolean readDigitalInput(String channel) {
 			return inputs.get(channel);
 		}
 
 		public void out(int ch, boolean val) {
-			outputs.put(new LogCh(ch), val);
+			outputs.put(Integer.toString(ch), val);
 		}
 
 		public boolean out(int ch) {
-			return outputs.get(new LogCh(ch));
+			return outputs.get(Integer.toString(ch));
 		}
 
 		public void in(int ch, boolean val) {
-			inputs.put(new LogCh(ch), val);
+			inputs.put(Integer.toString(ch), val);
 		}
 
 		public boolean in(int ch) {
-			return inputs.get(new LogCh(ch));
+			return inputs.get(Integer.toString(ch));
 		}
 	};
 
@@ -83,24 +81,20 @@ public class TestSwitchBoardScreens {
 
 		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
-		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", new LogCh(
-				SW_DN_1), dom);
-		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen",
-				new LogCh(SW_UP_1), dom);
-		sr1 = new Screen("Screen1", "Screen Kitchen", null, new LogCh(REL_DN_1),
-				new LogCh(REL_UP_1), dom);
-		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", new LogCh(
-				SW_DN_2), dom);
-		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", new LogCh(
-				SW_UP_2), dom);
-		sr2 = new Screen("Screen2", "Screen Bathroom", null, new LogCh(REL_DN_2),
-				new LogCh(REL_UP_2), dom);
-		
-		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1,swUp1,ISwitchListener.ClickType.SINGLE);
+		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", Integer.toString(SW_DN_1), dom);
+		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen", Integer.toString(SW_UP_1), dom);
+		sr1 = new Screen("Screen1", "Screen Kitchen", null, Integer.toString(REL_DN_1), Integer.toString(REL_UP_1),
+				dom);
+		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", Integer.toString(SW_DN_2), dom);
+		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", Integer.toString(SW_UP_2), dom);
+		sr2 = new Screen("Screen2", "Screen Bathroom", null, Integer.toString(REL_DN_2), Integer.toString(REL_UP_2),
+				dom);
+
+		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1, swUp1, ISwitchListener.ClickType.SINGLE);
 		s2s1.registerListener(sr1);
-		s2s2 = new Switch2Screen("s2s2", "s2s2", null, swDn2,swUp2,ISwitchListener.ClickType.SINGLE);
+		s2s2 = new Switch2Screen("s2s2", "s2s2", null, swDn2, swUp2, ISwitchListener.ClickType.SINGLE);
 		s2s2.registerListener(sr2);
-		
+
 		swDn1.setLongClickEnabled(true);
 		swDn1.setLongClickTimeout(LONGCLICKTIMEOUT);
 		swUp1.setLongClickEnabled(true);
@@ -108,9 +102,9 @@ public class TestSwitchBoardScreens {
 		s2sAll = new Switch2Screen("all", "", null, swDn1, swUp1, ISwitchListener.ClickType.LONG);
 		s2sAll.registerListener(sr1);
 		s2sAll.registerListener(sr2);
-		
+
 		cur = 0L;
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 	}
 
 	@Test
@@ -139,9 +133,11 @@ public class TestSwitchBoardScreens {
 	 * @param switchCh
 	 *            Up or Down switch channel.
 	 * @param relChOfSwitch
-	 *            If switchCh is up switch then this must be the up relay, and vice versa
+	 *            If switchCh is up switch then this must be the up relay, and
+	 *            vice versa
 	 * @param relChOther
-	 *            This must be the other relay, for the other direction, which must remain false
+	 *            This must be the other relay, for the other direction, which
+	 *            must remain false
 	 */
 	private void activateOne(int switchCh, int relChOfSwitch, int relChOther) {
 		dom.loopOnce(cur += 1);
@@ -168,25 +164,21 @@ public class TestSwitchBoardScreens {
 	@Test
 	public void AllDown() {
 		dom.loopOnce(cur += 1);
-		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1)
-				&& !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1) && !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
 		dom.loopOnce(cur += 1);
 
 		longClick(SW_DN_1);
-		Assert.assertTrue(hw.out(REL_DN_1) && !hw.out(REL_UP_1)
-				&& hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		Assert.assertTrue(hw.out(REL_DN_1) && !hw.out(REL_UP_1) && hw.out(REL_DN_2) && !hw.out(REL_UP_2));
 	}
 
 	@Test
 	public void AllUp() {
 		dom.loopOnce(cur += 1);
-		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1)
-				&& !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
+		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1) && !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
 		dom.loopOnce(cur += 1);
 
 		longClick(SW_UP_1);
-		Assert.assertTrue(!hw.out(REL_DN_1) && hw.out(REL_UP_1)
-				&& !hw.out(REL_DN_2) && hw.out(REL_UP_2));
+		Assert.assertTrue(!hw.out(REL_DN_1) && hw.out(REL_UP_1) && !hw.out(REL_DN_2) && hw.out(REL_UP_2));
 	}
 
 	@Test

@@ -13,7 +13,6 @@ import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.IThresholdListener;
 import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 public class TestLightSensor implements IThresholdListener {
 
@@ -21,14 +20,14 @@ public class TestLightSensor implements IThresholdListener {
 		public int level;
 
 		@Override
-		public int readAnalogInput(LogCh channel) throws IllegalArgumentException {
-			Assert.assertTrue(channel == LIGHTSENSOR_CH);
+		public int readAnalogInput(String channel) throws IllegalArgumentException {
+			Assert.assertTrue(channel.equals(LIGHTSENSOR_CH));
 			return level;
 		}
 	};
 
 	private static final long SAMPLE_TIME = 50;
-	private static final LogCh LIGHTSENSOR_CH = new LogCh(10);
+	private static final String LIGHTSENSOR_CH = Integer.toString(10);
 	private Hardware hw = new Hardware();
 	private IDomoticContext ctx = new DomoContextMock(hw);
 	private LightSensor ls;
@@ -49,7 +48,8 @@ public class TestLightSensor implements IThresholdListener {
 		nrEvents++;
 	}
 
-	private void check(LightSensor.States stateExpected, IThresholdListener.EventType eventExpected, int nrEventsExpected) {
+	private void check(LightSensor.States stateExpected, IThresholdListener.EventType eventExpected,
+			int nrEventsExpected) {
 		Assert.assertEquals(stateExpected, ls.getState());
 		Assert.assertEquals(eventExpected, lastEvent);
 		Assert.assertEquals(nrEventsExpected, nrEvents);
@@ -61,7 +61,8 @@ public class TestLightSensor implements IThresholdListener {
 	@Test
 	public final void testInitWrong() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 100, 500, 500);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 100, 500,
+					500);
 			fail("Should fail, since lowThreshold > highThreshold. LightSensor=" + ls);
 		} catch (IllegalConfigurationException e) {
 			;
@@ -71,7 +72,8 @@ public class TestLightSensor implements IThresholdListener {
 	@Test
 	public final void testLowHighLow() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 500, 1000, 2, 3);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 500, 1000, 2,
+					3);
 			ls.registerListener(this);
 
 			seq = cur = 0L;

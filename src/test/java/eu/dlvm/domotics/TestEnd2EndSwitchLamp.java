@@ -16,7 +16,6 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.SwitchClick2Toggle;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.ChannelType;
-import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
 import eu.dlvm.iohardware.diamondsys.FysCh;
@@ -39,8 +38,8 @@ public class TestEnd2EndSwitchLamp {
 			this.desc = description;
 		}
 
-		public LogCh ch() {
-			return new LogCh(ch);
+		public String ch() {
+			return Integer.toString(ch);
 		}
 
 		public String desc() {

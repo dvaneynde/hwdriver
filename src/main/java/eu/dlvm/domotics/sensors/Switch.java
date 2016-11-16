@@ -9,7 +9,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IllegalConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * A pushdown Switch.
@@ -52,12 +51,12 @@ public class Switch extends Sensor {
 		return state;
 	}
 
-	public Switch(String name, String description, LogCh channel,
+	public Switch(String name, String description, String channel,
 			IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 	}
 
-	public Switch(String name, String description, LogCh channel,
+	public Switch(String name, String description, String channel,
 			boolean singleClickEnabled, boolean longClickEnabled,
 			boolean doubleClickEnabled, IDomoticContext ctx) {
 		super(name, description, channel, ctx);

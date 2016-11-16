@@ -8,7 +8,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Dimmed Lamp.
@@ -48,7 +47,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, LogCh channel,
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel,
 			IDomoticContext ctx) {
 		super(name, description, ui, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
@@ -57,7 +56,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		prevOnLevel = 100;
 	}
 
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, LogCh channel,
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel,
 			IDomoticContext ctx) {
 		this(name, description, null, outputValueHardwareIfFull, channel, ctx);
 	}
@@ -79,7 +78,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 */
 	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel,
 			IDomoticContext ctx) {
-		this(name, description, null, outputValueHardwareIfFull, new LogCh(channel), ctx);
+		this(name, description, null, outputValueHardwareIfFull, Integer.toString(channel), ctx);
 	}
 
 	/**

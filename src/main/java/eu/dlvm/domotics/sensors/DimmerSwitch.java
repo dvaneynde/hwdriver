@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Events:
@@ -26,7 +25,7 @@ import eu.dlvm.iohardware.LogCh;
 public class DimmerSwitch extends Sensor {
 	static Logger log = LoggerFactory.getLogger(DimmerSwitch.class);
 
-	private LogCh channelR;
+	private String channelR;
 	private long leftRESTtime = 0L;
 	private boolean firstPressedLeft;
 	private long clickTimeout = 400L;
@@ -43,7 +42,7 @@ public class DimmerSwitch extends Sensor {
 	}
 
 	/**  */
-	public DimmerSwitch(String name, String description, LogCh channelLeft, LogCh channelRight, IDomoticContext ctx) {
+	public DimmerSwitch(String name, String description, String channelLeft, String channelRight, IDomoticContext ctx) {
 		super(name, description, channelLeft, ctx);
 		this.channelR = channelRight;
 	}
@@ -56,9 +55,10 @@ public class DimmerSwitch extends Sensor {
 	 * @param channelLeft
 	 * @param channelRight
 	 * @param hw
+	 * @deprecated 
 	 */
 	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IDomoticContext ctx) {
-		this(name, description, new LogCh(channelLeft), new LogCh(channelRight), ctx);
+		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), ctx);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class DimmerSwitch extends Sensor {
 		}
 	}
 
-	public LogCh getChannelRight() {
+	public String getChannelRight() {
 		return channelR;
 	}
 

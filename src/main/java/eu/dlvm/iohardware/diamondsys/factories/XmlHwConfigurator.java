@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import eu.dlvm.iohardware.ChannelType;
-import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
 import eu.dlvm.iohardware.diamondsys.FysCh;
@@ -140,9 +139,8 @@ public class XmlHwConfigurator implements IBoardFactory {
 
 	private void configureChannel(Attributes atts, ChannelMap cm) {
 		int ch = Integer.parseInt(atts.getValue("channel"));
-		String logch = atts.getValue("logical-id");
-		if (logch != null) {
-			LogCh lc = new LogCh(logch);
+		String lc = atts.getValue("logical-id");
+		if (lc != null) {
 			FysCh fc = new FysCh(boardNr, chtype, ch);
 			cm.add(lc, fc);
 		}

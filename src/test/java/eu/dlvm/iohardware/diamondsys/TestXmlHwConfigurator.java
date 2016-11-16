@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.HwDriverChannelMock;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 
@@ -33,21 +32,21 @@ public class TestXmlHwConfigurator {
 
 		FysCh f;
 		f = new FysCh(0, ChannelType.DigiIn, 5);
-		Assert.assertEquals(f, map.fysCh(new LogCh(87)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(87)));
 		f = new FysCh(0, ChannelType.DigiOut, 2);
-		Assert.assertEquals(f, map.fysCh(new LogCh(13)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(13)));
 
 		f = new FysCh(1, ChannelType.AnlgOut, 0);
-		Assert.assertEquals(f, map.fysCh(new LogCh(10)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(10)));
 
 		f = new FysCh(2, ChannelType.DigiIn, 15);
-		Assert.assertEquals(f, map.fysCh(new LogCh(111)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(111)));
 		f = new FysCh(2, ChannelType.DigiIn, 0);
-		Assert.assertEquals(f, map.fysCh(new LogCh(110)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(110)));
 		f = new FysCh(2, ChannelType.DigiIn, 5);
-		Assert.assertEquals(f, map.fysCh(new LogCh(100)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(100)));
 		f = new FysCh(2, ChannelType.DigiOut, 2);
-		Assert.assertEquals(f, map.fysCh(new LogCh(120)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(120)));
 
 	}
 
@@ -84,7 +83,7 @@ public class TestXmlHwConfigurator {
 
 	private void _checkMap(int logID, int boardNr, ChannelType channelType, int boardChannel, ChannelMap map) {
 		FysCh f = new FysCh(boardNr, channelType, boardChannel);
-		Assert.assertEquals(f, map.fysCh(new LogCh(logID)));
+		Assert.assertEquals(f, map.fysCh(Integer.toString(logID)));
 
 	}
 

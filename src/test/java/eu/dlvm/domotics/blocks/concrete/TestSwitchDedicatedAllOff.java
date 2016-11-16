@@ -14,7 +14,6 @@ import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
 import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
 import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestSwitchDedicatedAllOff {
@@ -37,9 +36,9 @@ public class TestSwitchDedicatedAllOff {
 
 		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
-		swLamp = new Switch("SwitchLamp", "Switch Lamp", new LogCh(0), dom);
-		swAllOff = new Switch("SwitchAllOff", "Switch All Off", new LogCh(1), dom);
-		lamp = new Lamp("Lamp1", "Lamp1", new LogCh(10), dom);
+		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), dom);
+		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), dom);
+		lamp = new Lamp("Lamp1", "Lamp1", Integer.toString(10), dom);
 
 		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
 		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);

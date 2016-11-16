@@ -8,7 +8,6 @@ import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.sensors.ISwitchListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 import junit.framework.Assert;
 
 public class TestSwitch {
@@ -17,7 +16,7 @@ public class TestSwitch {
 		public boolean inval;
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
+		public boolean readDigitalInput(String channel) {
 			return inval;
 		}
 	};
@@ -45,7 +44,7 @@ public class TestSwitch {
 
 	@Before
 	public void init() {
-		sw = new Switch("TestSwitch", "Unit Test Switch", new LogCh(0), ctx);
+		sw = new Switch("TestSwitch", "Unit Test Switch", Integer.toString(0), ctx);
 		sw.registerListener(listener);
 		cur = (seq = 0L);
 	}

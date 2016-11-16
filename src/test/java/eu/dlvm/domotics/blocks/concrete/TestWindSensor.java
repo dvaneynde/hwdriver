@@ -15,7 +15,6 @@ import eu.dlvm.domotics.sensors.IAlarmListener;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.domotics.sensors.WindSensor.States;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 public class TestWindSensor implements IAlarmListener {
 
@@ -23,18 +22,18 @@ public class TestWindSensor implements IAlarmListener {
 		public boolean inval;
 
 		@Override
-		public void writeDigitalOutput(LogCh channel, boolean value) throws IllegalArgumentException {
+		public void writeDigitalOutput(String channel, boolean value) throws IllegalArgumentException {
 			inval = value;
 		}
 
 		@Override
-		public boolean readDigitalInput(LogCh channel) {
+		public boolean readDigitalInput(String channel) {
 			return inval;
 		}
 	};
 
 	static final long SAMPLE_TIME = 20;
-	static final LogCh WINDSENSOR_CH = new LogCh(10);
+	static final String WINDSENSOR_CH = Integer.toString(10);
 
 	private static final Logger log = LoggerFactory.getLogger(TestWindSensor.class);
 	private Hardware hw;

@@ -1,13 +1,13 @@
 package eu.dlvm.domotics.actuators;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.service.UiInfo;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * A Fan that runs for a {@link #getRunningPeriodSec()} seconds when toggled on.
@@ -57,9 +57,9 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	
 	/**
-	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, LogCh, IHardwareAccess)} for details.
+	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, String, IHardwareAccess)} for details.
 	 */
-	public Fan(String name, String description, LogCh channel, IDomoticContext ctx) {
+	public Fan(String name, String description, String channel, IDomoticContext ctx) {
 		super(name, description, null, channel, ctx);
 		this.state = States.REST;
 		this.runningPeriodMs = 1000 * DEFAULT_RUN_PERIOD_SEC;
@@ -69,7 +69,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	 * Constructor.
 	 * @param name
 	 *            See superclass
-	 *            {@link Actuator#Actuator(String, String, LogCh)}.
+	 *            {@link Actuator#Actuator(String, String, String)}.
 	 * @param description
 	 *            See superclass.
 	 * @param lamp
@@ -81,7 +81,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	 *            Logical output channel of fan.
 	 * @param ctx
 	 */
-	public Fan(String name, String description, Lamp lamp, LogCh channel, IDomoticContext ctx) {
+	public Fan(String name, String description, Lamp lamp, String channel, IDomoticContext ctx) {
 		this(name, description, channel, ctx);
 		this.lamp = lamp;
 		this.delayPeriodMs = 1000 * DEFAULT_LAMP_DELAY_PERIOD_SEC;
@@ -91,7 +91,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	 * @deprecated
 	 */
 	public Fan(String name, String description, Lamp lamp, int logicalChannel, IDomoticContext ctx) {
-		this(name, description, lamp, new LogCh(logicalChannel), ctx);
+		this(name, description, lamp, Integer.toString(logicalChannel), ctx);
 	}
 
 	/**

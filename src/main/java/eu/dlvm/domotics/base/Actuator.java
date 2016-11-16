@@ -1,9 +1,9 @@
 package eu.dlvm.domotics.base;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.LogCh;
 
 /**
  * Actuators actuate output.
@@ -25,7 +25,7 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUiCapable
 
 	private static Logger log = LoggerFactory.getLogger(Actuator.class);
 
-	private LogCh channel;
+	private String channel;
 	private IDomoticContext ctx;
 
 	/**
@@ -35,7 +35,7 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUiCapable
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, String uiGroup, LogCh channel, IDomoticContext ctx) {
+	public Actuator(String name, String description, String uiGroup, String channel, IDomoticContext ctx) {
 		super(name, description, uiGroup);
 		this.ctx = ctx;
 		this.channel = channel;
@@ -45,7 +45,7 @@ public abstract class Actuator extends Block implements IDomoticLoop, IUiCapable
 	/**
 	 * @return Logical channel that this Sensor is connected on.
 	 */
-	public LogCh getChannel() {
+	public String getChannel() {
 		return channel;
 	}
 
