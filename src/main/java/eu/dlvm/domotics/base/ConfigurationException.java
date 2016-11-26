@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.factories;
+package eu.dlvm.domotics.base;
 
 @SuppressWarnings("serial")
 public class ConfigurationException extends RuntimeException {

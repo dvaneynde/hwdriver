@@ -1,11 +1,13 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.sensors;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
@@ -25,10 +27,10 @@ public class TestSwitch {
 	private DomoContextMock ctx = new DomoContextMock(hw);
 	private long seq, cur;
 	private Switch sw;
-	private ISwitchListener.ClickType lastClick;
-	private ISwitchListener listener = new ISwitchListener() {
+	private EventType lastClick;
+	private IEventListener listener = new IEventListener() {
 		@Override
-		public void onEvent(Switch s, ISwitchListener.ClickType e) {
+		public void onEvent(Block s, EventType e) {
 			lastClick = e;
 		}
 	};
@@ -62,7 +64,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.SINGLE, lastClick);
+		Assert.assertEquals(EventType.SINGLE_CLICK, lastClick);
 	}
 
 	@Test
@@ -91,7 +93,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.DOUBLE, lastClick);
+		Assert.assertEquals(EventType.DOUBLE_CLICK, lastClick);
 
 		hw.inval = false;
 		loop();
@@ -144,7 +146,7 @@ public class TestSwitch {
 		loop(60);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastClick);
+		Assert.assertEquals(EventType.LONG_CLICK, lastClick);
 		lastClick = null;
 
 		loop();
@@ -210,7 +212,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.SINGLE, lastClick);
+		Assert.assertEquals(EventType.SINGLE_CLICK, lastClick);
 		lastClick = null;
 
 		// Double click
@@ -230,7 +232,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.DOUBLE, lastClick);
+		Assert.assertEquals(EventType.DOUBLE_CLICK, lastClick);
 
 		hw.inval = false;
 		loop();
@@ -259,7 +261,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.SINGLE, lastClick);
+		Assert.assertEquals(EventType.SINGLE_CLICK, lastClick);
 		lastClick = null;
 
 		// Long click
@@ -271,7 +273,7 @@ public class TestSwitch {
 		loop(60);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastClick);
+		Assert.assertEquals(EventType.LONG_CLICK, lastClick);
 		lastClick = null;
 
 		loop();
@@ -310,7 +312,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.SINGLE, lastClick);
+		Assert.assertEquals(EventType.SINGLE_CLICK, lastClick);
 		lastClick = null;
 
 		// Long click
@@ -322,7 +324,7 @@ public class TestSwitch {
 		loop(110);
 		Assert.assertEquals(Switch.States.WAIT_RELEASE, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.LONG, lastClick);
+		Assert.assertEquals(EventType.LONG_CLICK, lastClick);
 		lastClick = null;
 
 		loop();
@@ -351,7 +353,7 @@ public class TestSwitch {
 		loop();
 		Assert.assertEquals(Switch.States.REST, sw.getState());
 		Assert.assertNotNull(lastClick);
-		Assert.assertEquals(ISwitchListener.ClickType.DOUBLE, lastClick);
+		Assert.assertEquals(EventType.DOUBLE_CLICK, lastClick);
 
 		hw.inval = false;
 		loop();

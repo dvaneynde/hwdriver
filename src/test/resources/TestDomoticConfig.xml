@@ -1,66 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig ../../../DomoticConfig.xsd ">
+
+	<switch channel="5" name="SchakAllOnOff" desc="Alle lichten aan/uit." />
+
 	<switch channel="1" name="SchakLichtBadkamer0" desc="Licht badkamer gelijkvloers." />
-	<switch channel="2" name="SchakLichtWC0" desc="Licht badkamer boven." />
+	<lamp channel="3" name="LichtBadkamer0">
+		<toggle src="SchakLichtBadkamer0" event="SingleClick"/>
+		<off src="SchakAllOnOff" event="LongClick"/>
+	</lamp>
+	
 	<switch channel="10" name="SchakFanBadkamer0" />
+	<fan name="FanBadkamer0" channel="6">
+		<toggle src="SchakFanBadkamer0" event="SingleClick"/>
+		<off src="SchakFanBadkamer0" event="LongClick"/>
+	</fan>
+	
+	<switch channel="2" name="SchakLichtWC0" desc="Licht badkamer boven." />
+	<lamp channel="4" name="LichtWC0">
+		<toggle src="SchakLichtWC0" event="SingleClick"/>
+		<off src="SchakAllOnOff" event="LongClick"/>
+	</lamp>
+
 	<switch channel="11" name="SchakFanWC0" />
-	<switch channel="5" name="AllOnOff" desc="Alle lichten aan/uit." />
-	<switch name="SchakKeukenScreenNeer" channel="6" />
-	<switch name="SchakKeukenScreenOp" channel="7" />
-	<lamp channel="3" name="LichtBadkamer0" />
-	<lamp channel="4" name="LichtWC0" />
-	<fan name="FanBadkamer0" channel="6" />
-	<fan name="FanWC0" channel="7" lamp="LichtWC0" desc="Ventilator WC gelijkvloers." />
+	<fan name="FanWC0" channel="7" lamp="LichtWC0" desc="Ventilator WC gelijkvloers.">
+		<toggle src="SchakFanWC0" event="SingleClick"/>
+		<off src="SchakFanWC0" event="LongClick"/>
+	</fan>
 
-	<group name="Lampen">
-		<block name="LichtBadkamer0" />
-		<block name="LichtWC0" />
-	</group>
-	<connect src="SchakLichtBadkamer0" src-event="single" target="LichtBadkamer0" event="toggle" />
-	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle" />
-	<connect src="AllOnOff" src-event="long" target="Lampen" event="off" />
-	<connect src="SchakFanWC0" src-event="single" target="FanWC0" event="toggle" />
-	<connect src="SchakFanWC0" src-event="long" target="FanWC0" event="off" />
-	<connect src="SchakFanBadkamer0" src-event="single" target="FanBadkamer0" event="toggle" />
-	<connect src="SchakFanBadkamer0" src-event="long" target="FanBadkamer0" event="off" />
-
+<!--	
 	<repeatOff name="GarageAutoUit" desc="test repeat off" intervalSec="60">
 		<on hour="21" minute="0" />
 		<off hour="21" minute="15" />
 	</repeatOff>
 	<connect src="GarageAutoUit" target="LichtBadkamer0" />
-
+-->
 	<!-- Screens -->
-	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" ui="Screens:0" />
-	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100" ui="Screens:1" />
 	<switch name="SchakScreenBreedUp" />
 	<switch name="SchakScreenBreedDown" />
 	<switch name="SchakScreenLangUp" />
 	<switch name="SchakScreenLangDown" />
 	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
 	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
-	<group name="Screens">
-		<block name="ScreenBreed" />
-		<block name="ScreenLang" />
-	</group>
-	<connect-screen screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" click="single" />
-	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
-		desc="Alle Screens" />
 
+	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" />
+	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100"  />
+
+	<windSensor name="Windmeter" channel="Windmeter" />
+	<lightGauge name="LichtsensorScreen" channel="AnalogIn" />
+
+
+	<screenController name="ScreenController" desc="Zon/Wind Automaat" ui="Screens:0">
+		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand -->
+		<group name="ScreensGroup">
+			<wind sensor="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60"/>
+			<sun sensor="LichtsensorScreen" low="1000" high="3000" low2highTime="10" high2lowTime="60"/>
+			<connect screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" />
+			<connect screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" />
+			<allUp src="SchakScreenAllUp" event="LongClick"/>
+			<allDown src="SchakScreenAllDown" event="LongClick"/>
+		</group>
+	</screenController>	
+	
+	
+<!-- TODO
 	<lightGauge name="LichtsensorNacht" low="3000" high="4000" low2highTime="10" high2lowTime="60" channel="AnalogIn" />
 
-	<!-- Zon / Wind Automaat -->
-	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" channel="Windmeter" />
-	<lightGauge name="LichtsensorScreen" low="1000" high="3000" low2highTime="10" high2lowTime="60" channel="AnalogIn" />
-	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtsensorScreen"
-		screen="Screens" ui="Alles:2" />
-	<connect src="SchakScreenAllDown" src-event="single" target="ZonneAutomaat" event="off" />
-	<connect src="SchakScreenAllUp" src-event="single" target="ZonneAutomaat" event="on" />
-
-	<!-- Alle screens -->
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="Alles:1"
-		desc="Alle Screens" />
-
+	<lamp name="indicator" />
+	<connectMap name="blabla" src="ZonneAutomaat" tgt="indicator">
+		<map from="ALARM" to="ON" />
+		<map from="SAFE" to="OFF" />
+	</connectMap>
+-->
 </domotic>

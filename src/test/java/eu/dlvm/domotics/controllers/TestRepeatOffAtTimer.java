@@ -9,41 +9,48 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
+import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.base.Block;
+import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.service.UiInfo;
 
 public class TestRepeatOffAtTimer {
 	boolean lastOffCalled = false;
 
 	@Test
 	public void testTypicalDay() {
-		RepeatOffAtTimer t = new RepeatOffAtTimer("timer", "timer test", new DomoContextMock(null), 60);
-		t.register(new IOnOffToggleCapable() {
+		IDomoticContext domoticContext = new DomoContextMock(null);
+		RepeatOffAtTimer t = new RepeatOffAtTimer("timer", "timer test", domoticContext, 60);
+		t.registerListener(new Actuator("test", "test", null, null, domoticContext) {
 
-			@Override
-			public boolean toggle() {
-				fail();
-				return false;
-			}
-
-			@Override
-			public void onEvent(ActionType action) {
-				if (action == ActionType.OFF)
-					off();
+			public void onEvent(Block source, EventType event) {
+				if (event == EventType.OFF)
+					lastOffCalled = true;
 				else
 					fail();
 			}
 
 			@Override
-			public void on() {
-				fail();
+			public void loop(long currentTime, long sequence) {
 			}
 
 			@Override
-			public void off() {
-				lastOffCalled = true;
+			public UiInfo getUiInfo() {
+				return null;
+			}
+
+			@Override
+			public void update(String action) {
+			}
+
+			@Override
+			public void initializeOutput(RememberedOutput ro) {
 			}
 		});
+		
 		t.setOnTime(7, 30);
 		t.setOffTime(8, 30);
 		assertFalse(t.isOn());

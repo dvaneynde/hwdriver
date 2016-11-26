@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.controllers;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.events.EventType;
 
 public class RepeatOffAtTimer extends Timer {
 	private static Logger log = LoggerFactory.getLogger(RepeatOffAtTimer.class);
@@ -38,7 +39,7 @@ public class RepeatOffAtTimer extends Timer {
 		if (state) {
 			if (currentTime - timeLastOffSent >= intervalSec * 1000) {
 				log.info("RepeatOffAtTimer '" + getName() + "' sends OFF to listeners.");
-				notifyListeners(ActionType.OFF);
+				notifyListeners(EventType.OFF);
 				timeLastOffSent = currentTime;
 			}
 		}

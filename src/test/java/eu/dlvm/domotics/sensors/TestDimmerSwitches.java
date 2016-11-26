@@ -1,13 +1,15 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.sensors;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
-import eu.dlvm.domotics.sensors.IDimmerSwitchListener;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
@@ -25,17 +27,18 @@ public class TestDimmerSwitches {
 	private IDomoticContext ctx = new DomoContextMock(hw);
 	private long seq, cur;
 	private DimmerSwitch ds;
-	private IDimmerSwitchListener.ClickType lastEvent;
-	private IDimmerSwitchListener dsListener = new IDimmerSwitchListener() {
+	private EventType lastEvent;
+	private IEventListener dsListener = new IEventListener() {
 		@Override
-		public void onEvent(DimmerSwitch source, ClickType click) {
+		public void onEvent(Block source, EventType click) {
 			lastEvent = click;
 		}
 	};
 
 	@Before
 	public void init() {
-		ds = new DimmerSwitch("TestDimmerSwitches", "Unit Test DimmerSwitches", Integer.toString(0), Integer.toString(1), ctx);
+		ds = new DimmerSwitch("TestDimmerSwitches", "Unit Test DimmerSwitches", Integer.toString(0),
+				Integer.toString(1), ctx);
 		lastEvent = null;
 		ds.registerListener(dsListener);
 		seq = (cur = 0L);
@@ -66,7 +69,7 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.REST, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.LEFT_CLICK, lastEvent);
+		Assert.assertEquals(EventType.LEFT_CLICK, lastEvent);
 	}
 
 	@Test
@@ -85,7 +88,7 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.REST, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.RIGHT_CLICK, lastEvent);
+		Assert.assertEquals(EventType.RIGHT_CLICK, lastEvent);
 	}
 
 	@Test
@@ -101,14 +104,14 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.DOWN_LONG, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.LEFT_HOLD_DOWN, lastEvent);
+		Assert.assertEquals(EventType.LEFT_HOLD_DOWN, lastEvent);
 
 		loop();
 		hw.inLeft = false;
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.REST, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.LEFT_RELEASED, lastEvent);
+		Assert.assertEquals(EventType.LEFT_RELEASED, lastEvent);
 	}
 
 	@Test
@@ -124,14 +127,14 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.DOWN_LONG, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.RIGHT_HOLD_DOWN, lastEvent);
+		Assert.assertEquals(EventType.RIGHT_HOLD_DOWN, lastEvent);
 
 		loop();
 		hw.inRight = false;
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.REST, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(IDimmerSwitchListener.ClickType.RIGHT_RELEASED, lastEvent);
+		Assert.assertEquals(EventType.RIGHT_RELEASED, lastEvent);
 	}
 
 	@Test
@@ -169,7 +172,7 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.DOWN_LONG, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(leftFirst ? IDimmerSwitchListener.ClickType.LEFT_HOLD_DOWN : IDimmerSwitchListener.ClickType.RIGHT_HOLD_DOWN, lastEvent);
+		Assert.assertEquals(leftFirst ? EventType.LEFT_HOLD_DOWN : EventType.RIGHT_HOLD_DOWN, lastEvent);
 
 		loop();
 		if (!leftFirst)
@@ -179,7 +182,7 @@ public class TestDimmerSwitches {
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.BOTH_DOWN, ds.getState());
 		Assert.assertNotNull(lastEvent);
-		Assert.assertEquals(leftFirst ? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK : IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK, lastEvent);
+		Assert.assertEquals(leftFirst ? EventType.LEFT_WITH_RIGHTCLICK : EventType.RIGHT_WITH_LEFTCLICK, lastEvent);
 
 		loop();
 		if (releaseRightFirst)
@@ -188,7 +191,7 @@ public class TestDimmerSwitches {
 			hw.inLeft = false;
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.BOTH_DOWN, ds.getState());
-		Assert.assertEquals(leftFirst ? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK : IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK, lastEvent);
+		Assert.assertEquals(leftFirst ? EventType.LEFT_WITH_RIGHTCLICK : EventType.RIGHT_WITH_LEFTCLICK, lastEvent);
 		loop();
 		if (!releaseRightFirst)
 			hw.inRight = false;
@@ -196,7 +199,7 @@ public class TestDimmerSwitches {
 			hw.inLeft = false;
 		loop();
 		Assert.assertEquals(DimmerSwitch.States.REST, ds.getState());
-		Assert.assertEquals(leftFirst ? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK : IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK, lastEvent);
+		Assert.assertEquals(leftFirst ? EventType.LEFT_WITH_RIGHTCLICK : EventType.RIGHT_WITH_LEFTCLICK, lastEvent);
 	}
 
 }

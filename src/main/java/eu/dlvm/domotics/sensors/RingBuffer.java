@@ -3,6 +3,7 @@ package eu.dlvm.domotics.sensors;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
+// TODO move to util package
 public class RingBuffer<T> implements Iterable<T> {
 
 	public RingBuffer(int capacity) {

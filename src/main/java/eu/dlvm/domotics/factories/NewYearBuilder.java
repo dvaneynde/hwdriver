@@ -12,6 +12,7 @@ import eu.dlvm.domotics.controllers.newyear.OnOff;
 import eu.dlvm.domotics.controllers.newyear.RandomOnOff;
 import eu.dlvm.domotics.controllers.newyear.Sinus;
 
+// TODO move to controllers package
 public class NewYearBuilder {
 
 	public NewYear build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
@@ -37,7 +38,7 @@ public class NewYearBuilder {
 			gs.endMs = setEndTime;
 			ny.addEntry(gs);
 			OnOff oo = new OnOff();
-			oo.add(oo.new Event(setStartTime, false));
+			oo.add(oo.new TodoEvent(setStartTime, false));
 			addLamps2OnOff(blocks, oo, false);
 			gs.gadgets.add(oo);
 		}

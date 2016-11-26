@@ -1,16 +1,14 @@
 package eu.dlvm.domotics.controllers;
 
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
@@ -23,10 +21,9 @@ import eu.dlvm.domotics.service.UiInfo;
  */
 public class Timer extends Controller {
 
-	private static Logger log = LoggerFactory.getLogger(Timer.class);
+	private static Logger logger = LoggerFactory.getLogger(Timer.class);
 	protected int onTime, offTime;
 	protected boolean state;
-	private Set<IOnOffToggleCapable> listeners = new HashSet<>();
 
 	// helpers
 	public static int timeInDay(long time) {
@@ -75,17 +72,7 @@ public class Timer extends Controller {
 	public boolean isOn() {
 		return state;
 	}
-
-	// internal usage interface
-	public void register(IOnOffToggleCapable listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IOnOffToggleCapable.ActionType action) {
-		for (IOnOffToggleCapable l : listeners)
-			l.onEvent(action);
-	}
-
+	
 	public String getOnTimeAsString() {
 		int[] times = hourMinute(onTime);
 		return String.format("%02d:%02d", times[0], times[1]);
@@ -95,6 +82,13 @@ public class Timer extends Controller {
 		int[] times = hourMinute(offTime);
 		return String.format("%02d:%02d", times[0], times[1]);
 	}
+
+	@Override
+	public void onEvent(Block source, EventType event) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 	@Override
 	public void loop(long currentTime, long sequence) {
@@ -107,8 +101,8 @@ public class Timer extends Controller {
 		}
 		if (state2 != state) {
 			state = state2;
-			log.info("Timer '" + getName() + "' sends event '" + (state ? "ON" : "OFF") + "'");
-			notifyListeners(state ? ActionType.ON : ActionType.OFF);
+			logger.info("Timer '" + getName() + "' sends event '" + (state ? "ON" : "OFF") + "'");
+			notifyListeners(state ? EventType.ON : EventType.OFF);
 		}
 	}
 
@@ -120,4 +114,5 @@ public class Timer extends Controller {
 	@Override
 	public void update(String action) {
 	}
+
 }

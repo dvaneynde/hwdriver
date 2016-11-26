@@ -1,18 +1,19 @@
 package eu.dlvm.domotics.actuators;
 
-import org.slf4j.Logger; 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
-public class Lamp extends Actuator implements IOnOffToggleCapable {
+public class Lamp extends Actuator implements IEventListener {
 
-	static Logger log = LoggerFactory.getLogger(Lamp.class);
+	static Logger logger = LoggerFactory.getLogger(Lamp.class);
 	private boolean outval;
 
 	public Lamp(String name, String description, String channel, IDomoticContext ctx) {
@@ -26,7 +27,7 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated 
 	 */
 	public Lamp(String name, String description, int channel, IDomoticContext ctx) {
 		this(name, description, Integer.toString(channel), ctx);
@@ -49,18 +50,15 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 * 
 	 * @return New output state.
 	 */
-	@Override
 	public boolean toggle() {
 		setOn(!outval);
 		return outval;
 	}
 
-	@Override
 	public void on() {
 		setOn(true);
 	}
 
-	@Override
 	public void off() {
 		setOn(false);
 	}
@@ -76,7 +74,7 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	 */
 	public void setOn(boolean outval) {
 		this.outval = outval;
-		log.info("Lamp '" + getName() + "' set state to " + (isOn() ? "ON" : "OFF"));
+		logger.info("Lamp '" + getName() + "' set state to " + (isOn() ? "ON" : "OFF"));
 		getHw().writeDigitalOutput(getChannel(), outval);
 	}
 
@@ -88,8 +86,8 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 	}
 
 	@Override
-	public void onEvent(ActionType action) {
-		switch (action) {
+	public void onEvent(Block source, EventType event) {
+		switch (event) {
 		case ON:
 			setOn(true);
 			break;
@@ -99,7 +97,16 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 		case TOGGLE:
 			toggle();
 			break;
+		default:
+			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
+
+	}
+
+	@Override
+	public void update(String action) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -112,16 +119,6 @@ public class Lamp extends Actuator implements IOnOffToggleCapable {
 		//ai.addParm("on", isOn() ? "1" : "0");
 		bi.setOn(isOn());
 		return bi;
-	}
-
-	@Override
-	public void update(String action) {
-		try {
-			ActionType at = ActionType.valueOf(action.toUpperCase());
-			onEvent(at);
-		} catch (IllegalArgumentException e) {
-			log.warn("update(), ignored unknown action: " + action);
-		}
 	}
 
 	@Override

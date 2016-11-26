@@ -1,14 +1,13 @@
 package eu.dlvm.domotics.sensors;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
-import eu.dlvm.domotics.base.IllegalConfigurationException;
+import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.UiInfo;
 import eu.dlvm.iohardware.IHardwareIO;
 
@@ -34,9 +33,6 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	private States state;
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
 
-	// TODO listeners via generic in Sensor basis class
-	private Set<IThresholdListener> listeners = new HashSet<>();
-
 	// ===================
 	// PUBLIC API
 
@@ -45,10 +41,10 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	};
 
 	public LightSensor(String name, String description, String ui, String channel, IDomoticContext ctx, int lowThreshold, int highThreshold, int lowToHighDelaySec, int highToLowDelaySec)
-			throws IllegalConfigurationException {
+			throws ConfigurationException {
 		super(name, description, ui, channel, ctx);
 		if ((highThreshold < lowThreshold) || lowThreshold < 0 || highThreshold < 0) {
-			throw new IllegalConfigurationException("Incorrect parameters. Check doc.");
+			throw new ConfigurationException("Incorrect parameters. Check doc.");
 		}
 		this.lowThreshold = lowThreshold;
 		this.highThreshold = highThreshold;
@@ -122,16 +118,6 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		return measuredLevel*100/getHighThreshold();
 	}
 
-	public void registerListener(IThresholdListener listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IThresholdListener.EventType event) {
-		for (IThresholdListener l : listeners)
-			l.onEvent(this, event);
-	}
-
-
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo uiInfo = new UiInfo(this);
@@ -180,7 +166,8 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 				state = States.HIGH;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + measuredLevel + " > thresholdHigh=" + getHighThreshold());
-				notifyListeners(IThresholdListener.EventType.HIGH);
+				notifyListeners(EventType.LIGHT_HIGH);
+
 			}
 			break;
 		case HIGH:
@@ -197,12 +184,12 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 				state = States.LOW;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("LightSensor -" + getName() + "' notifies back to NORMAL event: input=" + measuredLevel + " < thresholdLow=" + getLowThreshold());
-				notifyListeners(IThresholdListener.EventType.LOW);
+				notifyListeners(EventType.LIGHT_LOW);
 			}
 			break;
 		}
 		if (currentTime - timeSinceLastEventSent >= DEFAULT_REPEAT_EVENT_MS) {
-			notifyListeners((state == States.HIGH || state == States.HIGH2LOW_DELAY) ? IThresholdListener.EventType.HIGH : IThresholdListener.EventType.LOW);
+			notifyListeners((state == States.HIGH || state == States.HIGH2LOW_DELAY) ? EventType.LIGHT_HIGH : EventType.LIGHT_LOW);
 			timeSinceLastEventSent = currentTime;
 		}
 	}

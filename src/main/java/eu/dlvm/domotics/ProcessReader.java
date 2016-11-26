@@ -34,7 +34,7 @@ public class ProcessReader {
 		Runnable runner = new Runnable() {
 			@Override
 			public void run() {
-				log.info("Started process-reader. Checker driver log for a 'started' message too.");
+				log.info("Started process-reader. Checker driver logger for a 'started' message too.");
 				logDriver.info("Started process-reader.");
 				running = true;
 				try {

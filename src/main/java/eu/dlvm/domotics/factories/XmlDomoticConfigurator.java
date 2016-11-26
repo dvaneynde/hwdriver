@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
+import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.IDomoticContext;
 
 public class XmlDomoticConfigurator {
 
-	private static Logger log = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
+	private static Logger logger = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 
 	public static void configure(String cfgFilepath, IDomoticContext domoCtx) {
 		try {
@@ -29,7 +30,7 @@ public class XmlDomoticConfigurator {
 			DefaultHandler2 h = new DomoticXmlDefaultHandler(domoCtx);
 			p.parse(cfgFile, h);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			log.error("Configuration Failed: ", e);
+			logger.error("Configuration Failed: ", e);
 			throw new ConfigurationException(e.getMessage());
 		}
 	}

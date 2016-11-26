@@ -21,8 +21,8 @@ import eu.dlvm.iohardware.IHardwareIO;
  * <p>
  * Overview of methods:
  * <ol>
- * <li>{@link #createSingleton(IHardwareIO)} creates singleton and accepts hardware
- * driver connection</li>
+ * <li>{@link #createSingleton(IHardwareIO)} creates singleton and accepts
+ * hardware driver connection</li>
  * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to
  * construct the domotic system</li>
  * <li>{@link #initialize(Map)} should then be called to do some one-time
@@ -72,15 +72,9 @@ public class Domotic implements IDomoticContext {
 	}
 
 	public static synchronized Domotic createSingleton(IHardwareIO hw) {
-		if (singleton == null) {
-			singleton = new Domotic();
-			singleton.setHw(hw);
-		}
+		singleton = new Domotic();
+		singleton.setHw(hw);
 		return singleton;
-	}
-
-	public static synchronized void resetSingleton() {
-		singleton = null;
 	}
 
 	private Domotic() {
@@ -115,10 +109,10 @@ public class Domotic implements IDomoticContext {
 		log.info("Added sensor " + sensor.getName());
 	}
 
-/*	public List<Sensor> getSensors() {
-		return sensors;
-	}
-*/
+	/*	public List<Sensor> getSensors() {
+			return sensors;
+		}
+	*/
 	/**
 	 * Add Actuator to loop set (see {@link #loopOnce()}.
 	 * 
@@ -136,11 +130,11 @@ public class Domotic implements IDomoticContext {
 		log.info("Added actuator " + actuator.getName());
 	}
 
-/*	public List<Actuator> getActuators() {
-		return actuators;
-	}
-
-*/	public void addController(Controller controller) {
+	/*	public List<Actuator> getActuators() {
+			return actuators;
+		}
+	
+	*/ public void addController(Controller controller) {
 		if (controllers.contains(controller)) {
 			log.warn("Controller already added, ignored: " + controller);
 			assert (false);
@@ -273,7 +267,7 @@ public class Domotic implements IDomoticContext {
 	 *            path. Note that this driver must be on the same host, since
 	 *            'localhost' is passed to it as an argument. Otherwise that
 	 *            driver should be started separately, after this one shows
-	 *            "START" in the log.
+	 *            "START" in the logger.
 	 * @param checkDriverAndRestartOnError
 	 */
 	public void runDomotic(int looptime, String pathToDriver, boolean checkDriverAndRestartOnError) {
@@ -310,7 +304,7 @@ public class Domotic implements IDomoticContext {
 			long lastLoopSequence = -1;
 			while (!stopRequested.get() && !restartDriverRequested.get()) {
 				// TODO deze sleep moet interrupted ! Of heb ik dat al gedaan?
-				sleepSafe(MONITORING_INTERVAL_MS); 
+				sleepSafe(MONITORING_INTERVAL_MS);
 				saveState.writeRememberedOutputs(actuators);
 
 				long currentLoopSequence = loopSequence;
@@ -388,8 +382,8 @@ public class Domotic implements IDomoticContext {
 			// TODO must be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			//if (loopSequence % 10 == 0) {
-				for (IStateChangedListener uiUpdator : stateChangeListeners)
-					uiUpdator.updateUi();
+			for (IStateChangedListener uiUpdator : stateChangeListeners)
+				uiUpdator.updateUi();
 			//}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
 			if (tookMs >= 20)

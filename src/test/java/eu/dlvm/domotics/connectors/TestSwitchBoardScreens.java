@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.connectors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,12 +10,20 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.connectors.Switch2Screen;
-import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
+/**
+ * Tests with Switches connected to Screens with Connector.
+ * <p>
+ * No ScreenController used here.
+ * 
+ * @author dirk
+ *
+ */
 public class TestSwitchBoardScreens {
 
 	public static int LONGCLICKTIMEOUT = 50;
@@ -64,7 +72,6 @@ public class TestSwitchBoardScreens {
 	private Domotic dom;
 	private Switch swDn1, swUp1, swDn2, swUp2;
 	private Screen sr1, sr2;
-	private Switch2Screen s2s1, s2s2, s2sAll;
 	private long cur;
 
 	@Before
@@ -79,29 +86,34 @@ public class TestSwitchBoardScreens {
 		hw.out(REL_DN_2, false);
 		hw.out(REL_UP_2, false);
 
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", Integer.toString(SW_DN_1), dom);
 		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen", Integer.toString(SW_UP_1), dom);
-		sr1 = new Screen("Screen1", "Screen Kitchen", null, Integer.toString(REL_DN_1), Integer.toString(REL_UP_1),
-				dom);
+		sr1 = new Screen("Screen1", "Screen Kitchen", null, Integer.toString(REL_DN_1), Integer.toString(REL_UP_1), dom);
 		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", Integer.toString(SW_DN_2), dom);
 		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", Integer.toString(SW_UP_2), dom);
-		sr2 = new Screen("Screen2", "Screen Bathroom", null, Integer.toString(REL_DN_2), Integer.toString(REL_UP_2),
-				dom);
+		sr2 = new Screen("Screen2", "Screen Bathroom", null, Integer.toString(REL_DN_2), Integer.toString(REL_UP_2), dom);
 
-		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1, swUp1, ISwitchListener.ClickType.SINGLE);
-		s2s1.registerListener(sr1);
-		s2s2 = new Switch2Screen("s2s2", "s2s2", null, swDn2, swUp2, ISwitchListener.ClickType.SINGLE);
-		s2s2.registerListener(sr2);
+		//		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1, swUp1, ISwitchListener.ClickType.SINGLE);
+		//		s2s1.registerListener(sr1);
+		//		s2s2 = new Switch2Screen("s2s2", "s2s2", null, swDn2, swUp2, ISwitchListener.ClickType.SINGLE);
+		//		s2s2.registerListener(sr2);
+		swDn1.registerListener(new Connector(EventType.SINGLE_CLICK, sr1, EventType.TOGGLE_DOWN, "switchDown1_Screen1"));
+		swUp1.registerListener(new Connector(EventType.SINGLE_CLICK, sr1, EventType.TOGGLE_UP, "switchUp1_Screen1"));
+		swDn2.registerListener(new Connector(EventType.SINGLE_CLICK, sr2, EventType.TOGGLE_DOWN, "switchDown2_Screen2"));
+		swUp2.registerListener(new Connector(EventType.SINGLE_CLICK, sr2, EventType.TOGGLE_UP, "switchUp2_Screen2"));
 
 		swDn1.setLongClickEnabled(true);
 		swDn1.setLongClickTimeout(LONGCLICKTIMEOUT);
 		swUp1.setLongClickEnabled(true);
 		swUp1.setLongClickTimeout(LONGCLICKTIMEOUT);
-		s2sAll = new Switch2Screen("all", "", null, swDn1, swUp1, ISwitchListener.ClickType.LONG);
-		s2sAll.registerListener(sr1);
-		s2sAll.registerListener(sr2);
+		//		s2sAll = new Switch2Screen("all", "", null, swDn1, swUp1, ISwitchListener.ClickType.LONG);
+		//		s2sAll.registerListener(sr1);
+		//		s2sAll.registerListener(sr2);
+		swDn1.registerListener(new Connector(EventType.LONG_CLICK, sr1, EventType.TOGGLE_DOWN, "switchDown1_ALL_Screen1"));
+		swDn1.registerListener(new Connector(EventType.LONG_CLICK, sr2, EventType.TOGGLE_DOWN, "switchDown1_ALL_Screen2"));
+		swUp1.registerListener(new Connector(EventType.LONG_CLICK, sr1, EventType.TOGGLE_UP, "switchUp1_ALL_Screen1"));
+		swUp1.registerListener(new Connector(EventType.LONG_CLICK, sr2, EventType.TOGGLE_UP, "switchUp1_ALL_Screen2"));
 
 		cur = 0L;
 		dom.initialize(new HashMap<String, RememberedOutput>(0));

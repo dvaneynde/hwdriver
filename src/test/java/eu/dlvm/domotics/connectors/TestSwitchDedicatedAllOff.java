@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.connectors;
 
 import java.util.HashMap;
 
@@ -10,9 +10,8 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
-import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
-import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
+import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import junit.framework.Assert;
 
@@ -22,7 +21,6 @@ public class TestSwitchDedicatedAllOff {
 	private Domotic dom;
 	private Switch swLamp, swAllOff;
 	private Lamp lamp;
-	private Switch2OnOffToggle swtch2toggle, swtch2All;
 	private long cur;
 
 	@Before
@@ -34,21 +32,22 @@ public class TestSwitchDedicatedAllOff {
 		hw.in(1, false);
 		hw.out(10, false);
 
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), dom);
 		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), dom);
 		lamp = new Lamp("Lamp1", "Lamp1", Integer.toString(10), dom);
 
-		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
-		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);
-		swLamp.registerListener(swtch2toggle);
-		swtch2toggle.registerListener(lamp);
+		//		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
+		//		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);
+		//		swLamp.registerListener(swtch2toggle);
+		//		swtch2toggle.registerListener(lamp);
+		swLamp.registerListener(new Connector(EventType.SINGLE_CLICK, lamp, EventType.TOGGLE, "toggle"));
 
-		swtch2All = new Switch2OnOffToggle("allof", "alloff", null);
-		swtch2All.map(ClickType.LONG, ActionType.OFF);
-		swAllOff.registerListener(swtch2All);
-		swtch2All.registerListener(lamp);
+		//		swtch2All = new Switch2OnOffToggle("allof", "alloff", null);
+		//		swtch2All.map(ClickType.LONG, ActionType.OFF);
+		//		swAllOff.registerListener(swtch2All);
+		//		swtch2All.registerListener(lamp);
+		swAllOff.registerListener(new Connector(EventType.LONG_CLICK, lamp, EventType.OFF, "all-off"));
 	}
 
 	@Test
@@ -59,7 +58,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swLamp, lamp);
 		// ssb.add(swAllOff, true, false);
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
@@ -82,7 +81,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swLamp, lamp);
 		// ssb.add(swAllOff, true, false);
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
@@ -105,7 +104,7 @@ public class TestSwitchDedicatedAllOff {
 		swAllOff.setSingleClickEnabled(false);
 		// ssb.add(swAllOff, true, false);
 		// ssb.add(swLamp, lamp, true, false);
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));
@@ -145,8 +144,8 @@ public class TestSwitchDedicatedAllOff {
 		swLamp.setLongClickTimeout(100);
 		swLamp.setDoubleClickEnabled(false);
 
-		swtch2toggle.map(ClickType.LONG, ActionType.OFF);
-		dom.initialize(new HashMap<String, RememberedOutput> (0));
+		swLamp.registerListener(new Connector(EventType.LONG_CLICK, lamp, EventType.OFF, "all-off"));
+		dom.initialize(new HashMap<String, RememberedOutput>(0));
 
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));

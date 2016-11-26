@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
 	elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
+
 				<!-- sensors -->
 				<element name="switch" minOccurs="0" maxOccurs="1">
 					<complexType>
@@ -16,7 +18,8 @@
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
+				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
+					minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
 				<element name="repeatOff" type="tns:repeatOffType" />
@@ -24,11 +27,14 @@
 				<element name="lightGauge" type="tns:lightGaugeType" />
 
 				<!-- actuators -->
-				<element name="lamp" type="tns:blockWithChannelStruct" minOccurs="0" maxOccurs="1" />
+				<element name="lamp" type="tns:OnOffToggleActuatorStruct"
+					minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:blockWithChannelStruct">
+							<extension base="tns:OnOffToggleActuatorStruct">
+								<!-- TODO element name="withLigth" en source en target event of zoiets 
+									- standaard dus -->
 								<attribute name="lamp" type="IDREF" use="optional" />
 							</extension>
 						</complexContent>
@@ -53,6 +59,8 @@
 						</complexContent>
 					</complexType>
 				</element>
+
+				<!-- controllers -->
 				<element name="newyear" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
@@ -63,85 +71,62 @@
 						</complexContent>
 					</complexType>
 				</element>
-
-				<element name="group" type="tns:groupType" />
-				<element name="connect">
-					<complexType>
-						<attribute name="src" type="IDREF" use="required" />
-						<attribute name="src-event" type="string" />
-						<attribute name="target" type="IDREF" use="required" />
-						<attribute name="event" type="string" />
-						<attribute name="ui" type="string" />
-						<attribute name="desc" type="string" />
-					</complexType>
-				</element>
-				<element name="connect-dimmer">
-					<complexType>
-						<attribute name="dimmerSwitch" type="IDREF" use="required" />
-						<attribute name="dimmedLamp" type="IDREF" use="required" />
-					</complexType>
-				</element>
-				<element name="connect-screen">
-					<complexType>
-						<attribute name="screen" type="IDREF" use="required" />
-						<attribute name="switchDown" type="IDREF" use="required" />
-						<attribute name="switchUp" type="IDREF" use="required" />
-						<attribute name="click" type="tns:switchEventType" use="required" />
-						<attribute name="ui" type="string" />
-						<attribute name="desc" type="string" />
-					</complexType>
-				</element>
-				<element name="connect-alarm-to-screen">
-					<complexType>
-						<attribute name="source" type="IDREF" use="required" />
-						<attribute name="screen" type="IDREF" use="required" />
-						<attribute name="ui" type="string" />
-						<attribute name="desc" type="string" />
-					</complexType>
-				</element>
-				<element name="connect-threshold-to-screen">
-					<complexType>
-						<attribute name="source" type="IDREF" use="required" />
-						<attribute name="screen" type="IDREF" use="required" />
-						<attribute name="ui" type="string" />
-						<attribute name="desc" type="string" />
-					</complexType>
-				</element>
-				<!-- <screen-controller name="SchermController" alarmSrc="windmeter" screen="Screens" />  -->
-				<element name="screen-controller">
-					<complexType>
-						<complexContent>
-							<extension base="tns:blockWithChannelStruct">
-								<attribute name="alarmSrc" type="IDREF"></attribute>
-								<attribute name="lightSrc" type="IDREF"></attribute>
-								<attribute name="screen" type="IDREF"></attribute>
-							</extension>
-						</complexContent>
-					</complexType>
-				</element>
+				<element name="screenController" type="tns:ScreenControllerStruct" />
 			</choice>
 		</complexType>
 	</element>
 
-
-	<complexType name="groupType">
-		<choice maxOccurs="unbounded">
-			<!-- <element name="group" type="tns:groupType" /> not supported, would
-				complicate parser and is probably not needed -->
-			<element name="group-ref">
-				<complexType>
-					<attribute name="name" type="IDREF" />
-				</complexType>
-			</element>
-			<element name="block">
-				<complexType>
-					<attribute name="name" type="IDREF" />
-				</complexType>
-			</element>
-		</choice>
-		<attribute name="name" type="ID" use="required" />
-		<attribute name="desc" use="optional" type="string" />
+	<complexType name="ScreenControllerStruct">
+		<complexContent>
+			<extension base="tns:blockWithChannelStruct">
+				<sequence>
+					<element name="group" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element name="wind" minOccurs="0">
+									<complexType>
+										<attribute name="sensor" type="IDREF" use="required" />
+										<attribute name="highFreq" use="required" />
+										<attribute name="lowFreq" use="required" />
+										<attribute name="highTimeBeforeAlert" use="required" />
+										<attribute name="lowTimeToResetAlert" use="required" />
+									</complexType>
+								</element>
+								<element name="sun" minOccurs="0">
+									<complexType>
+										<attribute name="sensor" type="IDREF" use="required" />
+										<attribute name="high" use="required" />
+										<attribute name="low" use="required" />
+										<attribute name="low2highTime" use="required" />
+										<attribute name="high2lowTime" use="required" />
+									</complexType>
+								</element>
+								<element name="connect" maxOccurs="unbounded">
+									<complexType>
+										<attribute name="screen" type="IDREF" use="required" />
+										<attribute name="switchUp" type="IDREF" use="required" />
+										<attribute name="switchDown" type="IDREF" use="required" />
+									</complexType>
+								</element>
+								<element name="allUp" minOccurs="0">
+									<complexType>
+										<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+									</complexType>
+								</element>
+								<element name="allDown" minOccurs="0">
+									<complexType>
+										<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+									</complexType>
+								</element>
+							</sequence>
+							<attribute name="name" type="string" />
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
+
 	<simpleType name="switchEventType">
 		<restriction base="string">
 			<enumeration value="single" />
@@ -181,7 +166,7 @@
 	<complexType name="repeatOffType">
 		<complexContent>
 			<extension base="tns:timerType">
-				<attribute name="intervalSec" use="required" type="int"/>
+				<attribute name="intervalSec" use="required" type="int" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -189,10 +174,6 @@
 	<complexType name="windSensorType">
 		<complexContent>
 			<extension base="tns:blockWithChannelStruct">
-				<attribute name="highFreq" use="required" />
-				<attribute name="lowFreq" use="required" />
-				<attribute name="highTimeBeforeAlert" use="required" />
-				<attribute name="lowTimeToResetAlert" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -200,10 +181,6 @@
 	<complexType name="lightGaugeType">
 		<complexContent>
 			<extension base="tns:blockWithChannelStruct">
-				<attribute name="high" use="required" />
-				<attribute name="low" use="required" />
-				<attribute name="low2highTime" use="required" />
-				<attribute name="high2lowTime" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -231,6 +208,38 @@
 			</extension>
 		</complexContent>
 	</complexType>
+
+	<attributeGroup name="EventConsumerAttributeGroup">
+		<attribute name="src" type="IDREF" use="required" />
+		<attribute name="event" type="string" use="required" />
+	</attributeGroup>
+
+	<complexType name="OnOffToggleActuatorStruct">
+		<complexContent>
+			<extension base="tns:blockWithChannelStruct">
+				<sequence>
+					<choice maxOccurs="unbounded">
+						<element name="on">
+							<complexType>
+								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+							</complexType>
+						</element>
+						<element name="off">
+							<complexType>
+								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+							</complexType>
+						</element>
+						<element name="toggle">
+							<complexType>
+								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+							</complexType>
+						</element>
+					</choice>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
 	<complexType name="BlockWithChannelUpDownStruct">
 		<complexContent>
 			<extension base="tns:blockStruct">

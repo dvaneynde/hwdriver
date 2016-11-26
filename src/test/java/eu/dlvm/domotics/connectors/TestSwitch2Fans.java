@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.connectors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,8 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.connectors.Switch2Fan;
+import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
@@ -66,7 +67,6 @@ public class TestSwitch2Fans {
 		hw.in(0, false);
 		hw.in(1, false);
 
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), dom);
@@ -75,14 +75,16 @@ public class TestSwitch2Fans {
 		f1 = new Fan("Fan1", "Fan1", l1, Integer.toString(FAN1_OUT), dom);
 		f2 = new Fan("Fan2", "Fan2", l2, Integer.toString(FAN2_OUT), dom);
 
-		Switch2Fan s2f1 = new Switch2Fan("s2f1", "s2f1");
-		sw1.registerListener(s2f1);
-		s2f1.registerListener(f1);
+		//Switch2Fan s2f1 = new Switch2Fan("s2f1", "s2f1");
+		Connector s2f1_single = new Connector(EventType.SINGLE_CLICK, f1, EventType.TOGGLE, "s2f1_single");
+		sw1.registerListener(s2f1_single);
+		
+		//Switch2Fan s2f2 = new Switch2Fan("s2f2", "s2f2");
+		Connector s2f2_single = new Connector(EventType.SINGLE_CLICK, f2, EventType.TOGGLE, "s2f2_single");
+		sw2.registerListener(s2f2_single);
 
-		Switch2Fan s2f2 = new Switch2Fan("s2f2", "s2f2");
-		sw2.registerListener(s2f2);
-		s2f2.registerListener(f2);
-
+		// TODO long click to stop until lamp off
+		
 		dom.initialize(new HashMap<String, RememberedOutput>(0));
 	}
 

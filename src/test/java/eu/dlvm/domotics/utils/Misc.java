@@ -1,4 +1,4 @@
-package eu.dlvm.domotics;
+package eu.dlvm.domotics.utils;
 
 import org.junit.Test;
 

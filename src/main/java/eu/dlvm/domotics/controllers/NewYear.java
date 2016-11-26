@@ -5,16 +5,18 @@ import java.util.List;
 
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
 import eu.dlvm.domotics.controllers.newyear.GSstate;
 import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
-public class NewYear extends Controller implements IOnOffToggleCapable {
+public class NewYear extends Controller implements IEventListener {
 
-	static Logger LOG = LoggerFactory.getLogger(NewYear.class);
+	static Logger logger = LoggerFactory.getLogger(NewYear.class);
 	private long startTimeMs;
 	private long endTimeMs;
 	private boolean running, manual;
@@ -48,14 +50,14 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 	}
 
 	public synchronized void start() {
-		LOG.info(getName() + " started.");
+		logger.info(getName() + " started.");
 		actualStartMs = -1;
 		running = true;
 		manual = true;
 	}
 
 	public synchronized void stop() {
-		LOG.info(getName() + " stopped.");
+		logger.info(getName() + " stopped.");
 		running = false;
 		manual = true;
 	}
@@ -65,6 +67,49 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 			running = (currentTime >= startTimeMs && currentTime <= endTimeMs);
 		return running;
 	}
+
+	public void on() {
+		onEvent(this, EventType.ON);
+	}
+
+	public void off() {
+		onEvent(this, EventType.OFF);
+	}
+
+	public boolean toggle() {
+		onEvent(this, EventType.TOGGLE);
+		return running;
+	}
+
+	@Override
+	public void onEvent(Block source, EventType event) {
+		switch (event) {
+		case ON:
+			start();
+			break;
+		case OFF:
+			stop();
+			break;
+		case TOGGLE:
+			if (running)
+				stop();
+			else
+				start();
+			break;
+		default:
+			logger.warn("Ignored event " + event + " from " + source.getName());
+		}
+	}
+
+	public long getStartTimeMs() {
+		return startTimeMs;
+	}
+
+	public long getEndTimeMs() {
+		return endTimeMs;
+	}
+
+
 
 	@Override
 	public void loop(long currentTime, long sequence) {
@@ -89,49 +134,6 @@ public class NewYear extends Controller implements IOnOffToggleCapable {
 					g.loop2(currentTime - actualStartMs - e.startMs, e.state);
 			}
 		}
-	}
-
-	@Override
-	public void onEvent(ActionType action) {
-		switch (action) {
-		case ON:
-			start();
-			break;
-		case OFF:
-			stop();
-			break;
-		case TOGGLE:
-			if (running)
-				stop();
-			else
-				start();
-			break;
-		}
-	}
-
-	public long getStartTimeMs() {
-		return startTimeMs;
-	}
-
-	public long getEndTimeMs() {
-		return endTimeMs;
-	}
-
-	@Override
-	public void on() {
-		onEvent(ActionType.ON);
-	}
-
-	@Override
-	public void off() {
-		onEvent(ActionType.OFF);
-	}
-
-	@Override
-	public boolean toggle() {
-		onEvent(ActionType.TOGGLE);
-		// TODO niet correct... return false
-		return false;
 	}
 
 	@Override

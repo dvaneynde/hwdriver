@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.events.EventType;
 
 /**
  * Lamp die op bepaald moment on/off gaat, eventueel meerdere keren.
@@ -15,18 +16,19 @@ import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
  */
 public class OnOff implements INewYearGadget {
 
-	private List<IOnOffToggleCapable> lamps;
+	private List<Actuator> actuators;
 	private long startTime;
-	private SortedSet<Event> entries;
+	private SortedSet<TodoEvent> entries;
 
-	public class Event implements Comparable<Event> {
+	// TODO how does this work, proper name...
+	public class TodoEvent implements Comparable<TodoEvent> {
 		public boolean state;
 		public long timeSec;
-		public Event(long timeSec, boolean state) {
+		public TodoEvent(long timeSec, boolean state) {
 			this.timeSec = timeSec; this.state = state;
 		}
 		@Override
-		public int compareTo(Event o) {
+		public int compareTo(TodoEvent o) {
 			if (timeSec == o.timeSec)
 				return 0;
 			else
@@ -35,27 +37,27 @@ public class OnOff implements INewYearGadget {
 	}
 
 	public OnOff() {
-		this.lamps = new ArrayList<>();
+		this.actuators = new ArrayList<>();
 		startTime = -1;
 		entries = new TreeSet<>();
 	}
 
-	public OnOff(IOnOffToggleCapable lamp) {
+	public OnOff(Actuator actuator) {
 		this();
-		lamps.add(lamp);
+		actuators.add(actuator);
 	}
 
-	public void add(IOnOffToggleCapable oot) {
-		lamps.add(oot);
+	public void add(Actuator actuator) {
+		actuators.add(actuator);
 	}
 
-	public void add(Event e) {
+	public void add(TodoEvent e) {
 		entries.add(e);
 	}
 
-	private Event findLastEntryBefore(long time) {
-		Event lastEntry = null;
-		for (Event e : entries) {
+	private TodoEvent findLastEntryBefore(long time) {
+		TodoEvent lastEntry = null;
+		for (TodoEvent e : entries) {
 			if ((e.timeSec * 1000 + startTime) <= time)
 				lastEntry = e;
 			else
@@ -69,10 +71,10 @@ public class OnOff implements INewYearGadget {
 		if (startTime < 0)
 			startTime = time;
 
-		Event e = findLastEntryBefore(time);
+		TodoEvent e = findLastEntryBefore(time);
 		if (e != null) {
-			for (IOnOffToggleCapable lamp : lamps)
-				lamp.onEvent(e.state ? IOnOffToggleCapable.ActionType.ON : IOnOffToggleCapable.ActionType.OFF);
+			for (Actuator lamp : actuators)
+				lamp.onEvent(null, e.state ? EventType.ON : EventType.OFF);
 		}
 
 	}

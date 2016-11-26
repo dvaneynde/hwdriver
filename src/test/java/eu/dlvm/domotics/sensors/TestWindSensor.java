@@ -1,8 +1,7 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.sensors;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +10,13 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
-import eu.dlvm.domotics.sensors.IAlarmListener;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.domotics.sensors.WindSensor.States;
 import eu.dlvm.iohardware.IHardwareIO;
 
-public class TestWindSensor implements IAlarmListener {
+public class TestWindSensor implements IEventListener {
 
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
 		public boolean inval;
@@ -40,7 +40,7 @@ public class TestWindSensor implements IAlarmListener {
 	private IDomoticContext dom;
 	private WindSensor ws;
 	private long time;
-	private IAlarmListener.EventType lastEvent;
+	private EventType lastEvent;
 	private int nrEvents;
 
 	// private long seq, cur;
@@ -167,7 +167,7 @@ public class TestWindSensor implements IAlarmListener {
 		check(States.NORMAL, EventType.SAFE, 38);
 	}
 
-	private void check(WindSensor.States stateExpected, IAlarmListener.EventType eventExpected, int nrEventsExpected) {
+	private void check(WindSensor.States stateExpected, EventType eventExpected, int nrEventsExpected) {
 		Assert.assertEquals(stateExpected, ws.getState());
 		Assert.assertEquals(eventExpected, lastEvent);
 		Assert.assertEquals(nrEventsExpected, nrEvents);

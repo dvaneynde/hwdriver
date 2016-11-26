@@ -1,14 +1,12 @@
 package eu.dlvm.domotics.sensors;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
@@ -21,7 +19,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
 	private static final Logger log = LoggerFactory.getLogger(WindSensor.class);
 	private static final Logger logwind = LoggerFactory.getLogger("WIND");
-	private static final Logger dumpFreq = LoggerFactory.getLogger("FREQ");
+	// private static final Logger dumpFreq = LoggerFactory.getLogger("FREQ");
 	private int highFreqThreshold, lowFreqThreshold;
 	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
 	private States state;
@@ -29,9 +27,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
 
 	FrequencyGauge gauge; // package scope for unit tests
-
-	// TODO listeners via generic in Sensor basis class
-	private Set<IAlarmListener> listeners = new HashSet<>();
 
 	// ===================
 	// PUBLIC API
@@ -120,15 +115,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		return (int) (freq * 100);
 	}
 
-	public void registerListener(IAlarmListener listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IAlarmListener.EventType event) {
-		for (IAlarmListener l : listeners)
-			l.onEvent(this, event);
-	}
-
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfo uiInfo = new UiInfo(this);
@@ -190,7 +176,8 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 				log.info("WindSensor '" + getName() + "' notifies HIGH event because in ALARM state: freq=" + freq
 						+ " > thresholdHigh=" + getHighFreqThreshold() + " for more than "
 						+ getHighTimeBeforeAlertSec() / 1000 + "sec.");
-				notifyListeners(IAlarmListener.EventType.ALARM);
+				notifyListeners(EventType.ALARM);
+
 			}
 			break;
 		case ALARM:
@@ -213,13 +200,13 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 				log.info(
 						"WindSensor '" + getName() + "' notifies LOW event because wind has been low long enough: freq="
 								+ freq + " < thresholdLow=" + getLowFreqThreshold());
-				notifyListeners(IAlarmListener.EventType.SAFE);
+				notifyListeners(EventType.SAFE);
 			}
 			break;
 		}
 		if (currentTime - timeSinceLastEventSent >= DEFAULT_REPEAT_EVENT_MS) {
-			notifyListeners((state == States.ALARM || state == States.ALARM_BUT_LOW) ? IAlarmListener.EventType.ALARM
-					: IAlarmListener.EventType.SAFE);
+			notifyListeners((state == States.ALARM || state == States.ALARM_BUT_LOW) ? EventType.ALARM
+					: EventType.SAFE);
 			timeSinceLastEventSent = currentTime;
 
 		}

@@ -7,7 +7,6 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IStateChangedListener;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.iohardware.IHardwareIO;
 
@@ -63,10 +62,6 @@ public class DomoContextMock implements IDomoticContext {
 	public long getLoopSequence() {
 		return 0;
 	}
-
-//	@Override
-//	public void addUiCapableBlock(IUiCapableBlock uiblock0) {
-//	}
 
 	@Override
 	public void addStateChangedListener(IStateChangedListener updator) {

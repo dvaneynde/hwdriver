@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.actuators;
 
 import org.junit.Before;
 

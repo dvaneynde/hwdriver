@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.SwitchClick2Toggle;
+import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.Board;
@@ -71,15 +72,12 @@ public class TestEnd2EndSwitchLamp {
 		drv = new HwDriverChannelMock();
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 		s = new Switch(IO.S_KEUKENLICHT.name(), IO.S_KEUKENLICHT.desc(),
 				IO.S_KEUKENLICHT.ch(), dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), IO.L_KEUKEN.ch(),
 				dom);
-		SwitchClick2Toggle sct = new SwitchClick2Toggle("switch2lamp", "");
-		s.registerListener(sct);
-		sct.registerListener(o);
+		s.registerListener(new Connector(EventType.SINGLE_CLICK, o, EventType.TOGGLE,"switchClick2Toggle"));
 	}
 
 	@Ignore

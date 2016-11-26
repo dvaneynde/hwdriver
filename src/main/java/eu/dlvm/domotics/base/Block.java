@@ -1,5 +1,11 @@
 package eu.dlvm.domotics.base;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
+
 /**
  * A block is a building block for anything from switches to lamps.
  * 
@@ -10,6 +16,7 @@ public abstract class Block {
 	protected String name;
 	protected String description;
 	protected String uiGroup;
+	private Set<IEventListener> listeners = new HashSet<>();
 
 	private Block(String name, String description) {
 		this.name = name;
@@ -33,9 +40,20 @@ public abstract class Block {
 		return uiGroup;
 	}
 
+	public void registerListener(IEventListener listener) {
+		listeners.add(listener);
+	}
+
+	protected void notifyListeners(EventType event) {
+		for (IEventListener listener : listeners) {
+			listener.onEvent(this, event);
+		}
+	}
+
 	@Override
 	public String toString() {
-		return "Block [name=" + name + ", description=" + description + ", uiGroup=" + uiGroup + "]";
+		return "Block [name=" + name + ", description=" + description + ", uiGroup=" + uiGroup + ", listeners="
+				+ listeners + "]";
 	}
-	
+
 }

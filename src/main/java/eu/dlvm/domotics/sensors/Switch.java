@@ -1,20 +1,17 @@
 package eu.dlvm.domotics.sensors;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.base.IllegalConfigurationException;
+import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
+import eu.dlvm.domotics.events.EventType;
 
 /**
  * A pushdown Switch.
  * <ol>
- * <li>
- * single-click: on > off</li>
+ * <li>single-click: on > off</li>
  * <li>double-click: 2x (on > off) within n seconds, if enabled.</li>
  * <li>long: on-for-m-secs > off, if enabled</li>
  * </ol>
@@ -27,7 +24,7 @@ import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
  */
 public class Switch extends Sensor {
 
-	static Logger log = LoggerFactory.getLogger(Switch.class);
+	static Logger logger = LoggerFactory.getLogger(Switch.class);
 
 	public static long DEFAULT_LONG_TIMEOUT = 1200L;
 	public static long DEFAULT_DOUBLE_TIMEOUT = 200L;
@@ -38,8 +35,6 @@ public class Switch extends Sensor {
 	private long doubleClickTimeout = DEFAULT_DOUBLE_TIMEOUT;
 	private boolean longClickEnabled = false;
 	private long longClickTimeout = DEFAULT_LONG_TIMEOUT;
-	
-	private Set<ISwitchListener> listeners = new HashSet<>();
 
 	public enum States {
 		REST, FIRST_PRESS, WAIT_2ND_PRESS, WAIT_RELEASE
@@ -51,35 +46,16 @@ public class Switch extends Sensor {
 		return state;
 	}
 
-	public Switch(String name, String description, String channel,
-			IDomoticContext ctx) {
+	public Switch(String name, String description, String channel, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 	}
 
-	public Switch(String name, String description, String channel,
-			boolean singleClickEnabled, boolean longClickEnabled,
+	public Switch(String name, String description, String channel, boolean singleClickEnabled, boolean longClickEnabled,
 			boolean doubleClickEnabled, IDomoticContext ctx) {
 		super(name, description, channel, ctx);
 		this.singleClickEnabled = singleClickEnabled;
 		this.longClickEnabled = longClickEnabled;
 		this.doubleClickEnabled = doubleClickEnabled;
-	}
-
-	public void registerListener(ISwitchListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void notifyListeners(ClickType click) {
-		for (ISwitchListener sl:listeners)
-			sl.onEvent(this, click);
-	}
-	
-	public String toString() {
-		return "Switch (" + super.toString() + ") (SINGLE,DOUBLE,LONG)=("
-				+ isSingleClickEnabled() + ',' + isDoubleClickEnabled() + ','
-				+ isLongClickEnabled() + ", (dblT,lngT)=("
-				+ getDoubleClickTimeout() + ',' + getLongClickTimeout()
-				+ "), state=" + getState();
 	}
 
 	/**
@@ -101,10 +77,8 @@ public class Switch extends Sensor {
 		case FIRST_PRESS:
 			if (isLongClickEnabled()) {
 				if ((currentTime - leftRESTtime) > getLongClickTimeout()) {
-					log.info("Switch '" + getName()
-							+ "' notifies LONG click event (seq=" + sequence
-							+ ").");
-					notifyListeners(ISwitchListener.ClickType.LONG);
+					logger.info("Switch '" + getName() + "' notifies LONG click event (seq=" + sequence + ").");
+					notifyListeners(EventType.LONG_CLICK);
 					state = States.WAIT_RELEASE;
 					break;
 				}
@@ -113,10 +87,8 @@ public class Switch extends Sensor {
 				if (isDoubleClickEnabled()) {
 					state = States.WAIT_2ND_PRESS;
 				} else if (isSingleClickEnabled()) {
-					log.info("Switch '" + getName()
-							+ "' notifies SINGLE click event (seq=" + sequence
-							+ ").");
-					notifyListeners(ISwitchListener.ClickType.SINGLE);
+					logger.info("Switch '" + getName() + "' notifies SINGLE click event (seq=" + sequence + ").");
+					notifyListeners(EventType.SINGLE_CLICK);
 					state = States.REST;
 				} else if (isLongClickEnabled()) {
 					state = States.REST; // Did not press long enough
@@ -131,17 +103,13 @@ public class Switch extends Sensor {
 		case WAIT_2ND_PRESS:
 			if ((currentTime - leftRESTtime) > getDoubleClickTimeout()) {
 				if (isSingleClickEnabled()) {
-					log.info("Switch '" + getName()
-							+ "' notifies SINGLE click event (seq=" + sequence
-							+ ").");
-					notifyListeners(ISwitchListener.ClickType.SINGLE);
+					logger.info("Switch '" + getName() + "' notifies SINGLE click event (seq=" + sequence + ").");
+					notifyListeners(EventType.SINGLE_CLICK);
 				}
 				state = States.REST;
 			} else if (newInputState) {
-				log.info("Switch '" + getName()
-						+ "' notifies DOUBLE click event (seq=" + sequence
-						+ ").");
-				notifyListeners(ISwitchListener.ClickType.DOUBLE);
+				logger.info("Switch '" + getName() + "' notifies DOUBLE click event (seq=" + sequence + ").");
+				notifyListeners(EventType.DOUBLE_CLICK);
 				state = States.REST;
 			}
 			break;
@@ -161,10 +129,8 @@ public class Switch extends Sensor {
 	}
 
 	public void setDoubleClickTimeout(long doubleClickTimeout) {
-		if (!longClickLongerThanDoubleClick(getLongClickTimeout(),
-				doubleClickTimeout)) {
-			throw new IllegalConfigurationException(
-					"Long click timeout must be longer than double click timeout.");
+		if (!longClickLongerThanDoubleClick(getLongClickTimeout(), doubleClickTimeout)) {
+			throw new ConfigurationException("Long click timeout must be longer than double click timeout.");
 		}
 		this.doubleClickTimeout = doubleClickTimeout;
 	}
@@ -182,10 +148,8 @@ public class Switch extends Sensor {
 	}
 
 	public void setLongClickTimeout(long longClickTimeout) {
-		if (!longClickLongerThanDoubleClick(longClickTimeout,
-				getDoubleClickTimeout())) {
-			throw new IllegalConfigurationException(
-					"Long click timeout must be longer than double click timeout.");
+		if (!longClickLongerThanDoubleClick(longClickTimeout, getDoubleClickTimeout())) {
+			throw new ConfigurationException("Long click timeout must be longer than double click timeout.");
 		}
 		this.longClickTimeout = longClickTimeout;
 	}
@@ -198,12 +162,17 @@ public class Switch extends Sensor {
 		this.singleClickEnabled = singleClickEnabled;
 	}
 
-	private boolean longClickLongerThanDoubleClick(long longClickTimeout,
-			long doubleClickTimeout) {
+	private boolean longClickLongerThanDoubleClick(long longClickTimeout, long doubleClickTimeout) {
 		if (isLongClickEnabled() && isDoubleClickEnabled()) {
 			return (longClickTimeout > doubleClickTimeout);
 		} else {
 			return true; // in fact, not applicable, but precondition is ok
 		}
+	}
+
+	public String toString() {
+		return "Switch (" + super.toString() + ") (SINGLE,DOUBLE,LONG)=(" + isSingleClickEnabled() + ','
+				+ isDoubleClickEnabled() + ',' + isLongClickEnabled() + ", (dblT,lngT)=(" + getDoubleClickTimeout()
+				+ ',' + getLongClickTimeout() + "), state=" + getState();
 	}
 }

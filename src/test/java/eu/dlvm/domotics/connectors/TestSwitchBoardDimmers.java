@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.connectors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +12,9 @@ import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.connectors.DimmerSwitch2Dimmer;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType;
-import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
+import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
-import eu.dlvm.domotics.sensors.ISwitchListener.ClickType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
@@ -55,7 +53,6 @@ public class TestSwitchBoardDimmers {
 	private DimmerSwitch dsw1;
 	private DimmedLamp dl1;
 	private Switch swAllOnOff;
-	private DimmerSwitch2Dimmer ds2d;
 	private long cur;
 
 	@Before
@@ -71,15 +68,15 @@ public class TestSwitchBoardDimmers {
 		hw.outputs.put(DIMMER1, 0);
 		hw.outputs.put(DIMMER2, 0);
 
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
+
 		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
 		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
 		dl1.setMsTimeFullDim(3000);
-
-		ds2d = new DimmerSwitch2Dimmer("ds2d", "ds2d");
-		ds2d.setLamp(dl1);
-		dsw1.registerListener(ds2d);
+		//		ds2d = new DimmerSwitch2Dimmer("ds2d", "ds2d");
+		//		ds2d.setLamp(dl1);
+		//		dsw1.registerListener(ds2d);
+		dsw1.registerListener(dl1);
 
 		swAllOnOff = new Switch("swAll", "Switch All On/Off", SW_ALL, dom);
 		swAllOnOff.setDoubleClickEnabled(true);
@@ -87,10 +84,11 @@ public class TestSwitchBoardDimmers {
 		swAllOnOff.setLongClickEnabled(true);
 		swAllOnOff.setLongClickTimeout(1000L);
 		swAllOnOff.setSingleClickEnabled(false);
-		Switch2OnOffToggle swtch2AllOff = new Switch2OnOffToggle("allOff", "allOff", null);
-		swtch2AllOff.map(ClickType.LONG, ActionType.OFF);
-		swAllOnOff.registerListener(swtch2AllOff);
-		swtch2AllOff.registerListener(dl1);
+//		Switch2OnOffToggle swtch2AllOff = new Switch2OnOffToggle("allOff", "allOff", null);
+//		swtch2AllOff.map(ClickType.LONG, ActionType.OFF);
+//		swAllOnOff.registerListener(swtch2AllOff);
+//		swtch2AllOff.registerListener(dl1);
+		swAllOnOff.registerListener(new Connector(EventType.LONG_CLICK, dl1, EventType.OFF, "AllOnOff"));
 	}
 
 	@Test

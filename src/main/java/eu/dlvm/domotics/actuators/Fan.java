@@ -1,19 +1,22 @@
 package eu.dlvm.domotics.actuators;
 
-import org.slf4j.Logger; 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * A Fan that runs for a {@link #getRunningPeriodSec()} seconds when toggled on.
- * Optionally it can be connected to a {@link Lamp}:  if the lamp goes on then
- * after {@link #getDelayPeriodSec()} the fan will run until the lamp goes off again plus the same
- * {@link #getRunningPeriodSec()} seconds while the lamp is off.
+ * Optionally it can be connected to a {@link Lamp}: if the lamp goes on then
+ * after {@link #getDelayPeriodSec()} the fan will run until the lamp goes off
+ * again plus the same {@link #getRunningPeriodSec()} seconds while the lamp is
+ * off.
  * <p>
  * The state diagram below shows all possibilities.
  * <p>
@@ -23,15 +26,16 @@ import eu.dlvm.domotics.service.UiInfo;
  * <li>dT is the time spent in a given state</li>
  * <li>there is a toggle and long-toggle; long-toggle is only used in one case,
  * when the lamp is on and the fan runs you want to make sure the fan remains
- * off. With a normal toggle, after the delay period, the fan will go on again.</li>
+ * off. With a normal toggle, after the delay period, the fan will go on
+ * again.</li>
  * </ul>
  * 
  * @author Dirk Vaneynde
  */
 
-public class Fan extends Actuator implements IOnOffToggleCapable {
+public class Fan extends Actuator implements IEventListener {
 
-	static Logger log = LoggerFactory.getLogger(Fan.class);
+	static Logger logger = LoggerFactory.getLogger(Fan.class);
 
 	/**
 	 * If lamp is used, default time lamp has to be on in seconds before Fan
@@ -53,11 +57,12 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	public enum States {
 		REST, RUN, DELAYED_LAMP_ON, RUN_LAMP_ON, RUN_LAMP_OFF, WAIT_LAMP_OFF
 	};
+
 	private States state;
 
-	
 	/**
-	 * Constructor without a Lamp. See {@link #Fan(String, String, Lamp, String, IHardwareAccess)} for details.
+	 * Constructor without a Lamp. See
+	 * {@link #Fan(String, String, Lamp, String, IHardwareAccess)} for details.
 	 */
 	public Fan(String name, String description, String channel, IDomoticContext ctx) {
 		super(name, description, null, channel, ctx);
@@ -67,6 +72,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	/**
 	 * Constructor.
+	 * 
 	 * @param name
 	 *            See superclass
 	 *            {@link Actuator#Actuator(String, String, String)}.
@@ -80,6 +86,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 	 * @param logicalChannel
 	 *            Logical output channel of fan.
 	 * @param ctx
+	 * @deprecated Lamp should be through event listener !
 	 */
 	public Fan(String name, String description, Lamp lamp, String channel, IDomoticContext ctx) {
 		this(name, description, channel, ctx);
@@ -141,12 +148,10 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 		return (state == States.RUN || state == States.RUN_LAMP_ON || state == States.RUN_LAMP_OFF);
 	}
 
-	@Override
 	public void on() {
 		setOn(true);
 	}
 
-	@Override
 	public void off() {
 		setOn(false);
 	}
@@ -164,7 +169,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 			changeState(States.RUN);
 			writeOutput(true);
 			running = true;
-			log.info("Fan '" + getName() + "' goes ON for " + getRunningPeriodSec() + " sec. or until switched off (state=" + getState() + ").");
+			logger.info("Fan '" + getName() + "' goes ON for " + getRunningPeriodSec()
+					+ " sec. or until switched off (state=" + getState() + ").");
 			break;
 		case RUN:
 		case RUN_LAMP_ON:
@@ -173,7 +179,7 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 			changeState(States.REST);
 			writeOutput(false);
 			running = false;
-			log.info("Fan '" + getName() + "' goes OFF because toggled.");
+			logger.info("Fan '" + getName() + "' goes OFF because toggled.");
 			break;
 		}
 		return running;
@@ -192,7 +198,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 		case RUN_LAMP_ON:
 			changeState(States.WAIT_LAMP_OFF);
 			writeOutput(false);
-			log.info("Fan '" + getName() + "' goes OFF, and will not turn on again because lamp is still ON (state=" + getState() + ").");
+			logger.info("Fan '" + getName() + "' goes OFF, and will not turn on again because lamp is still ON (state="
+					+ getState() + ").");
 			break;
 		default:
 			// ignored;
@@ -215,14 +222,16 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	/**
 	 * Reacts on {@see IOnOffToggle.ActionType} events, with some pecularities:
-	 * <ul><li>ON: if off, behaves like {@link #toggle()}, otherwise no effect</li>
+	 * <ul>
+	 * <li>ON: if off, behaves like {@link #toggle()}, otherwise no effect</li>
 	 * <li>OFF: if on, behaves as {@link #turnOffUntilLampOff()}</li>
 	 * <li>TOGGLE: see {@link #toggle()}</li>
 	 * </ul>
+	 * TODO add check on source; if lamp then it should sync wiht lamp
 	 */
 	@Override
-	public void onEvent(ActionType action) {
-		switch (action) {
+	public void onEvent(Block source, EventType event) {
+		switch (event) {
 		case ON:
 			setOn(true);
 			break;
@@ -232,6 +241,9 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 		case TOGGLE:
 			toggle();
 			break;
+		// TODO add OFF_WITHOUT_RESTART, see turnOffUntilLampOff
+		default:
+			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
 	}
 
@@ -250,7 +262,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 			if ((lamp != null) && (lamp.isOn())) {
 				state = States.DELAYED_LAMP_ON;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' watches lamp '" + lamp.getName() + "' for " + getDelayPeriodSec() + " sec. before going ON (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "' watches lamp '" + lamp.getName() + "' for " + getDelayPeriodSec()
+						+ " sec. before going ON (seq=" + sequence + ").");
 			}
 			break;
 		case RUN:
@@ -258,26 +271,29 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 				writeOutput(false);
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' goes off because it has run for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "' goes off because it has run for " + getRunningPeriodSec()
+						+ " sec (seq=" + sequence + ").");
 			}
 			break;
 		case DELAYED_LAMP_ON:
 			if (!lamp.isOn()) {
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Lamp goes off before delay period has expired. No fanning.");
+				logger.info("Lamp goes off before delay period has expired. No fanning.");
 			} else if ((current - timeStateEntered) > delayPeriodMs) {
 				writeOutput(true);
 				state = States.RUN_LAMP_ON;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' stays ON  for as long as lamp '" + lamp.getName() + "' is ON (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "' stays ON  for as long as lamp '" + lamp.getName() + "' is ON (seq="
+						+ sequence + ").");
 			}
 			break;
 		case RUN_LAMP_ON:
 			if (!lamp.isOn()) {
 				state = States.RUN_LAMP_OFF;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "', lamp '" + lamp.getName() + "'has gone out, keep running for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "', lamp '" + lamp.getName() + "'has gone out, keep running for "
+						+ getRunningPeriodSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case RUN_LAMP_OFF:
@@ -285,14 +301,16 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 				writeOutput(false);
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "' goes off because lamp '" + lamp.getName() + " has been OFF for " + getRunningPeriodSec() + " sec (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "' goes off because lamp '" + lamp.getName() + " has been OFF for "
+						+ getRunningPeriodSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case WAIT_LAMP_OFF:
 			if (!lamp.isOn()) {
 				state = States.REST;
 				timeStateEntered = current;
-				log.info("Fan '" + getName() + "', lamp '" + lamp.getName() + "'has gone off, which I was waiting for to go to REST (seq=" + sequence + ").");
+				logger.info("Fan '" + getName() + "', lamp '" + lamp.getName()
+						+ "'has gone off, which I was waiting for to go to REST (seq=" + sequence + ").");
 			}
 			break;
 		default:
@@ -319,7 +337,8 @@ public class Fan extends Actuator implements IOnOffToggleCapable {
 
 	@Override
 	public String toString() {
-		return "Fan (" + super.toString() + ") running=" + isOn() + " state=" + getState().name() + " delay=" + getDelayPeriodSec() + "s runperiod=" + getRunningPeriodSec() + "s.";
+		return "Fan (" + super.toString() + ") running=" + isOn() + " state=" + getState().name() + " delay="
+				+ getDelayPeriodSec() + "s runperiod=" + getRunningPeriodSec() + "s.";
 	}
 
 }

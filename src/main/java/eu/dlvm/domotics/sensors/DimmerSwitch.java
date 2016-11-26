@@ -1,13 +1,11 @@
 package eu.dlvm.domotics.sensors;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.events.EventType;
 
 /**
  * Events:
@@ -29,7 +27,6 @@ public class DimmerSwitch extends Sensor {
 	private long leftRESTtime = 0L;
 	private boolean firstPressedLeft;
 	private long clickTimeout = 400L;
-	private Set<IDimmerSwitchListener> listeners = new HashSet<>();
 
 	public enum States {
 		REST, DOWN_SHORT, DOWN_LONG, BOTH_DOWN
@@ -55,7 +52,7 @@ public class DimmerSwitch extends Sensor {
 	 * @param channelLeft
 	 * @param channelRight
 	 * @param hw
-	 * @deprecated 
+	 * @deprecated
 	 */
 	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IDomoticContext ctx) {
 		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), ctx);
@@ -65,15 +62,6 @@ public class DimmerSwitch extends Sensor {
 	public String toString() {
 		return "DimmerSwitches '" + name + "', chLeft=" + getChannel() + ", chRight=" + getChannelRight() + ", state="
 				+ getState();
-	}
-
-	public void registerListener(IDimmerSwitchListener listener) {
-		listeners.add(listener);
-	}
-
-	public void notifyListeners(IDimmerSwitchListener.ClickType click) {
-		for (IDimmerSwitchListener sl : listeners)
-			sl.onEvent(this, click);
 	}
 
 	@Override
@@ -95,23 +83,19 @@ public class DimmerSwitch extends Sensor {
 			break;
 		case DOWN_SHORT:
 			if ((currentTime - leftRESTtime) >= getClickedTimeoutMS()) {
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_HOLD_DOWN
-						: IDimmerSwitchListener.ClickType.RIGHT_HOLD_DOWN);
+				EventType ct = (firstPressedLeft ? EventType.LEFT_HOLD_DOWN : EventType.RIGHT_HOLD_DOWN);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.DOWN_LONG;
 				break;
 			} else if ((firstPressedLeft && !newInputLeft) || (!firstPressedLeft && !newInputRight)) {
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_CLICK
-						: IDimmerSwitchListener.ClickType.RIGHT_CLICK);
+				EventType ct = (firstPressedLeft ? EventType.LEFT_CLICK : EventType.RIGHT_CLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft
-						? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK
-						: IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
+				EventType ct = (firstPressedLeft ? EventType.LEFT_WITH_RIGHTCLICK : EventType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.BOTH_DOWN;
@@ -120,16 +104,13 @@ public class DimmerSwitch extends Sensor {
 		case DOWN_LONG:
 			if ((firstPressedLeft && !newInputLeft) || (!firstPressedLeft && !newInputRight)) {
 				// Released the key being hold
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft ? IDimmerSwitchListener.ClickType.LEFT_RELEASED
-						: IDimmerSwitchListener.ClickType.RIGHT_RELEASED);
+				EventType ct = (firstPressedLeft ? EventType.LEFT_RELEASED : EventType.RIGHT_RELEASED);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.REST;
 			} else if ((firstPressedLeft && newInputRight) || (!firstPressedLeft && newInputLeft)) {
 				// Pressed a key down while already holding the other one
-				IDimmerSwitchListener.ClickType ct = (firstPressedLeft
-						? IDimmerSwitchListener.ClickType.LEFT_WITH_RIGHTCLICK
-						: IDimmerSwitchListener.ClickType.RIGHT_WITH_LEFTCLICK);
+				EventType ct = (firstPressedLeft ? EventType.LEFT_WITH_RIGHTCLICK : EventType.RIGHT_WITH_LEFTCLICK);
 				log.info("DimmerSwitches '" + getName() + "' notifies " + ct + " event.");
 				notifyListeners(ct);
 				state = States.BOTH_DOWN;

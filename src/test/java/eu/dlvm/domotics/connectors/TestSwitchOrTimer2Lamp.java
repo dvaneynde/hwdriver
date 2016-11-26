@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks.concrete;
+package eu.dlvm.domotics.connectors;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,11 +15,9 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
-import eu.dlvm.domotics.connectors.Switch2OnOffToggle;
-import eu.dlvm.domotics.connectors.SwitchClick2Toggle;
+import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.Timer;
-import eu.dlvm.domotics.sensors.ISwitchListener;
+import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
@@ -72,7 +70,6 @@ public class TestSwitchOrTimer2Lamp {
 		hw.out(10, false);
 		hw.out(11, false);
 
-		Domotic.resetSingleton();
 		dom = Domotic.createSingleton(hw);
 
 		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), dom);
@@ -80,20 +77,23 @@ public class TestSwitchOrTimer2Lamp {
 		o1 = new Lamp("Lamp1", "Lamp1", Integer.toString(10), dom);
 		o2 = new Lamp("Lamp2", "Lamp2", Integer.toString(11), dom);
 
-		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
-		sw1.registerListener(sct1);
-		sct1.registerListener(o1);
-		SwitchClick2Toggle sct2 = new SwitchClick2Toggle("sct2", "");
-		sw2.registerListener(sct2);
-		sct2.registerListener(o2);
+		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
+		//		sct1.registerListener(o1);
+		sw1.registerListener(new Connector(EventType.SINGLE_CLICK, o1, EventType.TOGGLE, "sw1_to_o1"));
 
-		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "", null);
-		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleCapable.ActionType.OFF);
-		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleCapable.ActionType.ON);
+		//		SwitchClick2Toggle sct2 = new SwitchClick2Toggle("sct2", "");
+		//		sct2.registerListener(o2);
+		sw2.registerListener(new Connector(EventType.SINGLE_CLICK, o2, EventType.TOGGLE, "sw2_to_o2"));
 
-		sw2.registerListener(s2allonoff);
-		s2allonoff.registerListener(o1);
-		s2allonoff.registerListener(o2);
+		//		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "", null);
+		//		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleCapable.ActionType.OFF);
+		//		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleCapable.ActionType.ON);
+		//		s2allonoff.registerListener(o1);
+		//		s2allonoff.registerListener(o2);
+		sw2.registerListener(new Connector(EventType.LONG_CLICK, o1, EventType.OFF, "sw_o1_long_off"));
+		sw2.registerListener(new Connector(EventType.LONG_CLICK, o2, EventType.OFF, "sw_o2_long_off"));
+		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o1, EventType.ON, "sw_o1_double_on"));
+		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o2, EventType.ON, "sw_o2_double_on"));
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class TestSwitchOrTimer2Lamp {
 		Timer t = new Timer("timer", "timer", dom);
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
-		t.register(o1);
+		t.registerListener(o1);
 		dom.initialize(new HashMap<String, RememberedOutput>(0));
 
 		assertFalse(t.isOn());

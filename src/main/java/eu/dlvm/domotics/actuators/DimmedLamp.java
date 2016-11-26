@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.IOnOffToggleCapable;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
@@ -16,13 +18,14 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author dirk
  */
-public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
+public class DimmedLamp extends Actuator implements IEventListener {
 	/**
 	 * Time in ms to dim from off to fully on.
 	 */
 	public static final int DEFAULT_FULL_DIMTIME_MS = 5000; // milliseconds
 
-	static Logger log = LoggerFactory.getLogger(DimmedLamp.class);
+	private static Logger logger = LoggerFactory.getLogger(DimmedLamp.class);
+	
 	private double level, prevOnLevel;
 	private int factorHwOut;
 	private int msTimeFullDim = DEFAULT_FULL_DIMTIME_MS;
@@ -87,7 +90,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public void initializeOutput(RememberedOutput ro) {
 		if (ro == null) {
-			log.info("Dimmed Lamp initializing to ON, 50% - default behaviour when no previous state known.");
+			logger.info("Dimmed Lamp initializing to ON, 50% - default behaviour when no previous state known.");
 			on(50);
 		} else {
 			if (ro.getVals()[0] == 0)
@@ -143,7 +146,6 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * When going on the level of the last on-state is taken. For instance, if
 	 * lamp was 50% and then switched off, it will go on to 50% again.
 	 */
-	@Override
 	public boolean toggle() {
 		switch (state) {
 		case OFF:
@@ -154,7 +156,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			break;
 		case UP:
 		case DOWN:
-			log.warn("User did toggle, but I'm dimming up or down - should not be possible. Switching to off.");
+			logger.warn("User did toggle, but I'm dimming up or down - should not be possible. Switching to off.");
 			off();
 			break;
 		}
@@ -166,12 +168,11 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 * won't see a difference; but the same is true if the lamp was before on at
 	 * 1%... so we don't bother about this).
 	 */
-	@Override
 	public void on() {
 		level = prevOnLevel;
 		state = States.ON;
 		writeAnalogOutput();
-		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
+		logger.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
 	}
 
 	/**
@@ -183,26 +184,25 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	 */
 	public void on(int newLevel) {
 		if ((newLevel < 0) || (newLevel > 100)) {
-			log.warn("DimmedLamp on(" + newLevel + ") called, argument not in range [0..100]. Operation is ignored.");
+			logger.warn("DimmedLamp on(" + newLevel + ") called, argument not in range [0..100]. Operation is ignored.");
 			return;
 		}
 		level = newLevel;
 		state = States.ON;
 		writeAnalogOutput();
-		log.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
+		logger.info("DimmedLamp '" + getName() + "' set to ON: " + level + '%');
 	}
 
 	/**
 	 * Switch lamp off.
 	 */
-	@Override
 	public void off() {
 		if (state != States.OFF) {
 			prevOnLevel = level;
 			level = 0;
 			state = States.OFF;
 			writeAnalogOutput();
-			log.info("DimmedLamp '" + getName() + "' set to OFF (remembered level: " + prevOnLevel + "%)");
+			logger.info("DimmedLamp '" + getName() + "' set to OFF (remembered level: " + prevOnLevel + "%)");
 		}
 	}
 
@@ -224,9 +224,9 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		switch (state) {
 		case OFF:
 			if (!active) {
-				log.warn("Caller desactivates up, but I am OFF. Ignored.");
+				logger.warn("Caller desactivates up, but I am OFF. Ignored.");
 			} else {
-				log.debug("up(true), going from OFF to UP.");
+				logger.debug("up(true), going from OFF to UP.");
 				level = 0;
 				lastUpDnLoopTime = -1L;
 				state = States.UP;
@@ -234,7 +234,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			break;
 		case ON:
 			if (!active) {
-				log.warn("Caller desactivates up, but I am ON. Ignored.");
+				logger.warn("Caller desactivates up, but I am ON. Ignored.");
 			} else {
 				lastUpDnLoopTime = -1L;
 				state = States.UP;
@@ -242,14 +242,14 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			break;
 		case UP:
 			if (active) {
-				log.warn("Caller activates up, but I am already UP. Ignored.");
+				logger.warn("Caller activates up, but I am already UP. Ignored.");
 			} else {
 				state = States.ON;
-				log.info("DimmedLamp '" + getName() + "' dimmed up to level: " + level + '%');
+				logger.info("DimmedLamp '" + getName() + "' dimmed up to level: " + level + '%');
 			}
 			break;
 		case DOWN:
-			log.warn("Caller activates/deactivates (active=" + active + ") up, but I am in DOWN. Ignored.");
+			logger.warn("Caller activates/deactivates (active=" + active + ") up, but I am in DOWN. Ignored.");
 			break;
 		default:
 			throw new RuntimeException();
@@ -274,7 +274,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		switch (state) {
 		case OFF:
 			if (!active) {
-				log.warn("Caller desactivates down, but I am OFF. Ignored");
+				logger.warn("Caller desactivates down, but I am OFF. Ignored");
 			} else {
 				level = prevOnLevel;
 				lastUpDnLoopTime = -1L;
@@ -283,22 +283,22 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			break;
 		case ON:
 			if (!active) {
-				log.warn("Caller desactivates down, but I am ON. Ignored");
+				logger.warn("Caller desactivates down, but I am ON. Ignored");
 			} else {
 				lastUpDnLoopTime = -1L;
 				state = States.DOWN;
 			}
 			break;
 		case UP:
-			log.warn("Caller activates/deactivates (active=" + active + ") down, but I am in UP. Ignored");
+			logger.warn("Caller activates/deactivates (active=" + active + ") down, but I am in UP. Ignored");
 			break;
 		case DOWN:
 			if (active) {
-				log.warn("Caller activates down, but I am already DOWN. Ignored");
+				logger.warn("Caller activates down, but I am already DOWN. Ignored");
 			} else {
 				state = States.ON; // Note: ON even if 0%; light strength is
 				// basically the same as 1%, so...
-				log.info("DimmedLamp '" + getName() + "' dimmed down to level: " + level + "%, state is ON");
+				logger.info("DimmedLamp '" + getName() + "' dimmed down to level: " + level + "%, state is ON");
 			}
 			break;
 		default:
@@ -306,9 +306,21 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		}
 	}
 
+	/**
+	 * For the dimmers, depending on the input (see
+	 * {@link IDimmerSwitchListener.ClickType} ), the following happens (only
+	 * describing the LEFT part):
+	 * <ul>
+	 * <li>LEFT_CLICK - switch on/off</li>
+	 * <li>LEFT_HOLD_DOWN - start dimming; if light was off first turn it on to
+	 * previous on-level</li>
+	 * <li>LEFT_RELEASED - stop dimming.</li>
+	 * <li>LEFT_WITH_RIGHTCLICK - set to full strength</li>
+	 * </ul>
+	 */
 	@Override
-	public void onEvent(ActionType action) {
-		switch (action) {
+	public void onEvent(Block source, EventType event) {
+		switch (event) {
 		case ON:
 			on();
 			break;
@@ -318,6 +330,28 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 		case TOGGLE:
 			toggle();
 			break;
+		case LEFT_CLICK:
+		case RIGHT_CLICK:
+			toggle();
+			break;
+		case LEFT_HOLD_DOWN:
+			down(true);
+			break;
+		case LEFT_RELEASED:
+			down(false);
+			break;
+		case RIGHT_HOLD_DOWN:
+			up(true);
+			break;
+		case RIGHT_RELEASED:
+			up(false);
+			break;
+		case LEFT_WITH_RIGHTCLICK:
+		case RIGHT_WITH_LEFTCLICK:
+			on(100);
+			break;
+		default:
+			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
 	}
 
@@ -336,7 +370,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			if (lastUpDnLoopTime != -1) {
 				// This is skipped at the first loop() while UP or DOWN
 				double change = ((double) (current - lastUpDnLoopTime)) * 100.0d / (double) msTimeFullDim;
-				log.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level
+				logger.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level
 						+ ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs=" + msTimeFullDim);
 				if (state == States.UP) {
 					level += change;
@@ -348,7 +382,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 						level = 0;
 					}
 				}
-				log.debug("After change, level =" + level);
+				logger.debug("After change, level =" + level);
 			}
 			// also write if first time up or down, since if the lamp was OFF we
 			// first have to put it to ON.
@@ -377,8 +411,8 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 	@Override
 	public void update(String action) {
 		try {
-			ActionType at = ActionType.valueOf(action.toUpperCase());
-			onEvent(at);
+			EventType at = EventType.valueOf(action.toUpperCase());
+			onEvent(null, at);
 			return;
 		} catch (IllegalArgumentException e) {
 		}
@@ -389,7 +423,7 @@ public class DimmedLamp extends Actuator implements IOnOffToggleCapable {
 			else
 				off();
 		} catch (NumberFormatException e) {
-			log.warn("update(); unknown action=" + action);
+			logger.warn("update(); unknown action=" + action);
 		}
 	}
 

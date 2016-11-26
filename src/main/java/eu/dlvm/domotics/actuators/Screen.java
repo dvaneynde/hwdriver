@@ -4,8 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
+import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
 /**
@@ -25,9 +28,9 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author Dirk Vaneynde
  */
-public class Screen extends Actuator {
+public class Screen extends Actuator implements IEventListener {
 
-	private static final Logger log = LoggerFactory.getLogger(Screen.class);
+	private static final Logger logger = LoggerFactory.getLogger(Screen.class);
 
 	/**
 	 * Delay in ms between switching motors, i.e. period that both motors are
@@ -134,155 +137,34 @@ public class Screen extends Actuator {
 		this.motorDnPeriodMs = motorDnPeriod * 1000;
 	}
 
-	/*
-	 * Internal API
-	 */
-
 	@Override
-	public void initializeOutput(RememberedOutput ro) {
-		// Nothing to do;
-	}
-
-	@Override
-	public void loop(long current, long sequence) {
-		switch (state) {
-		case REST:
-			// TODO safety time, door hier ook te checken op timeStateStart,
-			// delay-protection moet verstreken zijn. Overal waar REST
-			// gezet wordt moet die tijd ook gezet worden.
-			if (protect) {
-				setStateAndEnterUp(current);
-				log.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got PROTECT message; time=" + getMotorUpPeriod() + " sec.");
-			} else if (gotToggleUp || gotUp) {
-				setStateAndEnterUp(current);
-				log.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got '" + (gotToggleUp ? "toggle-up" : "up") + "' messaage; time=" + getMotorUpPeriod()
-						+ "sec.");
-			} else if (gotToggleDown || gotDown) {
-				setStateAndEntryDown(current);
-				log.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got '" + (gotToggleDown ? "toggle-down" : "down") + "' message; time="
-						+ getMotorDnPeriod() + "sec.");
-			}
+	public void onEvent(Block source, EventType event) {
+		switch (event) {
+		case ALARM:
+			setProtect(true);
+			break;
+		case SAFE:
+			setProtect(false);
+			break;
+		case TOGGLE_UP:
+			toggleUp();
+			break;
+		case TOGGLE_DOWN:
+			toggleDown();
+			break;
+		case LIGHT_LOW:
+			up();
 			break;
 		case DOWN:
-			ratioClosed = Math.min(1.0,
-					ratioClosedAtStateStart + (current - timeStateStart) / (double) motorDnPeriodMs);
-			if (gotToggleDown && !protect) {
-				exitDown(current);
-				state = States.REST;
-				log.info("Screen " + getName() + " DOWN-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got toggle-down message; " + getRatioClosedAsPercentage() + "% closed.");
-			} else if (gotToggleUp || gotUp || protect) {
-				exitDown(current);
-				state = States.DELAY_DOWN_2_UP;
-				log.info("Screen " + getName() + " DOWN -->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got '" + (protect ? "PROTECT" : (gotUp ? "up" : "toggle-up")) + "'; "
-						+ getRatioClosedAsPercentage() + "% closed.");
-			} else if ((current - timeStateStart) > motorDnPeriodMs) {
-				exitDown(current);
-				state = States.REST;
-				log.info("Screen " + getName() + " DOWN-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: motor-on time is reached; " + getRatioClosedAsPercentage() + "% closed.");
-			}
-			break;
-		case UP:
-			ratioClosed = Math.max(0.0,
-					ratioClosedAtStateStart - (current - timeStateStart) / (double) motorUpPeriodMs);
-			if (gotToggleUp && !protect) {
-				exitUp(current);
-				state = States.REST;
-				log.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got toggle-UP message; " + getRatioClosedAsPercentage() + "% closed.");
-			} else if ((gotToggleDown || gotDown) && !protect) {
-				exitUp(current);
-				state = States.DELAY_UP_2_DOWN;
-				log.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: got '" + (gotToggleDown ? "toggle-down" : "down") + "' message; "
-						+ getRatioClosedAsPercentage() + "% closed.");
-			} else if ((current - timeStateStart) > motorUpPeriodMs) {
-				exitUp(current);
-				if (protect) {
-					state = States.REST_PROTECT;
-				} else {
-					state = States.REST;
-				}
-				log.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
-						+ " mode: motor-on time is reached; " + getRatioClosedAsPercentage() + "% closed.");
-			}
-			break;
-		case DELAY_UP_2_DOWN:
-			if (gotToggleDown || gotToggleUp || gotDown || gotUp) {
-				timeStateStart = current;
-				state = States.REST;
-				log.warn("Screen " + getName() + " DELAY_UP_2_DOWN-->" + getState() + ", "
-						+ (protect ? "PROTECT" : "SAFE")
-						+ " mode: got event while switching up to down, strange. Therefore stop screen.");
-			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
-				if (protect) {
-					setStateAndEnterUp(current);
-				} else {
-					setStateAndEntryDown(current);
-				}
-				log.info("Screen " + getName() + " DELAY_UP_2_DOWN-->" + getState() + ", "
-						+ (protect ? "PROTECT" : "SAFE") + " mode: delay has passed.");
-			}
-			break;
-		case DELAY_DOWN_2_UP:
-			if (gotToggleDown || gotToggleUp || gotDown || gotUp) {
-				timeStateStart = current;
-				state = States.REST;
-				log.warn("Screen " + getName() + " DELAY_DOWN_2_UP-->" + getState() + ", "
-						+ (protect ? "PROTECT" : "SAFE")
-						+ " mode: got event while switching up to down, strange. Therefore stop screen.");
-			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
-				if (protect) {
-					setStateAndEnterUp(current);
-				} else {
-					setStateAndEnterUp(current);
-				}
-				log.info("Screen " + getName() + " DELAY_DOWN_2_UP-->" + getState() + ", "
-						+ (protect ? "PROTECT" : "SAFE") + " mode: delay has passed.");
-			}
-			break;
-		case REST_PROTECT:
-			if (!protect) {
-				timeStateStart = current;
-				state = States.REST;
-				log.info("Screen " + getName() + " REST_PROTECT-->" + getState() + ": leaves PROTECTED mode.");
-			}
+		case LIGHT_HIGH:
+			down();
 			break;
 		default:
-			break;
-
+			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
-		gotToggleUp = gotToggleDown = gotUp = gotDown = false;
 	}
 
-	private void setStateAndEnterUp(long current) {
-		timeStateStart = current;
-		ratioClosedAtStateStart = ratioClosed;
-		state = States.UP;
-		getHw().writeDigitalOutput(chUp, true);
-	}
-
-	private void exitUp(long current) {
-		timeStateStart = current;
-		getHw().writeDigitalOutput(chUp, false);
-	}
-
-	private void setStateAndEntryDown(long current) {
-		timeStateStart = current;
-		ratioClosedAtStateStart = ratioClosed;
-		state = States.DOWN;
-		getHw().writeDigitalOutput(getChannel(), true);
-	}
-
-	private void exitDown(long current) {
-		timeStateStart = current;
-		getHw().writeDigitalOutput(getChannel(), false);
-	}
+	// ===== UI =====
 
 	@Override
 	public UiInfo getUiInfo() {
@@ -318,7 +200,7 @@ public class Screen extends Actuator {
 
 	@Override
 	public void update(String action) {
-		log.debug("update() action=" + action + ", this=" + this);
+		logger.debug("update() action=" + action + ", this=" + this);
 		switch (action) {
 		case "up":
 			toggleUp();
@@ -327,8 +209,155 @@ public class Screen extends Actuator {
 			toggleDown();
 			break;
 		default:
-			log.warn("update(): ignored unknown action=" + action + " on screen with name=" + getName() + '.');
+			logger.warn("update(): ignored unknown action=" + action + " on screen with name=" + getName() + '.');
 		}
+	}
+
+	// ===== Internal =====
+	@Override
+	public void initializeOutput(RememberedOutput ro) {
+		// Nothing to do;
+	}
+
+	@Override
+	public void loop(long current, long sequence) {
+		switch (state) {
+		case REST:
+			// TODO safety time, door hier ook te checken op timeStateStart,
+			// delay-protection moet verstreken zijn. Overal waar REST
+			// gezet wordt moet die tijd ook gezet worden.
+			if (protect) {
+				setStateAndEnterUp(current);
+				logger.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got PROTECT message; time=" + getMotorUpPeriod() + " sec.");
+			} else if (gotToggleUp || gotUp) {
+				setStateAndEnterUp(current);
+				logger.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got '" + (gotToggleUp ? "toggle-up" : "up") + "' messaage; time=" + getMotorUpPeriod()
+						+ "sec.");
+			} else if (gotToggleDown || gotDown) {
+				setStateAndEntryDown(current);
+				logger.info("Screen " + getName() + " REST-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got '" + (gotToggleDown ? "toggle-down" : "down") + "' message; time="
+						+ getMotorDnPeriod() + "sec.");
+			}
+			break;
+		case DOWN:
+			ratioClosed = Math.min(1.0,
+					ratioClosedAtStateStart + (current - timeStateStart) / (double) motorDnPeriodMs);
+			if (gotToggleDown && !protect) {
+				exitDown(current);
+				state = States.REST;
+				logger.info("Screen " + getName() + " DOWN-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got toggle-down message; " + getRatioClosedAsPercentage() + "% closed.");
+			} else if (gotToggleUp || gotUp || protect) {
+				exitDown(current);
+				state = States.DELAY_DOWN_2_UP;
+				logger.info("Screen " + getName() + " DOWN -->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got '" + (protect ? "PROTECT" : (gotUp ? "up" : "toggle-up")) + "'; "
+						+ getRatioClosedAsPercentage() + "% closed.");
+			} else if ((current - timeStateStart) > motorDnPeriodMs) {
+				exitDown(current);
+				state = States.REST;
+				logger.info("Screen " + getName() + " DOWN-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: motor-on time is reached; " + getRatioClosedAsPercentage() + "% closed.");
+			}
+			break;
+		case UP:
+			ratioClosed = Math.max(0.0,
+					ratioClosedAtStateStart - (current - timeStateStart) / (double) motorUpPeriodMs);
+			if (gotToggleUp && !protect) {
+				exitUp(current);
+				state = States.REST;
+				logger.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got toggle-UP message; " + getRatioClosedAsPercentage() + "% closed.");
+			} else if ((gotToggleDown || gotDown) && !protect) {
+				exitUp(current);
+				state = States.DELAY_UP_2_DOWN;
+				logger.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: got '" + (gotToggleDown ? "toggle-down" : "down") + "' message; "
+						+ getRatioClosedAsPercentage() + "% closed.");
+			} else if ((current - timeStateStart) > motorUpPeriodMs) {
+				exitUp(current);
+				if (protect) {
+					state = States.REST_PROTECT;
+				} else {
+					state = States.REST;
+				}
+				logger.info("Screen " + getName() + " UP-->" + getState() + ", " + (protect ? "PROTECT" : "SAFE")
+						+ " mode: motor-on time is reached; " + getRatioClosedAsPercentage() + "% closed.");
+			}
+			break;
+		case DELAY_UP_2_DOWN:
+			if (gotToggleDown || gotToggleUp || gotDown || gotUp) {
+				timeStateStart = current;
+				state = States.REST;
+				logger.warn("Screen " + getName() + " DELAY_UP_2_DOWN-->" + getState() + ", "
+						+ (protect ? "PROTECT" : "SAFE")
+						+ " mode: got event while switching up to down, strange. Therefore stop screen.");
+			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
+				if (protect) {
+					setStateAndEnterUp(current);
+				} else {
+					setStateAndEntryDown(current);
+				}
+				logger.info("Screen " + getName() + " DELAY_UP_2_DOWN-->" + getState() + ", "
+						+ (protect ? "PROTECT" : "SAFE") + " mode: delay has passed.");
+			}
+			break;
+		case DELAY_DOWN_2_UP:
+			if (gotToggleDown || gotToggleUp || gotDown || gotUp) {
+				timeStateStart = current;
+				state = States.REST;
+				logger.warn("Screen " + getName() + " DELAY_DOWN_2_UP-->" + getState() + ", "
+						+ (protect ? "PROTECT" : "SAFE")
+						+ " mode: got event while switching up to down, strange. Therefore stop screen.");
+			} else if ((current - timeStateStart) > MOTOR_SWITCH_DELAY_PROTECTION) {
+				if (protect) {
+					setStateAndEnterUp(current);
+				} else {
+					setStateAndEnterUp(current);
+				}
+				logger.info("Screen " + getName() + " DELAY_DOWN_2_UP-->" + getState() + ", "
+						+ (protect ? "PROTECT" : "SAFE") + " mode: delay has passed.");
+			}
+			break;
+		case REST_PROTECT:
+			if (!protect) {
+				timeStateStart = current;
+				state = States.REST;
+				logger.info("Screen " + getName() + " REST_PROTECT-->" + getState() + ": leaves PROTECTED mode.");
+			}
+			break;
+		default:
+			break;
+
+		}
+		gotToggleUp = gotToggleDown = gotUp = gotDown = false;
+	}
+
+	private void setStateAndEnterUp(long current) {
+		timeStateStart = current;
+		ratioClosedAtStateStart = ratioClosed;
+		state = States.UP;
+		getHw().writeDigitalOutput(chUp, true);
+	}
+
+	private void exitUp(long current) {
+		timeStateStart = current;
+		getHw().writeDigitalOutput(chUp, false);
+	}
+
+	private void setStateAndEntryDown(long current) {
+		timeStateStart = current;
+		ratioClosedAtStateStart = ratioClosed;
+		state = States.DOWN;
+		getHw().writeDigitalOutput(getChannel(), true);
+	}
+
+	private void exitDown(long current) {
+		timeStateStart = current;
+		getHw().writeDigitalOutput(getChannel(), false);
 	}
 
 	@Override
