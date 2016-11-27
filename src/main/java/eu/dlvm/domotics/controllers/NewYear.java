@@ -22,7 +22,7 @@ public class NewYear extends Controller implements IEventListener {
 	private boolean running, manual;
 	private long actualStartMs = -1;
 	private List<GadgetSet> gadgetSets;
-	GadgetSet lastGS;
+	GadgetSet lastGadgetSet;
 
 	public class GadgetSet {
 		public int startMs, endMs;
@@ -116,22 +116,23 @@ public class NewYear extends Controller implements IEventListener {
 		if (needToRun(currentTime)) {
 			if (actualStartMs == -1)
 				actualStartMs = currentTime;
-			GadgetSet e = selectEntry(currentTime - actualStartMs);
-			if (e != lastGS && lastGS != null) {
-				if (lastGS.state == GSstate.BUSY) {
-					lastGS.state = GSstate.LAST;
-					for (INewYearGadget g : lastGS.gadgets)
-						g.loop2(currentTime - actualStartMs - e.startMs, lastGS.state);
+			GadgetSet gadgetSet = selectEntry(currentTime - actualStartMs);
+			if (gadgetSet != lastGadgetSet && lastGadgetSet != null) {
+				// Changed set, and not first one.
+				if (lastGadgetSet.state == GSstate.BUSY) {
+					lastGadgetSet.state = GSstate.LAST;
+					for (INewYearGadget g : lastGadgetSet.gadgets)
+						g.loop2(currentTime - actualStartMs - gadgetSet.startMs, lastGadgetSet.state);
 				} else
-					lastGS.state = GSstate.DONE;
+					lastGadgetSet.state = GSstate.DONE;
 			}
-			if (e != null) {
-				if (e.state == GSstate.BEFORE)
-					e.state = GSstate.FIRST;
-				else if (e.state == GSstate.FIRST)
-					e.state = GSstate.BUSY;
-				for (INewYearGadget g : e.gadgets)
-					g.loop2(currentTime - actualStartMs - e.startMs, e.state);
+			if (gadgetSet != null) {
+				if (gadgetSet.state == GSstate.BEFORE)
+					gadgetSet.state = GSstate.FIRST;
+				else if (gadgetSet.state == GSstate.FIRST)
+					gadgetSet.state = GSstate.BUSY;
+				for (INewYearGadget g : gadgetSet.gadgets)
+					g.loop2(currentTime - actualStartMs - gadgetSet.startMs, gadgetSet.state);
 			}
 		}
 	}

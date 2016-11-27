@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.factories;
+package eu.dlvm.domotics.controllers.newyear;
 
 import java.util.Map;
 
@@ -7,10 +7,6 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.controllers.NewYear;
-import eu.dlvm.domotics.controllers.newyear.Blink;
-import eu.dlvm.domotics.controllers.newyear.OnOff;
-import eu.dlvm.domotics.controllers.newyear.RandomOnOff;
-import eu.dlvm.domotics.controllers.newyear.Sinus;
 
 // TODO move to controllers package
 public class NewYearBuilder {

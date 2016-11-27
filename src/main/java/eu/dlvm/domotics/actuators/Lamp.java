@@ -63,19 +63,11 @@ public class Lamp extends Actuator implements IEventListener {
 		setOn(false);
 	}
 
-	/**
-	 * Sets lamp to On or Off
-	 * 
-	 * @deprecate Use on() or off() or
-	 *            {@link IOnOffToggleCapable#onEvent(Block, eu.dlvm.domotics.connectors.IOnOffToggleCapable.ActionType)}
-	 *            .
-	 * @param outval
-	 *            true for On, false for Off
-	 */
-	public void setOn(boolean outval) {
+	private void setOn(boolean outval) {
 		this.outval = outval;
 		logger.info("Lamp '" + getName() + "' set state to " + (isOn() ? "ON" : "OFF"));
 		getHw().writeDigitalOutput(getChannel(), outval);
+		notifyListeners(outval?EventType.ON:EventType.OFF);
 	}
 
 	/**
