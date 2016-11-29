@@ -12,5 +12,22 @@ package eu.dlvm.domotics.events;
  * <dd>RIGHT_WITH_LEFTCLICK</dd>
  */
 public enum EventType {
-	ON, OFF, TOGGLE, LIGHT_HIGH, LIGHT_LOW, ALARM, SAFE, UP, DOWN, TOGGLE_UP, TOGGLE_DOWN, SINGLE_CLICK, DOUBLE_CLICK, LONG_CLICK, LEFT_CLICK, RIGHT_CLICK, LEFT_HOLD_DOWN, LEFT_RELEASED, RIGHT_HOLD_DOWN, RIGHT_RELEASED, LEFT_WITH_RIGHTCLICK, RIGHT_WITH_LEFTCLICK, DELAY_ON, DELAY_OFF
+	ON("On"), OFF("Off"), TOGGLE("Toggle"), LIGHT_HIGH("LightHigh"), LIGHT_LOW("LightLow"), ALARM("Alarm"), SAFE("Safe"), 
+	UP("Up"), DOWN("Down"), TOGGLE_UP("ToggleUp"), TOGGLE_DOWN("ToggleDown"), 
+	SINGLE_CLICK("SingleClick"), DOUBLE_CLICK("DoubleClick"), LONG_CLICK("LongClick"), LEFT_CLICK("LeftClick"), RIGHT_CLICK("RightClick"), 
+	LEFT_HOLD_DOWN("LeftHoldDown"), LEFT_RELEASED("LeftReleased"), RIGHT_HOLD_DOWN("RightHoldDown"), RIGHT_RELEASED("RightReleased"), LEFT_WITH_RIGHTCLICK("LeftWithRightClick"), RIGHT_WITH_LEFTCLICK("RightWithLeftClick"), 
+	DELAY_ON("DelayOn"), DELAY_OFF("DelayOff");
+
+	private String alias;
+
+	EventType(String alias) {
+		this.alias = alias;
+	}
+
+	public static EventType fromAlias(String alias) {
+		for (EventType e : EventType.values()) 
+			if (e.alias.equalsIgnoreCase(alias))
+				return e;
+		return null;
+	}
 }

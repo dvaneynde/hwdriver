@@ -1,13 +1,7 @@
 package eu.dlvm.domotics.factories;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +15,16 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.base.ConfigurationException;
-import eu.dlvm.domotics.controllers.NewYear;
+import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.Switch;
@@ -40,12 +35,10 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	static Logger logger = LoggerFactory.getLogger(DomoticXmlDefaultHandler.class);
 
 	private IDomoticContext ctx;
-	// TODO rename block to currentBlock
-	private Block block;
+	private Block currentBlock;
 	private String name, desc, ui;
-	private String channel;
-	// TODO rename to blocksProcessed
-	private Map<String, Block> blocks = new HashMap<>();
+	private String channel, channelDown, channelUp;
+	private Map<String, Block> blocksSoFar = new HashMap<>();
 
 	private static class ActionEvent {
 		public Block srcBlock;
@@ -64,19 +57,19 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			// ===== Inner elements
 
 		} else if (localName.equals("on")) {
-			if (block instanceof Timer) {
-				((Timer) block).setOnTime(Integer.parseInt(atts.getValue("hour")),
+			if (currentBlock instanceof Timer) {
+				((Timer) currentBlock).setOnTime(Integer.parseInt(atts.getValue("hour")),
 						Integer.parseInt(atts.getValue("minute")));
-			} else if (block instanceof Actuator) {
+			} else if (currentBlock instanceof Actuator) {
 				connectEvent2Action(atts, EventType.ON);
 			} else
 				throw new RuntimeException("Bug.");
 
 		} else if (localName.equals("off")) {
-			if (block instanceof Timer) {
-				((Timer) block).setOffTime(Integer.parseInt(atts.getValue("hour")),
+			if (currentBlock instanceof Timer) {
+				((Timer) currentBlock).setOffTime(Integer.parseInt(atts.getValue("hour")),
 						Integer.parseInt(atts.getValue("minute")));
-			} else if (block instanceof Actuator) {
+			} else if (currentBlock instanceof Actuator) {
 				connectEvent2Action(atts, EventType.OFF);
 			} else
 				throw new RuntimeException("Bug.");
@@ -84,6 +77,23 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		} else if (localName.equals("toggle")) {
 			connectEvent2Action(atts, EventType.TOGGLE);
 
+		} else if (localName.equals("delayedOnOff")) {
+			IEventListener target = (IEventListener) currentBlock;
+			Block source = blocksSoFar.get(atts.getValue("src"));
+			source.registerListener(new Connector(EventType.ON, target, EventType.DELAY_ON,
+					"delayOn_" + source.getName() + "_to_" + ((Block) target).getName()));
+			source.registerListener(new Connector(EventType.OFF, target, EventType.DELAY_OFF,
+					"delayOff_" + source.getName() + "_to_" + ((Block) target).getName()));
+		} else if (localName.equals("wind")) {
+		} else if (localName.equals("sun")) {
+		} else if (localName.equals("upDown")) {
+			Sensor srcUp = (Sensor) blocksSoFar.get(atts.getValue("srcUp"));
+			Sensor srcDown = (Sensor) blocksSoFar.get(atts.getValue("srcDown"));
+			String eventName = atts.getValue("event");
+			srcUp.registerListener(
+					new Connector(EventType.fromAlias(eventName), (Screen) currentBlock, EventType.TOGGLE_UP, "TODO"));
+			srcDown.registerListener(
+					new Connector(EventType.fromAlias(eventName), (Screen) currentBlock, EventType.TOGGLE_DOWN, "TODO"));
 			// ===== Sensors 
 
 		} else if (localName.equals("switch")) {
@@ -91,8 +101,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			boolean singleClick = parseBoolAttribute("singleClick", true, atts);
 			boolean longClick = parseBoolAttribute("longClick", false, atts);
 			boolean doubleClick = parseBoolAttribute("doubleClick", false, atts);
-			block = new Switch(name, desc, channel, singleClick, longClick, doubleClick, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new Switch(name, desc, channel, singleClick, longClick, doubleClick, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("dimmerSwitches")) {
 			parseBaseBlock(atts);
@@ -100,8 +110,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			String channelDown = (s == null ? new String(name + "Down") : new String(s));
 			s = atts.getValue("channelUp");
 			String channelUp = (s == null ? new String(name + "Up") : new String(s));
-			block = new DimmerSwitch(name, desc, channelDown, channelUp, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new DimmerSwitch(name, desc, channelDown, channelUp, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("windSensor")) {
 			parseBaseBlockWithChannel(atts);
@@ -109,9 +119,9 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
 			int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
 			int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-			block = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold,
-					highTimeBeforeAlert, lowTimeToResetAlert);
-			blocks.put(block.getName(), block);
+			currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,
+					lowTimeToResetAlert);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("lightGauge")) {
 			parseBaseBlockWithChannel(atts);
@@ -119,9 +129,8 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			int lowThreshold = parseIntAttribute("low", atts);
 			int low2highTime = parseIntAttribute("low2highTime", atts);
 			int high2lowTime = parseIntAttribute("high2lowTime", atts);
-			block = new LightSensor(name, desc, ui, channel, ctx, lowThreshold, highThreshold, low2highTime,
-					high2lowTime);
-			blocks.put(block.getName(), block);
+			currentBlock = new LightSensor(name, desc, ui, channel, ctx, lowThreshold, highThreshold, low2highTime, high2lowTime);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 			//		} else if (localName.equals("connect")) {
 			//			parseConnect(atts);
 			//		} else if (localName.equals("connect-dimmer")) {
@@ -136,78 +145,76 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			//			 */} else if (localName.equals("newyear")) {
 			//			Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 			//			Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
-			//			NewYear ny = new NewYearBuilder().build(blocks, start.getTime(), end.getTime(), ctx);
-			//			blocks.put(ny.getName(), ny);
+			//			NewYear ny = new NewYearBuilder().build(blocksSoFar, start.getTime(), end.getTime(), ctx);
+			//			blocksSoFar.put(ny.getName(), ny);
 
 			// ===== Controllers 
 
 		} else if (localName.equals("timer")) {
 			parseBaseBlock(atts);
-			block = new Timer(name, desc, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new Timer(name, desc, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("timerDayNight")) {
 			parseBaseBlock(atts);
-			block = new TimerDayNight(name, desc, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new TimerDayNight(name, desc, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("repeatOff")) {
 			parseBaseBlock(atts);
 			int intervalSec = parseIntAttribute("intervalSec", atts);
-			block = new RepeatOffAtTimer(name, desc, ctx, intervalSec);
-			blocks.put(block.getName(), block);
+			currentBlock = new RepeatOffAtTimer(name, desc, ctx, intervalSec);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
-		} else if (localName.equals("screen-controller")) {
-			//parseScreenController(atts);
+		} else if (localName.equals("sunWindController")) {
+			parseBaseBlock(atts);
+			currentBlock = new SunWindController(name, desc, ui, ctx);
 
 			// ===== Actuators
 
 		} else if (localName.equals("lamp")) {
 			parseBaseBlockWithChannel(atts);
-			block = new Lamp(name, desc, ui, channel, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new Lamp(name, desc, ui, channel, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 		} else if (localName.equals("toggle")) {
 			// actuators
 
 		} else if (localName.equals("dimmedLamp")) {
 			parseBaseBlockWithChannel(atts);
 			int fullOn = Integer.parseInt(atts.getValue("fullOnHwOutput"));
-			block = new DimmedLamp(name, desc, ui, fullOn, channel, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new DimmedLamp(name, desc, ui, fullOn, channel, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("fan")) {
 			parseBaseBlockWithChannel(atts);
-			String lampName = atts.getValue("lamp");
-			block = new Fan(name, desc, (Lamp) blocks.get(lampName), channel, ctx);
-			blocks.put(block.getName(), block);
+			currentBlock = new Fan(name, desc, channel, ctx);
+			blocksSoFar.put(currentBlock.getName(), currentBlock);
 
 		} else if (localName.equals("screen")) {
-			parseBaseBlock(atts);
-			String s = atts.getValue("channelDown");
-			String channelDown = (s == null ? new String(name + "Down") : new String(s));
-			s = atts.getValue("channelUp");
-			String channelUp = (s == null ? new String(name + "Up") : new String(s));
-			block = new Screen(name, desc, ui, channelDown, channelUp, ctx);
-			if (atts.getValue("motor-up-time") != null)
-				((Screen) block).setMotorUpPeriod(Integer.parseInt(atts.getValue("motor-up-time")));
-			if (atts.getValue("motor-dn-time") != null)
-				((Screen) block).setMotorDnPeriod(Integer.parseInt(atts.getValue("motor-dn-time")));
-			blocks.put(block.getName(), block);
-
+			if (currentBlock instanceof SunWindController) {
+				SunWindController swc = (SunWindController) currentBlock;
+				Screen screen = (Screen) blocksSoFar.get(atts.getValue("name"));
+				swc.registerListener(screen);
+			} else {
+				parseBaseBlockWithUpDownChannel(atts);
+				currentBlock = new Screen(name, desc, ui, channelDown, channelUp, ctx);
+				if (atts.getValue("motor-up-time") != null)
+					((Screen) currentBlock).setMotorUpPeriod(Integer.parseInt(atts.getValue("motor-up-time")));
+				if (atts.getValue("motor-dn-time") != null)
+					((Screen) currentBlock).setMotorDnPeriod(Integer.parseInt(atts.getValue("motor-dn-time")));
+				blocksSoFar.put(currentBlock.getName(), currentBlock);
+			}
 		} else {
-			throw new RuntimeException("Block " + qqName + " not supported.");
+			throw new RuntimeException("Element '" + qqName + "' not supported.");
 		}
 	}
 
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {
 		ActionEvent ae = parseActionEvent(atts);
-		Connector c = new Connector(ae.srcEvent, (Actuator) block, targetEventType, "(" + ae.srcBlock.getName() + ','
-				+ ae.srcEvent + ")_TO_(" + block.getName() + "," + targetEventType.name() + ")");
-		Block source = blocks.get(ae.srcBlock);
-		if (source == null)
-			throw new ConfigurationException(
-					"Cannot find source block " + ae.srcBlock + ". Check config inside " + block.getName());
-		source.registerListener(c);
+		Connector c = new Connector(ae.srcEvent, (Actuator) currentBlock, targetEventType, "(" + ae.srcBlock.getName() + ','
+				+ ae.srcEvent + ")_TO_(" + currentBlock.getName() + "," + targetEventType.name() + ")");
+
+		ae.srcBlock.registerListener(c);
 	}
 
 	public void endElement(String uri, String localName, String qqName) throws SAXException {
@@ -215,16 +222,15 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 	private ActionEvent parseActionEvent(Attributes atts) {
 		ActionEvent ae = new ActionEvent();
-		String srcName = atts.getValue("srcBlock");
-		String event = atts.getValue("event");
+		String srcName = atts.getValue("src");
+		String eventAlias = atts.getValue("event");
 
-		Block src = blocks.get(srcName);
+		Block src = blocksSoFar.get(srcName);
 		if (src != null) {
 			ae.srcBlock = src;
-			ae.srcEvent = EventType.valueOf(event);
+			ae.srcEvent = EventType.fromAlias(eventAlias);
 		} else {
-			throw new ConfigurationException(
-					"Could not find srcBlock =" + srcName + ". Check config of " + block.getName());
+			throw new ConfigurationException("Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
 		}
 		return ae;
 	}
@@ -235,16 +241,16 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		SunWindController sunWindController = new SunWindController(name, desc, ui, ctx);
 	
 		String srcAlarmName = atts.getValue("alarmSrc");
-		WindSensor srcAlarm = (WindSensor) blocks.get(srcAlarmName);
+		WindSensor srcAlarm = (WindSensor) blocksSoFar.get(srcAlarmName);
 		srcAlarm.registerListener(sunWindController);
 	
 		String srcLightName = atts.getValue("lightSrc");
-		LightSensor lightSensor = (LightSensor) blocks.get(srcLightName);
+		LightSensor lightSensor = (LightSensor) blocksSoFar.get(srcLightName);
 		lightSensor.registerListener(sunWindController);
 	
 		List<Block> targetBlocks;
 		String screenName = atts.getValue("screen");
-		Block t = blocks.get(screenName);
+		Block t = blocksSoFar.get(screenName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(screenName);
 		else {
@@ -259,14 +265,14 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			throw new ConfigurationException(
 					"Unsupported type for screen-controller, name=" + name + ", screen=" + screenName + ".");
 		}
-		blocks.put(sunWindController.getName(), sunWindController);
+		blocksSoFar.put(sunWindController.getName(), sunWindController);
 	}
 	*/
 
 	/*
 	private void handleConnectSwitch2OOT(Switch swtch, String srcEventName, String targetName, String eventName) {
 		List<Block> targetBlocks;
-		Block t = blocks.get(targetName);
+		Block t = blocksSoFar.get(targetName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(targetName);
 		else {
@@ -275,7 +281,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		}
 	
 		String s2ootName = swtch.getName() + "_to_" + targetName;
-		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocks.get(s2ootName);
+		Switch2OnOffToggle s2oot = (Switch2OnOffToggle) blocksSoFar.get(s2ootName);
 		if (s2oot == null) {
 			s2oot = new Switch2OnOffToggle(s2ootName,
 					(desc == null ? "Switch " + swtch.getName() + " connected to " + targetName : desc), ui);
@@ -283,7 +289,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 			//				// TODO algemenere oplossing...
 			//				ctx.addUiCapableBlock(s2oot);
 			//			}
-			blocks.put(s2ootName, s2oot);
+			blocksSoFar.put(s2ootName, s2oot);
 		}
 	
 		s2oot.map(ISwitchListener.ClickType.valueOf(srcEventName.toUpperCase()),
@@ -298,7 +304,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	/*
 	private void handleConnectTimer(Timer timer, String targetName) {
 		List<Block> targetBlocks;
-		Block t = blocks.get(targetName);
+		Block t = blocksSoFar.get(targetName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(targetName);
 		else {
@@ -314,82 +320,82 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 	/*
 	private void parseConnectDimmer(Attributes atts) {
 		parseBaseBlock(atts);
-
+	
 		String switchName = atts.getValue("dimmerSwitch");
 		String lampName = atts.getValue("dimmedLamp");
-		if (!blocks.containsKey(switchName)) {
+		if (!blocksSoFar.containsKey(switchName)) {
 			throw new ConfigurationException(
 					"Need a DimmerSwitches named " + switchName + ", which I did not encounter in configuration file.");
 		}
-		if (!blocks.containsKey(lampName)) {
+		if (!blocksSoFar.containsKey(lampName)) {
 			throw new ConfigurationException(
 					"Need a Lamp named " + lampName + ", which I did not encounter in configuration file.");
 		}
-		DimmerSwitch ds = (DimmerSwitch) blocks.get(switchName);
-		DimmedLamp dl = (DimmedLamp) blocks.get(lampName);
+		DimmerSwitch ds = (DimmerSwitch) blocksSoFar.get(switchName);
+		DimmedLamp dl = (DimmedLamp) blocksSoFar.get(lampName);
 		String ds2dName = switchName + "_to_" + lampName;
 		DimmerSwitch2Dimmer ds2d = new DimmerSwitch2Dimmer(ds2dName, ds2dName);
-		blocks.put(ds2d.getName(), ds2d);
+		blocksSoFar.put(ds2d.getName(), ds2d);
 		ds.registerListener(ds2d);
 		ds2d.setLamp(dl);
 	}
 	*/
-	
+
 	/*
 	private void parseConnectScreen(Attributes atts) {
 		String switchDownName = atts.getValue("switchDown");
 		String switchUpName = atts.getValue("switchUp");
 		String screenName = atts.getValue("screen");
 		String clickName = atts.getValue("click");
-
+	
 		// Not null in case of UiCapable mapper
 		desc = atts.getValue("desc");
 		ui = atts.getValue("ui");
-
+	
 		List<Block> targetBlocks;
-		Block t = blocks.get(screenName);
+		Block t = blocksSoFar.get(screenName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(screenName);
 		else {
 			targetBlocks = new ArrayList<>(1);
 			targetBlocks.add(t);
 		}
-
+	
 		String csName = "Switch2Screen_" + screenName;
-		Switch down = (Switch) blocks.get(switchDownName);
-		Switch up = (Switch) blocks.get(switchUpName);
+		Switch down = (Switch) blocksSoFar.get(switchDownName);
+		Switch up = (Switch) blocksSoFar.get(switchUpName);
 		ISwitchListener.ClickType click = ISwitchListener.ClickType.valueOf(clickName.toUpperCase());
 		Switch2Screen s2s = new Switch2Screen(csName, desc, ui, down, up, click);
 		//		if (ui != null && ui.length() > 0) {
 		//			// TODO algemenere oplossing...
 		//			ctx.addUiCapableBlock(s2s);
 		//		}
-		blocks.put(s2s.getName(), s2s);
-
+		blocksSoFar.put(s2s.getName(), s2s);
+	
 		for (Block target : targetBlocks) {
 			s2s.registerListener((Screen) target);
 		}
 	}
-
+	
 	private void parseConnectAlarm2Screen(Attributes atts) {
 		String wsName = atts.getValue("source");
 		String screenName = atts.getValue("screen");
-
+	
 		// Not null in case of UiCapable mapper
 		desc = atts.getValue("desc");
 		ui = atts.getValue("ui");
-
+	
 		List<Block> targetBlocks;
-		Block t = blocks.get(screenName);
+		Block t = blocksSoFar.get(screenName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(screenName);
 		else {
 			targetBlocks = new ArrayList<>(1);
 			targetBlocks.add(t);
 		}
-
+	
 		try {
-			WindSensor ws = (WindSensor) blocks.get(wsName);
+			WindSensor ws = (WindSensor) blocksSoFar.get(wsName);
 			/*
 			 * FIXME AlarmEvent2Screen ws2s = new AlarmEvent2Screen(wsName +
 			 * "_2_" + screenName, desc); ws.registerListener(ws2s); for (Block
@@ -401,26 +407,26 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 					"Unsupported type for connect, source=" + wsName + ", screen=" + screenName + ".");
 		}
 	}
-
+	
 	private void parseConnectThreshold2Screen(Attributes atts) {
 		String srcName = atts.getValue("source");
 		String screenName = atts.getValue("screen");
-
+	
 		// Not null in case of UiCapable mapper
 		desc = atts.getValue("desc");
 		ui = atts.getValue("ui");
-
+	
 		List<Block> targetBlocks;
-		Block t = blocks.get(screenName);
+		Block t = blocksSoFar.get(screenName);
 		if (t == null)
 			targetBlocks = group2Blocks.get(screenName);
 		else {
 			targetBlocks = new ArrayList<>(1);
 			targetBlocks.add(t);
 		}
-
+	
 		try {
-			LightSensor ls = (LightSensor) blocks.get(srcName);
+			LightSensor ls = (LightSensor) blocksSoFar.get(srcName);
 			/*
 			 * FIXME ThresholdEvent2Screen ws2s = new
 			 * ThresholdEvent2Screen(srcName + "_2_" + screenName, desc);
@@ -440,6 +446,14 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		if (s == null)
 			s = name;
 		channel = new String(s);
+	}
+
+	private void parseBaseBlockWithUpDownChannel(Attributes atts) {
+		parseBaseBlock(atts);
+		String s = atts.getValue("channelDown");
+		channelDown = (s == null ? new String(name + "Down") : new String(s));
+		s = atts.getValue("channelUp");
+		channelUp = (s == null ? new String(name + "Up") : new String(s));
 	}
 
 	private void parseBaseBlock(Attributes atts) {

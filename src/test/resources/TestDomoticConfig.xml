@@ -14,6 +14,7 @@
 	<fan name="FanBadkamer0" channel="6">
 		<toggle src="SchakFanBadkamer0" event="SingleClick"/>
 		<off src="SchakFanBadkamer0" event="LongClick"/>
+		<delayedOnOff src="LichtBadkamer0"/>
 	</fan>
 	
 	<switch channel="2" name="SchakLichtWC0" desc="Licht badkamer boven." />
@@ -23,9 +24,10 @@
 	</lamp>
 
 	<switch channel="11" name="SchakFanWC0" />
-	<fan name="FanWC0" channel="7" lamp="LichtWC0" desc="Ventilator WC gelijkvloers.">
+	<fan name="FanWC0" channel="7" desc="Ventilator WC gelijkvloers.">
 		<toggle src="SchakFanWC0" event="SingleClick"/>
 		<off src="SchakFanWC0" event="LongClick"/>
+		<delayedOnOff src="LichtWC0"/>
 	</fan>
 
 <!--	
@@ -43,24 +45,28 @@
 	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
 	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
 
-	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" />
-	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100"  />
+	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36">
+		<upDown srcUp="SchakScreenBreedUp"  srcDown="SchakScreenBreedDown" />
+		<upDown srcUp="SchakScreenAllUp"  srcDown="SchakScreenAllDown" event="LongClick" />
+	</screen>
+	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100">
+		<upDown srcUp="SchakScreenLangUp"  srcDown="SchakScreenLangDown" />
+		<upDown srcUp="SchakScreenAllUp"  srcDown="SchakScreenAllDown" event="LongClick" />
+	</screen>
 
-	<windSensor name="Windmeter" channel="Windmeter" />
-	<lightGauge name="LichtsensorScreen" channel="AnalogIn" />
+	<windSensor name="Windmeter" channel="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60"/>
+	<lightGauge name="LichtsensorScreen" channel="AnalogIn" low="1000" high="3000" low2highTime="10" high2lowTime="60"/>
 
 
-	<screenController name="ScreenController" desc="Zon/Wind Automaat" ui="Screens:0">
-		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand -->
-		<group name="ScreensGroup">
-			<wind sensor="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60"/>
-			<sun sensor="LichtsensorScreen" low="1000" high="3000" low2highTime="10" high2lowTime="60"/>
-			<connect screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" />
-			<connect screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" />
-			<allUp src="SchakScreenAllUp" event="LongClick"/>
-			<allDown src="SchakScreenAllDown" event="LongClick"/>
-		</group>
-	</screenController>	
+	<sunWindController name="ZonWindAutomaat" desc="Zon/Wind Automaat" ui="Screens:0">
+		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. 
+		Dus hier moeten groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun.
+		-->
+			<wind sensor="Windmeter" />
+			<sun sensor="LichtsensorScreen" />
+			<screen name="ScreenBreed"  />
+			<screen name="ScreenLang"  />
+	</sunWindController>	
 	
 	
 <!-- TODO

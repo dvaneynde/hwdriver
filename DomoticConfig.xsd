@@ -10,7 +10,7 @@
 				<element name="switch" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:blockWithChannelStruct">
+							<extension base="tns:BlockWithChannelStruct">
 								<attribute name="singleClick" type="boolean" default="true" />
 								<attribute name="longClick" type="boolean" default="false" />
 								<attribute name="doubleClick" type="boolean" default="false" />
@@ -32,18 +32,14 @@
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:OnOffToggleActuatorStruct">
-								<!-- TODO element name="withLigth" en source en target event of zoiets 
-									- standaard dus -->
-								<attribute name="lamp" type="IDREF" use="optional" />
-							</extension>
+							<extension base="tns:OnOffToggleActuatorStruct" />
 						</complexContent>
 					</complexType>
 				</element>
 				<element name="dimmedLamp" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:blockWithChannelStruct">
+							<extension base="tns:BlockWithChannelStruct">
 								<attribute name="fullOnHwOutput" type="int" use="required" />
 							</extension>
 						</complexContent>
@@ -53,6 +49,16 @@
 					<complexType>
 						<complexContent>
 							<extension base="tns:BlockWithChannelUpDownStruct">
+								<sequence>
+									<element name="upDown" maxOccurs="3">
+										<complexType>
+											<attribute name="srcUp" type="IDREF" use="required" />
+											<attribute name="srcDown" type="IDREF" use="required" />
+											<attribute name="event" type="string" use="optional"
+												default="SingleClick" />
+										</complexType>
+									</element>
+								</sequence>
 								<attribute name="motor-up-time" type="int" />
 								<attribute name="motor-dn-time" type="int" />
 							</extension>
@@ -64,62 +70,35 @@
 				<element name="newyear" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:blockWithChannelStruct">
+							<extension base="tns:BlockWithChannelStruct">
 								<attribute name="start" type="dateTime"></attribute>
 								<attribute name="end" type="dateTime"></attribute>
 							</extension>
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="screenController" type="tns:ScreenControllerStruct" />
+				<element name="sunWindController" type="tns:SunWindControllerStruct" />
 			</choice>
 		</complexType>
 	</element>
 
-	<complexType name="ScreenControllerStruct">
+	<complexType name="SunWindControllerStruct">
 		<complexContent>
-			<extension base="tns:blockWithChannelStruct">
+			<extension base="tns:BlockWithChannelStruct">
 				<sequence>
-					<element name="group" maxOccurs="unbounded">
+					<element name="wind" minOccurs="0">
 						<complexType>
-							<sequence>
-								<element name="wind" minOccurs="0">
-									<complexType>
-										<attribute name="sensor" type="IDREF" use="required" />
-										<attribute name="highFreq" use="required" />
-										<attribute name="lowFreq" use="required" />
-										<attribute name="highTimeBeforeAlert" use="required" />
-										<attribute name="lowTimeToResetAlert" use="required" />
-									</complexType>
-								</element>
-								<element name="sun" minOccurs="0">
-									<complexType>
-										<attribute name="sensor" type="IDREF" use="required" />
-										<attribute name="high" use="required" />
-										<attribute name="low" use="required" />
-										<attribute name="low2highTime" use="required" />
-										<attribute name="high2lowTime" use="required" />
-									</complexType>
-								</element>
-								<element name="connect" maxOccurs="unbounded">
-									<complexType>
-										<attribute name="screen" type="IDREF" use="required" />
-										<attribute name="switchUp" type="IDREF" use="required" />
-										<attribute name="switchDown" type="IDREF" use="required" />
-									</complexType>
-								</element>
-								<element name="allUp" minOccurs="0">
-									<complexType>
-										<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
-									</complexType>
-								</element>
-								<element name="allDown" minOccurs="0">
-									<complexType>
-										<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
-									</complexType>
-								</element>
-							</sequence>
-							<attribute name="name" type="string" />
+							<attribute name="sensor" type="IDREF" use="required" />
+						</complexType>
+					</element>
+					<element name="sun" minOccurs="0">
+						<complexType>
+							<attribute name="sensor" type="IDREF" use="required" />
+						</complexType>
+					</element>
+					<element name="screen" maxOccurs="unbounded">
+						<complexType>
+							<attribute name="name" type="IDREF" use="required" />
 						</complexType>
 					</element>
 				</sequence>
@@ -134,17 +113,9 @@
 			<enumeration value="long" />
 		</restriction>
 	</simpleType>
-	<simpleType name="targetEventType">
-		<restriction base="string">
-			<enumeration value="on" />
-			<enumeration value="off" />
-			<enumeration value="toggle" />
-		</restriction>
-	</simpleType>
-
 	<complexType name="timerType">
 		<complexContent>
-			<extension base="tns:blockStruct">
+			<extension base="tns:BlockStruct">
 				<sequence>
 					<element name="on">
 						<complexType>
@@ -173,31 +144,39 @@
 
 	<complexType name="windSensorType">
 		<complexContent>
-			<extension base="tns:blockWithChannelStruct">
+			<extension base="tns:BlockWithChannelStruct">
+				<attribute name="highFreq" use="required" />
+				<attribute name="lowFreq" use="required" />
+				<attribute name="highTimeBeforeAlert" use="required" />
+				<attribute name="lowTimeToResetAlert" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
 
 	<complexType name="lightGaugeType">
 		<complexContent>
-			<extension base="tns:blockWithChannelStruct">
+			<extension base="tns:BlockWithChannelStruct">
+				<attribute name="high" use="required" />
+				<attribute name="low" use="required" />
+				<attribute name="low2highTime" use="required" />
+				<attribute name="high2lowTime" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<complexType name="allSwitchStruct">
+	<complexType name="AllSwitchStruct">
 		<attribute name="switch" use="required" type="IDREF" />
 		<attribute name="allOff" default="true" type="boolean" />
 		<attribute name="allOn" default="false" type="boolean" />
 	</complexType>
-	<complexType name="blockStruct">
+	<complexType name="BlockStruct">
 		<attribute name="name" use="required" type="ID" />
 		<attribute name="desc" use="optional" type="string" />
 		<attribute name="ui" type="string" use="optional" />
 	</complexType>
-	<complexType name="blockWithChannelStruct">
+	<complexType name="BlockWithChannelStruct">
 		<complexContent>
-			<extension base="tns:blockStruct">
+			<extension base="tns:BlockStruct">
 				<annotation>
 					<documentation>Default channel naam is name attribute, kan
 						overridden door
@@ -211,12 +190,13 @@
 
 	<attributeGroup name="EventConsumerAttributeGroup">
 		<attribute name="src" type="IDREF" use="required" />
-		<attribute name="event" type="string" use="required" />
+		<attribute name="event" type="string" use="optional"
+			default="SingleClick" />
 	</attributeGroup>
 
 	<complexType name="OnOffToggleActuatorStruct">
 		<complexContent>
-			<extension base="tns:blockWithChannelStruct">
+			<extension base="tns:BlockWithChannelStruct">
 				<sequence>
 					<choice maxOccurs="unbounded">
 						<element name="on">
@@ -234,6 +214,11 @@
 								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
 							</complexType>
 						</element>
+						<element name="delayedOnOff">
+							<complexType>
+								<attribute name="src" type="IDREF" use="required" />
+							</complexType>
+						</element>
 					</choice>
 				</sequence>
 			</extension>
@@ -242,7 +227,7 @@
 
 	<complexType name="BlockWithChannelUpDownStruct">
 		<complexContent>
-			<extension base="tns:blockStruct">
+			<extension base="tns:BlockStruct">
 				<annotation>
 					<documentation>Default channel naam is name attribute, kan
 						overridden door

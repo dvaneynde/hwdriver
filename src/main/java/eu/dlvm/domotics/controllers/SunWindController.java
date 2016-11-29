@@ -71,10 +71,12 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			break;
 		case SAFE:
 		case ALARM:
+			// TODO these should be generated here, not come from WindSensor or LightGauge ! Goes together with parameters that must be here of course.
 			notifyListeners(event);
 			break;
 		case LIGHT_HIGH:
 		case LIGHT_LOW:
+			// TODO these should be generated here, not come from WindSensor or LightGauge ! Goes together with parameters that must be here of course.
 			if (enabled)
 				notifyListeners(event);
 			else
