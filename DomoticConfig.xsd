@@ -40,6 +40,30 @@
 					<complexType>
 						<complexContent>
 							<extension base="tns:BlockWithChannelStruct">
+								<sequence>
+									<choice maxOccurs="unbounded">
+										<element name="on">
+											<complexType>
+												<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+											</complexType>
+										</element>
+										<element name="off">
+											<complexType>
+												<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+											</complexType>
+										</element>
+										<element name="toggle">
+											<complexType>
+												<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+											</complexType>
+										</element>
+										<element name="dimmerSwitches">
+											<complexType>
+												<attribute name="src" type="IDREF" use="required" />
+											</complexType>
+										</element>
+									</choice>
+								</sequence>
 								<attribute name="fullOnHwOutput" type="int" use="required" />
 							</extension>
 						</complexContent>
@@ -70,7 +94,7 @@
 				<element name="newyear" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:BlockWithChannelStruct">
+							<extension base="tns:OnOffToggleActuatorStruct">
 								<attribute name="start" type="dateTime"></attribute>
 								<attribute name="end" type="dateTime"></attribute>
 							</extension>

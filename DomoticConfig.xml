@@ -4,211 +4,230 @@
 
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
-	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" />
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0">
+		<toggle src="SchakLichtInkom" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtWC0" desc="Licht WC gelijkvloers." />
-	<lamp name="LichtWC0" desc="WC" ui="Nutsruimtes:6" />
+	<lamp name="LichtWC0" desc="WC" ui="Nutsruimtes:6">
+		<toggle src="SchakLichtWC0" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakVentilatorWC0" />
-	<fan name="VentilatorWC0" lamp="LichtWC0" desc="Ventilator WC" />
+	<fan name="VentilatorWC0" desc="Ventilator WC">
+		<toggle src="SchakVentilatorWC0" />
+		<off src="SchakVentilatorWC0" event="LongClick" />
+		<delayedOnOff src="LichtWC0" />
+	</fan>
+
+	<repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600">
+		<on hour="7" minute="30" />
+		<off hour="9" minute="0" />
+	</repeatOff>
+	<repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600">
+		<on hour="16" minute="30" />
+		<off hour="17" minute="30" />
+	</repeatOff>
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" />
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2">
+		<toggle src="SchakLichtGaragePoort" />
+		<off src="SchakLichtInkom" event="LongClick" />
+		<off src="GarageAutoUitOchtend" event="off" />
+		<off src="GarageAutoUitAvond" event="off" />
+	</lamp>
+
 	<switch name="SchakLichtGarageTuin" longClick="true" />
-	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" />
+	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3">
+		<toggle src="SchakLichtGarageTuin" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtKeuken" />
-	<lamp name="LichtKeuken" desc="Keuken" ui="Beneden:0" />
+	<lamp name="LichtKeuken" desc="Keuken" ui="Beneden:0">
+		<toggle src="SchakLichtKeuken" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtBadk0" />
-	<lamp name="LichtBadk0" desc="Badkamer +0" ui="Nutsruimtes:4" />
+	<lamp name="LichtBadk0" desc="Badkamer +0" ui="Nutsruimtes:4">
+		<toggle src="SchakLichtBadk0" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakVentilatorBadk0" />
-	<fan name="VentilatorBadk0" desc="Ventilator Badkamer" />
+	<fan name="VentilatorBadk0" desc="Ventilator Badkamer">
+		<toggle src="SchakVentilatorBadk0" />
+	</fan>
+
 	<dimmerSwitches name="SchakLichtVeranda" />
-	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda" ui="Beneden:1" />
+	<dimmedLamp name="LichtVeranda" fullOnHwOutput="4095" desc="Veranda" ui="Beneden:1">
+		<dimmerSwitches src="SchakLichtVeranda" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</dimmedLamp>
+
 	<dimmerSwitches name="SchakLichtCircanteRondom" />
-	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" desc="Eetkamer" ui="Beneden:2" />
+	<dimmedLamp name="LichtCircanteRondom" fullOnHwOutput="4095" desc="Eetkamer" ui="Beneden:2">
+		<dimmerSwitches src="SchakLichtCircanteRondom" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</dimmedLamp>
+
 	<switch name="SchakLichtCircante" />
-	<lamp name="LichtCircante" desc="Circante Tafel" ui="Beneden:3" />
+	<lamp name="LichtCircante" desc="Circante Tafel" ui="Beneden:3">
+		<toggle src="SchakLichtCircante" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<dimmerSwitches name="SchakLichtZithoek" />
-	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" ui="Beneden:4" />
+	<dimmedLamp name="LichtZithoek" fullOnHwOutput="4095" desc="Zithoek" ui="Beneden:4">
+		<dimmerSwitches src="SchakLichtZithoek" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</dimmedLamp>
+
 	<switch name="SchakLichtBureau" doubleClick="true" />
-	<lamp name="LichtBureau" desc="Bureau" ui="Beneden:5" />
-	<group name="LichtBeneden">
-		<block name="LichtInkom" />
-		<block name="LichtWC0" />
-		<block name="LichtGaragePoort" />
-		<block name="LichtGarageTuin" />
-		<block name="LichtKeuken" />
-		<block name="LichtBadk0" />
-		<block name="LichtCircante" />
-		<block name="LichtBureau" />
-	</group>
+	<lamp name="LichtBureau" desc="Bureau" ui="Beneden:5">
+		<toggle src="SchakLichtBureau" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1" />
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1">
+		<toggle src="SchakLichtGangBoven" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtBadk1" />
-	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Nutsruimtes:5" />
+	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Nutsruimtes:5">
+		<toggle src="SchakLichtBadk1" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Tomas:0" />
-	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt
-		met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Tomas:1" /><!-- TODO nakijken of klopt
-		met relais -->
+	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Tomas:0">
+		<toggle src="SchakLichtTomasWand" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
+	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
+	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Tomas:1"><!-- TODO nakijken of klopt met relais -->
+		<toggle src="SchakLichtTomasSpots" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Dries:0" />
+	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Dries:0">
+		<toggle src="SchakLichtDriesWand" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Dries Spots" ui="Dries:1" />
+	<lamp name="LichtDries" desc="Dries Spots" ui="Dries:1">
+		<toggle src="SchakLichtDries" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtRoosWand" />
-	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Roos:0" />
+	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Roos:0">
+		<toggle src="SchakLichtRoosWand" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+
 	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" desc="Roos Spots" ui="Roos:1" />
-	<group name="LichtBoven">
-		<block name="LichtGangBoven" />
-		<block name="LichtBadk1" />
-		<block name="LichtTomasWand" />
-		<block name="LichtTomasSpots" />
-		<block name="LichtDriesWand" />
-		<block name="LichtDries" />
-		<block name="LichtRoosWand" />
-		<block name="LichtRoos" />
-	</group>
+	<lamp name="LichtRoos" desc="Roos Spots" ui="Roos:1">
+		<toggle src="SchakLichtRoos" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
 
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
-	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0" />
-	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1" />
-	<group name="Buiten">
-		<block name="LichtTerras" />
-		<block name="StopkBuiten" />
-	</group>
+	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
+		<toggle src="SchakBuitenTuin" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
+		<toggle src="SchakBuitenTuin" event="LongClick" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
 
-	<group name="GedimdeLampen">
-		<block name="LichtVeranda" />
-		<block name="LichtCircanteRondom" />
-		<block name="LichtZithoek" />
-	</group>
-
-	<group name="AlleLichten">
-		<group-ref name="LichtBeneden" />
-		<group-ref name="LichtBoven" />
-		<group-ref name="GedimdeLampen" />
-		<group-ref name="Buiten" />
-	</group>
-
-	<!-- Buiten -->
-	<connect src="SchakBuitenTuin" src-event="single" target="LichtTerras" event="toggle" />
-	<connect src="SchakBuitenTuin" src-event="long" target="StopkBuiten" event="toggle" />
-
-	<!-- Licht Beneden -->
-	<connect src="SchakLichtInkom" src-event="single" target="LichtInkom" event="toggle" />
-	<connect src="SchakLichtWC0" src-event="single" target="LichtWC0" event="toggle" />
-	<connect src="SchakLichtGaragePoort" src-event="single" target="LichtGaragePoort" event="toggle" />
-	<connect src="SchakLichtGarageTuin" src-event="single" target="LichtGarageTuin" event="toggle" />
-	<connect src="SchakLichtGarageTuin" src-event="long" target="LichtGaragePoort" event="toggle" />
-	<connect src="SchakLichtKeuken" src-event="single" target="LichtKeuken" event="toggle" />
-	<connect src="SchakLichtBadk0" src-event="single" target="LichtBadk0" event="toggle" />
-	<connect src="SchakLichtCircante" src-event="single" target="LichtCircante" event="toggle" />
-	<connect src="SchakLichtBureau" src-event="single" target="LichtBureau" event="toggle" />
-
-	<!-- Licht Boven -->
-	<connect src="SchakLichtGangBoven" src-event="single" target="LichtGangBoven" event="toggle" />
-	<connect src="SchakLichtBadk1" src-event="single" target="LichtBadk1" event="toggle" />
-	<connect src="SchakLichtTomasWand" src-event="single" target="LichtTomasWand" event="toggle" />
-	<connect src="SchakLichtTomasSpots" src-event="single" target="LichtTomasSpots" event="toggle" />
-	<connect src="SchakLichtDriesWand" src-event="single" target="LichtDriesWand" event="toggle" />
-	<connect src="SchakLichtDries" src-event="single" target="LichtDries" event="toggle" />
-	<connect src="SchakLichtRoosWand" src-event="single" target="LichtRoosWand" event="toggle" />
-	<connect src="SchakLichtRoos" src-event="single" target="LichtRoos" event="toggle" />
 
 	<!-- Nachtlicht -->
 	<timerDayNight name="TimerNacht">
 		<on hour="20" minute="30" />
 		<off hour="6" minute="0" />
 	</timerDayNight>
-	<lamp name="LichtNacht" desc="Nachtlichten" />
-	<connect src="TimerNacht" target="LichtNacht" />
+	<lamp name="LichtNacht" desc="Nachtlichten">
+		<on src="TimerNacht" event="on" />
+		<off src="TimerNacht" event="off" />
+	</lamp>
 
-	<!-- Ecologie -->
-	<repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600">
-		<on hour="7" minute="30" />
-		<off hour="9" minute="0" />
-	</repeatOff>
-	<connect src="GarageAutoUitOchtend" target="LichtGaragePoort" />
-	<repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600">
-		<on hour="16" minute="30" />
-		<off hour="17" minute="30" />
-	</repeatOff>
-	<connect src="GarageAutoUitAvond" target="LichtGaragePoort" />
-
-	<!-- New Year -->
-	<newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00" />
-
-	<connect src="SchakLichtBureau" src-event="double" target="newyear" event="toggle" />
-
-	<!-- Ventilatie -->
-	<connect src="SchakVentilatorWC0" src-event="single" target="VentilatorWC0" event="toggle" />
-	<connect src="SchakVentilatorWC0" src-event="long" target="VentilatorWC0" event="off" />
-	<connect src="SchakVentilatorBadk0" src-event="single" target="VentilatorBadk0" event="toggle" />
-	<connect src="SchakVentilatorBadk0" src-event="long" target="VentilatorBadk0" event="off" />
-
-
-	<connect-dimmer dimmedLamp="LichtVeranda" dimmerSwitch="SchakLichtVeranda" />
-	<connect-dimmer dimmedLamp="LichtCircanteRondom" dimmerSwitch="SchakLichtCircanteRondom" />
-	<connect-dimmer dimmedLamp="LichtZithoek" dimmerSwitch="SchakLichtZithoek" />
-
-	<!-- Alle lichten uit -->
-	<!-- TODO als je 'ui="Alles...:0"' zet dan werkt de javascript niet meer - brol. -->
-	<connect src="SchakLichtInkom" src-event="long" target="AlleLichten" event="off" ui="SPECIAAL:0" desc="Alles Uit" />
-
+	<!-- New Year <newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"> <toggle src="SchakLichtBureau" event="double" 
+		/> </newyear> -->
 
 	<!-- Screens -->
-	<screen name="ScreenTomas" desc="Tomas" motor-up-time="30" motor-dn-time="30" ui="Screens:3" />
-	<screen name="ScreenDriesTuin" desc="Dries (T)" motor-up-time="30" motor-dn-time="30" ui="Screens:4" />
-	<screen name="ScreenDriesOpzij" desc="Dries (Z)" motor-up-time="30" motor-dn-time="30" ui="Screens:5" />
-	<screen name="ScreenRoos" desc="Roos" motor-up-time="30" motor-dn-time="30" ui="Screens:6" />
-	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" ui="Screens:1" />
-	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100" ui="Screens:2" />
-	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0" />
-	<switch name="SchakScreenTomasUp" />
-	<switch name="SchakScreenTomasDown" />
-	<switch name="SchakScreenDriesTuinUp" />
-	<switch name="SchakScreenDriesTuinDown" />
-	<switch name="SchakScreenDriesOpzijUp" />
-	<switch name="SchakScreenDriesOpzijDown" />
-	<switch name="SchakScreenRoosUp" />
-	<switch name="SchakScreenRoosDown" />
-	<switch name="SchakScreenBreedUp" />
-	<switch name="SchakScreenBreedDown" />
-	<switch name="SchakScreenLangUp" />
-	<switch name="SchakScreenLangDown" />
-	<switch name="SchakScreenKeukenUp" />
-	<switch name="SchakScreenKeukenDown" />
 	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
 	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
-	<group name="Screens">
-		<block name="ScreenTomas" />
-		<block name="ScreenDriesTuin" />
-		<block name="ScreenDriesOpzij" />
-		<block name="ScreenRoos" />
-		<block name="ScreenBreed" />
-		<block name="ScreenLang" />
-		<block name="ScreenKeuken" />
-	</group>
-	<connect-screen screen="ScreenTomas" switchUp="SchakScreenTomasUp" switchDown="SchakScreenTomasDown" click="single" />
-	<connect-screen screen="ScreenDriesTuin" switchUp="SchakScreenDriesTuinUp" switchDown="SchakScreenDriesTuinDown"
-		click="single" />
-	<connect-screen screen="ScreenDriesOpzij" switchUp="SchakScreenDriesOpzijUp" switchDown="SchakScreenDriesOpzijDown"
-		click="single" />
-	<connect-screen screen="ScreenRoos" switchUp="SchakScreenRoosUp" switchDown="SchakScreenRoosDown" click="single" />
-	<connect-screen screen="ScreenBreed" switchUp="SchakScreenBreedUp" switchDown="SchakScreenBreedDown" click="single" />
-	<connect-screen screen="ScreenLang" switchUp="SchakScreenLangUp" switchDown="SchakScreenLangDown" click="single" />
-	<connect-screen screen="ScreenKeuken" switchUp="SchakScreenKeukenUp" switchDown="SchakScreenKeukenDown" click="single" />
-	
-	<!-- Alle screens -->
-	<connect-screen screen="Screens" switchDown="SchakScreenAllDown" switchUp="SchakScreenAllUp" click="long" ui="SPECIAAL:1"
-		desc="Alle Screens" />
+
+	<switch name="SchakScreenTomasUp" />
+	<switch name="SchakScreenTomasDown" />
+	<screen name="ScreenTomas" desc="Tomas" motor-up-time="30" motor-dn-time="30" ui="Screens:3">
+		<upDown srcDown="SchakScreenTomasDown" srcUp="SchakScreenTomasUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenDriesTuinUp" />
+	<switch name="SchakScreenDriesTuinDown" />
+	<screen name="ScreenDriesTuin" desc="Dries (T)" motor-up-time="30" motor-dn-time="30" ui="Screens:4">
+		<upDown srcDown="SchakScreenDriesTuinDown" srcUp="SchakScreenDriesTuinUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenDriesOpzijUp" />
+	<switch name="SchakScreenDriesOpzijDown" />
+	<screen name="ScreenDriesOpzij" desc="Dries (Z)" motor-up-time="30" motor-dn-time="30" ui="Screens:5">
+		<upDown srcDown="SchakScreenDriesOpzijDown" srcUp="SchakScreenDriesOpzijUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenRoosUp" />
+	<switch name="SchakScreenRoosDown" />
+	<screen name="ScreenRoos" desc="Roos" motor-up-time="30" motor-dn-time="30" ui="Screens:6">
+		<upDown srcDown="SchakScreenRoosDown" srcUp="SchakScreenRoosUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenBreedUp" />
+	<switch name="SchakScreenBreedDown" />
+	<screen name="ScreenBreed" desc="Breed" motor-up-time="40" motor-dn-time="36" ui="Screens:1">
+		<upDown srcDown="SchakScreenBreedDown" srcUp="SchakScreenBreedUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenLangUp" />
+	<switch name="SchakScreenLangDown" />
+	<screen name="ScreenLang" desc="Smal" motor-up-time="100" motor-dn-time="100" ui="Screens:2">
+		<upDown srcDown="SchakScreenLangDown" srcUp="SchakScreenLangUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
+	<switch name="SchakScreenKeukenUp" />
+	<switch name="SchakScreenKeukenDown" />
+	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0">
+		<upDown srcDown="SchakScreenKeukenDown" srcUp="SchakScreenKeukenUp" />
+		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
+	</screen>
+
 
 	<!-- Wind & Licht meter -->
-	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="5" channel="Windmeter" ui="SPECIAAL:2"/>
-	<lightGauge name="LichtScreen" low="3500" high="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3"/>
-	<screen-controller name="ZonneAutomaat" desc="Zon/Wind Automaat" alarmSrc="Windmeter" lightSrc="LichtScreen"
-		screen="Screens" ui="SPECIAAL:2" />
-	<connect src="SchakScreenAllDown" src-event="single" target="ZonneAutomaat" event="off" />
-	<connect src="SchakScreenAllUp" src-event="single" target="ZonneAutomaat" event="on" />
+	<windSensor name="Windmeter" highFreq="5" lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="5" channel="Windmeter"
+		ui="SPECIAAL:2" />
+	<lightGauge name="Lichtmeter" low="3500" high="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3" />
+	<sunWindController name="ZonWindAutomaat" desc="Zon/Wind Automaat" ui="Screens:0">
+		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
+			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
+		<wind sensor="Windmeter" />
+		<sun sensor="Lichtmeter" />
+		<screen name="ScreenBreed" />
+		<screen name="ScreenLang" />
+	</sunWindController>
 
 </domotic>

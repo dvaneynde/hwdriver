@@ -77,7 +77,7 @@ public class TestEnd2EndSwitchLamp {
 				IO.S_KEUKENLICHT.ch(), dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), IO.L_KEUKEN.ch(),
 				dom);
-		s.registerListener(new Connector(EventType.SINGLE_CLICK, o, EventType.TOGGLE,"switchClick2Toggle"));
+		s.registerListener(new Connector(EventType.SINGLE_CLICK, o, EventType.TOGGLE,"switch"));
 	}
 
 	@Ignore

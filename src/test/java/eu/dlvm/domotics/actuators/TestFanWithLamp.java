@@ -46,8 +46,8 @@ public class TestFanWithLamp {
 		lamp = new Lamp("TestLamp", "TestLamp", LAMP_OUT, ctx);
 		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, ctx).overrideDelayOnDurationSec(5).overrideDelayOffDurationSec(5)
 				.overrideOnDurationSec(10);
-		lamp.registerListener(new Connector(EventType.ON, fan, EventType.DELAY_ON, "LampOn2FanDelayOn"));
-		lamp.registerListener(new Connector(EventType.OFF, fan, EventType.DELAY_OFF, "LampOff2FanDelayOff"));
+		lamp.registerListener(new Connector(EventType.ON, fan, EventType.DELAY_ON, "Test_Lamp"));
+		lamp.registerListener(new Connector(EventType.OFF, fan, EventType.DELAY_OFF, "Test_Lamp"));
 		current = seq = 0L;
 	}
 

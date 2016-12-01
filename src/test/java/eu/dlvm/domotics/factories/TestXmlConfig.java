@@ -11,8 +11,8 @@ public class TestXmlConfig {
 	public void testConfigure() {
 		DomoContextMock ctx = new DomoContextMock(null);
 		XmlDomoticConfigurator.configure("src/test/resources/TestDomoticConfig.xml", ctx);
-		Assert.assertEquals(13, ctx.sensors.size());
-		Assert.assertEquals(6, ctx.actuators.size());
-		Assert.assertEquals(1, ctx.controllers.size());
+		Assert.assertEquals(15, ctx.sensors.size());
+		Assert.assertEquals(8, ctx.actuators.size());
+		Assert.assertEquals(2, ctx.controllers.size());
 	}
 }

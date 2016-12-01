@@ -41,7 +41,7 @@ public class TestSwitchDedicatedAllOff {
 		//		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);
 		//		swLamp.registerListener(swtch2toggle);
 		//		swtch2toggle.registerListener(lamp);
-		swLamp.registerListener(new Connector(EventType.SINGLE_CLICK, lamp, EventType.TOGGLE, "toggle"));
+		swLamp.registerListener(new Connector(EventType.SINGLE_CLICK, lamp, EventType.TOGGLE, "switch"));
 
 		//		swtch2All = new Switch2OnOffToggle("allof", "alloff", null);
 		//		swtch2All.map(ClickType.LONG, ActionType.OFF);

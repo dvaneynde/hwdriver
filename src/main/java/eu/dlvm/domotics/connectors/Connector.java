@@ -10,9 +10,9 @@ import eu.dlvm.domotics.events.IEventListener;
 /**
  * For now just one mapping.
  * <p>
- * Connectors are very simple, they listen for events, map them to another srcEvent
- * and send it. Connectors do <b>not</b> have state, nor do they loop - they
- * only react to events.
+ * Connectors are very simple, they listen for events, map them to another
+ * srcEvent and send it. Connectors do <b>not</b> have state, nor do they loop -
+ * they only react to events.
  * 
  * @author dirk
  * 
@@ -21,11 +21,11 @@ public class Connector implements IEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(Connector.class);
 
-	public Connector(EventType fromEvent, IEventListener to, EventType toEvent, String debugId) {
+	public Connector(EventType fromEvent, IEventListener to, EventType toEvent, String debugSrcName) {
 		this.fromEvent = fromEvent;
 		this.to = to;
 		this.toEvent = toEvent;
-		this.debugId = debugId;
+		this.debugId = debugSrcName + "_" + fromEvent.getAlias() + "_to_" + ((Block) to).getName() + "_" + toEvent.getAlias();
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class Connector implements IEventListener {
 		if (event.equals(fromEvent))
 			to.onEvent(source, toEvent);
 		else
-		logger.warn("Ignored srcEvent " + event + " from " + source.getName()+" (connector id="+debugId+").");
+			logger.warn("Ignored srcEvent " + event + " from " + source.getName() + " (connector id=" + debugId + ").");
 	}
 
 	// ============ Implementation

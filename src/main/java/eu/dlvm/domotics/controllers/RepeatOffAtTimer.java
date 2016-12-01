@@ -6,6 +6,12 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.events.EventType;
 
+/**
+ * TODO must be incorporated in lamps instead. With blinking 2 times, and if toggled remains on, otherwises goes out.
+ * 
+ * @author dirk
+ *
+ */
 public class RepeatOffAtTimer extends Timer {
 	private static Logger log = LoggerFactory.getLogger(RepeatOffAtTimer.class);
 	private int intervalSec;

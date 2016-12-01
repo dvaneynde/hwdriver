@@ -79,21 +79,21 @@ public class TestSwitchOrTimer2Lamp {
 
 		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		//		sct1.registerListener(o1);
-		sw1.registerListener(new Connector(EventType.SINGLE_CLICK, o1, EventType.TOGGLE, "sw1_to_o1"));
+		sw1.registerListener(new Connector(EventType.SINGLE_CLICK, o1, EventType.TOGGLE, "sw1"));
 
 		//		SwitchClick2Toggle sct2 = new SwitchClick2Toggle("sct2", "");
 		//		sct2.registerListener(o2);
-		sw2.registerListener(new Connector(EventType.SINGLE_CLICK, o2, EventType.TOGGLE, "sw2_to_o2"));
+		sw2.registerListener(new Connector(EventType.SINGLE_CLICK, o2, EventType.TOGGLE, "sw2"));
 
 		//		Switch2OnOffToggle s2allonoff = new Switch2OnOffToggle("allonoff", "", null);
 		//		s2allonoff.map(ISwitchListener.ClickType.LONG, IOnOffToggleCapable.ActionType.OFF);
 		//		s2allonoff.map(ISwitchListener.ClickType.DOUBLE, IOnOffToggleCapable.ActionType.ON);
 		//		s2allonoff.registerListener(o1);
 		//		s2allonoff.registerListener(o2);
-		sw2.registerListener(new Connector(EventType.LONG_CLICK, o1, EventType.OFF, "sw_o1_long_off"));
-		sw2.registerListener(new Connector(EventType.LONG_CLICK, o2, EventType.OFF, "sw_o2_long_off"));
-		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o1, EventType.ON, "sw_o1_double_on"));
-		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o2, EventType.ON, "sw_o2_double_on"));
+		sw2.registerListener(new Connector(EventType.LONG_CLICK, o1, EventType.OFF, "sw2"));
+		sw2.registerListener(new Connector(EventType.LONG_CLICK, o2, EventType.OFF, "sw2"));
+		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o1, EventType.ON, "sw2"));
+		sw2.registerListener(new Connector(EventType.DOUBLE_CLICK, o2, EventType.ON, "sw2"));
 	}
 
 	@Test

@@ -73,18 +73,18 @@ public class TestSwitch2Fans {
 		l1 = new Lamp("Lamp1", "Lamp1", Integer.toString(LAMP1_OUT), dom);
 		l2 = new Lamp("Lamp2", "Lamp2", Integer.toString(LAMP2_OUT), dom);
 		f1 = new Fan("Fan1", "Fan1", Integer.toString(FAN1_OUT), dom);
-		l1.registerListener(new Connector(EventType.ON, f1, EventType.DELAY_ON, "LampOn2FanDelayOn"));
-		l1.registerListener(new Connector(EventType.OFF, f1, EventType.DELAY_OFF, "LampOff2FanDelayOff"));
+		l1.registerListener(new Connector(EventType.ON, f1, EventType.DELAY_ON, "Test_Lamp"));
+		l1.registerListener(new Connector(EventType.OFF, f1, EventType.DELAY_OFF, "Test_Lamp"));
 		f2 = new Fan("Fan2", "Fan2", Integer.toString(FAN2_OUT), dom);
-		l2.registerListener(new Connector(EventType.ON, f2, EventType.DELAY_ON, "LampOn2FanDelayOn"));
-		l2.registerListener(new Connector(EventType.OFF, f2, EventType.DELAY_OFF, "LampOff2FanDelayOff"));
+		l2.registerListener(new Connector(EventType.ON, f2, EventType.DELAY_ON, "Test_Lamp"));
+		l2.registerListener(new Connector(EventType.OFF, f2, EventType.DELAY_OFF, "Test_Lamp"));
 
 		//Switch2Fan s2f1 = new Switch2Fan("s2f1", "s2f1");
-		Connector s2f1_single = new Connector(EventType.SINGLE_CLICK, f1, EventType.TOGGLE, "s2f1_single");
+		Connector s2f1_single = new Connector(EventType.SINGLE_CLICK, f1, EventType.TOGGLE, "Test_Switch2");
 		sw1.registerListener(s2f1_single);
 		
 		//Switch2Fan s2f2 = new Switch2Fan("s2f2", "s2f2");
-		Connector s2f2_single = new Connector(EventType.SINGLE_CLICK, f2, EventType.TOGGLE, "s2f2_single");
+		Connector s2f2_single = new Connector(EventType.SINGLE_CLICK, f2, EventType.TOGGLE, "Test_Switch2");
 		sw2.registerListener(s2f2_single);
 
 		// TODO long click to stop until lamp off

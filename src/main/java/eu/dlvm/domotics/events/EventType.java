@@ -24,6 +24,8 @@ public enum EventType {
 		this.alias = alias;
 	}
 
+	public String getAlias() { return alias; }
+	
 	public static EventType fromAlias(String alias) {
 		for (EventType e : EventType.values()) 
 			if (e.alias.equalsIgnoreCase(alias))
