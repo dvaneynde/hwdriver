@@ -34,7 +34,6 @@ public class SunWindController extends Controller implements IEventListener, IUi
 		super(name, description, ui, ctx);
 	}
 
-
 	public void on() {
 		logger.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
@@ -80,8 +79,8 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			if (enabled)
 				notifyListeners(event);
 			else
-				logger.info(getName() + " has blocked event '" + event.toString() + "' from source '" + source.getName() + "'.");
-			break;
+				// TODO waarom dit loggen? logger.info(getName() + " has blocked event '" + event.toString() + "' from source '" + source.getName() + "'.");
+				break;
 		default:
 			break;
 		}
@@ -96,15 +95,15 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	}
 
 	@Override
-	public void update(String eventName) {
-		try {
-			EventType eventType = EventType.valueOf(eventName.toUpperCase());
-			onEvent(null, eventType);
-		} catch (IllegalArgumentException e) {
-			logger.warn("update(), ignored unknown action: " + eventName);
-		}
-	}
+	public void update(String action) {
+		if (action.equalsIgnoreCase("on"))
+			on();
+		else if (action.equalsIgnoreCase("off"))
+			off();
+		else
+			logger.warn("update on Lamp '" + getName() + "' got unsupported action '" + action + ".");
 
+	}
 
 	@Override
 	public void loop(long currentTime, long sequence) {

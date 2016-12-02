@@ -10,7 +10,6 @@ public interface INewYearGadget {
 	 *            Time in milliseconds since start of this gadget's gadgetset.
 	 *            So a relative time, relative to gadget's set start.
 	 * @param state
-	 *            TODO
 	 */
 	public void loop2(long time, GSstate state);
 

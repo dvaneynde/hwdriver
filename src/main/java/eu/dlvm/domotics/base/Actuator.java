@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import org.slf4j.Logger; 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.events.IEventListener;
@@ -19,6 +19,9 @@ import eu.dlvm.iohardware.IHardwareIO;
  * must only be called within an {@link #loop(long, long)} call.</li>
  * <li></li>
  * </ol>
+ * *
+ * <p>
+ * TODO remove IUICapableBlock here?
  * 
  * @author Dirk Vaneynde
  */
@@ -78,8 +81,7 @@ public abstract class Actuator extends Block implements IDomoticLoop, IEventList
 
 	@Override
 	public String toString() {
-		return "Actuator [channel=" + channel + ", ctx=" + ctx + ", name=" + name + ", description=" + description
-				+ ", uiGroup=" + uiGroup + "]";
+		return "Actuator [channel=" + channel + ", ctx=" + ctx + ", name=" + name + ", description=" + description + ", uiGroup=" + uiGroup + "]";
 	}
 
 }

@@ -410,6 +410,7 @@ public class DimmedLamp extends Actuator implements IEventListener {
 
 	@Override
 	public void update(String action) {
+		// dirty, but effective...
 		try {
 			EventType at = EventType.valueOf(action.toUpperCase());
 			onEvent(null, at);

@@ -144,6 +144,12 @@ public class NewYear extends Controller implements IEventListener {
 
 	@Override
 	public void update(String action) {
+		if (action.equalsIgnoreCase("on"))
+			on();
+		else if (action.equalsIgnoreCase("off"))
+			off();
+		else
+			logger.warn("update on NewYear '" + getName() + "' got unsupported action '" + action + ".");
 	}
 
 }

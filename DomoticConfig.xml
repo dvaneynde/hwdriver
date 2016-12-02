@@ -211,7 +211,7 @@
 
 	<switch name="SchakScreenKeukenUp" />
 	<switch name="SchakScreenKeukenDown" />
-	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:0">
+	<screen name="ScreenKeuken" desc="Keuken" motor-up-time="25" motor-dn-time="20" ui="Screens:7">
 		<upDown srcDown="SchakScreenKeukenDown" srcUp="SchakScreenKeukenUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>

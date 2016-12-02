@@ -13,10 +13,11 @@ import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * A Fan that runs for a {@link #getOnDurationSec()} seconds when toggled on.
- * <P>The fan also supports delayed on and off, useful when connected to a Lamp (or any other event source): if the lamp goes on then
- * after {@link #getDelayOnDurationSec()} the fan will run until the lamp goes off
- * again plus  {@link #getDelayOffDurationSec()} seconds while the lamp is
- * off.
+ * <P>
+ * The fan also supports delayed on and off, useful when connected to a Lamp (or
+ * any other event source): if the lamp goes on then after
+ * {@link #getDelayOnDurationSec()} the fan will run until the lamp goes off
+ * again plus {@link #getDelayOffDurationSec()} seconds while the lamp is off.
  * <p>
  * The state diagram below shows all possibilities.
  * <p>
@@ -67,8 +68,8 @@ public class Fan extends Actuator implements IEventListener {
 
 	private States state;
 	private long onDurationMs = DEFAULT_ON_DURATION_SEC * 1000L;
-	private long delayToOnDurationMs = DEFAULT_DELAY_ON_DURATION_SEC*1000L;
-	private long delayToOffDurationMs = DEFAULT_DELAY_OFF_DURATION_SEC*1000L;
+	private long delayToOnDurationMs = DEFAULT_DELAY_ON_DURATION_SEC * 1000L;
+	private long delayToOffDurationMs = DEFAULT_DELAY_OFF_DURATION_SEC * 1000L;
 	private long timeStateEntered;
 
 	/**
@@ -80,29 +81,29 @@ public class Fan extends Actuator implements IEventListener {
 	}
 
 	public long getOnDurationSec() {
-		return onDurationMs/1000L;
+		return onDurationMs / 1000L;
 	}
 
 	public Fan overrideOnDurationSec(long runPeriodSec) {
-		this.onDurationMs = runPeriodSec*1000L;
+		this.onDurationMs = runPeriodSec * 1000L;
 		return this;
 	}
 
 	public long getDelayOnDurationSec() {
-		return delayToOnDurationMs/1000L;
+		return delayToOnDurationMs / 1000L;
 	}
 
 	public Fan overrideDelayOnDurationSec(long delayOnPeriodSec) {
-		this.delayToOnDurationMs = delayOnPeriodSec*1000L;
+		this.delayToOnDurationMs = delayOnPeriodSec * 1000L;
 		return this;
 	}
 
 	public long getDelayOffDurationSec() {
-		return delayToOffDurationMs/1000L;
+		return delayToOffDurationMs / 1000L;
 	}
 
 	public Fan overrideDelayOffDurationSec(long delayOffPeriodSec) {
-		this.delayToOffDurationMs = delayOffPeriodSec*1000L;
+		this.delayToOffDurationMs = delayOffPeriodSec * 1000L;
 		return this;
 	}
 
@@ -124,7 +125,7 @@ public class Fan extends Actuator implements IEventListener {
 		if (isOn())
 			reallyOff();
 	}
-	
+
 	/**
 	 * Toggle between immediately turning and stopping. If started, it runs for
 	 * {@link #getDelayPeriodSec()} seconds.
@@ -142,8 +143,7 @@ public class Fan extends Actuator implements IEventListener {
 			changeState(States.ON_D);
 			fanOn = true;
 			writeOutput(fanOn);
-			logger.info("Fan '" + getName() + "' goes ON for " + getOnDurationSec() + " sec. or until switched off (state="
-					+ getState() + ").");
+			logger.info("Fan '" + getName() + "' goes ON for " + getOnDurationSec() + " sec. or until switched off (state=" + getState() + ").");
 			break;
 		case ON_D:
 			changeState(States.DELAYED_ON);
@@ -162,7 +162,6 @@ public class Fan extends Actuator implements IEventListener {
 		}
 		return fanOn;
 	}
-
 
 	/**
 	 * Only effective when in state ON_D, otherwise ignored.
@@ -199,7 +198,6 @@ public class Fan extends Actuator implements IEventListener {
 			logger.warn("delayOff ignored, is missing code. status=" + this.toString());
 		}
 	}
-
 
 	/* To be used outside {@link #loop()}. */
 	private void changeState(States target) {
@@ -260,8 +258,7 @@ public class Fan extends Actuator implements IEventListener {
 				writeOutput(false);
 				state = States.OFF;
 				timeStateEntered = current;
-				logger.info("Fan '" + getName() + "' goes off because it has run for " + getOnDurationSec() + " sec (seq="
-						+ sequence + ").");
+				logger.info("Fan '" + getName() + "' goes off because it has run for " + getOnDurationSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
 		case DELAYED_ON:
@@ -280,8 +277,7 @@ public class Fan extends Actuator implements IEventListener {
 				writeOutput(false);
 				state = States.OFF;
 				timeStateEntered = current;
-				logger.info("Fan '" + getName() + "' goes off because delayed OFF has been busy for " + getOnDurationSec()
-						+ " sec.");
+				logger.info("Fan '" + getName() + "' goes off because delayed OFF has been busy for " + getOnDurationSec() + " sec.");
 			}
 			break;
 		default:
@@ -302,6 +298,12 @@ public class Fan extends Actuator implements IEventListener {
 
 	@Override
 	public void update(String action) {
+		if (action.equalsIgnoreCase("on"))
+			on();
+		else if (action.equalsIgnoreCase("off"))
+			off();
+		else
+			logger.warn("update on '" + getName() + "' got unsupported action '" + action + ".");
 	}
 
 	// ===== Private =====
@@ -315,6 +317,5 @@ public class Fan extends Actuator implements IEventListener {
 		return "Fan [onDurationMs=" + onDurationMs + ", delayToOnDurationMs=" + delayToOnDurationMs + ", delayToOffDurationMs=" + delayToOffDurationMs
 				+ ", timeStateEntered=" + timeStateEntered + ", state=" + state + "]";
 	}
-
 
 }

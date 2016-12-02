@@ -17,8 +17,7 @@ public class Lamp extends Actuator implements IEventListener {
 	private boolean outval;
 
 	public Lamp(String name, String description, String channel, IDomoticContext ctx) {
-		super(name, description, null, channel, ctx);
-		this.outval = false;
+		this(name, description, null, channel, ctx);
 	}
 
 	public Lamp(String name, String description, String ui, String channel, IDomoticContext ctx) {
@@ -27,7 +26,7 @@ public class Lamp extends Actuator implements IEventListener {
 	}
 
 	/**
-	 * @deprecated 
+	 * @deprecated
 	 */
 	public Lamp(String name, String description, int channel, IDomoticContext ctx) {
 		this(name, description, Integer.toString(channel), ctx);
@@ -67,7 +66,7 @@ public class Lamp extends Actuator implements IEventListener {
 		this.outval = outval;
 		logger.info("Lamp '" + getName() + "' set state to " + (isOn() ? "ON" : "OFF"));
 		getHw().writeDigitalOutput(getChannel(), outval);
-		notifyListeners(outval?EventType.ON:EventType.OFF);
+		notifyListeners(outval ? EventType.ON : EventType.OFF);
 	}
 
 	/**
@@ -97,8 +96,12 @@ public class Lamp extends Actuator implements IEventListener {
 
 	@Override
 	public void update(String action) {
-		// TODO Auto-generated method stub
-
+		if (action.equalsIgnoreCase("on"))
+			on();
+		else if (action.equalsIgnoreCase("off"))
+			off();
+		else
+			logger.warn("update on Lamp '" + getName() + "' got unsupported action '" + action + ".");
 	}
 
 	@Override
