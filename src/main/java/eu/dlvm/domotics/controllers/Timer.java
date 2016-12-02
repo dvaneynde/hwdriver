@@ -9,7 +9,6 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.UiInfo;
 
 /**
  * Has two per-day times, at {@link #setOnTime(int, int)} an on signal is sent,
@@ -102,15 +101,6 @@ public class Timer extends Controller {
 			logger.info("Timer '" + getName() + "' sends event '" + (state ? "ON" : "OFF") + "'");
 			notifyListeners(state ? EventType.ON : EventType.OFF);
 		}
-	}
-
-	@Override
-	public UiInfo getUiInfo() {
-		return null;
-	}
-
-	@Override
-	public void update(String action) {
 	}
 
 }

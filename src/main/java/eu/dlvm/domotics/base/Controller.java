@@ -8,7 +8,7 @@ import eu.dlvm.domotics.events.IEventListener;
  * <p>
  * TODO remove IUICapableBlock here?
  */
-public abstract class Controller extends Block implements IDomoticLoop, IEventListener, IUiCapableBlock {
+public abstract class Controller extends Block implements IDomoticLoop, IEventListener {
 
 	public Controller(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui);

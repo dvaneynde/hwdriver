@@ -27,7 +27,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.Opmm1616BoardWithMsg;
 public class XmlHwConfigurator implements IBoardFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlHwConfigurator.class);
-	private String cfgFilepath; // TODO File object
+	private String cfgFilepath; 
 
 	int boardNr, address;
 	private ChannelType chtype = null;

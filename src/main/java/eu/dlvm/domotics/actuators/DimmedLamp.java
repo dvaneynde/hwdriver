@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
@@ -18,7 +19,7 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author dirk
  */
-public class DimmedLamp extends Actuator implements IEventListener {
+public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBlock {
 	/**
 	 * Time in ms to dim from off to fully on.
 	 */

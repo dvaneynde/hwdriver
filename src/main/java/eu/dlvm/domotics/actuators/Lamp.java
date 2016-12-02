@@ -6,12 +6,13 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
-public class Lamp extends Actuator implements IEventListener {
+public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	static Logger logger = LoggerFactory.getLogger(Lamp.class);
 	private boolean outval;

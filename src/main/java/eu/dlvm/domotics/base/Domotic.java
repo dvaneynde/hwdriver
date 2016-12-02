@@ -130,11 +130,7 @@ public class Domotic implements IDomoticContext {
 		log.info("Added actuator " + actuator.getName());
 	}
 
-	/*	public List<Actuator> getActuators() {
-			return actuators;
-		}
-	
-	*/ public void addController(Controller controller) {
+	public void addController(Controller controller) {
 		if (controllers.contains(controller)) {
 			log.warn("Controller already added, ignored: " + controller);
 			assert (false);
@@ -208,27 +204,22 @@ public class Domotic implements IDomoticContext {
 	}
 
 	private void registerIfUiCapable(Block b) {
-		if (b instanceof IUiCapableBlock)
-			addUiCapableBlock((IUiCapableBlock) b);
-	}
+		if (b instanceof IUiCapableBlock) {
+			IUiCapableBlock uiblock0 = ((IUiCapableBlock) b);
 
-	//@Override
-	private void addUiCapableBlock(IUiCapableBlock uiblock0) {
-		if (uiblock0.getUiInfo() == null) {
-			// TODO all Controllers zijn nu IUserDinges, maar dat is niet juist.
-			log.warn("Not adding UI info for " + ((Block) uiblock0).getName()
-					+ ". BlockInfo is null - is a bug, refactor code.");
-			return;
-		}
-		for (IUiCapableBlock uiblock : uiblocks) {
-			if (uiblock.getUiInfo().getName().equals(uiblock0.getUiInfo().getName())) {
-				log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getUiInfo().getName()
-						+ "' already registered - ignored.");
+			if (uiblock0.getUiInfo() == null) {
+				log.warn("Not adding UI info for " + ((Block) uiblock0).getName() + ". BlockInfo is null - is a bug, refactor code.");
 				return;
 			}
+			for (IUiCapableBlock uiblock : uiblocks) {
+				if (uiblock.getUiInfo().getName().equals(uiblock0.getUiInfo().getName())) {
+					log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getUiInfo().getName() + "' already registered - ignored.");
+					return;
+				}
+			}
+			uiblocks.add(uiblock0);
+			log.debug("Added UiCapableBlock " + uiblock0.getUiInfo().getName());
 		}
-		uiblocks.add(uiblock0);
-		log.debug("Added UiCapableBlock " + uiblock0.getUiInfo().getName());
 	}
 
 	private void addShutdownHook(Domotic dom) {
@@ -310,14 +301,12 @@ public class Domotic implements IDomoticContext {
 				long currentLoopSequence = loopSequence;
 				if (currentLoopSequence <= lastLoopSequence) {
 					if (checkDriverAndRestartOnError) {
-						log.error("Domotic does not seem to be looping anymore, last recorded loopsequence="
-								+ lastLoopSequence + ", current=" + currentLoopSequence
-								+ ". I'll try to restart driver.");
+						log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current="
+								+ currentLoopSequence + ". I'll try to restart driver.");
 						break;
 					} else {
-						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence="
-								+ lastLoopSequence + ", current=" + currentLoopSequence
-								+ ". I'll ignore it since flag to restart is not set.");
+						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current="
+								+ currentLoopSequence + ". I'll ignore it since flag to restart is not set.");
 					}
 				}
 				lastLoopSequence = currentLoopSequence;
@@ -432,13 +421,11 @@ public class Domotic implements IDomoticContext {
 				driverProcess.destroy();
 				sleepSafe(500);
 				if (driverMonitor.getProcessWatch().isRunning()) {
-					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid()
-							+ ". Ignored, you'll see what happens.");
+					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid() + ". Ignored, you'll see what happens.");
 					// TODO stop domotic?
 				}
 			} else {
-				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode()
-						+ ". Now Stopping driver monitor.");
+				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode() + ". Now Stopping driver monitor.");
 			}
 			driverMonitor.terminate();
 		}

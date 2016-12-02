@@ -19,14 +19,12 @@ import eu.dlvm.iohardware.IHardwareIO;
  * must only be called within an {@link #loop(long, long)} call.</li>
  * <li></li>
  * </ol>
- * *
- * <p>
- * TODO remove IUICapableBlock here?
  * 
  * @author Dirk Vaneynde
  */
-public abstract class Actuator extends Block implements IDomoticLoop, IEventListener, IUiCapableBlock {
+public abstract class Actuator extends Block implements IDomoticLoop, IEventListener {
 
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(Actuator.class);
 
 	private String channel;

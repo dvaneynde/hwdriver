@@ -15,7 +15,6 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.UiInfo;
 
 public class TestRepeatOffAtTimer {
 	boolean lastOffCalled = false;
@@ -35,15 +34,6 @@ public class TestRepeatOffAtTimer {
 
 			@Override
 			public void loop(long currentTime, long sequence) {
-			}
-
-			@Override
-			public UiInfo getUiInfo() {
-				return null;
-			}
-
-			@Override
-			public void update(String action) {
 			}
 
 			@Override

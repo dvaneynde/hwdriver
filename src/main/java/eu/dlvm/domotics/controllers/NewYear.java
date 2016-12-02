@@ -8,13 +8,14 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.controllers.newyear.GSstate;
 import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.UiInfo;
 
-public class NewYear extends Controller implements IEventListener {
+public class NewYear extends Controller implements IEventListener, IUiCapableBlock {
 
 	static Logger logger = LoggerFactory.getLogger(NewYear.class);
 	private long startTimeMs;
