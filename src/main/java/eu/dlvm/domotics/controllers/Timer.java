@@ -85,8 +85,6 @@ public class Timer extends Controller {
 
 	@Override
 	public void onEvent(Block source, EventType event) {
-		// TODO Auto-generated method stub
-		
 	}
 
 

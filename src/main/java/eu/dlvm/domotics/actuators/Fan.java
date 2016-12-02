@@ -219,7 +219,6 @@ public class Fan extends Actuator implements IEventListener {
 	 * <li>OFF: if on, behaves as {@link #reallyOff()}</li>
 	 * <li>TOGGLE: see {@link #toggle()}</li>
 	 * </ul>
-	 * TODO add check on source; if lamp then it should sync wiht lamp
 	 */
 	@Override
 	public void onEvent(Block source, EventType event) {
