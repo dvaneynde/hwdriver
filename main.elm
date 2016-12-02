@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object6, (:=))
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object7, (:=))
 import Json.Encode as Encode
 import WebSocket
 import Material
@@ -37,7 +37,7 @@ urlUpdateActuators =
 
 
 wsStatus =
-    "ws://"++ urlBase ++ "/time/"
+    "ws://"++ urlBase ++ "/status/"
 
 
 main =
@@ -49,31 +49,28 @@ main =
 
 
 type alias StatusRecord =
-    { name : String, kind : String, description : String, on : Bool, level : Int, status : String }
+    { name : String, kind : String, group: String, description : String, on : Bool, level : Int, status : String }
 
 
 type alias Model =
-    { statuses : List StatusRecord, errorMsg : String, test : String, mdl : Material.Model }
+    { statuses : List StatusRecord, blockOpen: Bool, errorMsg : String, test : String, mdl : Material.Model }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { statuses = [], errorMsg = "No worries...", test = "nothing tested", mdl = Material.model }, Cmd.none )
+    ( { statuses = [], blockOpen = True, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model }, Cmd.none )
 
 
 initialStatus : StatusRecord
 initialStatus =
-    { name = "", kind = "", description = "", on = False, level = 0, status = "" }
+    { name = "", kind = "", group = "", description = "", on = False, level = 0, status = "" }
 
 
 statusByName : String -> List StatusRecord -> StatusRecord
 statusByName name listOfRecords =
     let
-        checkName =
-            (\rec -> rec.name == name)
-
         filteredList =
-            List.filter checkName listOfRecords
+            List.filter (\rec -> rec.name == name) listOfRecords
     in
         Maybe.withDefault initialStatus (List.head filteredList)
 
@@ -85,14 +82,15 @@ statusByName name listOfRecords =
 type Msg
     = PutModelInTestAsString
     | Mdl (Material.Msg Msg)
-    | NewStatus String
     | Clicked String
     | Checked String Bool
     | Down String
     | Up String
     | SliderMsg String Float
+    | ToggleShowBlock
+    | NewStatusViaWs String
+    | NewStatusViaRest (List StatusRecord)
     | RestError Http.Error
-    | RestStatus (List StatusRecord)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -100,6 +98,9 @@ update msg model =
     case msg of
         PutModelInTestAsString ->
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
+
+        Mdl message' ->
+            Material.update message' model
 
         Clicked what ->
             ( model, toggleBlock what model )
@@ -123,25 +124,22 @@ update msg model =
         SliderMsg what level ->
             ( model, updateStatusViaRestCmd what (toString level) )
 
-        NewStatus str ->
+        NewStatusViaWs str ->
             let
                 ( newStatuses, error ) =
                     decodeStatuses str
             in
                 ( { model | statuses = newStatuses, errorMsg = error }, Cmd.none )
 
-        RestStatus statuses' ->
+        ToggleShowBlock ->
+            ( { model | blockOpen = not(model.blockOpen)}, Cmd.none )
+
+        NewStatusViaRest statuses' ->
             ( { model | statuses = statuses', errorMsg = "OK" }, Cmd.none )
 
         RestError error ->
             ( { model | errorMsg = toString error }, Cmd.none )
 
-        Mdl message' ->
-            Material.update message' model
-
-
-
--- TODO tuple teruggeven dat fout bevat, en dan met (value,error)=... en dan in model.error dat zetten als nodig
 
 
 decodeStatuses : String -> ( List StatusRecord, String )
@@ -165,9 +163,10 @@ statusesDecoder =
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-    object6 StatusRecord
+    object7 StatusRecord
         ("name" := string)
         ("type" := string)
+        ("groupName" := string)
         ("description" := string)
         ("on" := bool)
         ("level" := int)
@@ -191,7 +190,7 @@ toggleBlock what model =
 
 updateStatusViaRestCmd : String -> String -> Cmd Msg
 updateStatusViaRestCmd name value =
-    Task.perform RestError RestStatus (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ value))
+    Task.perform RestError NewStatusViaRest (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ value))
 
 
 
@@ -200,14 +199,13 @@ updateStatusViaRestCmd name value =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    WebSocket.listen wsStatus NewStatus
+    WebSocket.listen wsStatus NewStatusViaWs
 
 
 
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
 -- https://debois.github.io/elm-mdl/
-
 
 levelByName : String -> Model -> String
 levelByName name model =
@@ -258,8 +256,8 @@ toggleWithSliderDiv ( name, desc ) nr model =
         ]
 
 
-screenDiv : ( String, String ) -> Int -> Model -> Html Msg
-screenDiv ( name, desc ) nr model =
+screenDiv : ( String, String ) -> Model -> Int -> Html Msg
+screenDiv ( name, desc ) model nr =
     div []
         [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down name) ] [ Icon.i "arrow_downward" ]
         , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up name) ] [ Icon.i "arrow_upward" ]
@@ -268,29 +266,67 @@ screenDiv ( name, desc ) nr model =
         ]
 
 
+chainWidget : (Int->a) -> (List a, Int) -> (List a, Int)
+chainWidget widgetToAddTakingId (widgets, seq) =
+  let
+    widgetToAdd = widgetToAddTakingId seq
+  in
+    (List.append widgets [widgetToAdd], seq + 2)
+
+
+screenWidgets: Model -> List (Html Msg)
+screenWidgets model =
+        let
+          --(list, _) = ([],0) |> chainWidget (screenDiv ( "ScreenKeuken", "Keuken" ) model)
+          first = screenDiv ( "ScreenKeuken", "Keuken" ) model 0
+          --(result, _) = chainWidget (screenDiv ( "ScreenTomas", "Tomas" )) ([first], 2)
+          (result, _) = ([first], 2)
+            |> chainWidget (screenDiv ( "ScreenTomas", "Tomas" ) model)
+            |> chainWidget ( screenDiv ( "ScreenDriesTuin", "Dries Tuin" )  model)
+            |> chainWidget ( screenDiv ( "ScreenDriesOpzij", "Dries Opzij" )  model)
+            |> chainWidget ( screenDiv ( "ScreenRoos", "Roos" )  model)
+            |> chainWidget ( screenDiv ( "ScreenBreed", "Breed" )  model)
+            |> chainWidget ( screenDiv ( "ScreenLang", "Smal" )  model)
+        in
+          result
+
+{-
+      div [] [
+        div [style [("background-color","yellow")]] [
+          Html.span [style [("padding-right","50px")]] [text "Hallo"]
+          , Button.render Mdl [100] model.mdl [Button.raised, Button.colored, Button.ripple ] [text "Hide"]]
+        , div [] [text "rest hier"]
+      ]
+-}
+
+colorOfBlock : Model -> String
+colorOfBlock model =
+  if model.blockOpen then "#c2ef39" else "#b7cce8"
+
 view : Model -> Html Msg
 view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        [ div [] [ Html.hr [] [] ]
-        , div [] [ Html.h3 [] [ text "Screens" ] ]
-        , toggleDiv ( "ZonneAutomaat", "Zon Wind Automaat" ) 30 model
-        , div [{- style [ ( "display", "inline-block" ) ] -}]
-            [ text "Zon: "
-            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "LichtScreen" model) ] []
-            , text ((toString (statusByName "LichtScreen" model.statuses).level) ++ "% - " ++ (toString (statusByName "LichtScreen" model.statuses).status))
-            ]
-        , div [{- style [ ( "display", "inline-block" ) ] -}]
-            [ text "Wind: "
-            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
-            , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
-            ]
-        , screenDiv ( "ScreenKeuken", "Keuken" ) 20 model
-        , screenDiv ( "ScreenTomas", "Tomas" ) 22 model
-        , screenDiv ( "ScreenDriesTuin", "Dries Tuin" ) 24 model
-        , screenDiv ( "ScreenDriesOpzij", "Dries Opzij" ) 26 model
-        , screenDiv ( "ScreenRoos", "Roos" ) 28 model
-        , screenDiv ( "ScreenBreed", "Breed" ) 30 model
-        , screenDiv ( "ScreenLang", "Smal" ) 32 model
+        ([
+          div [] [
+            div [style [("background-color",colorOfBlock model)]] [
+              Html.span [style [("padding-right","50px"), ("font-size","200%")]] [text "Screens"]
+              , Button.render Mdl [100] model.mdl [Button.raised, Button.colored, Button.ripple, Button.onClick ToggleShowBlock ] [text (if model.blockOpen then "Verberg" else "Toon")]]
+            , if model.blockOpen then
+                div [] ([
+                  toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
+                  , div [{- style [ ( "display", "inline-block" ) ] -}]
+                      [ text "Zon: "
+                      , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
+                      , text ((toString (statusByName "Lichtmeter" model.statuses).level) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                      ]
+                  , div [{- style [ ( "display", "inline-block" ) ] -}]
+                      [ text "Wind: "
+                      , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
+                      , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+                      ]
+                  ] ++ screenWidgets model)
+              else div [] []
+          ]
         , div [] [ Html.hr [] [] ]
         , div [] [ Html.h3 [] [ text "Beneden" ] ]
         , div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
@@ -321,11 +357,6 @@ view model =
         , toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
         , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
         , div [] [ Html.hr [] [] ]
-        {--
-        , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
-            [ text "Model: "
-            , text (toString model.statuses)
-            ] --}
         , div [] [ Html.hr [] [] ]
         , div [] [ text "Error: ", text model.errorMsg ]
         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
@@ -333,5 +364,5 @@ view model =
             , text model.test
             ]
         , div [] [ Html.hr [] [] ]
-        ]
-        |> Scheme.topWithScheme Color.Green Color.Red
+        ])
+    |> Scheme.topWithScheme Color.Green Color.Red

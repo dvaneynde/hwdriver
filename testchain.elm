@@ -1,24 +1,31 @@
 import Html exposing (text)
 import Json.Decode exposing (..)
 
-chainFront : String -> Int -> Int -> String
-chainFront front seq until =
-  if (seq == until) then
-    front
-  else
-    (chainFront (front ++ "...another_" ++ (toString seq)) (seq+1) until)
-
-chainBack : String -> Int -> Int -> String
-chainBack back seq until =
-  if (seq == until) then
-    back
-  else
-    (chainBack ("...another_" ++ (toString seq) ++ " " ++ back) (seq+1) until)
-
-chain : (String, Int) -> String -> (String, Int)
-chain (already, seq) extra =
+chain : String -> (String, Int) -> (String, Int)
+chain extra (already, seq) =
   (already ++ " " ++ extra ++ ":" ++ (toString seq), seq + 1)
 
+
+
+chain2 : (Int->a) -> (List a, Int) -> (List a, Int)
+chain2 extraFunction (already, seq) =
+  let
+    extra = extraFunction seq
+  in
+    (List.append already [extra], seq+1)
+
+
+type alias Model = String
+
+v : Int -> Model -> String
+v nr model = "another " ++ model ++ " with index " ++ (toString nr)
+
+
 main =
-  -- text (("Chain Back: " ++ (chainBack "" 0 3)) ++ " ===== " ++ ("Chain Front: " ++ (chainFront "" 0 3)))
-  text (toString (chain (chain (chain ("", 0) "A") "B") "C"))
+  -- text (toString (chain "C" (chain "B" (chain "A" ("",0)))))
+  -- text (toString (("",0) |> chain "A" |> chain "B" |> chain "C"))
+  -- text (toString ( chain2 w (chain2 w ([""],0))))
+  let
+    (operations,_) = chain2 v (chain2 v ([\m-> (v 0) m],1))
+  in
+    text (toString (List.map (\f->f "modelletje") operations))

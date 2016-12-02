@@ -1,6 +1,58 @@
 import Html exposing (text)
 import Json.Decode exposing (..)
 
+-- TYPES ===============================
+
+type alias StatusRecord = {
+  name: String,
+  kind: String,
+  on: Bool,
+  level: Int
+}
+
+
+-- DECODING ===============================
+
+-- Decodes a Json string into list of StatusRecords
+decodeStatuses : String -> (List StatusRecord, String)
+decodeStatuses strJson =
+  let
+    result = decodeString statusesDecoder strJson
+  in
+    case result of
+      Ok value -> (value, "")
+      Err error -> ([], error)
+
+-- Decoder: decodes the list
+statusesDecoder: Decoder (List StatusRecord)
+statusesDecoder = list statusDecoder
+
+-- Decoder: decodes one statusrecord Json object
+statusDecoder: Decoder StatusRecord
+statusDecoder =
+  object4 StatusRecord
+    ("name" := string)
+    ("type" := string)
+    ("on" := bool)
+    ("level" := int)
+
+
+-- HELPER ===============================
+-- find StatusRecord by name
+statusByName : String -> List StatusRecord -> StatusRecord
+statusByName name listOfRecords =
+  let
+    checkName = (\rec -> rec.name == name)
+    filteredList = List.filter checkName listOfRecords
+  in
+    Maybe.withDefault emptyStatus (List.head filteredList)
+
+emptyStatus : StatusRecord
+emptyStatus = { name="", kind="", on=False, level=0 }
+
+
+-- TEST ===============================
+
 status: String
 status = """
 [
@@ -21,43 +73,6 @@ status = """
 ]
 """
 
-type alias StatusRecord = {
-  name: String,
-  kind: String,
-  on: Bool,
-  level: Int
-}
-
-init : StatusRecord
-init = { name="", kind="", on=False, level=0 }
-
-decodeStatuses : String -> (List StatusRecord, String)
-decodeStatuses strJson =
-  let
-    result = decodeString statusesDecoder strJson
-  in
-    case result of
-      Ok value -> (value, "")
-      Err error -> ([], error)
-
-statusesDecoder: Decoder (List StatusRecord)
-statusesDecoder = list statusDecoder
-
-statusDecoder: Decoder StatusRecord
-statusDecoder =
-  object4 StatusRecord
-    ("name" := string)
-    ("type" := string)
-    ("on" := bool)
-    ("level" := int)
-
-statusByName : String -> List StatusRecord -> StatusRecord
-statusByName name listOfRecords =
-  let
-    checkName = (\rec -> rec.name == name)
-    filteredList = List.filter checkName listOfRecords
-  in
-    Maybe.withDefault init (List.head filteredList)
 
 main =
   --text ("Decoded: " ++ (toString (decodeStatuses status)))
@@ -67,11 +82,3 @@ main =
     sun = statusByName "Zonnesensor" value
   in
     text ("Wind : " ++ (toString wind) ++ " |    Sun:" ++ (toString sun))
-  {--
-  let
-    (value, _) = decodeStatuses status
-    --datte = List.head value
-    datte = List.head (List.drop 1 value)
-  in
-    text ("Decoded: " ++ (toString (Maybe.withDefault init datte)))
-    --}
