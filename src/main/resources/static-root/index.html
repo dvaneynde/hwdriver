@@ -14636,13 +14636,53 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 		}
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
-var _dvaneynde$elm_domotica_ui$Main$initialStatus = {name: '', kind: '', description: '', on: false, level: 0, status: ''};
+var _dvaneynde$elm_domotica_ui$Main$colorOfBlock = function (model) {
+	return '#c2ef39';
+};
+var _dvaneynde$elm_domotica_ui$Main$chainWidget = F2(
+	function (widgetToAddTakingId, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
+		var widgetToAdd = widgetToAddTakingId(_p2);
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_elm_lang$core$List$append,
+				_p1._0,
+				_elm_lang$core$Native_List.fromArray(
+					[widgetToAdd])),
+			_1: _p2 + 2
+		};
+	});
+var _dvaneynde$elm_domotica_ui$Main$toggleGroup2Open = F2(
+	function (group2Open, name) {
+		var func = function (maybe) {
+			var _p3 = maybe;
+			if (_p3.ctor === 'Just') {
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Basics$not(_p3._0));
+			} else {
+				return _elm_lang$core$Maybe$Just(true);
+			}
+		};
+		return A3(_elm_lang$core$Dict$update, name, func, group2Open);
+	});
+var _dvaneynde$elm_domotica_ui$Main$isGroupOpen = F2(
+	function (blocks, blockName) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			true,
+			A2(_elm_lang$core$Dict$get, blockName, blocks));
+	});
+var _dvaneynde$elm_domotica_ui$Main$initialStatus = {name: '', kind: '', group: '', description: '', on: false, level: 0, status: ''};
 var _dvaneynde$elm_domotica_ui$Main$statusByName = F2(
 	function (name, listOfRecords) {
-		var checkName = function (rec) {
-			return _elm_lang$core$Native_Utils.eq(rec.name, name);
-		};
-		var filteredList = A2(_elm_lang$core$List$filter, checkName, listOfRecords);
+		var filteredList = A2(
+			_elm_lang$core$List$filter,
+			function (rec) {
+				return _elm_lang$core$Native_Utils.eq(rec.name, name);
+			},
+			listOfRecords);
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			_dvaneynde$elm_domotica_ui$Main$initialStatus,
@@ -14667,18 +14707,28 @@ var _dvaneynde$elm_domotica_ui$Main$level = F2(
 		return _elm_lang$core$Basics$toFloat(
 			A2(_dvaneynde$elm_domotica_ui$Main$statusByName, name, model.statuses).level);
 	});
+var _dvaneynde$elm_domotica_ui$Main$initGroups = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			{ctor: '_Tuple2', _0: 'Screens', _1: true},
+			{ctor: '_Tuple2', _0: 'Beneden', _1: true},
+			{ctor: '_Tuple2', _0: 'Nutsruimtes', _1: false},
+			{ctor: '_Tuple2', _0: 'Kinderen', _1: true},
+			{ctor: '_Tuple2', _0: 'Buiten', _1: false}
+		]));
 var _dvaneynde$elm_domotica_ui$Main$init = {
 	ctor: '_Tuple2',
 	_0: {
 		statuses: _elm_lang$core$Native_List.fromArray(
 			[]),
+		group2Open: _dvaneynde$elm_domotica_ui$Main$initGroups,
 		errorMsg: 'No worries...',
 		test: 'nothing tested',
 		mdl: _debois$elm_mdl$Material$model
 	},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _dvaneynde$elm_domotica_ui$Main$urlBase = '192.168.0.10:8080';
+var _dvaneynde$elm_domotica_ui$Main$urlBase = 'localhost:8080';
 var _dvaneynde$elm_domotica_ui$Main$urlUpdateActuators = A2(
 	_elm_lang$core$Basics_ops['++'],
 	'http://',
@@ -14686,16 +14736,17 @@ var _dvaneynde$elm_domotica_ui$Main$urlUpdateActuators = A2(
 var _dvaneynde$elm_domotica_ui$Main$wsStatus = A2(
 	_elm_lang$core$Basics_ops['++'],
 	'ws://',
-	A2(_elm_lang$core$Basics_ops['++'], _dvaneynde$elm_domotica_ui$Main$urlBase, '/time/'));
-var _dvaneynde$elm_domotica_ui$Main$StatusRecord = F6(
-	function (a, b, c, d, e, f) {
-		return {name: a, kind: b, description: c, on: d, level: e, status: f};
+	A2(_elm_lang$core$Basics_ops['++'], _dvaneynde$elm_domotica_ui$Main$urlBase, '/status/'));
+var _dvaneynde$elm_domotica_ui$Main$StatusRecord = F7(
+	function (a, b, c, d, e, f, g) {
+		return {name: a, kind: b, group: c, description: d, on: e, level: f, status: g};
 	});
-var _dvaneynde$elm_domotica_ui$Main$statusDecoder = A7(
-	_elm_lang$core$Json_Decode$object6,
+var _dvaneynde$elm_domotica_ui$Main$statusDecoder = A8(
+	_elm_lang$core$Json_Decode$object7,
 	_dvaneynde$elm_domotica_ui$Main$StatusRecord,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'groupName', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'description', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'on', _elm_lang$core$Json_Decode$bool),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'level', _elm_lang$core$Json_Decode$int),
@@ -14703,34 +14754,34 @@ var _dvaneynde$elm_domotica_ui$Main$statusDecoder = A7(
 var _dvaneynde$elm_domotica_ui$Main$statusesDecoder = _elm_lang$core$Json_Decode$list(_dvaneynde$elm_domotica_ui$Main$statusDecoder);
 var _dvaneynde$elm_domotica_ui$Main$decodeStatuses = function (strJson) {
 	var result = A2(_elm_lang$core$Json_Decode$decodeString, _dvaneynde$elm_domotica_ui$Main$statusesDecoder, strJson);
-	var _p0 = result;
-	if (_p0.ctor === 'Ok') {
-		return {ctor: '_Tuple2', _0: _p0._0, _1: ''};
+	var _p4 = result;
+	if (_p4.ctor === 'Ok') {
+		return {ctor: '_Tuple2', _0: _p4._0, _1: ''};
 	} else {
 		return {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Native_List.fromArray(
 				[]),
-			_1: _p0._0
+			_1: _p4._0
 		};
 	}
 };
-var _dvaneynde$elm_domotica_ui$Main$Model = F4(
-	function (a, b, c, d) {
-		return {statuses: a, errorMsg: b, test: c, mdl: d};
+var _dvaneynde$elm_domotica_ui$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {statuses: a, group2Open: b, errorMsg: c, test: d, mdl: e};
 	});
-var _dvaneynde$elm_domotica_ui$Main$RestStatus = function (a) {
-	return {ctor: 'RestStatus', _0: a};
-};
 var _dvaneynde$elm_domotica_ui$Main$RestError = function (a) {
 	return {ctor: 'RestError', _0: a};
+};
+var _dvaneynde$elm_domotica_ui$Main$NewStatusViaRest = function (a) {
+	return {ctor: 'NewStatusViaRest', _0: a};
 };
 var _dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd = F2(
 	function (name, value) {
 		return A3(
 			_elm_lang$core$Task$perform,
 			_dvaneynde$elm_domotica_ui$Main$RestError,
-			_dvaneynde$elm_domotica_ui$Main$RestStatus,
+			_dvaneynde$elm_domotica_ui$Main$NewStatusViaRest,
 			A2(
 				_evancz$elm_http$Http$get,
 				_dvaneynde$elm_domotica_ui$Main$statusesDecoder,
@@ -14751,8 +14802,8 @@ var _dvaneynde$elm_domotica_ui$Main$toggleBlock = F2(
 	});
 var _dvaneynde$elm_domotica_ui$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'PutModelInTestAsString':
 				return {
 					ctor: '_Tuple2',
@@ -14766,11 +14817,13 @@ var _dvaneynde$elm_domotica_ui$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'Mdl':
+				return A2(_debois$elm_mdl$Material$update, _p5._0, model);
 			case 'Clicked':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_dvaneynde$elm_domotica_ui$Main$toggleBlock, _p1._0, model)
+					_1: A2(_dvaneynde$elm_domotica_ui$Main$toggleBlock, _p5._0, model)
 				};
 			case 'Checked':
 				return {
@@ -14778,20 +14831,20 @@ var _dvaneynde$elm_domotica_ui$Main$update = F2(
 					_0: model,
 					_1: A2(
 						_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd,
-						_p1._0,
-						_p1._1 ? 'on' : 'off')
+						_p5._0,
+						_p5._1 ? 'on' : 'off')
 				};
 			case 'Down':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd, _p1._0, 'down')
+					_1: A2(_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd, _p5._0, 'down')
 				};
 			case 'Up':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd, _p1._0, 'up')
+					_1: A2(_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd, _p5._0, 'up')
 				};
 			case 'SliderMsg':
 				return {
@@ -14799,13 +14852,13 @@ var _dvaneynde$elm_domotica_ui$Main$update = F2(
 					_0: model,
 					_1: A2(
 						_dvaneynde$elm_domotica_ui$Main$updateStatusViaRestCmd,
-						_p1._0,
-						_elm_lang$core$Basics$toString(_p1._1))
+						_p5._0,
+						_elm_lang$core$Basics$toString(_p5._1))
 				};
-			case 'NewStatus':
-				var _p2 = _dvaneynde$elm_domotica_ui$Main$decodeStatuses(_p1._0);
-				var newStatuses = _p2._0;
-				var error = _p2._1;
+			case 'NewStatusViaWs':
+				var _p6 = _dvaneynde$elm_domotica_ui$Main$decodeStatuses(_p5._0);
+				var newStatuses = _p6._0;
+				var error = _p6._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -14813,28 +14866,45 @@ var _dvaneynde$elm_domotica_ui$Main$update = F2(
 						{statuses: newStatuses, errorMsg: error}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'RestStatus':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{statuses: _p1._0, errorMsg: 'OK'}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'RestError':
+			case 'ToggleShowBlock':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							errorMsg: _elm_lang$core$Basics$toString(_p1._0)
+							group2Open: A2(_dvaneynde$elm_domotica_ui$Main$toggleGroup2Open, model.group2Open, _p5._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'NewStatusViaRest':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{statuses: _p5._0, errorMsg: 'OK'}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
-				return A2(_debois$elm_mdl$Material$update, _p1._0, model);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							errorMsg: _elm_lang$core$Basics$toString(_p5._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
+var _dvaneynde$elm_domotica_ui$Main$NewStatusViaWs = function (a) {
+	return {ctor: 'NewStatusViaWs', _0: a};
+};
+var _dvaneynde$elm_domotica_ui$Main$subscriptions = function (model) {
+	return A2(_elm_lang$websocket$WebSocket$listen, _dvaneynde$elm_domotica_ui$Main$wsStatus, _dvaneynde$elm_domotica_ui$Main$NewStatusViaWs);
+};
+var _dvaneynde$elm_domotica_ui$Main$ToggleShowBlock = function (a) {
+	return {ctor: 'ToggleShowBlock', _0: a};
+};
 var _dvaneynde$elm_domotica_ui$Main$SliderMsg = F2(
 	function (a, b) {
 		return {ctor: 'SliderMsg', _0: a, _1: b};
@@ -14851,12 +14921,6 @@ var _dvaneynde$elm_domotica_ui$Main$Checked = F2(
 	});
 var _dvaneynde$elm_domotica_ui$Main$Clicked = function (a) {
 	return {ctor: 'Clicked', _0: a};
-};
-var _dvaneynde$elm_domotica_ui$Main$NewStatus = function (a) {
-	return {ctor: 'NewStatus', _0: a};
-};
-var _dvaneynde$elm_domotica_ui$Main$subscriptions = function (model) {
-	return A2(_elm_lang$websocket$WebSocket$listen, _dvaneynde$elm_domotica_ui$Main$wsStatus, _dvaneynde$elm_domotica_ui$Main$NewStatus);
 };
 var _dvaneynde$elm_domotica_ui$Main$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
@@ -14882,9 +14946,9 @@ var _dvaneynde$elm_domotica_ui$Main$toggle = F3(
 				]));
 	});
 var _dvaneynde$elm_domotica_ui$Main$toggleDiv = F3(
-	function (_p3, nr, model) {
-		var _p4 = _p3;
-		var _p5 = _p4._0;
+	function (_p7, nr, model) {
+		var _p8 = _p7;
+		var _p9 = _p8._0;
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -14900,20 +14964,20 @@ var _dvaneynde$elm_domotica_ui$Main$toggleDiv = F3(
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_debois$elm_mdl$Material_Toggles$onClick(
-							_dvaneynde$elm_domotica_ui$Main$Clicked(_p5)),
+							_dvaneynde$elm_domotica_ui$Main$Clicked(_p9)),
 							_debois$elm_mdl$Material_Toggles$value(
-							A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p5, model))
+							A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p9, model))
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html$text(_p4._1)
+							_elm_lang$html$Html$text(_p8._1)
 						]))
 				]));
 	});
 var _dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv = F3(
-	function (_p6, nr, model) {
-		var _p7 = _p6;
-		var _p8 = _p7._0;
+	function (_p10, nr, model) {
+		var _p11 = _p10;
+		var _p12 = _p11._0;
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -14935,13 +14999,13 @@ var _dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv = F3(
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_debois$elm_mdl$Material_Toggles$onClick(
-							_dvaneynde$elm_domotica_ui$Main$Clicked(_p8)),
+							_dvaneynde$elm_domotica_ui$Main$Clicked(_p12)),
 							_debois$elm_mdl$Material_Toggles$value(
-							A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p8, model))
+							A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p12, model))
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html$text(_p7._1)
+							_elm_lang$html$Html$text(_p11._1)
 						])),
 					_debois$elm_mdl$Material_Slider$view(
 					A2(
@@ -14949,19 +15013,19 @@ var _dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv = F3(
 						_elm_lang$core$Native_List.fromArray(
 							[
 								_debois$elm_mdl$Material_Slider$onChange(
-								_dvaneynde$elm_domotica_ui$Main$SliderMsg(_p8)),
+								_dvaneynde$elm_domotica_ui$Main$SliderMsg(_p12)),
 								_debois$elm_mdl$Material_Slider$value(
-								A2(_dvaneynde$elm_domotica_ui$Main$level, _p8, model))
+								A2(_dvaneynde$elm_domotica_ui$Main$level, _p12, model))
 							]),
-						A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p8, model) ? _elm_lang$core$Native_List.fromArray(
+						A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, _p12, model) ? _elm_lang$core$Native_List.fromArray(
 							[]) : _elm_lang$core$Native_List.fromArray(
 							[_debois$elm_mdl$Material_Slider$disabled])))
 				]));
 	});
 var _dvaneynde$elm_domotica_ui$Main$screenDiv = F3(
-	function (_p9, nr, model) {
-		var _p10 = _p9;
-		var _p11 = _p10._0;
+	function (_p13, model, nr) {
+		var _p14 = _p13;
+		var _p15 = _p14._0;
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -14979,7 +15043,7 @@ var _dvaneynde$elm_domotica_ui$Main$screenDiv = F3(
 							_debois$elm_mdl$Material_Button$minifab,
 							_debois$elm_mdl$Material_Button$ripple,
 							_debois$elm_mdl$Material_Button$onClick(
-							_dvaneynde$elm_domotica_ui$Main$Down(_p11))
+							_dvaneynde$elm_domotica_ui$Main$Down(_p15))
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
@@ -14996,16 +15060,129 @@ var _dvaneynde$elm_domotica_ui$Main$screenDiv = F3(
 							_debois$elm_mdl$Material_Button$minifab,
 							_debois$elm_mdl$Material_Button$ripple,
 							_debois$elm_mdl$Material_Button$onClick(
-							_dvaneynde$elm_domotica_ui$Main$Up(_p11))
+							_dvaneynde$elm_domotica_ui$Main$Up(_p15))
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_debois$elm_mdl$Material_Icon$i('arrow_upward')
 						])),
 					_elm_lang$html$Html$text(
-					A2(_dvaneynde$elm_domotica_ui$Main$screenStatus, _p11, model)),
+					A2(_dvaneynde$elm_domotica_ui$Main$screenStatus, _p15, model)),
 					_elm_lang$html$Html$text(
-					A2(_elm_lang$core$Basics_ops['++'], ' | ', _p10._1))
+					A2(_elm_lang$core$Basics_ops['++'], ' | ', _p14._1))
+				]));
+	});
+var _dvaneynde$elm_domotica_ui$Main$screenWidgets = function (model) {
+	var first = A3(
+		_dvaneynde$elm_domotica_ui$Main$screenDiv,
+		{ctor: '_Tuple2', _0: 'ScreenKeuken', _1: 'Keuken'},
+		model,
+		0);
+	var _p16 = A2(
+		_dvaneynde$elm_domotica_ui$Main$chainWidget,
+		A2(
+			_dvaneynde$elm_domotica_ui$Main$screenDiv,
+			{ctor: '_Tuple2', _0: 'ScreenLang', _1: 'Smal'},
+			model),
+		A2(
+			_dvaneynde$elm_domotica_ui$Main$chainWidget,
+			A2(
+				_dvaneynde$elm_domotica_ui$Main$screenDiv,
+				{ctor: '_Tuple2', _0: 'ScreenBreed', _1: 'Breed'},
+				model),
+			A2(
+				_dvaneynde$elm_domotica_ui$Main$chainWidget,
+				A2(
+					_dvaneynde$elm_domotica_ui$Main$screenDiv,
+					{ctor: '_Tuple2', _0: 'ScreenRoos', _1: 'Roos'},
+					model),
+				A2(
+					_dvaneynde$elm_domotica_ui$Main$chainWidget,
+					A2(
+						_dvaneynde$elm_domotica_ui$Main$screenDiv,
+						{ctor: '_Tuple2', _0: 'ScreenDriesOpzij', _1: 'Dries Opzij'},
+						model),
+					A2(
+						_dvaneynde$elm_domotica_ui$Main$chainWidget,
+						A2(
+							_dvaneynde$elm_domotica_ui$Main$screenDiv,
+							{ctor: '_Tuple2', _0: 'ScreenDriesTuin', _1: 'Dries Tuin'},
+							model),
+						A2(
+							_dvaneynde$elm_domotica_ui$Main$chainWidget,
+							A2(
+								_dvaneynde$elm_domotica_ui$Main$screenDiv,
+								{ctor: '_Tuple2', _0: 'ScreenTomas', _1: 'Tomas'},
+								model),
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_List.fromArray(
+									[first]),
+								_1: 2
+							}))))));
+	var result = _p16._0;
+	return result;
+};
+var _dvaneynde$elm_domotica_ui$Main$groupToggleBar = F4(
+	function (groupName, nr, model, content) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{
+									ctor: '_Tuple2',
+									_0: 'background-color',
+									_1: _dvaneynde$elm_domotica_ui$Main$colorOfBlock(model)
+								}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$span,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$style(
+									_elm_lang$core$Native_List.fromArray(
+										[
+											{ctor: '_Tuple2', _0: 'padding-right', _1: '50px'},
+											{ctor: '_Tuple2', _0: 'font-size', _1: '200%'}
+										]))
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text(groupName)
+								])),
+							A5(
+							_debois$elm_mdl$Material_Button$render,
+							_dvaneynde$elm_domotica_ui$Main$Mdl,
+							_elm_lang$core$Native_List.fromArray(
+								[nr]),
+							model.mdl,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_debois$elm_mdl$Material_Button$raised,
+									_debois$elm_mdl$Material_Button$colored,
+									_debois$elm_mdl$Material_Button$ripple,
+									_debois$elm_mdl$Material_Button$onClick(
+									_dvaneynde$elm_domotica_ui$Main$ToggleShowBlock(groupName))
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text(
+									A2(_dvaneynde$elm_domotica_ui$Main$isGroupOpen, model.group2Open, groupName) ? 'Verberg' : 'Toon')
+								]))
+						])),
+					content(model)
 				]));
 	});
 var _dvaneynde$elm_domotica_ui$Main$PutModelInTestAsString = {ctor: 'PutModelInTestAsString'};
@@ -15027,6 +15204,108 @@ var _dvaneynde$elm_domotica_ui$Main$view = function (model) {
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
+					A4(
+					_dvaneynde$elm_domotica_ui$Main$groupToggleBar,
+					'Screens',
+					100,
+					model,
+					function (model) {
+						return A2(_dvaneynde$elm_domotica_ui$Main$isGroupOpen, model.group2Open, 'Screens') ? A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A3(
+										_dvaneynde$elm_domotica_ui$Main$toggleDiv,
+										{ctor: '_Tuple2', _0: 'ZonWindAutomaat', _1: 'Zon Wind Automaat'},
+										30,
+										model),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html$text('Zon: '),
+												A2(
+												_elm_lang$html$Html$meter,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$style(
+														_elm_lang$core$Native_List.fromArray(
+															[
+																{ctor: '_Tuple2', _0: 'width', _1: '250px'},
+																{ctor: '_Tuple2', _0: 'height', _1: '15px'}
+															])),
+														_elm_lang$html$Html_Attributes$min('3000'),
+														A2(_elm_lang$html$Html_Attributes$attribute, 'low', '3400'),
+														A2(_elm_lang$html$Html_Attributes$attribute, 'high', '3600'),
+														_elm_lang$html$Html_Attributes$max('4000'),
+														_elm_lang$html$Html_Attributes$value(
+														A2(_dvaneynde$elm_domotica_ui$Main$levelByName, 'Lichtmeter', model))
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[])),
+												_elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(
+														A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Lichtmeter', model.statuses).level),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'% - ',
+														_elm_lang$core$Basics$toString(
+															A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Lichtmeter', model.statuses).status))))
+											])),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html$text('Wind: '),
+												A2(
+												_elm_lang$html$Html$meter,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$style(
+														_elm_lang$core$Native_List.fromArray(
+															[
+																{ctor: '_Tuple2', _0: 'width', _1: '250px'},
+																{ctor: '_Tuple2', _0: 'height', _1: '15px'}
+															])),
+														_elm_lang$html$Html_Attributes$min('0'),
+														A2(_elm_lang$html$Html_Attributes$attribute, 'low', '0'),
+														A2(_elm_lang$html$Html_Attributes$attribute, 'high', '900'),
+														_elm_lang$html$Html_Attributes$max('1200'),
+														_elm_lang$html$Html_Attributes$value(
+														A2(_dvaneynde$elm_domotica_ui$Main$levelByName, 'Windmeter', model))
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[])),
+												_elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(
+														_elm_lang$core$Basics$toFloat(
+															A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Windmeter', model.statuses).level) / 100.0),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'RPM - ',
+														_elm_lang$core$Basics$toString(
+															A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Windmeter', model.statuses).status))))
+											]))
+									]),
+								_dvaneynde$elm_domotica_ui$Main$screenWidgets(model))) : A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[]));
+					}),
 					A2(
 					_elm_lang$html$Html$div,
 					_elm_lang$core$Native_List.fromArray(
@@ -15034,262 +15313,138 @@ var _dvaneynde$elm_domotica_ui$Main$view = function (model) {
 					_elm_lang$core$Native_List.fromArray(
 						[
 							A2(
-							_elm_lang$html$Html$hr,
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html$hr,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[]))
+								])),
+							A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html$h3,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_elm_lang$html$Html$text('Beneden')
+										]))
+								])),
+							A2(_dvaneynde$elm_domotica_ui$Main$isGroupOpen, model.group2Open, 'Beneden') ? A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html$div,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											A5(
+											_debois$elm_mdl$Material_Toggles$switch,
+											_dvaneynde$elm_domotica_ui$Main$Mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[8]),
+											model.mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_debois$elm_mdl$Material_Toggles$onClick(
+													_dvaneynde$elm_domotica_ui$Main$Clicked('LichtKeuken')),
+													_debois$elm_mdl$Material_Toggles$value(
+													A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtKeuken', model))
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Keuken')
+												]))
+										])),
+									A3(
+									_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
+									{ctor: '_Tuple2', _0: 'LichtVeranda', _1: 'Licht Veranda'},
+									9,
+									model),
+									A2(
+									_elm_lang$html$Html$div,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[])),
+									A3(
+									_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
+									{ctor: '_Tuple2', _0: 'LichtCircanteRondom', _1: 'Eetkamer'},
+									10,
+									model),
+									A2(
+									_elm_lang$html$Html$div,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											A5(
+											_debois$elm_mdl$Material_Toggles$switch,
+											_dvaneynde$elm_domotica_ui$Main$Mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[11]),
+											model.mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_debois$elm_mdl$Material_Toggles$onClick(
+													_dvaneynde$elm_domotica_ui$Main$Clicked('LichtCircante')),
+													_debois$elm_mdl$Material_Toggles$value(
+													A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtCircante', model))
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Circante Tafel')
+												]))
+										])),
+									A3(
+									_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
+									{ctor: '_Tuple2', _0: 'LichtZithoek', _1: 'Zithoek'},
+									21,
+									model),
+									A2(
+									_elm_lang$html$Html$div,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											A5(
+											_debois$elm_mdl$Material_Toggles$switch,
+											_dvaneynde$elm_domotica_ui$Main$Mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[12]),
+											model.mdl,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_debois$elm_mdl$Material_Toggles$onClick(
+													_dvaneynde$elm_domotica_ui$Main$Clicked('LichtBureau')),
+													_debois$elm_mdl$Material_Toggles$value(
+													A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtBureau', model))
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Bureau')
+												]))
+										]))
+								])) : A2(
+							_elm_lang$html$Html$div,
 							_elm_lang$core$Native_List.fromArray(
 								[]),
 							_elm_lang$core$Native_List.fromArray(
 								[]))
-						])),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$h3,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text('Screens')
-								]))
-						])),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$toggleDiv,
-					{ctor: '_Tuple2', _0: 'ZonneAutomaat', _1: 'Zon Wind Automaat'},
-					30,
-					model),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text('Zon: '),
-							A2(
-							_elm_lang$html$Html$meter,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$style(
-									_elm_lang$core$Native_List.fromArray(
-										[
-											{ctor: '_Tuple2', _0: 'width', _1: '250px'},
-											{ctor: '_Tuple2', _0: 'height', _1: '15px'}
-										])),
-									_elm_lang$html$Html_Attributes$min('3000'),
-									A2(_elm_lang$html$Html_Attributes$attribute, 'low', '3400'),
-									A2(_elm_lang$html$Html_Attributes$attribute, 'high', '3600'),
-									_elm_lang$html$Html_Attributes$max('4000'),
-									_elm_lang$html$Html_Attributes$value(
-									A2(_dvaneynde$elm_domotica_ui$Main$levelByName, 'LichtScreen', model))
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[])),
-							_elm_lang$html$Html$text(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Basics$toString(
-									A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'LichtScreen', model.statuses).level),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'% - ',
-									_elm_lang$core$Basics$toString(
-										A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'LichtScreen', model.statuses).status))))
-						])),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text('Wind: '),
-							A2(
-							_elm_lang$html$Html$meter,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$style(
-									_elm_lang$core$Native_List.fromArray(
-										[
-											{ctor: '_Tuple2', _0: 'width', _1: '250px'},
-											{ctor: '_Tuple2', _0: 'height', _1: '15px'}
-										])),
-									_elm_lang$html$Html_Attributes$min('0'),
-									A2(_elm_lang$html$Html_Attributes$attribute, 'low', '0'),
-									A2(_elm_lang$html$Html_Attributes$attribute, 'high', '900'),
-									_elm_lang$html$Html_Attributes$max('1200'),
-									_elm_lang$html$Html_Attributes$value(
-									A2(_dvaneynde$elm_domotica_ui$Main$levelByName, 'Windmeter', model))
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[])),
-							_elm_lang$html$Html$text(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Basics$toString(
-									_elm_lang$core$Basics$toFloat(
-										A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Windmeter', model.statuses).level) / 100.0),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'RPM - ',
-									_elm_lang$core$Basics$toString(
-										A2(_dvaneynde$elm_domotica_ui$Main$statusByName, 'Windmeter', model.statuses).status))))
-						])),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenKeuken', _1: 'Keuken'},
-					20,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenTomas', _1: 'Tomas'},
-					22,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenDriesTuin', _1: 'Dries Tuin'},
-					24,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenDriesOpzij', _1: 'Dries Opzij'},
-					26,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenRoos', _1: 'Roos'},
-					28,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenBreed', _1: 'Breed'},
-					30,
-					model),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$screenDiv,
-					{ctor: '_Tuple2', _0: 'ScreenLang', _1: 'Smal'},
-					32,
-					model),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$hr,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
-							_elm_lang$core$Native_List.fromArray(
-								[]))
-						])),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$h3,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text('Beneden')
-								]))
-						])),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A5(
-							_debois$elm_mdl$Material_Toggles$switch,
-							_dvaneynde$elm_domotica_ui$Main$Mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[8]),
-							model.mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_debois$elm_mdl$Material_Toggles$onClick(
-									_dvaneynde$elm_domotica_ui$Main$Clicked('LichtKeuken')),
-									_debois$elm_mdl$Material_Toggles$value(
-									A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtKeuken', model))
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text('Keuken')
-								]))
-						])),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
-					{ctor: '_Tuple2', _0: 'LichtVeranda', _1: 'Licht Veranda'},
-					9,
-					model),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[])),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
-					{ctor: '_Tuple2', _0: 'LichtCircanteRondom', _1: 'Eetkamer'},
-					10,
-					model),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A5(
-							_debois$elm_mdl$Material_Toggles$switch,
-							_dvaneynde$elm_domotica_ui$Main$Mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[11]),
-							model.mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_debois$elm_mdl$Material_Toggles$onClick(
-									_dvaneynde$elm_domotica_ui$Main$Clicked('LichtCircante')),
-									_debois$elm_mdl$Material_Toggles$value(
-									A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtCircante', model))
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text('Circante Tafel')
-								]))
-						])),
-					A3(
-					_dvaneynde$elm_domotica_ui$Main$toggleWithSliderDiv,
-					{ctor: '_Tuple2', _0: 'LichtZithoek', _1: 'Zithoek'},
-					21,
-					model),
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A5(
-							_debois$elm_mdl$Material_Toggles$switch,
-							_dvaneynde$elm_domotica_ui$Main$Mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[12]),
-							model.mdl,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_debois$elm_mdl$Material_Toggles$onClick(
-									_dvaneynde$elm_domotica_ui$Main$Clicked('LichtBureau')),
-									_debois$elm_mdl$Material_Toggles$value(
-									A2(_dvaneynde$elm_domotica_ui$Main$isOnByName, 'LichtBureau', model))
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text('Bureau')
-								]))
 						])),
 					A2(
 					_elm_lang$html$Html$div,

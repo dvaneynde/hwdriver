@@ -30,18 +30,18 @@
 		<on hour="16" minute="30" />
 		<off hour="17" minute="30" />
 	</repeatOff>
-	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2">
-		<toggle src="SchakLichtGaragePoort" />
-		<off src="SchakLichtInkom" event="LongClick" />
-		<off src="GarageAutoUitOchtend" event="off" />
-		<off src="GarageAutoUitAvond" event="off" />
-	</lamp>
-
 	<switch name="SchakLichtGarageTuin" longClick="true" />
 	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3">
 		<toggle src="SchakLichtGarageTuin" />
 		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+	<switch name="SchakLichtGaragePoort" />
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2">
+		<toggle src="SchakLichtGaragePoort" />
+		<toggle src="SchakLichtGarageTuin" event="LongClick"/>
+		<off src="SchakLichtInkom" event="LongClick" />
+		<off src="GarageAutoUitOchtend" event="off" />
+		<off src="GarageAutoUitAvond" event="off" />
 	</lamp>
 
 	<switch name="SchakLichtKeuken" />
