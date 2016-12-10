@@ -170,7 +170,17 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("lamp")) {
 				parseBaseBlockWithChannel(atts);
-				currentBlock = new Lamp(name, desc, ui, channel, ctx);
+				Lamp lamp = new Lamp(name, desc, ui, channel, ctx);
+				String val;
+				val = atts.getValue("autoOffSec");
+				if (val != null) {
+					lamp.setEco(true);
+					lamp.setAutoOffSec(Integer.parseInt(val));
+					val = atts.getValue("blink");
+					if (val !=null)
+						lamp.setBlink(Boolean.parseBoolean(val));
+				}
+				currentBlock = lamp;
 			} else if (localName.equals("toggle")) {
 				// actuators
 

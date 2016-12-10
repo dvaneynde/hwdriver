@@ -33,7 +33,7 @@ public class Connector implements IEventListener {
 		if (event.equals(fromEvent))
 			to.onEvent(source, toEvent);
 		else
-			logger.warn("Ignored srcEvent " + event + " from " + source.getName() + " (connector id=" + debugId + ").");
+			logger.debug("Ignored srcEvent " + event + " from " + source.getName() + " (connector id=" + debugId + ").");
 	}
 
 	// ============ Implementation

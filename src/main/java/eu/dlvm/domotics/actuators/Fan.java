@@ -71,7 +71,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	private long onDurationMs = DEFAULT_ON_DURATION_SEC * 1000L;
 	private long delayToOnDurationMs = DEFAULT_DELAY_ON_DURATION_SEC * 1000L;
 	private long delayToOffDurationMs = DEFAULT_DELAY_OFF_DURATION_SEC * 1000L;
-	private long timeStateEntered;
+	private long timeStateEntered = -1L;
 
 	/**
 	 * Constructor.

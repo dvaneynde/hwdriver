@@ -4,7 +4,7 @@
 
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
-	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0">
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" autoOffSec="60" blink="true">
 		<toggle src="SchakLichtInkom" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
@@ -22,26 +22,19 @@
 		<delayedOnOff src="LichtWC0" />
 	</fan>
 
-	<repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600">
-		<on hour="7" minute="30" />
-		<off hour="9" minute="0" />
-	</repeatOff>
-	<repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600">
-		<on hour="16" minute="30" />
-		<off hour="17" minute="30" />
-	</repeatOff>
+	<!-- <repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600"> <on hour="7" minute="30" 
+		/> <off hour="9" minute="0" /> </repeatOff> <repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600"> 
+		<on hour="16" minute="30" /> <off hour="17" minute="30" /> </repeatOff> -->
 	<switch name="SchakLichtGarageTuin" longClick="true" />
-	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3">
+	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" >
 		<toggle src="SchakLichtGarageTuin" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2">
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="60" blink="false">
 		<toggle src="SchakLichtGaragePoort" />
-		<toggle src="SchakLichtGarageTuin" event="LongClick"/>
+		<toggle src="SchakLichtGarageTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
-		<off src="GarageAutoUitOchtend" event="off" />
-		<off src="GarageAutoUitAvond" event="off" />
 	</lamp>
 
 	<switch name="SchakLichtKeuken" />

@@ -25,7 +25,16 @@
 				<element name="lightGauge" type="tns:lightGaugeType" />
 
 				<!-- actuators -->
-				<element name="lamp" type="tns:OnOffToggleActuatorStruct" minOccurs="0" maxOccurs="1" />
+				<element name="lamp" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:OnOffToggleActuatorStruct">
+								<attribute name="autoOffSec" type="int" use="optional" />
+								<attribute name="blink" type="boolean" use="optional" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
