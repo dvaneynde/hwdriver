@@ -29,11 +29,8 @@ import Material.Slider as Slider
 
 
 urlBase =
-    "localhost:8080"
-
-
-
---"192.168.0.10:8080"
+--    "localhost:8080"
+    "192.168.0.10:8080"
 
 
 urlUpdateActuators =
@@ -71,7 +68,7 @@ init =
 
 initGroups : Group2OpenDict
 initGroups =
-    Dict.fromList [ ( "Screens", True ), ("Beneden", True), ("Nutsruimtes", False), ("Kinderen", True), ("Buiten", False) ]
+    Dict.fromList [ ( "Screens", False ), ( "Beneden", True ), ( "Nutsruimtes", True ), ( "Kinderen", True ), ( "Buiten", False ) ]
 
 
 initialStatus : StatusRecord
@@ -332,146 +329,129 @@ screenWidgets model =
         result
 
 
-
-{-
-   div [] [
-     div [style [("background-color","yellow")]] [
-       Html.span [style [("padding-right","50px")]] [text "Hallo"]
-       , Button.render Mdl [100] model.mdl [Button.raised, Button.colored, Button.ripple ] [text "Hide"]]
-     , div [] [text "rest hier"]
-   ]
--}
+colorOfBlock : Model -> String -> String
+colorOfBlock model groupName =
+    if (isGroupOpen model.group2Open groupName) then
+        "#c2ef39"
+    else
+        "#b7cce8"
 
 
-colorOfBlock : Model -> String
-colorOfBlock model =
-    -- if model.blockOpen then "#c2ef39" else "#b7cce8"
-    "#c2ef39"
-
-groupToggleBar : String -> Int -> Model ->  (Model -> Html Msg) ->Html Msg
+groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
-  div [] [
-    div
-      [ style [ ( "background-color", colorOfBlock model ) ] ]
-      [ Html.span [ style [ ( "padding-right", "50px" ), ( "font-size", "200%" ) ] ] [ text groupName ]
-      , Button.render Mdl [ nr ] model.mdl
-        [ Button.raised, Button.colored, Button.ripple, Button.onClick (ToggleShowBlock groupName) ]
-        [ text
-          (if (isGroupOpen model.group2Open groupName) then
-              "Verberg"
-           else
-              "Toon"
-          )
+    div []
+        [ div
+            [ style [ ( "background-color", colorOfBlock model groupName ) ] ]
+            [ Button.render Mdl
+                [ nr ]
+                model.mdl
+                [ Button.raised, Button.colored, Button.ripple, Button.onClick (ToggleShowBlock groupName) ]
+                [ text
+                    (if (isGroupOpen model.group2Open groupName) then
+                        "Verberg"
+                     else
+                        "Toon"
+                    )
+                ]
+            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "150%" ) ] ] [ text groupName ]
+            ]
+        , content model
         ]
-      ]
-    , content model
-  ]
+
 
 view : Model -> Html Msg
 view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        ([
-         {--
-          div []
-            [ div [ style [ ( "background-color", colorOfBlock model ) ] ]
-                [ Html.span [ style [ ( "padding-right", "50px" ), ( "font-size", "200%" ) ] ] [ text "Screens" ]
-                , Button.render Mdl
-                    [ 100 ]
-                    model.mdl
-                    [ Button.raised, Button.colored, Button.ripple, Button.onClick (ToggleShowBlock "Screens") ]
-                    [ text
-                        (if (isGroupOpen model.group2Open "Screens") then
-                            "Verberg"
-                         else
-                            "Toon"
+        ([ groupToggleBar "Screens"
+            100
+            model
+            (\model ->
+                if (isGroupOpen model.group2Open "Screens") then
+                    div []
+                        ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
+                         , div [{- style [ ( "display", "inline-block" ) ] -}]
+                            [ text "Zon: "
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
+                            , text ((toString (statusByName "Lichtmeter" model.statuses).level) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                            ]
+                         , div [{- style [ ( "display", "inline-block" ) ] -}]
+                            [ text "Wind: "
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
+                            , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+                            ]
+                         ]
+                            ++ screenWidgets model
                         )
-                    ]
-                ]
-            , if (isGroupOpen model.group2Open "Screens") then
-                div []
-                    ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
-                     , div [{- style [ ( "display", "inline-block" ) ] -}]
-                        [ text "Zon: "
-                        , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
-                        , text ((toString (statusByName "Lichtmeter" model.statuses).level) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                else
+                    div [] []
+            ),
+        groupToggleBar "Beneden"
+            101
+            model
+            (\model ->
+                if (isGroupOpen model.group2Open "Beneden") then
+                    div []
+                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
+                        , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
+                        , div [] []
+                        , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
+                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
+                        , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
+                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
                         ]
-                     , div [{- style [ ( "display", "inline-block" ) ] -}]
-                        [ text "Wind: "
-                        , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
-                        , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+                else
+                    div [] []
+            ),
+        groupToggleBar "Nutsruimtes"
+            101
+            model
+            (\model ->
+                if (isGroupOpen model.group2Open "Nutsruimtes") then
+                    div []
+                        [ toggleDiv ( "LichtInkom", "Inkom" ) 1 model
+                        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
+                        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
+                        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
+                        , toggleDiv ( "LichtWC0", "WC" ) 7 model
                         ]
-                     ]
-                        ++ screenWidgets model
-                    )
-              else
-                div [] []
+                else
+                    div [] []
+            ),
+        groupToggleBar "Kinderen"
+            101
+            model
+            (\model ->
+                if (isGroupOpen model.group2Open "Kinderen") then
+                    div []
+                        [ toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
+                        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
+                        , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
+                        , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
+                        , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
+                        , toggleDiv ( "LichtRoosWand", "Roos Wand" ) 16 model
+                        , toggleDiv ( "LichtRoos", "Roos Spots" ) 17 model
+                        ]
+                else
+                    div [] []
+            ),
+        groupToggleBar "Buiten"
+            101
+            model
+            (\model ->
+                if (isGroupOpen model.group2Open "Buiten") then
+                    div []
+                        [ toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
+                        , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
+                        ]
+                else
+                    div [] []
+            )
+         , div [] [ Html.hr [] [] ]
+         , div [] [ text "Error: ", text model.errorMsg ]
+         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
+            [ button [ onClick PutModelInTestAsString ] [ text "Test" ]
+            , text model.test
             ]
-            --}
-           groupToggleBar "Screens" 100 model (\model ->
-                        if (isGroupOpen model.group2Open "Screens") then
-                           div []
-                               ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
-                                , div [{- style [ ( "display", "inline-block" ) ] -}]
-                                   [ text "Zon: "
-                                   , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
-                                   , text ((toString (statusByName "Lichtmeter" model.statuses).level) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
-                                   ]
-                                , div [{- style [ ( "display", "inline-block" ) ] -}]
-                                   [ text "Wind: "
-                                   , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
-                                   , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
-                                   ]
-                                ]
-                                   ++ screenWidgets model
-                               )
-                        else
-                          div [] []
-                        )
-
-          , div []
-              [ div [] [ Html.hr [] [] ]
-               , div [] [ Html.h3 [] [ text "Beneden" ] ]
-               , if (isGroupOpen model.group2Open "Beneden") then
-                  div[]
-                  ([
-                    div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
-                   , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
-                   , div [] []
-                   , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                   , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
-                   , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                   , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
-                  ])
-                  else div [] []
-                 ]
-           , div [] [ Html.hr [] [] ]
-           , div [] [ Html.h3 [] [ text "Nutsruimtes" ] ]
-           , toggleDiv ( "LichtInkom", "Inkom" ) 1 model
-           , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
-           , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
-           , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
-           , toggleDiv ( "LichtWC0", "WC" ) 7 model
-
-           , div [] [ Html.hr [] [] ]
-           , div [] [ Html.h3 [] [ text "Kinderen" ] ]
-           , toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
-           , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
-           , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
-           , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
-           , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
-           , toggleDiv ( "LichtRoosWand", "Roos Wand" ) 16 model
-           , toggleDiv ( "LichtRoos", "Roos Spots" ) 17 model
-           , div [] [ Html.hr [] [] ]
-           , div [] [ Html.h3 [] [ text "Buiten" ] ]
-           , toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
-           , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
-           , div [] [ Html.hr [] [] ]
-           , div [] [ Html.hr [] [] ]
-           , div [] [ text "Error: ", text model.errorMsg ]
-           , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
-              [ button [ onClick PutModelInTestAsString ] [ text "Test" ]
-              , text model.test
-              ]
-           , div [] [ Html.hr [] [] ]
-        ])
+         ]
+        )
         |> Scheme.topWithScheme Color.Green Color.Red
