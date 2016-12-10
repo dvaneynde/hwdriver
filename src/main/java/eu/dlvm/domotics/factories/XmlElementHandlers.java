@@ -34,9 +34,9 @@ import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.WindSensor;
 
-class DomoticXmlDefaultHandler extends DefaultHandler2 {
+class XmlElementHandlers extends DefaultHandler2 {
 
-	static Logger logger = LoggerFactory.getLogger(DomoticXmlDefaultHandler.class);
+	static Logger logger = LoggerFactory.getLogger(XmlElementHandlers.class);
 
 	private IDomoticContext ctx;
 	private int depth = -1; // -1 because domotic startelement makes it start and that is really 0
@@ -50,7 +50,7 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 		public EventType srcEvent;;
 	}
 
-	public DomoticXmlDefaultHandler(IDomoticContext ctx) {
+	public XmlElementHandlers(IDomoticContext ctx) {
 		super();
 		this.ctx = ctx;
 	}
@@ -182,7 +182,18 @@ class DomoticXmlDefaultHandler extends DefaultHandler2 {
 
 			} else if (localName.equals("fan")) {
 				parseBaseBlockWithChannel(atts);
-				currentBlock = new Fan(name, desc, channel, ctx);
+				Fan fan = new Fan(name, desc, channel, ctx);
+				String val;
+				val = atts.getValue("onSec");
+				if (val != null)
+					fan.setOnDurationSec(Long.parseLong(val));
+				val = atts.getValue("delayOnSec");
+				if (val != null)
+					fan.setDelayOnDurationSec(Long.parseLong(val));
+				val = atts.getValue("delayOffSec");
+				if (val != null)
+					fan.setDelayOffDurationSec(Long.parseLong(val));
+				currentBlock = fan;
 
 			} else if (localName.equals("screen")) {
 				if (currentBlock instanceof SunWindController) {

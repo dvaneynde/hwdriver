@@ -27,7 +27,7 @@ public class XmlDomoticConfigurator {
 			f.setValidating(true);
 			f.setNamespaceAware(true);
 			SAXParser p = f.newSAXParser();
-			DefaultHandler2 h = new DomoticXmlDefaultHandler(domoCtx);
+			DefaultHandler2 h = new XmlElementHandlers(domoCtx);
 			p.parse(cfgFile, h);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			logger.error("Configuration Failed: ", e);

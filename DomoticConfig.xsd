@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
-	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
 	elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
@@ -18,8 +17,7 @@
 						</complexContent>
 					</complexType>
 				</element>
-				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timer" type="tns:timerType" />
 				<element name="timerDayNight" type="tns:timerType" />
 				<element name="repeatOff" type="tns:repeatOffType" />
@@ -27,12 +25,15 @@
 				<element name="lightGauge" type="tns:lightGaugeType" />
 
 				<!-- actuators -->
-				<element name="lamp" type="tns:OnOffToggleActuatorStruct"
-					minOccurs="0" maxOccurs="1" />
+				<element name="lamp" type="tns:OnOffToggleActuatorStruct" minOccurs="0" maxOccurs="1" />
 				<element name="fan" minOccurs="0" maxOccurs="1">
 					<complexType>
 						<complexContent>
-							<extension base="tns:OnOffToggleActuatorStruct" />
+							<extension base="tns:OnOffToggleActuatorStruct">
+								<attribute name="onSec" type="int" use="optional" />
+								<attribute name="delayOnSec" type="int" use="optional" />
+								<attribute name="delayOffSec" type="int" use="optional" />
+							</extension>
 						</complexContent>
 					</complexType>
 				</element>
@@ -78,8 +79,7 @@
 										<complexType>
 											<attribute name="srcUp" type="IDREF" use="required" />
 											<attribute name="srcDown" type="IDREF" use="required" />
-											<attribute name="event" type="string" use="optional"
-												default="SingleClick" />
+											<attribute name="event" type="string" use="optional" default="SingleClick" />
 										</complexType>
 									</element>
 								</sequence>
@@ -214,8 +214,7 @@
 
 	<attributeGroup name="EventConsumerAttributeGroup">
 		<attribute name="src" type="IDREF" use="required" />
-		<attribute name="event" type="string" use="optional"
-			default="SingleClick" />
+		<attribute name="event" type="string" use="optional" default="SingleClick" />
 	</attributeGroup>
 
 	<complexType name="OnOffToggleActuatorStruct">

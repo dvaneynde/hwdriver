@@ -16,7 +16,7 @@
 	</lamp>
 
 	<switch name="SchakVentilatorWC0" />
-	<fan name="VentilatorWC0" desc="Ventilator WC">
+	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="120" delayOffSec="120" onSec="240">
 		<toggle src="SchakVentilatorWC0" />
 		<off src="SchakVentilatorWC0" event="LongClick" />
 		<delayedOnOff src="LichtWC0" />
@@ -227,7 +227,11 @@
 		<wind sensor="Windmeter" />
 		<sun sensor="Lichtmeter" />
 		<screen name="ScreenBreed" />
-		<screen name="ScreenLang" />
+		<screen name="ScreenTomas" />
+		<screen name="ScreenDriesTuin" />
+		<screen name="ScreenDriesOpzij" />
+		<screen name="ScreenRoos" />
+		<screen name="ScreenKeuken" />
 	</sunWindController>
 
 </domotic>

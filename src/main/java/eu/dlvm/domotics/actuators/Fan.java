@@ -85,8 +85,12 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 		return onDurationMs / 1000L;
 	}
 
-	public Fan overrideOnDurationSec(long runPeriodSec) {
+	public void setOnDurationSec(long runPeriodSec) {
 		this.onDurationMs = runPeriodSec * 1000L;
+	}
+
+	public Fan overrideOnDurationSec(long runPeriodSec) {
+		setOnDurationSec(runPeriodSec);
 		return this;
 	}
 
@@ -94,8 +98,12 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 		return delayToOnDurationMs / 1000L;
 	}
 
-	public Fan overrideDelayOnDurationSec(long delayOnPeriodSec) {
+	public void setDelayOnDurationSec(long delayOnPeriodSec) {
 		this.delayToOnDurationMs = delayOnPeriodSec * 1000L;
+	}
+
+	public Fan overrideDelayOnDurationSec(long delayOnPeriodSec) {
+		setDelayOnDurationSec(delayOnPeriodSec);
 		return this;
 	}
 
@@ -103,8 +111,12 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 		return delayToOffDurationMs / 1000L;
 	}
 
-	public Fan overrideDelayOffDurationSec(long delayOffPeriodSec) {
+	public void setDelayOffDurationSec(long delayOffPeriodSec) {
 		this.delayToOffDurationMs = delayOffPeriodSec * 1000L;
+	}
+
+	public Fan overrideDelayOffDurationSec(long delayOffPeriodSec) {
+		setDelayOffDurationSec(delayOffPeriodSec);
 		return this;
 	}
 
