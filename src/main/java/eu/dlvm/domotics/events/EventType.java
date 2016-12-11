@@ -16,7 +16,8 @@ public enum EventType {
 	UP("Up"), DOWN("Down"), TOGGLE_UP("ToggleUp"), TOGGLE_DOWN("ToggleDown"), 
 	SINGLE_CLICK("SingleClick"), DOUBLE_CLICK("DoubleClick"), LONG_CLICK("LongClick"), LEFT_CLICK("LeftClick"), RIGHT_CLICK("RightClick"), 
 	LEFT_HOLD_DOWN("LeftHoldDown"), LEFT_RELEASED("LeftReleased"), RIGHT_HOLD_DOWN("RightHoldDown"), RIGHT_RELEASED("RightReleased"), LEFT_WITH_RIGHTCLICK("LeftWithRightClick"), RIGHT_WITH_LEFTCLICK("RightWithLeftClick"), 
-	DELAY_ON("DelayOn"), DELAY_OFF("DelayOff");
+	DELAY_ON("DelayOn"), DELAY_OFF("DelayOff"),
+	ECO_ON("EcoOn"), ECO_OFF("EcoOff"), ECO_TOGGLE("EcoToggle");
 
 	private String alias;
 

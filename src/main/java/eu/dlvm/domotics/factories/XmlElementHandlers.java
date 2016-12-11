@@ -82,6 +82,9 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("toggle")) {
 				connectEvent2Action(atts, EventType.TOGGLE);
 
+			} else if (localName.equals("ecoToggle")) {
+				connectEvent2Action(atts, EventType.ECO_TOGGLE);
+
 			} else if (localName.equals("delayedOnOff")) {
 				IEventListener target = (IEventListener) currentBlock;
 				Block source = blocksSoFar.get(atts.getValue("src"));

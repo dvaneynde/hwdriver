@@ -47,7 +47,10 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	/** If {@link #isEco()} then this is the default on time. */
 	public static final int DEFAULT_AUTO_OFF_SEC = 10 * 60;
-	/** Number of blinks, default is 1 (i.e. being On, then Off, then remains On for grace period. */
+	/**
+	 * Number of blinks, default is 1 (i.e. being On, then Off, then remains On
+	 * for grace period.
+	 */
 	public static final int DEFAULT_BLINK_COUNT = 1;
 	/** Time in ms. between on and off, or off and on. */
 	public static final long BLINK_TIME_MS = 500;
@@ -168,6 +171,18 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			break;
 		case TOGGLE:
 			toggle();
+			break;
+		case ECO_ON:
+			setEco(false);
+			logger.info("Lamp '" + getName() + "' has set eco mode ON.");
+			break;
+		case ECO_OFF:
+			setEco(false);
+			logger.info("Lamp '" + getName() + "' has set eco mode OFF.");
+			break;
+		case ECO_TOGGLE:
+			setEco(!isEco());
+			logger.info("Lamp '" + getName() + "' has toggled eco mode to "+(isEco()? "ON":"OFF")+".");
 			break;
 		default:
 			logger.warn("Ignored event " + event + " from " + source.getName());

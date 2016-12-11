@@ -22,9 +22,10 @@
 		<delayedOnOff src="LichtWC0" />
 	</fan>
 
-	<switch name="SchakLichtGarageTuin" longClick="true" />
+	<switch name="SchakLichtGarageTuin" singleClick="true" longClick="true" doubleClick="true"/>
 	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" >
 		<toggle src="SchakLichtGarageTuin" />
+		<ecoToggle src="SchakLichtGarageTuin" event="DoubleClick"/>
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 	<switch name="SchakLichtGaragePoort" />

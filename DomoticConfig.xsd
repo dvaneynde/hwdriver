@@ -246,6 +246,11 @@
 								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
 							</complexType>
 						</element>
+						<element name="ecoToggle">
+							<complexType>
+								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
+							</complexType>
+						</element>
 						<element name="delayedOnOff">
 							<complexType>
 								<attribute name="src" type="IDREF" use="required" />
