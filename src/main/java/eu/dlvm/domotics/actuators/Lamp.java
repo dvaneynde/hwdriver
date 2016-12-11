@@ -41,11 +41,16 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	private long timeStateEntered = -1L;
 	// Eco stuff
 	private boolean eco, blink;
-	private int blinkCount;
+	private int blinkCtr = 0;
+	private int blinks = DEFAULT_BLINK_COUNT;
 	private int autoOffSec = DEFAULT_AUTO_OFF_SEC;
 
 	/** If {@link #isEco()} then this is the default on time. */
 	public static final int DEFAULT_AUTO_OFF_SEC = 10 * 60;
+	/** Number of blinks, default is 1 (i.e. being On, then Off, then remains On for grace period. */
+	public static final int DEFAULT_BLINK_COUNT = 1;
+	/** Time in ms. between on and off, or off and on. */
+	public static final long BLINK_TIME_MS = 500;
 
 	public enum States {
 		ON, OFF, GOING_OFF_BLINK, GOING_OFF_UNLESS_CLICK;
@@ -76,6 +81,14 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		this.blink = blink;
 	}
 
+	public int getBlinks() {
+		return blinks;
+	}
+
+	public void setBlinks(int blinks) {
+		this.blinks = blinks;
+	}
+
 	public int getAutoOffSec() {
 		return autoOffSec;
 	}
@@ -94,7 +107,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	public States getState() {
 		return state;
 	}
-	
+
 	/**
 	 * Toggles the output.
 	 * 
@@ -214,10 +227,10 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		case ON:
 			if ((currentTime - timeStateEntered) > autoOffSec * 1000L) {
 				if (isBlink()) {
-					writeOutput(false);
 					timeStateEntered = currentTime;
 					state = States.GOING_OFF_BLINK;
-					blinkCount = 1;
+					writeOutput(false);
+					blinkCtr = 1;
 					logger.info("Lamp '" + getName() + "' is about to go off because eco mode and it has been on for " + getAutoOffSec() + " sec.");
 				} else {
 					internalOff();
@@ -226,23 +239,20 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			}
 			break;
 		case GOING_OFF_BLINK:
-			if ((currentTime - timeStateEntered) > 1000L) {
-				timeStateEntered = currentTime;
-				if (blinkCount == 1) {
+			if ((currentTime - timeStateEntered) >= BLINK_TIME_MS) {
+				blinkCtr++;
+				if (blinkCtr >= 2 * blinks) {
 					writeOutput(true);
-					blinkCount = 2;
-				} else if (blinkCount == 2) {
-					writeOutput(false);
-					blinkCount = 3;
-				} else {
-					writeOutput(true);
-					blinkCount = 0;
+					blinkCtr = 0;
 					state = States.GOING_OFF_UNLESS_CLICK;
+				} else {
+					writeOutput(blinkCtr % 2 == 0);
 				}
+				timeStateEntered = currentTime;
 			}
 			break;
 		case GOING_OFF_UNLESS_CLICK:
-			if ((currentTime - timeStateEntered) > 5 * 1000L) {
+			if ((currentTime - timeStateEntered) >= 5 * 1000L) {
 				internalOff();
 				logger.info("Lamp '" + getName() + "' goes OFF because eco is enabled and " + autoOffSec + " sec. have passed and not interrupted by user.");
 			}
@@ -255,6 +265,6 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	@Override
 	public String toString() {
-		return "Lamp [name=" + name + ", state=" + state + ", eco=" + eco + ", blinkCount=" + blinkCount + ", autoOffSec=" + autoOffSec + "]";
+		return "Lamp [name=" + name + ", state=" + state + ", eco=" + eco + ", blinkCtr=" + blinkCtr + ", autoOffSec=" + autoOffSec + "]";
 	}
 }

@@ -141,11 +141,12 @@ public class TestLampWithAutoOff {
 	}
 
 	@Test
-	public void autoOffWithBlinkTest() {
+	public void autoOffWithDefaultBlinksTest() {
 		lamp.setEco(true);
 		lamp.setBlink(true);
 		Assert.assertTrue(lamp.isEco());
 		Assert.assertTrue(lamp.isBlink());
+		Assert.assertEquals(1, lamp.getBlinks());
 		Assert.assertEquals(Lamp.DEFAULT_AUTO_OFF_SEC, lamp.getAutoOffSec());
 		assertLampOff();
 
@@ -157,23 +158,56 @@ public class TestLampWithAutoOff {
 		assertLampOn();
 
 		// blink off
-		lamp.loop(current += 20, seq++);
-		assertLampBlink(false);
-		// blink on
-		lamp.loop(current += 1010, seq++);
-		assertLampBlink(true);
-		// blink off
-		lamp.loop(current += 1010, seq++);
+		lamp.loop(current += 10, seq++);
 		assertLampBlink(false);
 
 		// graceperiod
-		lamp.loop(current += 1010, seq++);
+		lamp.loop(current += Lamp.BLINK_TIME_MS, seq++);
 		assertLampGoingOffUnlessInterrupted();
 		lamp.loop(current += 10, seq++);
 		assertLampGoingOffUnlessInterrupted();
 
 		// off
-		lamp.loop(current += 5010, seq++);
+		lamp.loop(current += 5000, seq++);
+		assertLampOff();
+	}
+
+	@Test
+	public void autoOffWith2BlinksTest() {
+		lamp.setEco(true);
+		lamp.setBlink(true);
+		lamp.setBlinks(2);
+		Assert.assertTrue(lamp.isEco());
+		Assert.assertTrue(lamp.isBlink());
+		Assert.assertEquals(2, lamp.getBlinks());
+		Assert.assertEquals(Lamp.DEFAULT_AUTO_OFF_SEC, lamp.getAutoOffSec());
+		assertLampOff();
+
+		lamp.toggle();
+		lamp.loop(current += 10, seq++);
+		assertLampOn();
+
+		lamp.loop(current += (lamp.getAutoOffSec() * 1000), seq++);
+		assertLampOn();
+
+		// blink off
+		lamp.loop(current += 10, seq++);
+		assertLampBlink(false);
+		// blink on
+		lamp.loop(current += Lamp.BLINK_TIME_MS, seq++);
+		assertLampBlink(true);
+		// blink off
+		lamp.loop(current += Lamp.BLINK_TIME_MS, seq++);
+		assertLampBlink(false);
+
+		// graceperiod
+		lamp.loop(current += Lamp.BLINK_TIME_MS, seq++);
+		assertLampGoingOffUnlessInterrupted();
+		lamp.loop(current += 10, seq++);
+		assertLampGoingOffUnlessInterrupted();
+
+		// off
+		lamp.loop(current += 5000, seq++);
 		assertLampOff();
 	}
 }
