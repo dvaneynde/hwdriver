@@ -22,16 +22,13 @@
 		<delayedOnOff src="LichtWC0" />
 	</fan>
 
-	<!-- <repeatOff name="GarageAutoUitOchtend" desc="Licht garage uit in ochtend na 10 minuten." intervalSec="600"> <on hour="7" minute="30" 
-		/> <off hour="9" minute="0" /> </repeatOff> <repeatOff name="GarageAutoUitAvond" desc="Licht garage uit in avond na 10 minuten." intervalSec="600"> 
-		<on hour="16" minute="30" /> <off hour="17" minute="30" /> </repeatOff> -->
 	<switch name="SchakLichtGarageTuin" longClick="true" />
 	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" >
 		<toggle src="SchakLichtGarageTuin" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="60" blink="false">
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="300" blink="false">
 		<toggle src="SchakLichtGaragePoort" />
 		<toggle src="SchakLichtGarageTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -85,7 +82,7 @@
 	</lamp>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1">
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1" autoOffSec="180" blink="true">
 		<toggle src="SchakLichtGangBoven" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>

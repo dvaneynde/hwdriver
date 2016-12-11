@@ -32,7 +32,7 @@ import eu.dlvm.domotics.service.UiInfo;
  * 
  * @author dirk
  *
- *         TODO unit tests for eco and blink
+ *         TODO merge blink:boolean and blinks:int
  */
 public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
