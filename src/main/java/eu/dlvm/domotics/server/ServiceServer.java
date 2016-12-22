@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,15 +60,17 @@ public class ServiceServer {
 		try {
 			// Setup the basic application "context" for this application at "/"
 			// This is also known as the handler tree (in jetty speak)
-			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-			context.setContextPath("/");
-			Resource staticRoot = Resource.newClassPathResource("static-root");
-			context.setBaseResource(staticRoot);
-			context.setWelcomeFiles(new String[] { "index.html" });
-			server.setHandler(context);
+			ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+			contextHandler.setContextPath("/");
+			//Resource staticRoot = Resource.newClassPathResource("static-root");
+			File dir = new File("/Users/dirk/dev/ws-domotica/domotic");
+			Resource staticRoot = Resource.newResource(dir);
+			contextHandler.setBaseResource(staticRoot);
+			contextHandler.setWelcomeFiles(new String[] { "index.html" });
+			server.setHandler(contextHandler);
 
 			// Add the websocket filter
-			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(context);
+			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(contextHandler);
 			// Configure websocket behavior
 			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
@@ -80,12 +83,12 @@ public class ServiceServer {
 			ResourceConfig config = new ResourceConfig(services);
 			config.register(JacksonFeature.class);
 			ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
-			context.addServlet(jerseyServletHolder, "/rest/*");
+			contextHandler.addServlet(jerseyServletHolder, "/rest/*");
 
 			// Add default servlet
 			ServletHolder holderDefault = new ServletHolder("default", DefaultServlet.class);
 			holderDefault.setInitParameter("dirAllowed", "true");
-			context.addServlet(holderDefault, "/*");
+			contextHandler.addServlet(holderDefault, "/*");
 
 			server.start();
 			//server.join();
