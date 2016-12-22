@@ -22,7 +22,7 @@ import Material.Slider as Slider
 
 -- Domotics user interface
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
-   -- maar als elm op zelfde server wordt aangeboden, misschien geen probleem
+   -- maar als elm op zelfde server wordt aangeboden, geen probleem
    -- anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
 -- GLOBAL
@@ -277,7 +277,7 @@ toggleDiv ( name, desc ) nr model =
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
-    div [ style [ ( "display", "table-cell" ) ] ]
+    div [ style [ ( "display", "inline-block" ) ] ] -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
         [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ]
         , Slider.view
             ([ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
@@ -341,7 +341,7 @@ groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ) ] ]
+            [ style [ ( "background-color", colorOfBlock model groupName), ("width", "250px" ) ] ]
             [ Button.render Mdl
                 [ nr ]
                 model.mdl
@@ -353,7 +353,7 @@ groupToggleBar groupName nr model content =
                         "Toon"
                     )
                 ]
-            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "150%" ) ] ] [ text groupName ]
+            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "100%" ), ("border", "1px solid black") ] ] [ text groupName ]
             ]
         , content model
         ]
