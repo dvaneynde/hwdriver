@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.base;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -259,14 +260,19 @@ public class Domotic implements IDomoticContext {
 	 *            'localhost' is passed to it as an argument. Otherwise that
 	 *            driver should be started separately, after this one shows
 	 *            "START" in the logger.
+	 * @param htmlRootFile
+	 *            index.html of web app UI
 	 * @param checkDriverAndRestartOnError
 	 */
-	public void runDomotic(int looptime, String pathToDriver, boolean checkDriverAndRestartOnError) {
+	public void runDomotic(int looptime, String pathToDriver, File htmlRootFile, boolean checkDriverAndRestartOnError) {
 		addShutdownHook(this);
 		this.maintThread = Thread.currentThread();
 
-		ServiceServer server = new ServiceServer();
-		server.start(this);
+		ServiceServer server = null;
+		if (htmlRootFile != null) {
+			server = new ServiceServer(htmlRootFile);
+			server.start(this);
+		}
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
@@ -328,7 +334,9 @@ public class Domotic implements IDomoticContext {
 				sleepSafe(RESTART_DRIVER_WAITTIME_MS);
 			}
 		}
-		server.stop();
+		if (server != null)
+			server.stop();
+		
 		log.info("Domotica run exited.");
 	}
 

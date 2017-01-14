@@ -49,18 +49,17 @@ public class Main {
 		}
 	}
 
-	private void startAndRunDomotic(int looptime, String path2Driver, String blocksCfgFile, String hwCfgFile,
-			String hostname, int port, boolean simulation, boolean restartOnProblems) {
+	private void startAndRunDomotic(int looptime, String path2Driver, String blocksCfgFile, String hwCfgFile, String hostname, int port, File htmlRootFile,
+			boolean simulation, boolean restartOnProblems) {
 		PidSave pidSave = new PidSave(new File("./domotic.pid"));
 		String pid = pidSave.getPidFromCurrentProcessAndStoreToFile();
-		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime
-				+ "ms\n\thardware cfg:\t" + hwCfgFile + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t"
-				+ pid);
-		
+		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\thardware cfg:\t" + hwCfgFile
+				+ "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + pid);
+
 		IHardwareIO hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
 		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
-		
-		dom.runDomotic(looptime, path2Driver, restartOnProblems);
+
+		dom.runDomotic(looptime, path2Driver, htmlRootFile, restartOnProblems);
 	}
 
 	/**
@@ -76,6 +75,7 @@ public class Main {
 		String hwCfgFile = null;
 		String hostname = "localhost";
 		int port = HwDriverTcpChannel.DEFAULT_DRIVER_PORT;
+		File htmlRootFile = null;
 		if (args.length == 0) {
 			System.err.println("No arguments given.");
 			usage();
@@ -119,6 +119,10 @@ public class Main {
 				if (++i >= args.length)
 					usage();
 				port = Integer.parseInt(args[i++]);
+			} else if (args[i].equals("-w")) {
+				if (++i >= args.length)
+					usage();
+				htmlRootFile = new File(args[i++]);
 			} else {
 				System.err.println("Argument error. Failed on " + args[i]);
 				usage();
@@ -130,8 +134,7 @@ public class Main {
 			usage();
 		}
 		if (domotic && (blocksCfgFile == null)) {
-			System.err
-					.println("Both blocks-config-file and hardware-config-file must be specified for domotic system.");
+			System.err.println("Both blocks-config-file and hardware-config-file must be specified for domotic system.");
 			usage();
 		}
 		if (simulation && path2Driver != null) {
@@ -140,7 +143,7 @@ public class Main {
 		}
 
 		if (domotic) {
-			new Main().startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, simulation, restartIfProblems);
+			new Main().startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, htmlRootFile, simulation, restartIfProblems);
 		} else {
 			new HwConsoleRunner().run(hwCfgFile, hostname, port, path2Driver);
 		}
@@ -150,13 +153,13 @@ public class Main {
 
 	private static void usage() {
 		System.out.println("Usage:\t" + Main.class.getSimpleName()
-				+ " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] -b blocks-config-file -c hardware-config-file\n"
-				+ "\t" + Main.class.getSimpleName()
-				+ " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file\n"
+				+ " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file\n"
+				+ "\t" + Main.class.getSimpleName() + " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file\n"
 				+ "\t-s simulate hardware driver (domotic only, for testing and development)\n"
 				+ "\t-r restart (or try to) if something is wrong with driver or loopsequence\n"
-				+ "\t-d path to driver, if it needs to be started and managed by this program\n"
-				+ "\t-t time between loops, in ms; defaults to " + DEFAULT_LOOP_TIME_MS + " ms.\n"
+				+ "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms; defaults to "
+				+ DEFAULT_LOOP_TIME_MS + " ms.\n" + "\t-h hostname of hardware driver; incompatible with -d"
+				+ "\t-p port of hardware driver; incompatible with -d" + "\t-w path of directory with webapp (where index.html is located)"
 				+ "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n"
 				+ "To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.\n");
 		System.exit(2);

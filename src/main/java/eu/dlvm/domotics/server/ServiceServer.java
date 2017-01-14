@@ -36,10 +36,15 @@ public class ServiceServer {
 
 	private static final Logger log = LoggerFactory.getLogger(ServiceServer.class);
 	private Server server;
+	private File rootHtmlFile;
+
+	public ServiceServer(File rootHtmlFile) {
+		this.rootHtmlFile = rootHtmlFile;
+	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
 		private IDomoticContext domoContext;
-
+		
 		public UiSocketCreator(IDomoticContext domoContext) {
 			this.domoContext = domoContext;
 		}
@@ -63,8 +68,7 @@ public class ServiceServer {
 			ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			contextHandler.setContextPath("/");
 			//Resource staticRoot = Resource.newClassPathResource("static-root");
-			File dir = new File("/Users/dirk/dev/ws-domotica/domotic");
-			Resource staticRoot = Resource.newResource(dir);
+			Resource staticRoot = Resource.newResource(rootHtmlFile);
 			contextHandler.setBaseResource(staticRoot);
 			contextHandler.setWelcomeFiles(new String[] { "index.html" });
 			server.setHandler(contextHandler);
@@ -108,7 +112,7 @@ public class ServiceServer {
 	}
 
 	public static void main(String[] args) throws IOException, Exception {
-		ServiceServer ss = new ServiceServer();
+		ServiceServer ss = new ServiceServer(new File("/Users/dirk/dev/ws-domotica/domotic"));
 		ss.start(null);
 		System.out.println(String.format("Server app started.\nHit enter to stop it..."));
 		System.in.read();
