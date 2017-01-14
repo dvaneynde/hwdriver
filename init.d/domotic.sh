@@ -38,7 +38,7 @@ d_start() {
 		fi
 	fi
 	cd $DOMDIR
-	/usr/bin/java -jar $DOMDIR/domotic.jar domo -t 20 -l $DOMDIR/log4j.properties -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver >>$BOOTLOG 2>&1 &
+	/usr/bin/java -Dlogback.configurationFile=$DOMDIR/logback.xml -jar $DOMDIR/domotic.jar domo -t 20 -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver -w $DOMDIR >>$BOOTLOG 2>&1 &
 	echo "Domotic started." | tee -a $BOOTLOG
 }
 
