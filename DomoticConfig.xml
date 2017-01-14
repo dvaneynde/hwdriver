@@ -4,7 +4,7 @@
 
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
-	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" autoOffSec="60" blink="true">
+	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtInkom" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
@@ -16,7 +16,7 @@
 	</lamp>
 
 	<switch name="SchakVentilatorWC0" />
-	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="120" delayOffSec="120" onSec="240">
+	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="180" delayOffSec="180" onSec="300">
 		<toggle src="SchakVentilatorWC0" />
 		<off src="SchakVentilatorWC0" event="LongClick" />
 		<delayedOnOff src="LichtWC0" />
@@ -83,7 +83,7 @@
 	</lamp>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1" autoOffSec="180" blink="true">
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtGangBoven" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
