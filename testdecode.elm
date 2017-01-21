@@ -1,60 +1,90 @@
+module Main exposing (..)
+
 import Html exposing (text)
 import Json.Decode exposing (..)
 
+
 -- TYPES ===============================
 
-type alias StatusRecord = {
-  name: String,
-  kind: String,
-  on: Bool,
-  level: Int
-}
+
+type alias StatusRecord =
+    { name : String
+    , kind : String
+    , on : Bool
+    , level : Int
+    }
+
 
 
 -- DECODING ===============================
-
 -- Decodes a Json string into list of StatusRecords
-decodeStatuses : String -> (List StatusRecord, String)
+
+
+decodeStatuses : String -> ( List StatusRecord, String )
 decodeStatuses strJson =
-  let
-    result = decodeString statusesDecoder strJson
-  in
-    case result of
-      Ok value -> (value, "")
-      Err error -> ([], error)
+    let
+        result =
+            decodeString statusesDecoder strJson
+    in
+        case result of
+            Ok value ->
+                ( value, "" )
+
+            Err error ->
+                ( [], error )
+
+
 
 -- Decoder: decodes the list
-statusesDecoder: Decoder (List StatusRecord)
-statusesDecoder = list statusDecoder
+
+
+statusesDecoder : Decoder (List StatusRecord)
+statusesDecoder =
+    list statusDecoder
+
+
 
 -- Decoder: decodes one statusrecord Json object
-statusDecoder: Decoder StatusRecord
+
+
+statusDecoder : Decoder StatusRecord
 statusDecoder =
-  object4 StatusRecord
-    ("name" := string)
-    ("type" := string)
-    ("on" := bool)
-    ("level" := int)
+    object4 StatusRecord
+        ("name" := string)
+        ("type" := string)
+        ("on" := bool)
+        ("level" := int)
+
 
 
 -- HELPER ===============================
 -- find StatusRecord by name
+
+
 statusByName : String -> List StatusRecord -> StatusRecord
 statusByName name listOfRecords =
-  let
-    checkName = (\rec -> rec.name == name)
-    filteredList = List.filter checkName listOfRecords
-  in
-    Maybe.withDefault emptyStatus (List.head filteredList)
+    let
+        checkName =
+            (\rec -> rec.name == name)
+
+        filteredList =
+            List.filter checkName listOfRecords
+    in
+        Maybe.withDefault emptyStatus (List.head filteredList)
+
 
 emptyStatus : StatusRecord
-emptyStatus = { name="", kind="", on=False, level=0 }
+emptyStatus =
+    { name = "", kind = "", on = False, level = 0 }
+
 
 
 -- TEST ===============================
 
-status: String
-status = """
+
+status : String
+status =
+    """
 [
 {
   "name": "Windmeter",
@@ -75,10 +105,15 @@ status = """
 
 
 main =
-  --text ("Decoded: " ++ (toString (decodeStatuses status)))
-  let
-    (value, _) = decodeStatuses status
-    wind = statusByName "Windmeter" value
-    sun = statusByName "Zonnesensor" value
-  in
-    text ("Wind : " ++ (toString wind) ++ " |    Sun:" ++ (toString sun))
+    --text ("Decoded: " ++ (toString (decodeStatuses status)))
+    let
+        ( value, _ ) =
+            decodeStatuses status
+
+        wind =
+            statusByName "Windmeter" value
+
+        sun =
+            statusByName "Zonnesensor" value
+    in
+        text ("Wind : " ++ (toString wind) ++ " |    Sun:" ++ (toString sun))

@@ -2,21 +2,20 @@ module Main exposing (..)
 
 import Dict
 import Html exposing (Html, button, div, text, span, input, label, br, meter)
-import Html.App
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, object7, (:=))
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, map7, field)
 import Json.Encode as Encode
 import WebSocket
 import Material
 import Material.Button as Button
 import Material.Scheme as Scheme
-import Material.Options exposing (css)
-import Material.Toggles as Toggles
+import Material.Options as Options exposing (css)
 import Material.Icon as Icon
 import Material.Color as Color
+import Material.Toggles as Toggles
 import Material.Slider as Slider
 
 
@@ -29,8 +28,8 @@ import Material.Slider as Slider
 
 
 urlBase =
---    "localhost:8080"
-    "192.168.0.10:8080"
+    "localhost:8080"
+    -- "192.168.0.10:8080"
 
 
 urlUpdateActuators =
@@ -42,7 +41,7 @@ wsStatus =
 
 
 main =
-    Html.App.program { init = init, view = view, update = update, subscriptions = subscriptions }
+    Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
 
@@ -99,8 +98,7 @@ type Msg
     | SliderMsg String Float
     | ToggleShowBlock String
     | NewStatusViaWs String
-    | NewStatusViaRest (List StatusRecord)
-    | RestError Http.Error
+    | NewStatusViaRest (Result Http.Error (List StatusRecord))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,8 +107,8 @@ update msg model =
         PutModelInTestAsString ->
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
 
-        Mdl message' ->
-            Material.update message' model
+        Mdl message_ ->
+            Material.update Mdl message_ model
 
         Clicked what ->
             ( model, toggleBlock what model )
@@ -144,20 +142,17 @@ update msg model =
         ToggleShowBlock name ->
             ( { model | group2Open = (toggleGroup2Open model.group2Open name) }, Cmd.none )
 
-        NewStatusViaRest statuses' ->
-            ( { model | statuses = statuses', errorMsg = "OK" }, Cmd.none )
+        NewStatusViaRest (Ok statuses_) ->
+            ( { model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
 
-        RestError error ->
-            ( { model | errorMsg = toString error }, Cmd.none )
+        NewStatusViaRest (Err message) ->
+            ( { model | errorMsg = toString message }, Cmd.none )
 
 
 isGroupOpen : Group2OpenDict -> String -> Bool
 isGroupOpen blocks blockName =
     Maybe.withDefault True (Dict.get blockName blocks)
 
-
-
---blocks2 = Dict.insert blockName enabled blocks
 
 
 toggleGroup2Open : Group2OpenDict -> String -> Group2OpenDict
@@ -196,14 +191,14 @@ statusesDecoder =
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-    object7 StatusRecord
-        ("name" := string)
-        ("type" := string)
-        ("groupName" := string)
-        ("description" := string)
-        ("on" := bool)
-        ("level" := int)
-        ("status" := string)
+    map7 StatusRecord
+        (field "name" string)
+        (field "type" string)
+        (field "groupName" string)
+        (field "description" string)
+        (field "on" bool)
+        (field "level" int)
+        (field "status" string)
 
 
 toggleBlock : String -> Model -> Cmd Msg
@@ -223,7 +218,12 @@ toggleBlock what model =
 
 updateStatusViaRestCmd : String -> String -> Cmd Msg
 updateStatusViaRestCmd name value =
-    Task.perform RestError NewStatusViaRest (Http.get statusesDecoder (urlUpdateActuators ++ name ++ "/" ++ value))
+    let
+        url = urlUpdateActuators ++ name ++ "/" ++ value
+        request = Http.get url statusesDecoder
+    in
+        --Task.perform RestError NewStatusViaRest ()
+        Http.send NewStatusViaRest request
 
 
 
@@ -267,18 +267,19 @@ level name model =
 
 toggle : String -> Int -> Model -> Html Msg
 toggle name nr model =
-    Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text name ]
+    Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text name ]
 
 
 toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
-    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ] ]
+    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ] ]
 
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
-    div [ style [ ( "display", "inline-block" ) ] ] -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
-        [ Toggles.switch Mdl [ nr ] model.mdl [ Toggles.onClick (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ]
+    div [ style [ ( "display", "inline-block" ) ] ]
+        -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
+        [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ]
         , Slider.view
             ([ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
                 ++ (if (isOnByName name model) then
@@ -293,8 +294,8 @@ toggleWithSliderDiv ( name, desc ) nr model =
 screenDiv : ( String, String ) -> Model -> Int -> Html Msg
 screenDiv ( name, desc ) model nr =
     div []
-        [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Down name) ] [ Icon.i "arrow_downward" ]
-        , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Button.onClick (Up name) ] [ Icon.i "arrow_upward" ]
+        [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Down name) ] [ Icon.i "arrow_downward" ]
+        , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Up name) ] [ Icon.i "arrow_upward" ]
         , text (screenStatus name model)
         , text (" | " ++ desc)
         ]
@@ -341,11 +342,11 @@ groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName), ("width", "250px" ) ] ]
+            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ) ] ]
             [ Button.render Mdl
                 [ nr ]
                 model.mdl
-                [ Button.raised, Button.colored, Button.ripple, Button.onClick (ToggleShowBlock groupName) ]
+                [ Button.raised, Button.colored, Button.ripple, Options.onClick (ToggleShowBlock groupName) ]
                 [ text
                     (if (isGroupOpen model.group2Open groupName) then
                         "Verberg"
@@ -353,7 +354,7 @@ groupToggleBar groupName nr model content =
                         "Toon"
                     )
                 ]
-            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "100%" ), ("border", "1px solid black") ] ] [ text groupName ]
+            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "100%" ), ( "border", "1px solid black" ) ] ] [ text groupName ]
             ]
         , content model
         ]
@@ -384,25 +385,25 @@ view model =
                         )
                 else
                     div [] []
-            ),
-        groupToggleBar "Beneden"
+            )
+         , groupToggleBar "Beneden"
             101
             model
             (\model ->
                 if (isGroupOpen model.group2Open "Beneden") then
                     div []
-                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Toggles.onClick (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
+                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
                         , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
                         , div [] []
                         , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Toggles.onClick (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
+                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Options.onToggle (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
                         , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Toggles.onClick (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
+                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Options.onToggle (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
                         ]
                 else
                     div [] []
-            ),
-        groupToggleBar "Nutsruimtes"
+            )
+         , groupToggleBar "Nutsruimtes"
             101
             model
             (\model ->
@@ -416,8 +417,8 @@ view model =
                         ]
                 else
                     div [] []
-            ),
-        groupToggleBar "Kinderen"
+            )
+         , groupToggleBar "Kinderen"
             101
             model
             (\model ->
@@ -433,8 +434,8 @@ view model =
                         ]
                 else
                     div [] []
-            ),
-        groupToggleBar "Buiten"
+            )
+         , groupToggleBar "Buiten"
             101
             model
             (\model ->
