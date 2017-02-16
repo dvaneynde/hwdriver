@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HwDriverChannelSimulator implements IHwDriverChannel {
 
-	private boolean sunWindSimulation = true;
+	private boolean sunWindSimulation = false;
 	
 	private int levelLight = 3000;
 	private int directionLight = 1;

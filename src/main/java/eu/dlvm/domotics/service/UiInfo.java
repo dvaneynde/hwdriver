@@ -12,7 +12,7 @@ public class UiInfo {
 	private String name;
 	private String type;
 	private String description = "";
-	private String groupName = "";
+	private String group = "";
 	private boolean on;
 	private int level;
 	private String status = "";
@@ -28,7 +28,7 @@ public class UiInfo {
 		this();
 		setName(name);
 		setType(type);
-		setGroupName(uiGroup);
+		setGroup(uiGroup);
 		setDescription(description);
 	}
 
@@ -80,12 +80,12 @@ public class UiInfo {
 		this.status = (status == null ? "" : status);
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public String getGroup() {
+		return group;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = (groupName == null ? "" : groupName);
+	public void setGroup(String group) {
+		this.group = (group == null ? "" : group);
 	}
 	
 	@Override

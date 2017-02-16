@@ -83,49 +83,49 @@
 	</lamp>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Nutsruimtes:1" autoOffSec="300" blink="true">
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Kinderen:1" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtGangBoven" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtBadk1" />
-	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Nutsruimtes:5">
+	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Kinderen:5">
 		<toggle src="SchakLichtBadk1" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Tomas:0">
+	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Kinderen:0">
 		<toggle src="SchakLichtTomasWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Tomas:1"><!-- TODO nakijken of klopt met relais -->
+	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Kinderen:1"><!-- TODO nakijken of klopt met relais -->
 		<toggle src="SchakLichtTomasSpots" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Dries:0">
+	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Kinderen:0">
 		<toggle src="SchakLichtDriesWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Dries Spots" ui="Dries:1">
+	<lamp name="LichtDries" desc="Dries Spots" ui="Kinderen:1">
 		<toggle src="SchakLichtDries" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtRoosWand" />
-	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Roos:0">
+	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Kinderen:0">
 		<toggle src="SchakLichtRoosWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" desc="Roos Spots" ui="Roos:1">
+	<lamp name="LichtRoos" desc="Roos Spots" ui="Kinderen:1">
 		<toggle src="SchakLichtRoos" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>

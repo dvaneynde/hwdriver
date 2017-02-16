@@ -336,7 +336,7 @@ public class Domotic implements IDomoticContext {
 		}
 		if (server != null)
 			server.stop();
-		
+
 		log.info("Domotica run exited.");
 	}
 
@@ -378,10 +378,10 @@ public class Domotic implements IDomoticContext {
 		{
 			// TODO must be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
-			//if (loopSequence % 10 == 0) {
-			for (IStateChangedListener uiUpdator : stateChangeListeners)
-				uiUpdator.updateUi();
-			//}
+			if (loopSequence % 10 == 0) {
+				for (IStateChangedListener uiUpdator : stateChangeListeners)
+					uiUpdator.updateUi();
+			}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
 			if (tookMs >= 20)
 				log.error("Updating websockets took more than 19 ms!\nTotal=" + tookMs + " ms.");
