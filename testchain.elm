@@ -4,35 +4,48 @@ import Html exposing (text)
 import Json.Decode exposing (..)
 
 
-chain : String -> ( String, Int ) -> ( String, Int )
-chain extra ( already, seq ) =
-    ( already ++ " " ++ extra ++ ":" ++ (toString seq), seq + 1 )
+{- Chains components of type a, that need a unique number when created. -}
 
 
-chain2 : (Int -> a) -> ( List a, Int ) -> ( List a, Int )
-chain2 extraFunction ( already, seq ) =
-    let
-        extra =
-            extraFunction seq
-    in
-        ( List.append already [ extra ], seq + 1 )
+chain : (Int -> a) -> ( List a, Int ) -> ( List a, Int )
+chain a ( sofar, nr ) =
+        ( List.append sofar [ (a nr) ], nr + 1 )
 
 
 type alias Model =
     String
 
 
-v : Int -> Model -> String
-v nr model =
-    "another " ++ model ++ " with index " ++ (toString nr)
+type alias HtmlMsg =
+    String
+
+
+widgetA : Int -> Model -> HtmlMsg
+widgetA nr model =
+    "Widget AAA [" ++ (toString nr) ++ "] onto model '" ++ model ++ "'"
+
+
+widgetB : String -> Int -> Model -> HtmlMsg
+widgetB attribute nr model =
+    "widget BBB [" ++ (toString nr) ++ "] with attribute {" ++ attribute ++ "} onto model '" ++ model ++ "'"
+
+
+view : Model -> HtmlMsg
+view model =
+    let
+{-
+        widgetList = [ widgetA 0, widgetB "inner" 1, widgetB "outer" 2 ]
+-}
+{--}
+        ( widgetList, _ ) =
+            -- chain widgetA (chain widgetB (chain widgetA ( [], 0)))
+            ( [], 0 ) |> chain widgetA |> chain (widgetB "inner") |> chain (widgetB "outer")
+--}
+    in
+        -- widgetList is list of functions Model -> Html, so apply model to them to generate Html Msg
+        -- each time view is to be built
+        toString (List.map (\widget -> widget model) widgetList)
 
 
 main =
-    -- text (toString (chain "C" (chain "B" (chain "A" ("",0)))))
-    -- text (toString (("",0) |> chain "A" |> chain "B" |> chain "C"))
-    -- text (toString ( chain2 w (chain2 w ([""],0))))
-    let
-        ( operations, _ ) =
-            chain2 v (chain2 v ( [ \m -> (v 0) m ], 1 ))
-    in
-        text (toString (List.map (\f -> f "modelletje") operations))
+    text (view "model_185468434")

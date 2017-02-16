@@ -42,6 +42,7 @@ wsStatus =
 
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
+    -- To disable websockets for test: Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
 
 
 
@@ -83,7 +84,13 @@ statusByName name listOfRecords =
     in
         Maybe.withDefault initialStatus (List.head filteredList)
 
+nameInGroup : String -> String
+nameInGroup group =
+    let
+        groupSplit = String.split ":" group
 
+    in
+        Maybe.withDefault group (List.head groupSplit)
 
 -- UPDATE
 
@@ -143,10 +150,10 @@ update msg model =
             ( { model | group2Open = (toggleGroup2Open model.group2Open name) }, Cmd.none )
 
         NewStatusViaRest (Ok statuses_) ->
-            ( { model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
+            ( {  model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
 
         NewStatusViaRest (Err message) ->
-            ( { model | errorMsg = toString message }, Cmd.none )
+            ( { model | errorMsg = ("NewStatusViaRest: "++ (toString message)) }, Cmd.none )
 
 
 isGroupOpen : Group2OpenDict -> String -> Bool
@@ -194,7 +201,7 @@ statusDecoder =
     map7 StatusRecord
         (field "name" string)
         (field "type" string)
-        (field "groupName" string)
+        (field "group" string)
         (field "description" string)
         (field "on" bool)
         (field "level" int)
@@ -329,20 +336,28 @@ screenWidgets model =
     in
         result
 
+-- true iff at least one actuator is on in the given group
+somethingOn : Model -> String -> Bool
+somethingOn model groupName =
+    let
+        groupStatuses = List.filter (\status -> ((nameInGroup status.group) == groupName)) model.statuses
+    in
+        List.foldl (\status -> \soFar -> status.on || soFar) False groupStatuses
 
+-- other color depending on wether something is on or off
 colorOfBlock : Model -> String -> String
 colorOfBlock model groupName =
-    if (isGroupOpen model.group2Open groupName) then
-        "#c2ef39"
+    if (somethingOn model groupName) then
+        "yellow"
     else
-        "#b7cce8"
+        "green"
 
 
 groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ) ] ]
+            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ("padding","10px 10px 10px 10px") ] ]
             [ Button.render Mdl
                 [ nr ]
                 model.mdl
@@ -354,11 +369,12 @@ groupToggleBar groupName nr model content =
                         "Toon"
                     )
                 ]
-            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "100%" ), ( "border", "1px solid black" ) ] ] [ text groupName ]
+            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "120%" ) ] ] [ text groupName ]
             ]
         , content model
         ]
 
+lightPercentage level = (level - 3000) // 40
 
 view : Model -> Html Msg
 view model =
@@ -373,12 +389,12 @@ view model =
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Zon: "
                             , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
-                            , text ((toString (statusByName "Lichtmeter" model.statuses).level) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                            , text (toString (lightPercentage((statusByName "Lichtmeter" model.statuses).level)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
                             ]
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Wind: "
                             , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
-                            , text ((toString ((toFloat ((statusByName "Windmeter" model.statuses).level)) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+                            , text ((toString (toFloat ((statusByName "Windmeter" model.statuses).level) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
                             ]
                          ]
                             ++ screenWidgets model
