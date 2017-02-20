@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Domotic exposing (..)
 
 import Dict
 import Html exposing (Html, button, div, text, span, input, label, br, meter)
@@ -21,21 +21,16 @@ import Material.Slider as Slider
 
 -- Domotics user interface
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
-   maar als elm op zelfde server wordt aangeboden, geen probleem
+   But when on same server no problem.
    anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
--}
-{- After generating index.html, update as follows:
-        <meta name="viewport" content="width-device-width, initial-scale=1">
-        <title>dlvm domotica</title>
-
 -}
 
 -- GLOBAL
 
 
 urlBase =
-    --"localhost:8080"
-    "192.168.0.10:8080"
+    "localhost:8080"
+    --"192.168.0.10:8080"
 
 
 urlUpdateActuators =

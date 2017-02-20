@@ -4,7 +4,7 @@
     "repository": "https://github.com/dvaneynde/elm-domotica-ui.git",
     "license": "BSD3",
     "source-directories": [
-        "."
+        ".", "./src-test"
     ],
     "exposed-modules": [],
     "dependencies": {
