@@ -21,15 +21,21 @@ import Material.Slider as Slider
 
 -- Domotics user interface
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
-   -- maar als elm op zelfde server wordt aangeboden, geen probleem
-   -- anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
+   maar als elm op zelfde server wordt aangeboden, geen probleem
+   anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
+{- After generating index.html, update as follows:
+        <meta name="viewport" content="width-device-width, initial-scale=1">
+        <title>dlvm domotica</title>
+
+-}
+
 -- GLOBAL
 
 
 urlBase =
-    "localhost:8080"
-    -- "192.168.0.10:8080"
+    --"localhost:8080"
+    "192.168.0.10:8080"
 
 
 urlUpdateActuators =
@@ -42,7 +48,8 @@ wsStatus =
 
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
-    -- To disable websockets for test: Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
+    --To disable websockets for test:
+    --Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
 
 
 
@@ -348,7 +355,7 @@ somethingOn model groupName =
 colorOfBlock : Model -> String -> String
 colorOfBlock model groupName =
     if (somethingOn model groupName) then
-        "yellow"
+        "orange"
     else
         "green"
 
@@ -357,7 +364,7 @@ groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ("padding","10px 10px 10px 10px") ] ]
+            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ("margin","0px 0px 10px 0px"), ("padding","10px 10px 10px 10px") ] ]
             [ Button.render Mdl
                 [ nr ]
                 model.mdl
