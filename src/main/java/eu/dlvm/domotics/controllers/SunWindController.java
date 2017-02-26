@@ -9,7 +9,8 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 
 /**
  * Enables a source event to go through or not,
@@ -88,10 +89,9 @@ public class SunWindController extends Controller implements IEventListener, IUi
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this);
-		bi.setOn(isEnabled());
-		bi.setStatus(isEnabled() ? "ON" : "OFF");
-		return bi;
+		UiInfoOnOff uiInfo = new UiInfoOnOff(this, null, isEnabled());
+		//bi.setStatus(isEnabled() ? "ON" : "OFF");
+		return uiInfo;
 	}
 
 	@Override

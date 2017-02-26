@@ -202,10 +202,10 @@ class XmlElementHandlers extends DefaultHandler2 {
 					fan.setOnDurationSec(Long.parseLong(val));
 				val = atts.getValue("delayOnSec");
 				if (val != null)
-					fan.setDelayOnDurationSec(Long.parseLong(val));
+					fan.setDelayOff2OnSec(Long.parseLong(val));
 				val = atts.getValue("delayOffSec");
 				if (val != null)
-					fan.setDelayOffDurationSec(Long.parseLong(val));
+					fan.setDelayOn2OffSec(Long.parseLong(val));
 				currentBlock = fan;
 
 			} else if (localName.equals("screen")) {

@@ -7,7 +7,8 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
 
 /**
  * DOC document
@@ -117,9 +118,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo uiInfo = new UiInfo(this);
-		uiInfo.setLevel(getFreqTimesHundred());
-		uiInfo.setStatus(state.name());
+		UiInfoOnOffLevel uiInfo = new UiInfoOnOffLevel(this, getState().toString(), true, getFreqTimesHundred());
 		return uiInfo;
 	}
 

@@ -16568,7 +16568,7 @@ var _dvaneynde$elm_domotica_ui$Domotic$init = {
 	},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _dvaneynde$elm_domotica_ui$Domotic$urlBase = '192.168.0.10:8080';
+var _dvaneynde$elm_domotica_ui$Domotic$urlBase = 'localhost:8080';
 var _dvaneynde$elm_domotica_ui$Domotic$urlUpdateActuators = A2(
 	_elm_lang$core$Basics_ops['++'],
 	'http://',

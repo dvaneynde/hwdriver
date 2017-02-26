@@ -44,7 +44,7 @@ public class TestFanWithLamp {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
 		lamp = new Lamp("TestLamp", "TestLamp", LAMP_OUT, ctx);
-		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, ctx).overrideDelayOnDurationSec(5).overrideDelayOffDurationSec(5)
+		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, ctx).overrideDelayOff2OnSec(5).overrideDelayOn2OffSec(5)
 				.overrideOnDurationSec(10);
 		lamp.registerListener(new Connector(EventType.ON, fan, EventType.DELAY_ON, "Test_Lamp"));
 		lamp.registerListener(new Connector(EventType.OFF, fan, EventType.DELAY_OFF, "Test_Lamp"));
@@ -64,19 +64,19 @@ public class TestFanWithLamp {
 	}
 
 	private void assertDelayedOn_LampOn() {
-		Assert.assertEquals(Fan.States.DELAYED_ON, fan.getState());
+		Assert.assertEquals(Fan.States.OFF_DELAY2ON, fan.getState());
 		Assert.assertFalse(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && !hw.fanStatus);
 	}
 
 	private void assertOn_LampOn() {
-		Assert.assertEquals(Fan.States.ON_D, fan.getState());
+		Assert.assertEquals(Fan.States.ON_AFTER_DELAY, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && hw.fanStatus);
 	}
 
 	private void assertDelayedOff_LampOff() {
-		Assert.assertEquals(Fan.States.DELAYED_OFF, fan.getState());
+		Assert.assertEquals(Fan.States.ON_DELAY2OFF, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(!hw.lampStatus && hw.fanStatus);
 	}
@@ -108,7 +108,7 @@ public class TestFanWithLamp {
 		assertOff();
 		// Make sure it does not go on again...
 		fan.loop(current += 10, seq++);
-		fan.loop(current += fan.getDelayOnDurationSec() * 1000, seq++);
+		fan.loop(current += fan.getDelayOff2OnSec() * 1000, seq++);
 		fan.loop(current += 10, seq++);
 		assertOff();
 	}
@@ -123,7 +123,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedOn_LampOn();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayOnDurationSec() * 1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayOff2OnSec() * 1000 + 10), seq++);
 		assertOn_LampOn();
 		// Turn off lamp, fan must still run
 		lamp.off();
@@ -145,7 +145,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedOn_LampOn();
 		// Wait just before end of delay period, fan must still not run
-		fan.loop(current += (fan.getDelayOnDurationSec() - 20), seq++);
+		fan.loop(current += (fan.getDelayOff2OnSec() - 20), seq++);
 		assertDelayedOn_LampOn();
 		// Turn off lamp, fan must not run
 		lamp.off();
@@ -167,7 +167,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedOn_LampOn();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayOnDurationSec() * 1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayOff2OnSec() * 1000 + 10), seq++);
 		assertOn_LampOn();
 		// Toggle off, but lamp still on, so goes immediately to Delayed Run
 		fan.toggle();
@@ -189,7 +189,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedOn_LampOn();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayOnDurationSec() * 1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayOff2OnSec() * 1000 + 10), seq++);
 		assertOn_LampOn();
 		// Lamp off
 		lamp.off();
@@ -225,7 +225,7 @@ public class TestFanWithLamp {
 		fan.loop(current += 10, seq++);
 		assertDelayedOn_LampOn();
 		// Let lamp on long enough, so that fan goes on
-		fan.loop(current += (fan.getDelayOnDurationSec() * 1000 + 10), seq++);
+		fan.loop(current += (fan.getDelayOff2OnSec() * 1000 + 10), seq++);
 		assertOn_LampOn();
 		// Toggle off, but lamp still on, so goes immediately to Delayed Run
 		fan.reallyOff();

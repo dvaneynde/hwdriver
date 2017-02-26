@@ -10,7 +10,8 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 
 /**
  * Lamp - or anything that can go on or off - with optional auto-off.
@@ -182,7 +183,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			break;
 		case ECO_TOGGLE:
 			setEco(!isEco());
-			logger.info("Lamp '" + getName() + "' has toggled eco mode to "+(isEco()? "ON":"OFF")+".");
+			logger.info("Lamp '" + getName() + "' has toggled eco mode to " + (isEco() ? "ON" : "OFF") + ".");
 			break;
 		default:
 			logger.warn("Ignored event " + event + " from " + source.getName());
@@ -204,10 +205,8 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this);
-		//ai.addParm("on", isOn() ? "1" : "0");
-		bi.setOn(isOn());
-		return bi;
+		UiInfoOnOff uiInfo = new UiInfoOnOff(this, getState().toString(), isOn());
+		return uiInfo;
 	}
 
 	// ===== Init =====

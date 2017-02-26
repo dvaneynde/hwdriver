@@ -8,7 +8,9 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
@@ -40,8 +42,8 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
 	};
 
-	public LightSensor(String name, String description, String ui, String channel, IDomoticContext ctx, int lowThreshold, int highThreshold, int lowToHighDelaySec, int highToLowDelaySec)
-			throws ConfigurationException {
+	public LightSensor(String name, String description, String ui, String channel, IDomoticContext ctx, int lowThreshold, int highThreshold,
+			int lowToHighDelaySec, int highToLowDelaySec) throws ConfigurationException {
 		super(name, description, ui, channel, ctx);
 		if ((highThreshold < lowThreshold) || lowThreshold < 0 || highThreshold < 0) {
 			throw new ConfigurationException("Incorrect parameters. Check doc.");
@@ -53,13 +55,14 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
 		state = States.LOW;
-		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low=" + getLowThreshold() + ", low to high delay=" + getLowToHighDelaySec()
-				+ ", high to low delay=" + getHighToLowDelaySec() + " s., channel=" + getChannel());
+		log.info("LightSensor '" + getName() + "' configured: high=" + getHighThreshold() + ", low=" + getLowThreshold() + ", low to high delay="
+				+ getLowToHighDelaySec() + ", high to low delay=" + getHighToLowDelaySec() + " s., channel=" + getChannel());
 	}
 
 	/**
-	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(String)})
-	 * for {@link States#HIGH} state. See also {@link #getHighWaitingTime()}.
+	 * Threshold value of input (via
+	 * {@link IHardwareIO#readAnalogInput(String)}) for {@link States#HIGH}
+	 * state. See also {@link #getHighWaitingTime()}.
 	 * 
 	 * @return high threshold value
 	 */
@@ -68,8 +71,9 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
-	 * Threshold value of input (via {@link IHardwareIO#readAnalogInput(String)})
-	 * for {@link States#HIGH} state. See also {@link #getThresholdDelayMs()}.
+	 * Threshold value of input (via
+	 * {@link IHardwareIO#readAnalogInput(String)}) for {@link States#HIGH}
+	 * state. See also {@link #getThresholdDelayMs()}.
 	 * 
 	 * @return low threshold value
 	 */
@@ -112,19 +116,17 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
-	 * @return Last level as percentage, where 100 corresponds to {@link #getHighThreshold()}, so [0..100..]. So 0..100 or more.
+	 * @return Last level as percentage, where 100 corresponds to
+	 *         {@link #getHighThreshold()}, so [0..100..]. So 0..100 or more.
 	 */
 	public int getLevelAsPct() {
-		return measuredLevel*100/getHighThreshold();
+		return measuredLevel * 100 / getHighThreshold();
 	}
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo uiInfo = new UiInfo(this);
-		//uiInfo.setLevel(getLevelAsPct());
-		uiInfo.setLevel(getLevel());
-		uiInfo.setStatus(state.name());
-		return uiInfo;
+		UiInfoOnOffLevel ui = new UiInfoOnOffLevel(this, getState().toString(), true, getLevel());
+		return ui;
 	}
 
 	@Override
@@ -133,16 +135,15 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public String toString() {
-		return "LightSensor [highThreshold=" + highThreshold + ", lowThreshold=" + lowThreshold + ", lowToHighDelayMs="
-				+ lowToHighDelayMs + ", highToLowDelayMs=" + highToLowDelayMs + ", measuredLevel=" + measuredLevel
-				+ ", state=" + state + "]";
+		return "LightSensor [highThreshold=" + highThreshold + ", lowThreshold=" + lowThreshold + ", lowToHighDelayMs=" + lowToHighDelayMs
+				+ ", highToLowDelayMs=" + highToLowDelayMs + ", measuredLevel=" + measuredLevel + ", state=" + state + "]";
 	}
 
 	// ===================
 	// PRIVATE API
 
 	private long lastInfoOnAnalogLevel;
-	
+
 	@Override
 	public void loop(long currentTime, long sequence) {
 		measuredLevel = getHw().readAnalogInput(getChannel());

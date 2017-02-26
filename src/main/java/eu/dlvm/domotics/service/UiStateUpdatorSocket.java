@@ -16,6 +16,7 @@ import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IStateChangedListener;
 import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
  * Is created whenever a websocket is created, so whenever a client connects. If

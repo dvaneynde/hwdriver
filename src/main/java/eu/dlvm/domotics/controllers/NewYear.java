@@ -13,7 +13,7 @@ import eu.dlvm.domotics.controllers.newyear.GSstate;
 import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
 
 public class NewYear extends Controller implements IEventListener, IUiCapableBlock {
 

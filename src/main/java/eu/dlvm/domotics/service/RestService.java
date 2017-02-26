@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.service.uidata.UiInfo;
 
 @Singleton
 @Path("")

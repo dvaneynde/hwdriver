@@ -10,7 +10,8 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
 
 /**
  * Dimmed Lamp.
@@ -26,7 +27,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	public static final int DEFAULT_FULL_DIMTIME_MS = 5000; // milliseconds
 
 	private static Logger logger = LoggerFactory.getLogger(DimmedLamp.class);
-	
+
 	private double level, prevOnLevel;
 	private int factorHwOut;
 	private int msTimeFullDim = DEFAULT_FULL_DIMTIME_MS;
@@ -51,8 +52,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 * @param hardware
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel,
-			IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel, IDomoticContext ctx) {
 		super(name, description, ui, channel, ctx);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
@@ -60,8 +60,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 		prevOnLevel = 100;
 	}
 
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel,
-			IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel, IDomoticContext ctx) {
 		this(name, description, null, outputValueHardwareIfFull, channel, ctx);
 	}
 
@@ -80,8 +79,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 *            Link to underlying hardware layer.
 	 * @deprecated
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel,
-			IDomoticContext ctx) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoticContext ctx) {
 		this(name, description, null, outputValueHardwareIfFull, Integer.toString(channel), ctx);
 	}
 
@@ -371,8 +369,8 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 			if (lastUpDnLoopTime != -1) {
 				// This is skipped at the first loop() while UP or DOWN
 				double change = ((double) (current - lastUpDnLoopTime)) * 100.0d / (double) msTimeFullDim;
-				logger.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level
-						+ ", current-last=" + (current - lastUpDnLoopTime) + ", timeFullDimMs=" + msTimeFullDim);
+				logger.debug("Going (event=)" + state.toString() + ", change=" + change + ", current level=" + level + ", current-last="
+						+ (current - lastUpDnLoopTime) + ", timeFullDimMs=" + msTimeFullDim);
 				if (state == States.UP) {
 					level += change;
 					if (level > 100)
@@ -401,12 +399,8 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this);
-		// bi.addParm("on", getState() == States.OFF ? "0" : "1");
-		// bi.addParm("level", Integer.toString(getLevel()));
-		bi.setOn(getState() != States.OFF);
-		bi.setLevel(getLevel());
-		return bi;
+		UiInfoOnOffLevel uiInfo = new UiInfoOnOffLevel(this, getState().toString(), getState() != States.OFF, getLevel());
+		return uiInfo;
 	}
 
 	@Override

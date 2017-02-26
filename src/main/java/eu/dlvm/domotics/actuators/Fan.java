@@ -10,15 +10,16 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 
 /**
  * A Fan that runs for a {@link #getOnDurationSec()} seconds when toggled on.
  * <P>
  * The fan also supports delayed on and off, useful when connected to a Lamp (or
  * any other event source): if the lamp goes on then after
- * {@link #getDelayOnDurationSec()} the fan will run until the lamp goes off
- * again plus {@link #getDelayOffDurationSec()} seconds while the lamp is off.
+ * {@link #getDelayOff2OnSec()} the fan will start running and goes off
+ * after the lamp was out for {@link #getDelayOn2OffSec()} seconds.
  * <p>
  * The state diagram below shows all possibilities.
  * <p>
@@ -28,10 +29,24 @@ import eu.dlvm.domotics.service.UiInfo;
  * <li>TODO</li>
  * <li></li>
  * </ul>
- * 
+ * FIXME externalize state machine - has become too complex and need encapsulation
  * @author Dirk Vaneynde
  */
 
+/*
+ * BUG
+2017-02-26 18:55:35 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Fan 'VentilatorWC0' received delay-off, keep running for 180 sec.
+2017-02-26 18:55:35 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes OFF, toggle() called.
+2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.sensors.Switch - Switch 'SchakLichtWC0' notifies SINGLE click event (seq=30969012).
+2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Fan 'VentilatorWC0' in delay for ON for 180 sec.
+2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes on, on() called.
+2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes ON, toggle() called.
+2017-02-26 18:57:29 [Oscillator] INFO  eu.dlvm.domotics.sensors.Switch - Switch 'SchakLichtWC0' notifies SINGLE click event (seq=30969281).
+2017-02-26 18:57:29 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Lamp goes off before delay period has expired. No fanning.
+2017-02-26 18:57:29 [Oscillator] WARN  eu.dlvm.domotics.actuators.Fan - delayOff ignored, is missing code. status=Fan [onDurationMs=300000, delayToOnDurationMs=180000, delayTo
+OffDurationMs=180000, timeStateEntered=-1, state=OFF] 
+MAAR: ventilator blijft draaien, ging dus niet echt uit !
+*/
 public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 
 	static Logger logger = LoggerFactory.getLogger(Fan.class);
@@ -40,12 +55,12 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	 * Default time fan will be held off to run when delay-on event (typically
 	 * connected lamp going on) has been received.
 	 */
-	public static final int DEFAULT_DELAY_ON_DURATION_SEC = 120;
+	public static final int DEFAULT_DELAY_OFF2ON_SEC = 120;
 	/**
 	 * Default time fan keeps running when delay-off event (typically connected
 	 * lamp going off) has been received.
 	 */
-	public static final int DEFAULT_DELAY_OFF_DURATION_SEC = 180;
+	public static final int DEFAULT_DELAY_ON2OFF_SEC = 180;
 	/**
 	 * Default running period for a Fan.
 	 */
@@ -57,20 +72,20 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	public static final int MAX_ON_PERIOD_SED = 10 * 60;
 
 	/**
-	 * ON_D is in combination with DELAYED_ON and _OFF.
+	 * ON_AFTER_DELAY is in combination with OFF_DELAY2ON and _OFF.
 	 * <p>
 	 * <img src="doc-files/FanStatechart.jpg"/>
 	 * 
 	 * @author dirk
 	 */
 	public enum States {
-		OFF, ON, DELAYED_ON, ON_D, DELAYED_OFF
+		OFF, ON, OFF_DELAY2ON, ON_AFTER_DELAY, ON_DELAY2OFF
 	};
 
 	private States state;
 	private long onDurationMs = DEFAULT_ON_DURATION_SEC * 1000L;
-	private long delayToOnDurationMs = DEFAULT_DELAY_ON_DURATION_SEC * 1000L;
-	private long delayToOffDurationMs = DEFAULT_DELAY_OFF_DURATION_SEC * 1000L;
+	private long delayToOnDurationMs = DEFAULT_DELAY_OFF2ON_SEC * 1000L;
+	private long delayToOffDurationMs = DEFAULT_DELAY_ON2OFF_SEC * 1000L;
 	private long timeStateEntered = -1L;
 
 	/**
@@ -94,29 +109,29 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 		return this;
 	}
 
-	public long getDelayOnDurationSec() {
+	public long getDelayOff2OnSec() {
 		return delayToOnDurationMs / 1000L;
 	}
 
-	public void setDelayOnDurationSec(long delayOnPeriodSec) {
+	public void setDelayOff2OnSec(long delayOnPeriodSec) {
 		this.delayToOnDurationMs = delayOnPeriodSec * 1000L;
 	}
 
-	public Fan overrideDelayOnDurationSec(long delayOnPeriodSec) {
-		setDelayOnDurationSec(delayOnPeriodSec);
+	public Fan overrideDelayOff2OnSec(long delayOnPeriodSec) {
+		setDelayOff2OnSec(delayOnPeriodSec);
 		return this;
 	}
 
-	public long getDelayOffDurationSec() {
+	public long getDelayOn2OffSec() {
 		return delayToOffDurationMs / 1000L;
 	}
 
-	public void setDelayOffDurationSec(long delayOffPeriodSec) {
+	public void setDelayOn2OffSec(long delayOffPeriodSec) {
 		this.delayToOffDurationMs = delayOffPeriodSec * 1000L;
 	}
 
-	public Fan overrideDelayOffDurationSec(long delayOffPeriodSec) {
-		setDelayOffDurationSec(delayOffPeriodSec);
+	public Fan overrideDelayOn2OffSec(long delayOffPeriodSec) {
+		setDelayOn2OffSec(delayOffPeriodSec);
 		return this;
 	}
 
@@ -126,7 +141,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	}
 
 	public boolean isOn() {
-		return (state == States.ON || state == States.ON_D || state == States.DELAYED_OFF);
+		return (state == States.ON || state == States.ON_AFTER_DELAY || state == States.ON_DELAY2OFF);
 	}
 
 	public void on() {
@@ -152,20 +167,20 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 			writeOutput(fanOn);
 			logger.info("Fan '" + getName() + "' goes ON (state=" + getState() + ").");
 			break;
-		case DELAYED_ON:
-			changeState(States.ON_D);
+		case OFF_DELAY2ON:
+			changeState(States.ON_AFTER_DELAY);
 			fanOn = true;
 			writeOutput(fanOn);
 			logger.info("Fan '" + getName() + "' goes ON for " + getOnDurationSec() + " sec. or until switched off (state=" + getState() + ").");
 			break;
-		case ON_D:
-			changeState(States.DELAYED_ON);
+		case ON_AFTER_DELAY:
+			changeState(States.OFF_DELAY2ON);
 			fanOn = false;
 			writeOutput(fanOn);
-			logger.info("Fan '" + getName() + "' goes off and into DELAYED_ON because of toggle.");
+			logger.info("Fan '" + getName() + "' goes off and into OFF_DELAY2ON because of toggle.");
 			break;
 		case ON:
-		case DELAYED_OFF:
+		case ON_DELAY2OFF:
 		default:
 			changeState(States.OFF);
 			fanOn = false;
@@ -177,7 +192,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	}
 
 	/**
-	 * Only effective when in state ON_D, otherwise ignored.
+	 * Only effective when in state ON_AFTER_DELAY, otherwise ignored.
 	 * <p>
 	 * Turns off fan, and fan will remain off until lamp is off.
 	 * <p>
@@ -187,23 +202,25 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	public void reallyOff() {
 		changeState(States.OFF);
 		writeOutput(false);
-		logger.info("Fan '" + getName() + "' goes OFF (state=" + getState() + ").");
+		logger.info("Fan '" + getName() + "' goes OFF (really-off) (state=" + getState() + ").");
 	}
 
 	public void delayOn() {
-		state = States.DELAYED_ON;
+		// TODO check state...
+		state = States.OFF_DELAY2ON;
 		timeStateEntered = -1L;
-		logger.info("Fan '" + getName() + "' in delay for ON for " + getDelayOnDurationSec() + " sec.");
+		logger.info("Fan '" + getName() + "' in delay OFF to ON for " + getDelayOff2OnSec() + " sec.");
 	}
 
 	public void delayOff() {
+		// TODO check state...
 		switch (state) {
-		case ON_D:
-			state = States.DELAYED_OFF;
+		case ON_AFTER_DELAY:
+			state = States.ON_DELAY2OFF;
 			timeStateEntered = -1L;
-			logger.info("Fan '" + getName() + "' received delay-off, keep running for " + getDelayOffDurationSec() + " sec.");
+			logger.info("Fan '" + getName() + "' received delay-off, keep running for " + getDelayOn2OffSec() + " sec.");
 			break;
-		case DELAYED_ON:
+		case OFF_DELAY2ON:
 			state = States.OFF;
 			timeStateEntered = -1L;
 			logger.info("Lamp goes off before delay period has expired. No fanning.");
@@ -273,19 +290,25 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 				logger.info("Fan '" + getName() + "' goes off because it has run for " + getOnDurationSec() + " sec (seq=" + sequence + ").");
 			}
 			break;
-		case DELAYED_ON:
+		case OFF_DELAY2ON:
 			if ((current - timeStateEntered) > delayToOnDurationMs) {
 				writeOutput(true);
-				state = States.ON_D;
+				state = States.ON_AFTER_DELAY;
 				timeStateEntered = current;
 				logger.info("Fan '" + getName() + "' stays ON for as long as no delay-off is received, or manual off.");
 			}
 			break;
-		case ON_D:
-			// TODO if running for 10 minutes, without delay-off, then stop too
-			break;
-		case DELAYED_OFF:
+		case ON_AFTER_DELAY:
+			//  if running too long, without delay-off, then stop too
 			if ((current - timeStateEntered) > onDurationMs) {
+				writeOutput(false);
+				state = States.OFF;
+				timeStateEntered = current;
+				logger.info("Fan '" + getName() + "' goes off (while on because lamp triggered this) because it has run for " + getOnDurationSec() + " sec (seq=" + sequence + ").");
+			}
+			break;
+		case ON_DELAY2OFF:
+			if ((current - timeStateEntered) > delayToOffDurationMs) {
 				writeOutput(false);
 				state = States.OFF;
 				timeStateEntered = current;
@@ -301,11 +324,9 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this);
-		//bi.addParm("on", isOn() ? "1" : "0");
-		bi.setOn(isOn());
+		UiInfoOnOff uiInfo = new UiInfoOnOff(this, getState().toString(), isOn());
 		// TODO time still running, if running
-		return bi;
+		return uiInfo;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service;
+package eu.dlvm.domotics.service.uidata;
 
 import eu.dlvm.domotics.base.Block;
 
@@ -13,24 +13,27 @@ public class UiInfo {
 	private String type;
 	private String description = "";
 	private String group = "";
-	private boolean on;
-	private int level;
 	private String status = "";
 
 	public UiInfo() {
 	}
 
-	public UiInfo(Block block) {
-		this(block.getName(), block.getClass().getSimpleName(), block.getUiGroup(), block.getDescription());
+	public UiInfo(Block block, String status) {
+		// this(block.getName(), block.getClass().getSimpleName(), block.getUiGroup(), block.getDescription());
+		setName(block.getName());
+		setType(block.getClass().getSimpleName());
+		setGroup(block.getUiGroup());
+		setDescription(block.getDescription());
+		setStatus(status);
 	}
 
-	public UiInfo(String name, String type, String uiGroup, String description) {
-		this();
-		setName(name);
-		setType(type);
-		setGroup(uiGroup);
-		setDescription(description);
-	}
+//	public UiInfo(String name, String type, String uiGroup, String description) {
+//		this();
+//		setName(name);
+//		setType(type);
+//		setGroup(uiGroup);
+//		setDescription(description);
+//	}
 
 	public String getName() {
 		return name;
@@ -56,22 +59,6 @@ public class UiInfo {
 		this.description = (description == null ? "" : description);
 	}
 
-	public boolean isOn() {
-		return on;
-	}
-
-	public void setOn(boolean on) {
-		this.on = on;
-	}
-
-	public int getLevel() {
-		return level;
-	}
-
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -87,10 +74,10 @@ public class UiInfo {
 	public void setGroup(String group) {
 		this.group = (group == null ? "" : group);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", on=" + on + ", level="
-				+ level + "]";
+		return "UiInfoOnOff [name=" + name + ", type=" + type + ", description=" + description + ", group=" + group + ", status=" + status + "]";
 	}
+
 }

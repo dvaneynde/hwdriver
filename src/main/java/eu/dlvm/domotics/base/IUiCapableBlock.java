@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.base;
 
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
  * Blocks that can be shown and updated via GUI.
@@ -11,7 +11,7 @@ public interface IUiCapableBlock {
 
 	/**
 	 * Status and description information for displaying on GUI. The
-	 * identifying name of this block is in {@link UiInfo#getName()}.
+	 * identifying name of this block is in {@link UiInfoOnOff#getName()}.
 	 */
 	public UiInfo getUiInfo();
 

@@ -10,7 +10,7 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
  * Represents two Screen relays, one for the motor lifting a screen, the second
@@ -169,9 +169,9 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo bi = new UiInfo(this);
-		bi.setStatus("" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " STORM" : ""));
-		return bi;
+		String status = "" + getRatioClosedAsPercentage() + "% " + asSign() + (protect ? " STORM" : "");
+		UiInfo uiInfo = new UiInfo(this, status);
+		return uiInfo;
 	}
 
 	private String asSign() {
