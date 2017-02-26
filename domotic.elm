@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
 import Http
 import Task exposing (Task)
-import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, map7, field)
+import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, field, oneOf, succeed)
 import Json.Encode as Encode
 import WebSocket
 import Material
@@ -24,13 +24,15 @@ import Material.Slider as Slider
    But when on same server no problem.
    anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
-
 -- GLOBAL
 
 
 urlBase =
     "localhost:8080"
-    --"192.168.0.10:8080"
+
+
+
+--"192.168.0.10:8080" -- must be ip address, otherwise CORS problems
 
 
 urlUpdateActuators =
@@ -43,11 +45,11 @@ wsStatus =
 
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
-    --To disable websockets for test:
-    --Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
 
 
 
+--To disable websockets for test:
+--Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
 -- MODEL
 
 
@@ -55,12 +57,23 @@ type alias Group2OpenDict =
     Dict.Dict String Bool
 
 
+type ExtraStatus
+    = None
+    | OnOff Bool
+    | OnOffLevel Bool Int
+
+
 type alias StatusRecord =
-    { name : String, kind : String, group : String, description : String, on : Bool, level : Int, status : String }
+    { name : String, kind : String, group : String, description : String, status : String, extra : ExtraStatus }
 
 
 type alias Model =
     { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model }
+
+
+initialStatus : StatusRecord
+initialStatus =
+    { name = "", kind = "", group = "", description = "", status = "", extra = None }
 
 
 init : ( Model, Cmd Msg )
@@ -73,11 +86,6 @@ initGroups =
     Dict.fromList [ ( "Screens", False ), ( "Beneden", True ), ( "Nutsruimtes", True ), ( "Kinderen", True ), ( "Buiten", False ) ]
 
 
-initialStatus : StatusRecord
-initialStatus =
-    { name = "", kind = "", group = "", description = "", on = False, level = 0, status = "" }
-
-
 statusByName : String -> List StatusRecord -> StatusRecord
 statusByName name listOfRecords =
     let
@@ -86,13 +94,16 @@ statusByName name listOfRecords =
     in
         Maybe.withDefault initialStatus (List.head filteredList)
 
+
 nameInGroup : String -> String
 nameInGroup group =
     let
-        groupSplit = String.split ":" group
-
+        groupSplit =
+            String.split ":" group
     in
         Maybe.withDefault group (List.head groupSplit)
+
+
 
 -- UPDATE
 
@@ -152,16 +163,15 @@ update msg model =
             ( { model | group2Open = (toggleGroup2Open model.group2Open name) }, Cmd.none )
 
         NewStatusViaRest (Ok statuses_) ->
-            ( {  model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
+            ( { model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
 
         NewStatusViaRest (Err message) ->
-            ( { model | errorMsg = ("NewStatusViaRest: "++ (toString message)) }, Cmd.none )
+            ( { model | errorMsg = ("NewStatusViaRest: " ++ (toString message)) }, Cmd.none )
 
 
 isGroupOpen : Group2OpenDict -> String -> Bool
 isGroupOpen blocks blockName =
     Maybe.withDefault True (Dict.get blockName blocks)
-
 
 
 toggleGroup2Open : Group2OpenDict -> String -> Group2OpenDict
@@ -200,21 +210,30 @@ statusesDecoder =
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-    map7 StatusRecord
+    Decode.map6 StatusRecord
         (field "name" string)
         (field "type" string)
         (field "group" string)
         (field "description" string)
-        (field "on" bool)
-        (field "level" int)
         (field "status" string)
+        (oneOf [ decoderExtraOnOffLevel, decoderExtraOnOff, succeed None ])
+
+
+decoderExtraOnOffLevel : Decoder ExtraStatus
+decoderExtraOnOffLevel =
+    Decode.map2 OnOffLevel (field "on" bool) (field "level" int)
+
+
+decoderExtraOnOff : Decoder ExtraStatus
+decoderExtraOnOff =
+    Decode.map OnOff (field "on" bool)
 
 
 toggleBlock : String -> Model -> Cmd Msg
 toggleBlock what model =
     let
         onOff =
-            not (statusByName what model.statuses).on
+            not (isOnByName what model.statuses)
 
         onOffText =
             if onOff then
@@ -228,8 +247,11 @@ toggleBlock what model =
 updateStatusViaRestCmd : String -> String -> Cmd Msg
 updateStatusViaRestCmd name value =
     let
-        url = urlUpdateActuators ++ name ++ "/" ++ value
-        request = Http.get url statusesDecoder
+        url =
+            urlUpdateActuators ++ name ++ "/" ++ value
+
+        request =
+            Http.get url statusesDecoder
     in
         --Task.perform RestError NewStatusViaRest ()
         Http.send NewStatusViaRest request
@@ -250,14 +272,36 @@ subscriptions model =
 -- https://debois.github.io/elm-mdl/
 
 
-levelByName : String -> Model -> String
-levelByName name model =
-    (toString (statusByName name model.statuses).level)
+levelByName : String -> List StatusRecord -> Float
+levelByName name statuses =
+    let
+        status =
+            statusByName name statuses
+    in
+        case status.extra of
+            OnOffLevel isOn level ->
+                (toFloat level)
+
+            _ ->
+                0.0
 
 
-isOnByName : String -> Model -> Bool
-isOnByName name model =
-    (statusByName name model.statuses).on
+isOnByName : String -> List StatusRecord -> Bool
+isOnByName name statuses =
+    isOn (statusByName name statuses).extra
+
+
+isOn : ExtraStatus -> Bool
+isOn extraStatus =
+    case extraStatus of
+        OnOff isOn ->
+            isOn
+
+        OnOffLevel isOn level ->
+            isOn
+
+        _ ->
+            False
 
 
 screenStatus : String -> Model -> String
@@ -269,29 +313,24 @@ screenStatus name model =
         (toString status)
 
 
-level : String -> Model -> Float
-level name model =
-    (toFloat (statusByName name model.statuses).level)
-
-
 toggle : String -> Int -> Model -> Html Msg
 toggle name nr model =
-    Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text name ]
+    Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text name ]
 
 
 toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
-    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ] ]
+    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ] ]
 
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
     div [ style [ ( "display", "inline-block" ) ] ]
         -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
-        [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model) ] [ text desc ]
+        [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ]
         , Slider.view
-            ([ Slider.onChange (SliderMsg name), Slider.value (level name model) ]
-                ++ (if (isOnByName name model) then
+            ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.statuses) ]
+                ++ (if (isOnByName name model.statuses) then
                         []
                     else
                         [ Slider.disabled ]
@@ -322,11 +361,9 @@ chainWidget widgetToAddTakingId ( widgets, seq ) =
 screenWidgets : Model -> List (Html Msg)
 screenWidgets model =
     let
-        --(list, _) = ([],0) |> chainWidget (screenDiv ( "ScreenKeuken", "Keuken" ) model)
         first =
             screenDiv ( "ScreenKeuken", "Keuken" ) model 0
 
-        --(result, _) = chainWidget (screenDiv ( "ScreenTomas", "Tomas" )) ([first], 2)
         ( result, _ ) =
             ( [ first ], 2 )
                 |> chainWidget (screenDiv ( "ScreenTomas", "Tomas" ) model)
@@ -338,15 +375,24 @@ screenWidgets model =
     in
         result
 
+
+
 -- true iff at least one actuator is on in the given group
+
+
 somethingOn : Model -> String -> Bool
 somethingOn model groupName =
     let
-        groupStatuses = List.filter (\status -> ((nameInGroup status.group) == groupName)) model.statuses
+        groupStatuses =
+            List.filter (\status -> ((nameInGroup status.group) == groupName)) model.statuses
     in
-        List.foldl (\status -> \soFar -> status.on || soFar) False groupStatuses
+        List.foldl (\status -> \soFar -> (isOn status.extra) || soFar) False groupStatuses
+
+
 
 -- other color depending on wether something is on or off
+
+
 colorOfBlock : Model -> String -> String
 colorOfBlock model groupName =
     if (somethingOn model groupName) then
@@ -359,7 +405,7 @@ groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ("margin","0px 0px 10px 0px"), ("padding","10px 10px 10px 10px") ] ]
+            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ( "margin", "0px 0px 10px 0px" ), ( "padding", "10px 10px 10px 10px" ) ] ]
             [ Button.render Mdl
                 [ nr ]
                 model.mdl
@@ -376,7 +422,11 @@ groupToggleBar groupName nr model content =
         , content model
         ]
 
-lightPercentage level = (level - 3000) // 40
+
+lightPercentage : Float -> Float
+lightPercentage level =
+    (level - 3000) / 40
+
 
 view : Model -> Html Msg
 view model =
@@ -390,13 +440,13 @@ view model =
                         ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Zon: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (levelByName "Lichtmeter" model) ] []
-                            , text (toString (lightPercentage((statusByName "Lichtmeter" model.statuses).level)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
+                            , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
                             ]
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Wind: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (levelByName "Windmeter" model) ] []
-                            , text ((toString (toFloat ((statusByName "Windmeter" model.statuses).level) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName "Windmeter" model.statuses)) ] []
+                            , text ((toString ((levelByName "Windmeter" model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
                             ]
                          ]
                             ++ screenWidgets model
@@ -410,13 +460,13 @@ view model =
             (\model ->
                 if (isGroupOpen model.group2Open "Beneden") then
                     div []
-                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model) ] [ text "Keuken" ] ]
+                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model.statuses) ] [ text "Keuken" ] ]
                         , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
                         , div [] []
                         , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Options.onToggle (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model) ] [ text "Circante Tafel" ] ]
+                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Options.onToggle (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model.statuses) ] [ text "Circante Tafel" ] ]
                         , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Options.onToggle (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model) ] [ text "Bureau" ] ]
+                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Options.onToggle (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model.statuses) ] [ text "Bureau" ] ]
                         ]
                 else
                     div [] []
