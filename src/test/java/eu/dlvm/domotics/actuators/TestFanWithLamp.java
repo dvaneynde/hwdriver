@@ -52,31 +52,31 @@ public class TestFanWithLamp {
 	}
 
 	private void assertOff() {
-		Assert.assertEquals(Fan.States.OFF, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.OFF, fan.getState());
 		Assert.assertFalse(fan.isOn());
 		Assert.assertTrue(!hw.fanStatus);
 	}
 
 	private void assertOn() {
-		Assert.assertEquals(Fan.States.ON, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.ON, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.fanStatus);
 	}
 
 	private void assertDelayedOn_LampOn() {
-		Assert.assertEquals(Fan.States.OFF_DELAY2ON, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.OFF_DELAY2ON, fan.getState());
 		Assert.assertFalse(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && !hw.fanStatus);
 	}
 
 	private void assertOn_LampOn() {
-		Assert.assertEquals(Fan.States.ON_AFTER_DELAY, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.ON_AFTER_DELAY, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && hw.fanStatus);
 	}
 
 	private void assertDelayedOff_LampOff() {
-		Assert.assertEquals(Fan.States.ON_DELAY2OFF, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.ON_DELAY2OFF, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(!hw.lampStatus && hw.fanStatus);
 	}
@@ -233,4 +233,41 @@ public class TestFanWithLamp {
 		assertOff();
 	}
 
+	/*
+	 * BUG
+	2017-02-26 18:55:35 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Fan 'VentilatorWC0' received delay-off, keep running for 180 sec.
+	2017-02-26 18:55:35 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes OFF, toggle() called.
+	...
+	2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.sensors.Switch - Switch 'SchakLichtWC0' notifies SINGLE click event (seq=30969012).
+	2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Fan 'VentilatorWC0' in delay for ON for 180 sec.
+	2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes on, on() called.
+	2017-02-26 18:57:23 [Oscillator] INFO  eu.dlvm.domotics.actuators.Lamp - Lamp 'LichtWC0' goes ON, toggle() called.
+	2017-02-26 18:57:29 [Oscillator] INFO  eu.dlvm.domotics.sensors.Switch - Switch 'SchakLichtWC0' notifies SINGLE click event (seq=30969281).
+	2017-02-26 18:57:29 [Oscillator] INFO  eu.dlvm.domotics.actuators.Fan - Lamp goes off before delay period has expired. No fanning.
+	2017-02-26 18:57:29 [Oscillator] WARN  eu.dlvm.domotics.actuators.Fan - delayOff ignored, is missing code. status=Fan [onDurationMs=300000, delayToOnDurationMs=180000, delayTo
+	OffDurationMs=180000, timeStateEntered=-1, state=OFF] 
+	Error: Fan remained running, even if state was off.
+	So: when in delay for off (still running) then lamp goes on so goes to delay for on (should not be running, but remains running). Should go to on-after-delay.
+	*/
+	@Test
+	public void bugWhenInDelayToOffAndLightGoesOnMustGoToOnAfterDelay() {
+		fan.loop(current, seq++);
+		assertOff();
+		fan.loop(current += 10, seq++);
+		// Lamp on
+		lamp.on();
+		fan.loop(current += 10, seq++);
+		assertDelayedOn_LampOn();
+		// Let lamp on long enough, so that fan goes on
+		fan.loop(current += (fan.getDelayOff2OnSec() * 1000 + 10), seq++);
+		assertOn_LampOn();
+		// Lamp off
+		lamp.off();
+		fan.loop(current += 10, seq++);
+		assertDelayedOff_LampOff();
+		// Lamp on again
+		lamp.on();
+		fan.loop(current += 10, seq++);
+		assertOn_LampOn();
+	}
 }
