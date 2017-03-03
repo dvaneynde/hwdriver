@@ -70,7 +70,7 @@ public class TestFanWithLamp {
 	}
 
 	private void assertOn_LampOn() {
-		Assert.assertEquals(FanStatemachine.States.ON_AFTER_DELAY, fan.getState());
+		Assert.assertEquals(FanStatemachine.States.ON_DELAY, fan.getState());
 		Assert.assertTrue(fan.isOn());
 		Assert.assertTrue(hw.lampStatus && hw.fanStatus);
 	}

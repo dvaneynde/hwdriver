@@ -125,6 +125,10 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 		return delayToOffDurationMs;
 	}
 
+	public long getDelayToOffDurationSec() {
+		return delayToOffDurationMs/1000L;
+	}
+
 	@Override
 	public void initializeOutput(RememberedOutput ro) {
 		writeOutput(false);
@@ -163,7 +167,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	//
 	
 	/**
-	 * Only effective when in state ON_AFTER_DELAY, otherwise ignored.
+	 * Only effective when in state ON_DELAY, otherwise ignored.
 	 * <p>
 	 * Turns off fan, and fan will remain off until lamp is off.
 	 * <p>
