@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# Start domotic system at startup.
-#
+# Start domotic system as a service.
+# For version 3.0 (with logback, java 8)
+# 
 # Author:	Dirk Vaneynde
-#
-# Version:	0.1
+# Version:	4/3/2017
 #
 
 #set -x
@@ -17,7 +17,7 @@ id | tee -a $BOOTLOG
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 NAME=domotic
-DESC="domotica v2 system"
+DESC="domotica v3 system"
 PIDFILE=$DOMDIR/domotic.pid
 PIDFILE_DRIVER=$DOMDIR/driver.pid
 SCRIPTNAME=/etc/init.d/$NAME
@@ -38,8 +38,28 @@ d_start() {
 		fi
 	fi
 	cd $DOMDIR
-	/usr/bin/java -Dlog4j.debug=true -jar $DOMDIR/domotic.jar domo -t 20 -l $DOMDIR/log4j.properties -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver >>$BOOTLOG 2>&1 &
+	/usr/bin/java -Dlogback.configurationFile=$DOMDIR/logback.xml -jar $DOMDIR/domotic.jar domo -t 20 -b $DOMDIR/DomoticConfig.xml -c $DOMDIR/DiamondBoardsConfig.xml -d $DOMDIR/hwdriver -w $DOMDIR/static >>$BOOTLOG 2>&1 &
 	echo "Domotic started." | tee -a $BOOTLOG
+}
+
+# kill process of which id is in file given by 1st parameter
+killprocess() {
+	if [ ! \( -f $1 \) ]
+	then
+	echo "No pidfile $1 found, cannot stop domotic system." | tee -a $BOOTLOG
+	else
+		pid=$(cat $1)
+		kill $pid
+		sleep 1
+		ps -p $pid 
+		if [ $? -eq 0 ]
+		then
+			echo "Cannot stop process ${pid}, doing it the hard way." | tee -a $BOOTLOG
+			kill -9 $pid >/dev/null 2>&1 
+		fi
+		rm -f $1
+		echo "Stopped process ${pid}, removed file ${1}." | tee -a $BOOTLOG
+	fi		
 }
 
 #
@@ -47,21 +67,10 @@ d_start() {
 #
 d_stop() {
 	cd $DOMDIR
-	if [ ! \( -f $PIDFILE \) ]
-	then
-		echo "No $PIDFILE file found, cannot stop domotic system." | tee -a $BOOTLOG
-	else
-		kill $(cat $PIDFILE) 
-		sleep 1
-		ps -p $(cat $PIDFILE) 
-		if [ $? -eq 0 ]
-		then
-			echo "... can't stop it, doing it the hard way." | tee -a $BOOTLOG
-			#kill -9 $(cat $PIDFILE) 
-			#kill -9 $(cat $PIDFILE_DRIVER) >/dev/null 2>&1
-		fi
-		echo "Done." | tee -a $BOOTLOG
-	fi
+	echo "Stopping domotic system (java program)..."
+	killprocess $PIDFILE
+	echo "Stopping hardware driver..."
+	killprocess $PIDFILE_DRIVER
 }
 
 #
