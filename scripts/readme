@@ -1,0 +1,11 @@
+domotic.sh: 
+- copy to /etc/init.d/domotic.sh
+
+watchdog.sh: 
+- will check domotic.pid, and if process is not there but domotic.pid is, it will restart via 'domotic.sh restart'
+- to install:
+
+dirk@domotica3:~/domotic$ sudo crontab -l
+# m h  dom mon dow   command
+# Every minute run watchdog for domotic
+* * * * *	/home/dirk/domotic/watchdog.sh >/home/dirk/domotic/cron.out
