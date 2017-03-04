@@ -40,11 +40,11 @@ public class FanStatemachine {
 	// ===== Updates =====
 
 	private void logEvent(States oldState, String event, long time) {
-		logger.info("Fan %s - event %s [ %s -> %s ] - maximum %i seconds.", fan.getName(), oldState.name(), getState().name(), time);
+		logger.info("Fan {} - event {} [ {} -> {} ] - takes {} seconds.", fan.getName(), event, oldState.name(), getState().name(), time);
 	}
 
 	private void logEvent(States oldState, String event) {
-		logger.info("Fan %s - event %s [ %s -> %sgoes ON ].", fan.getName(), oldState.name(), getState().name());
+		logger.info("Fan {} - event {} [ {} -> {} ].", fan.getName(), event, oldState.name(), getState().name());
 	}
 
 	/**
@@ -57,24 +57,20 @@ public class FanStatemachine {
 		switch (oldState) {
 		case OFF:
 			fanOn = changeState(States.ON);
-			//logger.info("Fan '" + fan.getName() + "' goes ON because of toggle (OFF->ON).");
 			logEvent(oldState, "toggle", fan.getOnDurationSec());
 			break;
 		case OFF_DELAY2ON:
 			fanOn = changeState(States.ON_DELAY);
-			//logger.info("Fan '" + fan.getName() + "' goes ON for " + fan.getOnDurationSec() + " sec. or until switched off (state=" + getState() + ").");
 			logEvent(oldState, "toggle");
 			break;
 		case ON_DELAY:
 			fanOn = changeState(States.OFF_DELAY2ON);
-			//logger.info("Fan '" + fan.getName() + "' goes off and into OFF_DELAY2ON because of toggle.");
 			logEvent(oldState, "toggle", fan.getDelayOn2OffSec());
 			break;
 		case ON:
 		case ON_DELAY2OFF:
 		default:
 			fanOn = changeState(States.OFF);
-			//logger.info("Fan '" + fan.getName() + "' goes OFF because toggled.");
 			logEvent(oldState, "toggle");
 			break;
 		}
@@ -92,7 +88,6 @@ public class FanStatemachine {
 	public void reallyOff() {
 		States oldState = state;
 		changeState(States.OFF);
-		//logger.info("Fan '" + fan.getName() + "' goes OFF (really-off) (state=" + getState() + ").");
 		logEvent(oldState, "reallyOff");
 
 	}
@@ -102,23 +97,20 @@ public class FanStatemachine {
 		switch (oldState) {
 		case OFF:
 			changeState(States.OFF_DELAY2ON);
-			//logger.info("Fan '" + fan.getName() + "' in delay OFF to ON for " + fan.getDelayOff2OnSec() + " sec.");
 			logEvent(oldState, "delayOn", fan.getDelayOff2OnSec());
 			break;
 		case ON:
 			changeState(States.ON_DELAY);
-			//logger.info("Fan '" + fan.getName() + "' back to ON because delayed-on received.");
 			logEvent(oldState, "delayOn");
 			break;
 		case ON_DELAY2OFF:
 			changeState(States.ON_DELAY);
-			//logger.info("Fan '" + fan.getName() + "' back to ON because delayed-on received.");
 			logEvent(oldState, "delayOn");
 			break;
 		case ON_DELAY:
 		default:
 			changeState(States.OFF);
-			logger.warn("Unexpected event 'delayOn', going OFF (%s -> %s).", oldState.name(), state.name());
+			logger.warn("Unexpected event 'delayOn', going OFF ({} -> {}).", oldState.name(), state.name());
 		}
 	}
 
@@ -128,22 +120,20 @@ public class FanStatemachine {
 		case ON_DELAY:
 		case ON:
 			changeState(States.ON_DELAY2OFF);
-			//logger.info("Fan '" + fan.getName() + "' received delay-off, keep running for " + fan.getDelayOn2OffSec() + " sec.");
 			logEvent(oldState, "delayOff", fan.getDelayOn2OffSec());
 			break;
 		case OFF_DELAY2ON:
 			changeState(States.OFF);
-			//logger.info("Lamp goes off before delay-to-on period has expired. No fanning.");
 			logEvent(oldState, "delayOff");
 			break;
 		default:
 			changeState(States.OFF);
-			logger.warn("Unexpected event 'delayOff', going OFF (%s -> %s).", oldState.name(), state.name());
+			logger.warn("Unexpected event 'delayOff', going OFF ({} -> {}).", oldState.name(), state.name());
 		}
 	}
 
 	private void logLoop(States oldState, long time) {
-		logger.info("Fan %s - time of %i sec. passed [ %s -> %s ].", fan.getName(), time, oldState.name(), getState().name());
+		logger.info("Fan {} - time of {} sec. passed [ {} -> {} ].", fan.getName(), time, oldState.name(), getState().name());
 	}
 
 	public void loop(long current, long sequence) {
@@ -156,15 +146,13 @@ public class FanStatemachine {
 		case ON:
 			if ((current - timeStateEntered) > fan.getOnDurationMs()) {
 				changeState(States.OFF, current);
-				//logger.info("Fan '" + fan.getName() + "' goes off because it has run for " + fan.getOnDurationSec() + " sec (ON->OFF).");
 				logLoop(oldState, fan.getOnDurationSec());
 			}
 			break;
 		case OFF_DELAY2ON:
 			if ((current - timeStateEntered) > fan.getDelayToOnDurationMs()) {
 				changeState(States.ON_DELAY, current);
-				//logger.info("Fan '" + fan.getName() + "' stays ON for until delay-off, timeout or manual off (OFF_DELAY2ON->ON_DELAY).");
-				logLoop(oldState, fan.getDelayToOnDurationMs());
+				logLoop(oldState, fan.getDelayToOnDurationMs()/1000L);
 			}
 			break;
 		case ON_DELAY:
@@ -172,15 +160,12 @@ public class FanStatemachine {
 			long timeOut = 2 * fan.getOnDurationMs() + fan.getDelayToOffDurationMs();
 			if ((current - timeStateEntered) > timeOut) {
 				changeState(States.OFF, current);
-				//logger.info("Fan '" + fan.getName() + "' goes off because it has run for " + timeOut / 1000 + " sec. (ON_DELAY->OFF)");
 				logLoop(oldState, timeOut);
 			}
 			break;
 		case ON_DELAY2OFF:
 			if ((current - timeStateEntered) > fan.getDelayToOffDurationMs()) {
 				changeState(States.OFF, current);
-//				logger.info("Fan '" + fan.getName() + "' goes off because delayed OFF period of " + fan.getOnDurationSec()
-//						+ " sec. has passed (ON_DELAY2OFF->OFF).");
 				logLoop(oldState, fan.getDelayToOffDurationSec());
 			}
 			break;

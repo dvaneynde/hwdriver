@@ -50,7 +50,7 @@ public class Main {
 	}
 
 	private void startAndRunDomotic(int looptime, String path2Driver, String blocksCfgFile, String hwCfgFile, String hostname, int port, File htmlRootFile,
-			boolean simulation, boolean restartOnProblems) {
+			boolean simulation) {
 		PidSave pidSave = new PidSave(new File("./domotic.pid"));
 		String pid = pidSave.getPidFromCurrentProcessAndStoreToFile();
 		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\thardware cfg:\t" + hwCfgFile
@@ -59,7 +59,7 @@ public class Main {
 		IHardwareIO hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
 		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
 
-		dom.runDomotic(looptime, path2Driver, htmlRootFile, restartOnProblems);
+		dom.runDomotic(looptime, path2Driver, htmlRootFile);
 	}
 
 	/**
@@ -82,7 +82,6 @@ public class Main {
 		}
 		boolean domotic = false;
 		boolean simulation = false;
-		boolean restartIfProblems = false;
 		if (args[0].equalsIgnoreCase("domo"))
 			domotic = true;
 		else if (!args[0].equalsIgnoreCase("hw"))
@@ -100,9 +99,6 @@ public class Main {
 			} else if (args[i].equals("-s")) {
 				i++;
 				simulation = true;
-			} else if (args[i].equals("-r")) {
-				i++;
-				restartIfProblems = true;
 			} else if (args[i].equals("-b")) {
 				if (++i >= args.length)
 					usage();
@@ -143,7 +139,7 @@ public class Main {
 		}
 
 		if (domotic) {
-			new Main().startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, htmlRootFile, simulation, restartIfProblems);
+			new Main().startAndRunDomotic(looptime, path2Driver, blocksCfgFile, hwCfgFile, hostname, port, htmlRootFile, simulation);
 		} else {
 			new HwConsoleRunner().run(hwCfgFile, hostname, port, path2Driver);
 		}
@@ -156,7 +152,6 @@ public class Main {
 				+ " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file\n"
 				+ "\t" + Main.class.getSimpleName() + " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file\n"
 				+ "\t-s simulate hardware driver (domotic only, for testing and development)\n"
-				+ "\t-r restart (or try to) if something is wrong with driver or loopsequence\n"
 				+ "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms; defaults to "
 				+ DEFAULT_LOOP_TIME_MS + " ms.\n" + "\t-h hostname of hardware driver; incompatible with -d"
 				+ "\t-p port of hardware driver; incompatible with -d" + "\t-w path of directory with webapp (where index.html is located)"

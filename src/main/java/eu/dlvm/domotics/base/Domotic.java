@@ -44,7 +44,6 @@ import eu.dlvm.iohardware.IHardwareIO;
 public class Domotic implements IDomoticContext {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
-	public static int RESTART_DRIVER_WAITTIME_MS = 30000;
 
 	private static Logger log = LoggerFactory.getLogger(Domotic.class);
 	private static Logger MON = LoggerFactory.getLogger("MONITOR");
@@ -55,8 +54,9 @@ public class Domotic implements IDomoticContext {
 	private Process driverProcess;
 	private OutputStateSaver saveState;
 
-	private AtomicBoolean stopRequested = new AtomicBoolean();
-	private AtomicBoolean restartDriverRequested = new AtomicBoolean();
+	private AtomicBoolean normalStopRequested = new AtomicBoolean();
+	private AtomicBoolean errorStopRequested = new AtomicBoolean();
+	private int nrNoResponsesFromDriver;
 
 	// protected access for test cases only
 	protected IHardwareIO hw = null;
@@ -223,23 +223,29 @@ public class Domotic implements IDomoticContext {
 		}
 	}
 
-	private void addShutdownHook(Domotic dom) {
-		Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
-			@Override
-			public void run() {
-				log.info("Inside Add Shutdown Hook");
-				stopRequested.set(true);
-				log.warn("Stop requested - may take up to 5 seconds...");
-			}
-		});
-		log.info("Shutdown hook attached.");
-	}
-
+	/*	TODO does not work, especially not with websockets. All threads should stop gracefully upon normalStopRequested, but that is not yet implemented.
+	 * private void addShutdownHook(Domotic dom) {
+			final Thread mainThread = Thread.currentThread();
+			Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
+				@Override
+				public void run() {
+					log.info("Inside Shutdown Hook");
+					normalStopRequested.set(true);
+					log.warn("Stop requested - may take up to 5 seconds...");
+					try {
+						mainThread.join();
+					} catch (InterruptedException e) {
+					}
+				}
+			});
+			log.info("Shutdown hook attached.");
+		}
+	*/
 	/**
 	 * Domotic will stop running asap and gracefully. No guarantee...
 	 */
 	public void requestStop() {
-		stopRequested.set(true);
+		normalStopRequested.set(true);
 
 		if (maintThread == null) {
 			log.error("Calling interruptMainThread(), but mainThread is not set. Ignored.");
@@ -262,10 +268,9 @@ public class Domotic implements IDomoticContext {
 	 *            "START" in the logger.
 	 * @param htmlRootFile
 	 *            index.html of web app UI
-	 * @param checkDriverAndRestartOnError
 	 */
-	public void runDomotic(int looptime, String pathToDriver, File htmlRootFile, boolean checkDriverAndRestartOnError) {
-		addShutdownHook(this);
+	public void runDomotic(int looptime, String pathToDriver, File htmlRootFile) {
+		// TODO see addShutdownHook(this);
 		this.maintThread = Thread.currentThread();
 
 		ServiceServer server = null;
@@ -276,9 +281,9 @@ public class Domotic implements IDomoticContext {
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
-		stopRequested.set(false);
+		normalStopRequested.set(false);
 		boolean fatalError = false;
-		while (!stopRequested.get() && !fatalError) {
+		while (!normalStopRequested.get() && !fatalError) {
 			if (pathToDriver != null) {
 				fatalError = startDriverAndMonitoring(pathToDriver, fatalError);
 				if (fatalError)
@@ -299,24 +304,25 @@ public class Domotic implements IDomoticContext {
 
 			log.info("Everything started, now watching...");
 			long lastLoopSequence = -1;
-			while (!stopRequested.get() && !restartDriverRequested.get()) {
+			while (!normalStopRequested.get() && !errorStopRequested.get()) {
 				// TODO deze sleep moet interrupted ! Of heb ik dat al gedaan?
 				sleepSafe(MONITORING_INTERVAL_MS);
 				saveState.writeRememberedOutputs(actuators);
 
 				long currentLoopSequence = loopSequence;
 				if (currentLoopSequence <= lastLoopSequence) {
-					if (checkDriverAndRestartOnError) {
-						log.error("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current="
-								+ currentLoopSequence + ". I'll try to restart driver.");
-						break;
-					} else {
+					nrNoResponsesFromDriver++;
+					if (nrNoResponsesFromDriver < 3) {
 						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current="
-								+ currentLoopSequence + ". I'll ignore it since flag to restart is not set.");
+								+ currentLoopSequence + ". Trying again...");
+					} else {
+						log.error("Domotic did not loop for " + nrNoResponsesFromDriver + " times, exiting domotic.");
+						errorStopRequested.set(true);
 					}
-				}
+				} else
+					nrNoResponsesFromDriver = 0;
 				lastLoopSequence = currentLoopSequence;
-				if (pathToDriver != null && checkDriverAndRestartOnError) {
+				if (pathToDriver != null) {
 					if (driverMonitor.everythingSeemsWorking()) {
 						MON.info("Checked driver sub-process, seems OK.");
 					} else {
@@ -325,19 +331,17 @@ public class Domotic implements IDomoticContext {
 					}
 				}
 			}
-			boolean restartRequested = !stopRequested.get() && !fatalError;
-			// shutdown
-			// FIXME must do exit(1) to have it restarted
 			stopDriverOscilatorAndMonitor(pathToDriver, osc);
-			if (restartRequested) {
-				log.info("Will restart driver in " + RESTART_DRIVER_WAITTIME_MS / 1000 + " seconds...");
-				sleepSafe(RESTART_DRIVER_WAITTIME_MS);
+			if (errorStopRequested.get()) {
+				log.info("Halt with exit code 1 so watchdog will restart.");
+				System.exit(1);
 			}
 		}
 		if (server != null)
 			server.stop();
 
 		log.info("Domotica run exited.");
+
 	}
 
 	/**
