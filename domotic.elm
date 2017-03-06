@@ -3,20 +3,12 @@ module Domotic exposing (..)
 import Dict
 import Html exposing (Html, button, div, text, span, input, label, br, meter)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onCheck)
+import Html.Events exposing (onClick, onCheck, onInput)
 import Http
 import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, field, oneOf, succeed)
 import Json.Encode as Encode
 import WebSocket
-import Material
-import Material.Button as Button
-import Material.Scheme as Scheme
-import Material.Options as Options exposing (css)
-import Material.Icon as Icon
-import Material.Color as Color
-import Material.Toggles as Toggles
-import Material.Slider as Slider
 
 
 -- Domotics user interface
@@ -68,7 +60,7 @@ type alias StatusRecord =
 
 
 type alias Model =
-    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model }
+    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String }
 
 
 initialStatus : StatusRecord
@@ -78,7 +70,7 @@ initialStatus =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model }, Cmd.none )
+    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested" }, Cmd.none )
 
 
 initGroups : Group2OpenDict
@@ -110,12 +102,11 @@ nameInGroup group =
 
 type Msg
     = PutModelInTestAsString
-    | Mdl (Material.Msg Msg)
     | Clicked String
     | Checked String Bool
     | Down String
     | Up String
-    | SliderMsg String Float
+    | SliderMsg String String
     | ToggleShowBlock String
     | NewStatusViaWs String
     | NewStatusViaRest (Result Http.Error (List StatusRecord))
@@ -126,9 +117,6 @@ update msg model =
     case msg of
         PutModelInTestAsString ->
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
-
-        Mdl message_ ->
-            Material.update Mdl message_ model
 
         Clicked what ->
             ( model, toggleBlock what model )
@@ -150,7 +138,7 @@ update msg model =
             ( model, updateStatusViaRestCmd what "up" )
 
         SliderMsg what level ->
-            ( model, updateStatusViaRestCmd what (toString level) )
+            ( model, updateStatusViaRestCmd what level )
 
         NewStatusViaWs str ->
             let
@@ -269,7 +257,6 @@ subscriptions model =
 
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
--- https://debois.github.io/elm-mdl/
 
 
 levelByName : String -> List StatusRecord -> Float
@@ -289,6 +276,11 @@ levelByName name statuses =
 isOnByName : String -> List StatusRecord -> Bool
 isOnByName name statuses =
     isOn (statusByName name statuses).extra
+
+
+isOffByName : String -> List StatusRecord -> Bool
+isOffByName name statuses =
+    not (isOnByName name statuses)
 
 
 isOn : ExtraStatus -> Bool
@@ -313,37 +305,29 @@ screenStatus name model =
         (toString status)
 
 
-toggle : String -> Int -> Model -> Html Msg
-toggle name nr model =
-    Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text name ]
-
-
 toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
-    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ] ]
+    div []
+        [ input [ type_ "checkbox", onClick (Clicked name), checked (isOnByName name model.statuses) ] []
+        , text name
+        ]
 
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
     div [ style [ ( "display", "inline-block" ) ] ]
-        -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
-        [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ]
-        , Slider.view
-            ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.statuses) ]
-                ++ (if (isOnByName name model.statuses) then
-                        []
-                    else
-                        [ Slider.disabled ]
-                   )
-            )
+        [ input [ type_ "checkbox", onClick (Clicked name), checked (isOnByName name model.statuses) ] []
+        , text name
+        , input [ type_ "range", value (toString (levelByName name model.statuses)), onInput (SliderMsg name), disabled (isOffByName name model.statuses) ] []
+        , text (toString (levelByName name model.statuses))
         ]
 
 
 screenDiv : ( String, String ) -> Model -> Int -> Html Msg
 screenDiv ( name, desc ) model nr =
     div []
-        [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Down name) ] [ Icon.i "arrow_downward" ]
-        , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Up name) ] [ Icon.i "arrow_upward" ]
+        [ button [ onClick (Down name) ] [ text "Omlaag" ]
+        , button [ onClick (Up name) ] [ text "Omhoog" ]
         , text (screenStatus name model)
         , text (" | " ++ desc)
         ]
@@ -406,10 +390,7 @@ groupToggleBar groupName nr model content =
     div []
         [ div
             [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ( "margin", "0px 0px 10px 0px" ), ( "padding", "10px 10px 10px 10px" ) ] ]
-            [ Button.render Mdl
-                [ nr ]
-                model.mdl
-                [ Button.raised, Button.colored, Button.ripple, Options.onClick (ToggleShowBlock groupName) ]
+            [ button [ onClick (ToggleShowBlock groupName) ]
                 [ text
                     (if (isGroupOpen model.group2Open groupName) then
                         "Verberg"
@@ -431,19 +412,19 @@ lightPercentage level =
 view : Model -> Html Msg
 view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        ([ groupToggleBar "Screens"
+        [ groupToggleBar "Screens"
             100
             model
             (\model ->
                 if (isGroupOpen model.group2Open "Screens") then
                     div []
                         ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
-                         , div [{- style [ ( "display", "inline-block" ) ] -}]
+                         , div []
                             [ text "Zon: "
                             , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
                             , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
                             ]
-                         , div [{- style [ ( "display", "inline-block" ) ] -}]
+                         , div []
                             [ text "Wind: "
                             , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName "Windmeter" model.statuses)) ] []
                             , text ((toString ((levelByName "Windmeter" model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
@@ -452,26 +433,26 @@ view model =
                             ++ screenWidgets model
                         )
                 else
-                    div [] []
+                    div [] [ text "WatIsDat?" ]
             )
-         , groupToggleBar "Beneden"
+        , groupToggleBar "Beneden"
             101
             model
             (\model ->
                 if (isGroupOpen model.group2Open "Beneden") then
                     div []
-                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model.statuses) ] [ text "Keuken" ] ]
+                        [ toggleDiv ( "LichtKeuken", " Keuken" ) 0 model
                         , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
                         , div [] []
                         , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Options.onToggle (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model.statuses) ] [ text "Circante Tafel" ] ]
+                        , toggleDiv ( "LichtCircante", "Circante Tafel" ) 0 model
                         , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Options.onToggle (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model.statuses) ] [ text "Bureau" ] ]
+                        , toggleDiv ( "LichtBureau", "Bureau" ) 0 model
                         ]
                 else
                     div [] []
             )
-         , groupToggleBar "Nutsruimtes"
+        , groupToggleBar "Nutsruimtes"
             101
             model
             (\model ->
@@ -486,7 +467,7 @@ view model =
                 else
                     div [] []
             )
-         , groupToggleBar "Kinderen"
+        , groupToggleBar "Kinderen"
             101
             model
             (\model ->
@@ -503,7 +484,7 @@ view model =
                 else
                     div [] []
             )
-         , groupToggleBar "Buiten"
+        , groupToggleBar "Buiten"
             101
             model
             (\model ->
@@ -515,12 +496,10 @@ view model =
                 else
                     div [] []
             )
-         , div [] [ Html.hr [] [] ]
-         , div [] [ text "Error: ", text model.errorMsg ]
-         , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
+        , div [] [ Html.hr [] [] ]
+        , div [] [ text "Error: ", text model.errorMsg ]
+        , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
             [ button [ onClick PutModelInTestAsString ] [ text "Test" ]
             , text model.test
             ]
-         ]
-        )
-        |> Scheme.topWithScheme Color.Green Color.Red
+        ]
