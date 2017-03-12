@@ -9,7 +9,8 @@ import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, field, oneOf, succeed)
 import Json.Encode as Encode
 import WebSocket
-
+import Styles exposing (..)
+-- import FontAwesome
 
 -- Domotics user interface
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
@@ -305,21 +306,29 @@ screenStatus name model =
         (toString status)
 
 
-toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
-toggleDiv ( name, desc ) nr model =
-    div []
-        [ input [ type_ "checkbox", onClick (Clicked name), checked (isOnByName name model.statuses) ] []
-        , text name
+toggle : String -> List StatusRecord -> Html Msg
+toggle name statuses =
+    label [ attribute "class" "switch" ]
+        [ input [ type_ "checkbox", onClick (Clicked name), checked (isOnByName name statuses) ] []
+        , div [ style [ ( "display", "inline-block" ) ], attribute "class" "slider round" ] []
         ]
 
 
-toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
-toggleWithSliderDiv ( name, desc ) nr model =
-    div [ style [ ( "display", "inline-block" ) ] ]
-        [ input [ type_ "checkbox", onClick (Clicked name), checked (isOnByName name model.statuses) ] []
-        , text name
-        , input [ type_ "range", value (toString (levelByName name model.statuses)), onInput (SliderMsg name), disabled (isOffByName name model.statuses) ] []
-        , text (toString (levelByName name model.statuses))
+toggleDiv : ( String, String ) -> List StatusRecord -> Html Msg
+toggleDiv ( name, desc ) statuses =
+    div []
+        [ toggle name statuses
+        , text desc
+        ]
+
+
+toggleWithSliderDiv : ( String, String ) -> List StatusRecord -> Html Msg
+toggleWithSliderDiv ( name, desc ) statuses =
+    div []
+        [ toggle name statuses
+        , text desc
+        , input [ type_ "range", value (toString (levelByName name statuses)), onInput (SliderMsg name), disabled (isOffByName name statuses) ] []
+        , text (toString (levelByName name statuses))
         ]
 
 
@@ -389,7 +398,7 @@ groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
 groupToggleBar groupName nr model content =
     div []
         [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ( "margin", "0px 0px 10px 0px" ), ( "padding", "10px 10px 10px 10px" ) ] ]
+            [ style <| groupCss <| colorOfBlock model groupName ]
             [ button [ onClick (ToggleShowBlock groupName) ]
                 [ text
                     (if (isGroupOpen model.group2Open groupName) then
@@ -398,7 +407,7 @@ groupToggleBar groupName nr model content =
                         "Toon"
                     )
                 ]
-            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "120%" ) ] ] [ text groupName ]
+            , Html.span [ style groupTextCss ] [ text groupName ]
             ]
         , content model
         ]
@@ -411,22 +420,22 @@ lightPercentage level =
 
 view : Model -> Html Msg
 view model =
-    div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        [ groupToggleBar "Screens"
+    div [ style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
+        [groupToggleBar "Screens"
             100
             model
             (\model ->
                 if (isGroupOpen model.group2Open "Screens") then
                     div []
-                        ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
+                        ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) model.statuses
                          , div []
                             [ text "Zon: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
+                            , meter [ style meterCss, Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
                             , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
                             ]
                          , div []
                             [ text "Wind: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName "Windmeter" model.statuses)) ] []
+                            , meter [ style meterCss, Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName "Windmeter" model.statuses)) ] []
                             , text ((toString ((levelByName "Windmeter" model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
                             ]
                          ]
@@ -441,13 +450,13 @@ view model =
             (\model ->
                 if (isGroupOpen model.group2Open "Beneden") then
                     div []
-                        [ toggleDiv ( "LichtKeuken", " Keuken" ) 0 model
-                        , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
+                        [ toggleDiv ( "LichtKeuken", "Keuken" ) model.statuses
+                        , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) model.statuses
                         , div [] []
-                        , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                        , toggleDiv ( "LichtCircante", "Circante Tafel" ) 0 model
-                        , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                        , toggleDiv ( "LichtBureau", "Bureau" ) 0 model
+                        , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) model.statuses
+                        , toggleDiv ( "LichtCircante", "Circante Tafel" ) model.statuses
+                        , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" )  model.statuses
+                        , toggleDiv ( "LichtBureau", "Bureau" )  model.statuses
                         ]
                 else
                     div [] []
@@ -458,11 +467,11 @@ view model =
             (\model ->
                 if (isGroupOpen model.group2Open "Nutsruimtes") then
                     div []
-                        [ toggleDiv ( "LichtInkom", "Inkom" ) 1 model
-                        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
-                        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
-                        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
-                        , toggleDiv ( "LichtWC0", "WC" ) 7 model
+                        [ toggleDiv ( "LichtInkom", "Inkom" ) model.statuses
+                        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) model.statuses
+                        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) model.statuses
+                        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" )  model.statuses
+                        , toggleDiv ( "LichtWC0", "WC" ) model.statuses
                         ]
                 else
                     div [] []
@@ -473,13 +482,13 @@ view model =
             (\model ->
                 if (isGroupOpen model.group2Open "Kinderen") then
                     div []
-                        [ toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
-                        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
-                        , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
-                        , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
-                        , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
-                        , toggleDiv ( "LichtRoosWand", "Roos Wand" ) 16 model
-                        , toggleDiv ( "LichtRoos", "Roos Spots" ) 17 model
+                        [ toggleDiv ( "LichtGangBoven", "Gang Boven" ) model.statuses
+                        , toggleDiv ( "LichtBadk1", "Badkamer Boven" )  model.statuses
+                        , toggleDiv ( "LichtTomasSpots", "Tomas" )  model.statuses
+                        , toggleDiv ( "LichtDriesWand", "Dries Wand" )  model.statuses
+                        , toggleDiv ( "LichtDries", "Dries Spots" )  model.statuses
+                        , toggleDiv ( "LichtRoosWand", "Roos Wand" )  model.statuses
+                        , toggleDiv ( "LichtRoos", "Roos Spots" )  model.statuses
                         ]
                 else
                     div [] []
@@ -490,8 +499,8 @@ view model =
             (\model ->
                 if (isGroupOpen model.group2Open "Buiten") then
                     div []
-                        [ toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
-                        , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
+                        [ toggleDiv ( "LichtTerras", "Licht terras en zijkant" )  model.statuses
+                        , toggleDiv ( "StopkBuiten", "Stopcontact buiten" )  model.statuses
                         ]
                 else
                     div [] []
