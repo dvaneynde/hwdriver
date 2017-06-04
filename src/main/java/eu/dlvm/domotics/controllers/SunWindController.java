@@ -13,22 +13,24 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
 import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 
 /**
- * Enables a source event to go through or not,
+ * Enables a source event to go through or not.
  * <p>
  * <ul>
- * <li>When 'on' only the first HIGH or LOW are transmitted, and all ALARM/SAFE
- * events.</li>
+ * <li>When 'on' only the first HIGH or LOW are transmitted, besides all
+ * ALARM/SAFE events.</li>
  * <li>When 'off' all the ALARM/SAFE events are transmitted, but no others.</li>
- * <li>When going from ALARM to SAFE the next HIGH or LOW must be transmitted
- * again.</li>
- * <li></li>
- * <li></li>
  * </ul>
  * 
  * @author dirk
  */
 public class SunWindController extends Controller implements IEventListener, IUiCapableBlock {
 	private static final Logger logger = LoggerFactory.getLogger(SunWindController.class);
+
+	private enum LightState {
+		Init, WasDark, WasLight
+	}
+
+	private LightState lightState = LightState.Init;
 	private boolean enabled;
 
 	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
@@ -38,6 +40,7 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	public void on() {
 		logger.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
+		lightState = LightState.Init;
 	}
 
 	public void off() {
@@ -75,13 +78,31 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			notifyListeners(event);
 			break;
 		case LIGHT_HIGH:
+			if (enabled) {
+				switch (lightState) {
+				case Init:
+				case WasDark:
+					notifyListeners(event);
+					lightState = LightState.WasLight;
+					break;
+				case WasLight:
+					break;
+				}
+			}
+			break;
 		case LIGHT_LOW:
-			// TODO these should be generated here, not come from WindSensor or LightGauge ! Goes together with parameters that must be here of course.
-			if (enabled)
-				notifyListeners(event);
-			else
-				// TODO waarom dit loggen? logger.info(getName() + " has blocked event '" + event.toString() + "' from source '" + source.getName() + "'.");
-				break;
+			if (enabled) {
+				switch (lightState) {
+				case Init:
+				case WasLight:
+					notifyListeners(event);
+					lightState = LightState.WasDark;
+					break;
+				case WasDark:
+					break;
+				}
+			}
+			break;
 		default:
 			break;
 		}
