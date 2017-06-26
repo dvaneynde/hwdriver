@@ -20,7 +20,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private static final int DEFAULT_REPEAT_EVENT_MS = 1000;
 	private static final Logger log = LoggerFactory.getLogger(WindSensor.class);
 	private static final Logger logwind = LoggerFactory.getLogger("WIND");
-	// private static final Logger dumpFreq = LoggerFactory.getLogger("FREQ");
 	private int highFreqThreshold, lowFreqThreshold;
 	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
 	private States state;
@@ -136,6 +135,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	// ===================
 	// INTERNAL API
 
+	// for logging only, 4 times per second
 	private int infoCounter = 0;
 
 	@Override
@@ -143,15 +143,14 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		boolean newInput = getHw().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		freq = gauge.getMeasurement();
-		if (infoCounter == 4 && currentTime % 1000 < 250)
-			infoCounter = 0;
+		
 		if (log.isDebugEnabled())
 			logwind.debug(state + "\ttime=\t" + (currentTime / 1000) % 1000 + "s.\t" + currentTime % 1000 + "ms.\tfreq="
 					+ freq);
-		else if ((infoCounter < 4) && (currentTime % 1000 >= infoCounter * 250)) {
+		else if ((currentTime % 1000) >= (infoCounter * 250)) {
 			logwind.info(state + "\ttime=\t" + (currentTime / 1000) % 1000 + "s.\t" + currentTime % 1000 + "ms.\tfreq="
 					+ freq);
-			infoCounter = (infoCounter + 1) % 5;
+			infoCounter = (infoCounter + 1) % 4;
 		}
 
 		switch (state) {

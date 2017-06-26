@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
+<configuration debug="true" scan="true">
 
 	<property name="LOG_HOME" value="./logs" />
 
@@ -58,7 +58,29 @@
 	</appender>
 
 	<appender name="FREQFILE" class="ch.qos.logback.core.FileAppender">
-		<file>${LOG_HOME}/freqFile.log</file>
+		<file>${LOG_HOME}/freq.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+	</appender>
+
+	<appender name="WINDFILE" class="ch.qos.logback.core.FileAppender">
+		<file>${LOG_HOME}/wind.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+	</appender>
+
+	<appender name="LIGHTFILE" class="ch.qos.logback.core.FileAppender">
+		<file>${LOG_HOME}/light.log</file>
 		<append>true</append>
 		<encoder>
 			<pattern>
@@ -117,12 +139,16 @@
 	</root>
 
 	<logger name="FREQ" level="off" />
-	<logger name="WIND" level="off" />
-	<logger name="LIGHT" level="off" />
+	<logger name="WIND" level="info" additivity="false">
+		<appender-ref ref="WINDFILE" />
+	</logger>
+	<logger name="LIGHT" level="info" additivity="false">
+		<appender-ref ref="LIGHTFILE" />
+	</logger>
 	<logger name="DRIVER" level="info" additivity="false">
 		<appender-ref ref="DRIVER-LOG" />
 	</logger>
-	<logger name="MONITOR" level="info" additivity="false">
+	<logger name="MONITOR" level="off" additivity="false">
 		<appender-ref ref="MONITOR-LOG" />
 	</logger>
 
@@ -130,7 +156,6 @@
 	<logger name="eu.dlvm" level="info" additivity="false">
 		<appender-ref ref="DOMOTICA-LOG" />
 		<appender-ref ref="ERROR-LOG"/>
-		<appender-ref ref="STDOUT" />
 	</logger>
 
 	<!-- Jetty vanaf info; additivity false anders gaat het ook naar error.log -->
@@ -139,9 +164,4 @@
 		<appender-ref ref="ERROR-LOG"/>
 	</logger>
 
-<!-- 
-	<logger name="eu.dlvm.iohardware.diamondsys.messaging" level="debug" additivity="false">
-		<appender-ref ref="STDOUT" />
-	</logger>
-	 -->
 </configuration>
