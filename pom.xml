@@ -44,8 +44,12 @@
 	</pluginRepositories>
 
 	<dependencies>
-		<!-- <dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> 
-			<version>1.2.12</version> </dependency> <dependency> <groupId>org.slf4j</groupId> 
+		<dependency>
+			<groupId>default</groupId>
+			<artifactId>domotic-scala_2.12</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<!-- <dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> <version>1.2.12</version> </dependency> <dependency> <groupId>org.slf4j</groupId> 
 			<artifactId>slf4j-log4j12</artifactId> <version>1.7.21</version> </dependency> -->
 		<!-- TODO replace above by below -->
 		<dependency>
@@ -106,9 +110,8 @@
 			<artifactId>jersey-media-json-jackson</artifactId>
 			<version>${jersey-version}</version>
 		</dependency>
-		<!-- Ik had een probleem met jersey-media-json-jackson en jackson-core 
-			hieronder, als versies niet juist zijn lijken ze niet compatibel te zijn. 
-			Ik had 2.23.x voor jersey-json-jackson, maar dat werkte niet. -->
+		<!-- Ik had een probleem met jersey-media-json-jackson en jackson-core hieronder, als versies niet juist zijn lijken ze niet compatibel 
+			te zijn. Ik had 2.23.x voor jersey-json-jackson, maar dat werkte niet. -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -124,17 +127,8 @@
 	</dependencies>
 
 	<build>
-		<!-- 
-		<resources>
-			<resource>
-				<directory>src/my-resources</directory>
-				<includes>
-					<include>**/*.txt</include>
-					<include>**/*.rtf</include>
-				</includes>
-			</resource>
-		</resources>
-		 -->
+		<!-- <resources> <resource> <directory>src/my-resources</directory> <includes> <include>**/*.txt</include> <include>**/*.rtf</include> 
+			</includes> </resource> </resources> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
