@@ -21,11 +21,8 @@ import Styles exposing (..)
 
 
 urlBase =
-    "localhost:8080"
-
-
-
---"192.168.0.10:8080" -- must be ip address, otherwise CORS problems
+    --"localhost:8080"
+    "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
 
 
 urlUpdateActuators =
@@ -431,7 +428,8 @@ view model =
                          , div []
                             [ text "Zon: "
                             , meter [ style meterCss, Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
-                            , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                            , text (toString (levelByName "Lichtmeter" model.statuses) ++ " - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+--                            , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
                             ]
                          , div []
                             [ text "Wind: "
@@ -442,7 +440,7 @@ view model =
                             ++ screenWidgets model
                         )
                 else
-                    div [] [ text "WatIsDat?" ]
+                    div [] [ ]
             )
         , groupToggleBar "Beneden"
             101
