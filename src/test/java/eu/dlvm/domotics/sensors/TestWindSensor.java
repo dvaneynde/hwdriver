@@ -95,22 +95,12 @@ public class TestWindSensor implements IEventListener {
 		int LOW_TIME_TO_RESET_ALERT = 2;
 
 		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, dom, HIGH_FREQ_THRESHOLD,
-				LOW_FREQ_THRESHOLD, HIGH_TIME_BEFORE_ALERT, LOW_TIME_TO_RESET_ALERT);
+				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 
 		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
 
 		log.debug("\n=============\nSTART LOW FREQ " + LOW_FREQ_THRESHOLD + " FOR 5 SEC\n=============");
-		// frequency gauge op snelheid brengen
-		simulateWind(LOW_FREQ_THRESHOLD, 5000);
-		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
-
-		log.debug("\n=============\nSTART HIGH FREQ " + HIGH_FREQ_THRESHOLD
-				+ "+2 but just not long enough for alarm \n=============");
-		simulateWind(HIGH_FREQ_THRESHOLD + 2, HIGH_TIME_BEFORE_ALERT * 1000 - 100);
-		Assert.assertEquals(WindSensor.States.HIGH, ws.getState());
-
-		log.debug("\n=============\n LOW FREQ " + LOW_FREQ_THRESHOLD + " FOR 5 SEC\n=============");
 		// frequency gauge op snelheid brengen
 		simulateWind(LOW_FREQ_THRESHOLD, 5000);
 		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
@@ -131,40 +121,31 @@ public class TestWindSensor implements IEventListener {
 	public final void testSafeAlarmSafe() {
 		int HIGH_FREQ_THRESHOLD = 5;
 		int LOW_FREQ_THRESHOLD = 1;
-		int HIGH_TIME_BEFORE_ALERT = 5;
 		int LOW_TIME_TO_RESET_ALERT = 30;
 
 		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, dom, HIGH_FREQ_THRESHOLD,
-				LOW_FREQ_THRESHOLD, HIGH_TIME_BEFORE_ALERT, LOW_TIME_TO_RESET_ALERT);
+				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 
 		check(WindSensor.States.NORMAL, null, 0);
 
-		simulateWind(HIGH_FREQ_THRESHOLD + 1, 500);
-		log.info("600? "+ ws.getFreqTimesHundred());
-		check(States.HIGH, null, 0);
-
-		simulateWind(HIGH_FREQ_THRESHOLD + 1, 4000);
-		log.info("600? "+ ws.getFreqTimesHundred());
-		check(States.HIGH, EventType.SAFE, 4);
-
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 1000);
 		log.info("600? "+ ws.getFreqTimesHundred());
-		check(States.ALARM, EventType.ALARM, 6);
+		check(States.ALARM, EventType.ALARM, 1);
 
 		simulateWind(HIGH_FREQ_THRESHOLD - 1, 1000);
 		log.info("600? "+ ws.getFreqTimesHundred());
-		check(States.ALARM, EventType.ALARM, 7);
+		check(States.ALARM, EventType.ALARM, 2);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 2000);
 		log.info("600? "+ ws.getFreqTimesHundred());
-		check(States.ALARM_BUT_LOW, EventType.ALARM, 9);
+		check(States.ALARM_BUT_LOW, EventType.ALARM, 4);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 27000);
-		check(States.ALARM_BUT_LOW, EventType.ALARM, 36);
+		check(States.ALARM_BUT_LOW, EventType.ALARM, 31);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 2000);
-		check(States.NORMAL, EventType.SAFE, 38);
+		check(States.NORMAL, EventType.SAFE, 34);
 	}
 
 	private void check(WindSensor.States stateExpected, EventType eventExpected, int nrEventsExpected) {

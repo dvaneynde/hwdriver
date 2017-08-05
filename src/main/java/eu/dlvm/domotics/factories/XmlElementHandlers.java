@@ -133,9 +133,9 @@ class XmlElementHandlers extends DefaultHandler2 {
 				parseBaseBlockWithChannel(atts);
 				int highFreqThreshold = parseIntAttribute("highFreq", atts);
 				int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
-				int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
+				//int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
 				int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-				currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert, lowTimeToResetAlert);
+				currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
 
 			} else if (localName.equals("lightGauge")) {
 				parseBaseBlockWithChannel(atts);

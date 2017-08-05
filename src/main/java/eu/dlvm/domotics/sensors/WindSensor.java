@@ -11,7 +11,10 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
 import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
 
 /**
- * DOC document
+ * As soon as wind speed (actually rotations per second of a gauge) is above {@link #getHighFreqThreshold()} the state becomes
+ * {@link States#ALARM}. If then it stays for at least {@link #getLowTimeToResetAlertSec()} seconds below {@link #getLowFreqThreshold()} - during
+ * which the state is {@link States#ALARM_BUT_LOW} - state goes back to {@link States#NORMAL}.
+ * <p>TODO misschien als N keer boven threshold gedurende M seconden, dan pas alarm?
  * 
  * @author Dirk Vaneynde
  */
@@ -21,7 +24,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	private static final Logger log = LoggerFactory.getLogger(WindSensor.class);
 	private static final Logger logwind = LoggerFactory.getLogger("WIND");
 	private int highFreqThreshold, lowFreqThreshold;
-	private long highTimeBeforeAlertMs, lowTimeToResetAlertMs;
+	private long lowTimeToResetAlertMs;
 	private States state;
 	private double freq;
 	private long timeCurrentStateStarted, timeSinceLastEventSent;
@@ -32,7 +35,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	// PUBLIC API
 
 	public static enum States {
-		NORMAL, HIGH, ALARM, ALARM_BUT_LOW,
+		NORMAL, ALARM, ALARM_BUT_LOW,
 	};
 
 	/**
@@ -48,31 +51,28 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 *            Unit is seconds.
 	 */
 	public WindSensor(String name, String description, String channel, IDomoticContext ctx, int highFreqThreshold,
-			int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
-		this(name, description, null, channel, ctx, highFreqThreshold, lowFreqThreshold, highTimeBeforeAlert,
+			int lowFreqThreshold, int lowTimeToResetAlert) {
+		this(name, description, null, channel, ctx, highFreqThreshold, lowFreqThreshold, 
 				lowTimeToResetAlert);
 	}
 
 	public WindSensor(String name, String description, String ui, String channel, IDomoticContext ctx,
-			int highFreqThreshold, int lowFreqThreshold, int highTimeBeforeAlert, int lowTimeToResetAlert) {
+			int highFreqThreshold, int lowFreqThreshold, int lowTimeToResetAlert) {
 		super(name, description, ui, channel, ctx);
-		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far'
-														// below 1/(2 xlooptime)
+		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far' below 1/(2 xlooptime)
 			throw new RuntimeException("Configuration error: highSpeedThreshold must be lower than lowSpeedThreshold.");
 		this.highFreqThreshold = highFreqThreshold;
 		this.lowFreqThreshold = lowFreqThreshold;
-		this.highTimeBeforeAlertMs = highTimeBeforeAlert * 1000L;
 		this.lowTimeToResetAlertMs = lowTimeToResetAlert * 1000L;
 
-		// TODO 25 below as parameter? or calculated from sample time and
-		// lowfreq/highfreq?
+		// TODO 25 below as parameter? or calculated from sample time and lowfreq/highfreq?
 		this.gauge = new FrequencyGauge(25);
 
 		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
 		this.state = States.NORMAL;
 		// this.lastFrequency = 0L;
 		log.info("Windsensor '" + getName() + "' configured: highFreq=" + getHighFreqThreshold()
-				+ ", highTimeBeforeAlert=" + getHighTimeBeforeAlertSec() / 1000.0 + "(s), lowFreq="
+				+ ", lowFreq="
 				+ getLowFreqThreshold() + ", lowTimeToResetAlert=" + getLowTimeToResetAlertSec() / 1000.0 + "(s).");
 	}
 
@@ -88,13 +88,6 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 */
 	public int getLowFreqThreshold() {
 		return lowFreqThreshold;
-	}
-
-	/**
-	 * @return the high time after which to raise alarm, in seconds
-	 */
-	public long getHighTimeBeforeAlertSec() {
-		return highTimeBeforeAlertMs;
 	}
 
 	/**
@@ -128,7 +121,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	@Override
 	public String toString() {
 		return "WindSensor [highFreqThreshold=" + highFreqThreshold + ", lowFreqThreshold=" + lowFreqThreshold
-				+ ", highTimeBeforeAlertMs=" + highTimeBeforeAlertMs + ", lowTimeToResetAlertMs="
+				 + ", lowTimeToResetAlertMs="
 				+ lowTimeToResetAlertMs + ", state=" + state + ", freq=" + freq + "]";
 	}
 
@@ -156,26 +149,11 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		switch (state) {
 		case NORMAL:
 			if (freq >= getHighFreqThreshold()) {
-				state = States.HIGH;
-				timeCurrentStateStarted = currentTime;
-				log.info("WindSensor '" + getName() + "': NORMAL to HIGH: freq=" + freq + " >= thresholdHigh="
-						+ getHighFreqThreshold());
-			}
-			break;
-		case HIGH:
-			if (freq < getHighFreqThreshold()) {
-				state = States.NORMAL;
-				timeCurrentStateStarted = currentTime;
-				log.debug("WindSensor '" + getName() + "': HIGH to NORMAL : freq=" + freq + " < thresholdHigh="
-						+ getHighFreqThreshold());
-			} else if ((currentTime - timeCurrentStateStarted) > highTimeBeforeAlertMs) {
 				state = States.ALARM;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies HIGH event because in ALARM state: freq=" + freq
-						+ " > thresholdHigh=" + getHighFreqThreshold() + " for more than "
-						+ getHighTimeBeforeAlertSec() / 1000 + "sec.");
+						+ " > thresholdHigh=" + getHighFreqThreshold() + " for just one measurement.");
 				notifyListeners(EventType.ALARM);
-
 			}
 			break;
 		case ALARM:

@@ -180,7 +180,7 @@
 			<extension base="tns:BlockWithChannelStruct">
 				<attribute name="highFreq" use="required" />
 				<attribute name="lowFreq" use="required" />
-				<attribute name="highTimeBeforeAlert" use="required" />
+				<!-- <attribute name="highTimeBeforeAlert" use="required" /> -->
 				<attribute name="lowTimeToResetAlert" use="required" />
 			</extension>
 		</complexContent>
