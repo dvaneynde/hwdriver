@@ -21,8 +21,8 @@ import Styles exposing (..)
 
 
 urlBase =
-    --"localhost:8080"
-    "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
+    "localhost:8080"
+    -- "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
 
 
 urlUpdateActuators =
