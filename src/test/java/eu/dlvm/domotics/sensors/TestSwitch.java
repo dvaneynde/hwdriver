@@ -33,6 +33,12 @@ public class TestSwitch {
 		public void onEvent(Block s, EventType e) {
 			lastClick = e;
 		}
+
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	};
 
 	private void loop(long inc) {

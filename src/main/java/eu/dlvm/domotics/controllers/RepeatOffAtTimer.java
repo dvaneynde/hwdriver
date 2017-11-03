@@ -7,7 +7,7 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.events.EventType;
 
 /**
- * TODO must be incorporated in lamps instead. With blinking 2 times, and if toggled remains on, otherwises goes out.
+ * Sends {@link EventType.OFF} every {@link #intervalSec} seconds.
  * 
  * @author dirk
  *

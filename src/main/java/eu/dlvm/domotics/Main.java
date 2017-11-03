@@ -45,7 +45,7 @@ public class Main {
 			return domotic;
 		} catch (Exception e) {
 			log.error("Cannot configure system, abort.", e);
-			throw new RuntimeException("Abort. Cannot configure system.");
+			throw new RuntimeException("Abort. Cannot configure system.",e);
 		}
 	}
 

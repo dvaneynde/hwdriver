@@ -25,21 +25,27 @@ public class Connector implements IEventListener {
 		this.fromEvent = fromEvent;
 		this.to = to;
 		this.toEvent = toEvent;
-		this.debugId = debugSrcName + "_" + fromEvent.getAlias() + "_to_" + ((Block) to).getName() + "_" + toEvent.getAlias();
+		this.name = debugSrcName + "_" + fromEvent.getAlias() + "_to_" + to.getName() + "_" + toEvent.getAlias();
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
 	public void onEvent(Block source, EventType event) {
-		if (event.equals(fromEvent))
+		if (event.equals(fromEvent)) {
 			to.onEvent(source, toEvent);
-		else
-			logger.debug("Ignored srcEvent " + event + " from " + source.getName() + " (connector id=" + debugId + ").");
+			if (logger.isDebugEnabled())
+				logger.debug("Transferred srcEvent " + event + " from " + source.getName() + " as " + toEvent + " on " + to.getName() + " (connector name="
+						+ name + ").");
+		}
 	}
 
 	// ============ Implementation
 
-	private String debugId;
-
+	private String name;
 	private EventType fromEvent, toEvent;
 	private IEventListener to;
 

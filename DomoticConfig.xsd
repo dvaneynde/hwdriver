@@ -189,8 +189,7 @@
 	<complexType name="lightGaugeType">
 		<complexContent>
 			<extension base="tns:BlockWithChannelStruct">
-				<attribute name="high" use="required" />
-				<attribute name="low" use="required" />
+				<attribute name="threshold" use="required" />
 				<attribute name="low2highTime" use="required" />
 				<attribute name="high2lowTime" use="required" />
 			</extension>

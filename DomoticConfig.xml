@@ -29,7 +29,7 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 	<switch name="SchakLichtGaragePoort" />
-	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="300" blink="false">
+	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="600" blink="false">
 		<toggle src="SchakLichtGaragePoort" />
 		<toggle src="SchakLichtGarageTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -41,7 +41,7 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtBadk0" longClick="true"/>
+	<switch name="SchakLichtBadk0" longClick="true" />
 	<lamp name="LichtBadk0" desc="Badkamer +0" ui="Nutsruimtes:4">
 		<toggle src="SchakLichtBadk0" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -49,7 +49,7 @@
 
 	<!-- Waarschijnlijk iets fout in printbordje, vervangen door lichtschakelaar. -->
 	<!-- <switch name="SchakVentilatorBadk0" /> -->
-	
+
 	<fan name="VentilatorBadk0" desc="Ventilator Badkamer">
 		<!-- <toggle src="SchakVentilatorBadk0" /> -->
 		<toggle src="SchakLichtBadk0" event="LongClick" />
@@ -133,27 +133,6 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
-	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
-		<toggle src="SchakBuitenTuin" />
-		<off src="SchakLichtInkom" event="LongClick" />
-	</lamp>
-	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
-		<toggle src="SchakBuitenTuin" event="LongClick" />
-		<off src="SchakLichtInkom" event="LongClick" />
-	</lamp>
-
-
-	<!-- Nachtlicht -->
-	<timerDayNight name="TimerNacht">
-		<on hour="20" minute="30" />
-		<off hour="6" minute="0" />
-	</timerDayNight>
-	<lamp name="LichtNacht" desc="Nachtlichten">
-		<on src="TimerNacht" event="on" />
-		<off src="TimerNacht" event="off" />
-	</lamp>
-
 	<!-- New Year <newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"> <toggle src="SchakLichtBureau" event="double" 
 		/> </newyear> -->
 
@@ -212,9 +191,8 @@
 
 
 	<!-- Wind & Licht meter -->
-	<windSensor name="Windmeter" highFreq="15" lowFreq="2" lowTimeToResetAlert="180" channel="Windmeter"
-		ui="SPECIAAL:2" />
-	<lightGauge name="Lichtmeter" low="3500" high="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3" />
+	<windSensor name="Windmeter" highFreq="15" lowFreq="2" lowTimeToResetAlert="180" channel="Windmeter" ui="SPECIAAL:2" />
+	<lightGauge name="Lichtmeter" threshold="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3" />
 	<sunWindController name="ZonWindAutomaat" desc="Zon/Wind Automaat" ui="Screens:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
@@ -227,5 +205,34 @@
 		<screen name="ScreenRoos" />
 		<screen name="ScreenKeuken" />
 	</sunWindController>
+
+	<!-- Buiten -->
+	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
+	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
+		<toggle src="SchakBuitenTuin" event="LongClick" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+	<timerDayNight name="TimerTerras">
+		<!-- Uit doen, aan is niet belangrijk. -->
+		<on hour="23" minute="00" />
+		<off hour="0" minute="30" />
+	</timerDayNight>
+	<lightGauge name="LichtmeterTerras" threshold="2000" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
+	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
+		<toggle src="SchakBuitenTuin" />
+		<off src="SchakLichtInkom" event="LongClick" />
+		<off src="TimerTerras" event="off" />
+		<on src="LichtmeterTerras" event="LightHigh" />
+		<off src="LichtmeterTerras" event="LightLow" />
+	</lamp>
+
+	<timerDayNight name="TimerNacht">
+		<on hour="20" minute="30" />
+		<off hour="6" minute="0" />
+	</timerDayNight>
+	<lamp name="LichtNacht" desc="Nachtlichten">
+		<on src="TimerNacht" event="on" />
+		<off src="TimerNacht" event="off" />
+	</lamp>
 
 </domotic>

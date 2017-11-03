@@ -139,11 +139,10 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("lightGauge")) {
 				parseBaseBlockWithChannel(atts);
-				int highThreshold = parseIntAttribute("high", atts);
-				int lowThreshold = parseIntAttribute("low", atts);
+				int threshold = parseIntAttribute("threshold", atts);
 				int low2highTime = parseIntAttribute("low2highTime", atts);
 				int high2lowTime = parseIntAttribute("high2lowTime", atts);
-				currentBlock = new LightSensor(name, desc, ui, channel, ctx, lowThreshold, highThreshold, low2highTime, high2lowTime);
+				currentBlock = new LightSensor(name, desc, ui, channel, ctx, threshold, low2highTime, high2lowTime);
 
 				// ===== Controllers 
 
@@ -262,6 +261,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 		if (src != null) {
 			ae.srcBlock = src;
 			ae.srcEvent = EventType.fromAlias(eventAlias);
+			if (ae.srcEvent == null)
+				throw new ConfigurationException("Unknown event '"+eventAlias+"' on block '"+currentBlock.getName()+"'.");
 		} else {
 			throw new ConfigurationException("Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
 		}

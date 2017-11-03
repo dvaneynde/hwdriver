@@ -165,9 +165,11 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	public void onEvent(Block source, EventType event) {
 		switch (event) {
 		case ON:
+		case LIGHT_LOW:
 			on();
 			break;
 		case OFF:
+		case LIGHT_HIGH:
 			off();
 			break;
 		case TOGGLE:

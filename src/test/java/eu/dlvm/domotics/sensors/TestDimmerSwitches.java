@@ -33,6 +33,12 @@ public class TestDimmerSwitches {
 		public void onEvent(Block source, EventType click) {
 			lastEvent = click;
 		}
+
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	};
 
 	@Before
