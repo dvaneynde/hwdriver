@@ -192,12 +192,12 @@
 
 	<!-- Wind & Licht meter -->
 	<windSensor name="Windmeter" highFreq="15" lowFreq="2" lowTimeToResetAlert="180" channel="Windmeter" ui="SPECIAAL:2" />
-	<lightGauge name="Lichtmeter" threshold="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3" />
+	<lightGauge name="LichtmeterZonnewering" threshold="3600" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:3" />
 	<sunWindController name="ZonWindAutomaat" desc="Zon/Wind Automaat" ui="Screens:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
 		<wind sensor="Windmeter" />
-		<sun sensor="Lichtmeter" />
+		<sun sensor="LichtmeterZonnewering" />
 		<screen name="ScreenBreed" />
 		<screen name="ScreenTomas" />
 		<screen name="ScreenDriesTuin" />
@@ -217,13 +217,13 @@
 		<on hour="23" minute="00" />
 		<off hour="0" minute="30" />
 	</timerDayNight>
-	<lightGauge name="LichtmeterTerras" threshold="2000" low2highTime="30" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
+	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
 		<off src="SchakLichtInkom" event="LongClick" />
 		<off src="TimerTerras" event="off" />
-		<off src="LichtmeterTerras" event="LightHigh" />
-		<on src="LichtmeterTerras" event="LightLow" />
+		<off src="LichtmeterSchemering" event="LightHigh" />
+		<on src="LichtmeterSchemering" event="LightLow" />
 	</lamp>
 
 	<timerDayNight name="TimerNacht">

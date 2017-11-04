@@ -53,7 +53,8 @@ public class TestLampWithLightSensor {
 		Connector c1 = new Connector(EventType.LIGHT_LOW, lamp, EventType.ON, "LOW_to_ON");
 		lightSensor.registerListener(c0);
 		lightSensor.registerListener(c1);
-		current = seq = 0L;
+		current = -500L;
+		seq = 0L;
 	}
 
 	private void assertLampOn() {
@@ -69,10 +70,16 @@ public class TestLampWithLightSensor {
 	}
 
 	private void loop() {
-		current += 500;
-		seq++;
-		lightSensor.loop(current, seq);
-		lamp.loop(current, seq);
+		loop(1);
+	}
+
+	private void loop(int n) {
+		for (int i = 0; i < n; i++) {
+			current += 500;
+			seq++;
+			lightSensor.loop(current, seq);
+			lamp.loop(current, seq);
+		}
 	}
 
 	@Test
@@ -83,10 +90,9 @@ public class TestLampWithLightSensor {
 
 		hw.level = 2100;
 		loop();
-		loop();
 		Assert.assertEquals(LightSensor.States.HIGH, lightSensor.getState());
 		assertLampOff();
-		loop();
+		loop(4);
 		Assert.assertEquals(LightSensor.States.HIGH, lightSensor.getState());
 		assertLampOff();
 	}
@@ -97,13 +103,14 @@ public class TestLampWithLightSensor {
 		Assert.assertFalse(lamp.isBlink());
 		assertLampOff();
 
-		// donker, dus licht moet aangaan na warmup periode van 1 seconde + 1e sample
-		hw.level = 1000;
-		loop();
-		assertLampOff();
+		// donker, dus licht moet aangaan na high2low delay = 3 sec.
+		hw.level = 1900;
 		loop();
 		Assert.assertEquals(LightSensor.States.LOW, lightSensor.getState());
-		assertLampOff();
+		assertLampOn();
+		loop(6);
+		Assert.assertEquals(LightSensor.States.LOW, lightSensor.getState());
+		assertLampOn();
 		loop();
 		Assert.assertEquals(LightSensor.States.LOW, lightSensor.getState());
 		assertLampOn();
@@ -113,8 +120,7 @@ public class TestLampWithLightSensor {
 		loop();
 		assertLampOn();
 		Assert.assertEquals(LightSensor.States.LOW2HIGH_DELAY, lightSensor.getState());
-		for (int i = 0; i < 4; i++)
-			loop();
+		loop(4);
 		Assert.assertEquals(LightSensor.States.HIGH, lightSensor.getState());
 		assertLampOff();
 		loop();
@@ -126,14 +132,12 @@ public class TestLampWithLightSensor {
 		loop();
 		Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, lightSensor.getState());
 		assertLampOff();
-		for (int i = 0; i < 4; i++)
-			loop();
+		loop(4);
 		// na 2 seconden nog niks
 		Assert.assertEquals(LightSensor.States.HIGH2LOW_DELAY, lightSensor.getState());
 		assertLampOff();
 		// nog 1 seconde erbij
-		loop();
-		loop();
+		loop(2);
 		Assert.assertEquals(LightSensor.States.LOW, lightSensor.getState());
 		assertLampOn();
 

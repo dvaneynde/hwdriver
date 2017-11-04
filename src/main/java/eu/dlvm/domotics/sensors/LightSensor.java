@@ -17,28 +17,27 @@ import eu.dlvm.iohardware.IHardwareIO;
  * {@link IHardwareIO#readAnalogInput(String)}) .
  * <p>
  * If this input value is higher than {@link #getThreshold()} for
- * {@link #getHighWaitingTime()} milliseconds a {@link EventType#LIGHT_HIGH}
- * event is sent once. If lower than {@link #getLowThreshold()} for
- * {@link #getThresholdDelayMs()} milliseconds a {@link EventType#LIGHT_LOW}
- * event is sent once.
+ * {@link #getLowToHighDelaySec()} milliseconds a {@link EventType#LIGHT_HIGH}
+ * event is sent once. If lower than {@link #getThreshold()} for
+ * {@link #getHighToLowDelaySec()()} seconds a {@link EventType#LIGHT_LOW} event
+ * is sent once.
+ * <p>
+ * Initially if light is low we send {@link EventType#LIGHT_LOW} event
+ * immediately, otherwise {@link EventType#LIGHT_HIGH}. Of course this might be
+ * wrong at that moment, but only problem after startup and temporary problem -
+ * after a while correct state is found.
  * 
  * @author dirk vaneynde
  * 
  */
 public class LightSensor extends Sensor implements IUiCapableBlock {
 
-	/**
-	 * Period in ms that events are (re-)sent, also waiting time before first
-	 * event, and also period for light logging via {@link #loglight}.
-	 */
-	public static final long DEFAULT_REPEAT_EVENT_MS = 1000L;
 	private static final Logger log = LoggerFactory.getLogger(LightSensor.class);
-	private static final Logger loglight = LoggerFactory.getLogger("LIGHT");
 	private int threshold;
 	private long lowToHighDelayMs, highToLowDelayMs;
 	private int measuredLevel;
 	private States state;
-	private long timeCurrentStateStarted, timeSinceLastEventSent;
+	private long timeCurrentStateStarted;
 
 	// ===================
 	// PUBLIC API
@@ -57,11 +56,10 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		this.lowToHighDelayMs = lowToHighDelaySec * 1000L;
 		this.highToLowDelayMs = highToLowDelaySec * 1000L;
 
-		timeCurrentStateStarted = 0L;
-		timeSinceLastEventSent = -1L;
+		timeCurrentStateStarted = -1L;
 		state = States.LOW;
-		log.info("LightSensor '" + getName() + "' configured: high=" + getThreshold() + ", low to high delay=" + getLowToHighDelaySec() + ", high to low delay="
-				+ getHighToLowDelaySec() + " s., channel=" + getChannel());
+		log.info("LightSensor '" + getName() + "' configured: high=" + getThreshold() + ", low to high delay=" + getLowToHighDelaySec()
+				+ "sec., high to low delay=" + getHighToLowDelaySec() + " sec., channel=" + getChannel());
 	}
 
 	/**
@@ -135,15 +133,20 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	// ===================
 	// PRIVATE API
 
-	private boolean initializing = true;
-
 	@Override
 	public void loop(long currentTime, long sequence) {
 		measuredLevel = getHw().readAnalogInput(getChannel());
-		if (initializing) {
-			timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
-			state = (measuredLevel < getThreshold()) ? States.LOW : States.HIGH;
-			initializing = false;
+
+		if (timeCurrentStateStarted < 0L) {
+			// initialization
+			if (measuredLevel < getThreshold()) {
+				state = States.LOW;
+				notifyLow();
+			} else {
+				state = States.HIGH;
+				notifyHigh();
+			}
+			timeCurrentStateStarted = currentTime;
 		}
 
 		switch (state) {
@@ -159,9 +162,8 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) >= lowToHighDelayMs) {
 				state = States.HIGH;
-				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
-				log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + measuredLevel + " > threshold=" + getThreshold());
-				notifyListeners(EventType.LIGHT_HIGH);
+				timeCurrentStateStarted = currentTime;
+				notifyHigh();
 
 			}
 			break;
@@ -177,16 +179,20 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 				timeCurrentStateStarted = currentTime;
 			} else if ((currentTime - timeCurrentStateStarted) >= highToLowDelayMs) {
 				state = States.LOW;
-				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
-				log.info("LightSensor -" + getName() + "' notifies back to NORMAL event: input=" + measuredLevel + " < threshold=" + getThreshold());
-				notifyListeners(EventType.LIGHT_LOW);
+				timeCurrentStateStarted = currentTime;
+				notifyLow();
 			}
 			break;
 		}
-		if (currentTime - timeSinceLastEventSent >= DEFAULT_REPEAT_EVENT_MS) {
-			loglight.info("LightSensor " + getName() + ": ana in=" + measuredLevel);
-			notifyListeners((state == States.HIGH || state == States.HIGH2LOW_DELAY) ? EventType.LIGHT_HIGH : EventType.LIGHT_LOW);
-			timeSinceLastEventSent = currentTime;
-		}
+	}
+
+	private void notifyLow() {
+		log.info("LightSensor -" + getName() + "' notifies LOW event: input=" + measuredLevel + " < threshold=" + getThreshold());
+		notifyListeners(EventType.LIGHT_LOW);
+	}
+
+	private void notifyHigh() {
+		log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + measuredLevel + " ≥ threshold=" + getThreshold());
+		notifyListeners(EventType.LIGHT_HIGH);
 	}
 }

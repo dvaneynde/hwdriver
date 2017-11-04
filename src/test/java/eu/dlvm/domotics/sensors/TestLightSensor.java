@@ -77,24 +77,13 @@ public class TestLightSensor implements IEventListener {
 
 		hw.level = 100;
 		loopTo(0);
-		check(LightSensor.States.LOW, null, 0);
-		loopTo(500);
-		check(LightSensor.States.LOW, null, 0);
-		loopTo(1000);
 		check(LightSensor.States.LOW, EventType.LIGHT_LOW, 1);
-		loopTo(1000 + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.LOW, EventType.LIGHT_LOW, 2);
-		loopTo(1000 + 500 + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.LOW, EventType.LIGHT_LOW, 2);
-		loopTo(1000 + 2 * LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.LOW, EventType.LIGHT_LOW, 3);
+		loopTo(10000);
+		check(LightSensor.States.LOW, EventType.LIGHT_LOW, 1);
 	}
 
 	@Test
 	public final void initHigh() {
-		Assert.assertEquals(1000L, LightSensor.DEFAULT_REPEAT_EVENT_MS); // zoniet parameter van maken
-		Assert.assertTrue("Sample Time must divide Repeat", LightSensor.DEFAULT_REPEAT_EVENT_MS % SAMPLE_TIME == 0);
-
 		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 2, 3);
 		ls.registerListener(this);
 		seq = 0L;
@@ -102,17 +91,9 @@ public class TestLightSensor implements IEventListener {
 
 		hw.level = 1100;
 		loopTo(0);
-		check(LightSensor.States.HIGH, null, 0);
-		loopTo(500);
-		check(LightSensor.States.HIGH, null, 0);
-		loopTo(1000);
 		check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 1);
-		loopTo(1000 + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 2);
-		loopTo(1000 + 500 + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 2);
-		loopTo(1000 + 2 * LightSensor.DEFAULT_REPEAT_EVENT_MS);
-		check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 3);
+		loopTo(10000);
+		check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 1);
 	}
 
 	@Test
@@ -120,47 +101,54 @@ public class TestLightSensor implements IEventListener {
 		try {
 			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 2, 3);
 			ls.registerListener(this);
-			Assert.assertEquals(1000L, LightSensor.DEFAULT_REPEAT_EVENT_MS); // zoniet parameter van maken
 
 			seq = 0L;
 			cur = -SAMPLE_TIME;
 			loopTo(0);
-			hw.level = 100;
-			check(LightSensor.States.LOW, null, 0);
-
-			loopTo(LightSensor.DEFAULT_REPEAT_EVENT_MS); // warmup
+			// Init, should be low
+			hw.level = 900;
+			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 1);
+			loopTo(2500);
+			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 1);
+			loopTo(3000);
 			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 1);
 
-			hw.level = 2000;
-			loopTo(SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS); // let op, dit is begintijd LOW2HIGH !
+			// High light
+			hw.level = 1100;
+			loopTo(5000);
 			check(LightSensor.States.LOW2HIGH_DELAY, EventType.LIGHT_LOW, 1);
+			loopTo(5500);
+			check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 2);
 
-			loopTo(2000 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 4);
-
+			// A little less, but not long enough, should stay high
 			hw.level = 900;
-			loopTo(5000 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.HIGH2LOW_DELAY, EventType.LIGHT_HIGH, 7);
-
+			loopTo(6000);
+			check(LightSensor.States.HIGH2LOW_DELAY, EventType.LIGHT_HIGH, 2);
+			loopTo(8500);
+			check(LightSensor.States.HIGH2LOW_DELAY, EventType.LIGHT_HIGH, 2);
 			hw.level = 1100;
-			loopTo(6000 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 8);
+			loopTo(9000);
+			check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 2);
 
+			// Should go low
 			hw.level = 900;
-			loopTo(9500 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 12);
+			loopTo(9500);
+			check(LightSensor.States.HIGH2LOW_DELAY, EventType.LIGHT_HIGH, 2);
+			loopTo(12000);
+			check(LightSensor.States.HIGH2LOW_DELAY, EventType.LIGHT_HIGH, 2);
+			loopTo(12500);
+			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 3);
 
+			// A moment of sunshine, but not long enough
 			hw.level = 1100;
-			loopTo(11500 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.LOW2HIGH_DELAY, EventType.LIGHT_LOW, 14);
+			loopTo(13000);
+			check(LightSensor.States.LOW2HIGH_DELAY, EventType.LIGHT_LOW, 3);
+			loopTo(14500);
+			check(LightSensor.States.LOW2HIGH_DELAY, EventType.LIGHT_LOW, 3);
+			hw.level = 950;
+			loopTo(15000);
+			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 3);
 
-			hw.level = 900;
-			loopTo(12000 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.LOW, EventType.LIGHT_LOW, 14);
-
-			hw.level = 1100;
-			loopTo(14500 + SAMPLE_TIME + LightSensor.DEFAULT_REPEAT_EVENT_MS);
-			check(LightSensor.States.HIGH, EventType.LIGHT_HIGH, 17);
 		} catch (ConfigurationException e) {
 			fail(e.getMessage());
 		}
