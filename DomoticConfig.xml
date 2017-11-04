@@ -222,8 +222,8 @@
 		<toggle src="SchakBuitenTuin" />
 		<off src="SchakLichtInkom" event="LongClick" />
 		<off src="TimerTerras" event="off" />
-		<on src="LichtmeterTerras" event="LightHigh" />
-		<off src="LichtmeterTerras" event="LightLow" />
+		<off src="LichtmeterTerras" event="LightHigh" />
+		<on src="LichtmeterTerras" event="LightLow" />
 	</lamp>
 
 	<timerDayNight name="TimerNacht">
