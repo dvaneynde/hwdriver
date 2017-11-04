@@ -187,12 +187,12 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	private void notifyLow() {
-		log.info("LightSensor -" + getName() + "' notifies LOW event: input=" + measuredLevel + " < threshold=" + getThreshold());
+		log.info("LightSensor - '" + getName() + "' notifies LOW event: input=" + measuredLevel + " < threshold=" + getThreshold());
 		notifyListeners(EventType.LIGHT_LOW);
 	}
 
 	private void notifyHigh() {
-		log.info("LightSensor -" + getName() + "' notifies HIGH event: light=" + measuredLevel + " ≥ threshold=" + getThreshold());
+		log.info("LightSensor - '" + getName() + "' notifies HIGH event: light=" + measuredLevel + " ≥ threshold=" + getThreshold());
 		notifyListeners(EventType.LIGHT_HIGH);
 	}
 }
