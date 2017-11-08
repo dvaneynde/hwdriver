@@ -212,15 +212,15 @@
 		<toggle src="SchakBuitenTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
-	<timerDayNight name="TimerTerras">
+	<timer name="TimerTerras">
 		<!-- Uit doen, aan is niet belangrijk. -->
 		<on hour="23" minute="00" />
 		<off hour="0" minute="30" />
-	</timerDayNight>
+	</timer>
 	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
-		<off src="SchakLichtInkom" event="LongClick" />
+		<!-- <off src="SchakLichtInkom" event="LongClick" /> -->
 		<off src="TimerTerras" event="off" />
 		<off src="LichtmeterSchemering" event="LightHigh" />
 		<on src="LichtmeterSchemering" event="LightLow" />
