@@ -1,6 +1,6 @@
-package eu.dlvm.domotics.controllers.newyear;
+package eu.dlvm.domotics.controllers.gadgets;
 
-public interface INewYearGadget {
+public interface IGadget {
 
 	/**
 	 * Basic interface for gadgets, i.e. they do things with Actuators, like

@@ -1,8 +1,8 @@
-package eu.dlvm.domotics.controllers.newyear;
+package eu.dlvm.domotics.controllers.gadgets;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 
-public class Sinus implements INewYearGadget {
+public class Sinus implements IGadget {
 	private int cycleTime;
 	private double cycleStartRadians;
 	private DimmedLamp lamp;

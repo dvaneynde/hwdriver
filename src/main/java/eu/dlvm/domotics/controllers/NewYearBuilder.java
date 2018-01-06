@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.controllers.newyear;
+package eu.dlvm.domotics.controllers;
 
 import java.util.Map;
 
@@ -6,16 +6,18 @@ import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
-import eu.dlvm.domotics.controllers.NewYear;
+import eu.dlvm.domotics.controllers.gadgets.Blink;
+import eu.dlvm.domotics.controllers.gadgets.OnOff;
+import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
+import eu.dlvm.domotics.controllers.gadgets.Sinus;
+import eu.dlvm.domotics.controllers.gadgets.OnOff.TodoEvent;
 
-// TODO move to controllers package
 public class NewYearBuilder {
 
 	public NewYear build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
+		
 		NewYear ny = new NewYear("newyear", startTimeMs, endTimeMs, ctx);
 
-		// Lamp lamp;
-		// DimmedLamp dl;
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
 		 * <sine lamp="LichtCircanteRondom" cycle-ms="5000"

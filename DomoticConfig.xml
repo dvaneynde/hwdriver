@@ -133,8 +133,10 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<!-- New Year <newyear name="newyear" start="2013-12-27T22:59:50" end="2013-12-28T00:01:00"> <toggle src="SchakLichtBureau" event="double" 
-		/> </newyear> -->
+	<!-- New Year -->
+	<newyear name="newyear" start="2018-12-31T22:59:50" end="2019-01-01T00:01:00">
+		<toggle src="SchakLichtBureau" event="double" />
+	</newyear>
 
 	<!-- Screens -->
 	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
@@ -206,7 +208,7 @@
 		<screen name="ScreenKeuken" />
 	</sunWindController>
 
-	<!-- Buiten -->
+	<!-- Terras en stopcontacten buiten -->
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
 		<toggle src="SchakBuitenTuin" event="LongClick" />
@@ -226,6 +228,7 @@
 		<on src="LichtmeterSchemering" event="LightLow" />
 	</lamp>
 
+	<!-- Lampen overhang -->
 	<timerDayNight name="TimerNacht">
 		<on hour="20" minute="30" />
 		<off hour="6" minute="0" />

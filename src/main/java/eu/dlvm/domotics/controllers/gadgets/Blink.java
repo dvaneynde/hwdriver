@@ -1,8 +1,8 @@
-package eu.dlvm.domotics.controllers.newyear;
+package eu.dlvm.domotics.controllers.gadgets;
 
 import eu.dlvm.domotics.actuators.Lamp;
 
-public class Blink implements INewYearGadget {
+public class Blink implements IGadget {
 
 	private Lamp lamp;
 	private int freq;

@@ -9,8 +9,8 @@ import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
-import eu.dlvm.domotics.controllers.newyear.GSstate;
-import eu.dlvm.domotics.controllers.newyear.INewYearGadget;
+import eu.dlvm.domotics.controllers.gadgets.GSstate;
+import eu.dlvm.domotics.controllers.gadgets.IGadget;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.uidata.UiInfo;
@@ -28,7 +28,7 @@ public class NewYear extends Controller implements IEventListener, IUiCapableBlo
 	public class GadgetSet {
 		public int startMs, endMs;
 		public GSstate state = GSstate.BEFORE;
-		public List<INewYearGadget> gadgets = new ArrayList<>();
+		public List<IGadget> gadgets = new ArrayList<>();
 	}
 
 	public NewYear(String name, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
@@ -122,7 +122,7 @@ public class NewYear extends Controller implements IEventListener, IUiCapableBlo
 				// Changed set, and not first one.
 				if (lastGadgetSet.state == GSstate.BUSY) {
 					lastGadgetSet.state = GSstate.LAST;
-					for (INewYearGadget g : lastGadgetSet.gadgets)
+					for (IGadget g : lastGadgetSet.gadgets)
 						g.loop2(currentTime - actualStartMs - gadgetSet.startMs, lastGadgetSet.state);
 				} else
 					lastGadgetSet.state = GSstate.DONE;
@@ -132,7 +132,7 @@ public class NewYear extends Controller implements IEventListener, IUiCapableBlo
 					gadgetSet.state = GSstate.FIRST;
 				else if (gadgetSet.state == GSstate.FIRST)
 					gadgetSet.state = GSstate.BUSY;
-				for (INewYearGadget g : gadgetSet.gadgets)
+				for (IGadget g : gadgetSet.gadgets)
 					g.loop2(currentTime - actualStartMs - gadgetSet.startMs, gadgetSet.state);
 			}
 		}

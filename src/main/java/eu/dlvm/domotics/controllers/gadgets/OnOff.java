@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.controllers.newyear;
+package eu.dlvm.domotics.controllers.gadgets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import eu.dlvm.domotics.events.EventType;
  * @author dirkv
  * 
  */
-public class OnOff implements INewYearGadget {
+public class OnOff implements IGadget {
 
 	private List<Actuator> actuators;
 	private long startTime;
