@@ -135,7 +135,7 @@
 
 	<!-- New Year -->
 	<newyear name="newyear" start="2018-12-31T22:59:50" end="2019-01-01T00:01:00">
-		<toggle src="SchakLichtBureau" event="double" />
+		<toggle src="SchakLichtBureau" event="DoubleClick" />
 	</newyear>
 
 	<!-- Screens -->
@@ -237,5 +237,12 @@
 		<on src="TimerNacht" event="on" />
 		<off src="TimerNacht" event="off" />
 	</lamp>
+
+	<!--  Burglar -->
+	<antiBurglar name="antiBurglar" start="16:00" end="23:00">
+		<off src="SchakLichtInkom" event="SingleClick"/>
+		<sun sensor="LichtmeterSchemering"/>
+	</antiBurglar>
+
 
 </domotic>

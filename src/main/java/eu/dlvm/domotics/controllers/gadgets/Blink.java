@@ -9,13 +9,9 @@ public class Blink implements IGadget {
 	private long nextToggleTime;
 
 	/**
-	 * tijd aan of uit = min + rand() x mult
 	 * 
 	 * @param lamp
-	 * @param min
-	 *            minimale tijd aan of uit, milliseconden
-	 * @param mult
-	 *            gemiddelde tijd aan of uit bovenop min, ms.
+	 * @param frequency
 	 */
 	public Blink(Lamp lamp, int frequency) {
 		this.lamp = lamp;
@@ -24,10 +20,18 @@ public class Blink implements IGadget {
 	}
 
 	@Override
-	public void loop2(long time, GSstate state) {
+	public void loop2(long time, GadgetState state) {
 		if ((nextToggleTime < 0) || (time >= nextToggleTime)) {
 			lamp.toggle();
 			nextToggleTime = time + 1000 / freq / 2;
 		}
+	}
+
+	@Override
+	public void onBefore(long time) {
+	}
+
+	@Override
+	public void onDone(long time) {
 	}
 }

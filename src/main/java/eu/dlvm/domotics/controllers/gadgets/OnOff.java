@@ -24,9 +24,12 @@ public class OnOff implements IGadget {
 	public class TodoEvent implements Comparable<TodoEvent> {
 		public boolean state;
 		public long timeSec;
+
 		public TodoEvent(long timeSec, boolean state) {
-			this.timeSec = timeSec; this.state = state;
+			this.timeSec = timeSec;
+			this.state = state;
 		}
+
 		@Override
 		public int compareTo(TodoEvent o) {
 			if (timeSec == o.timeSec)
@@ -67,7 +70,7 @@ public class OnOff implements IGadget {
 	}
 
 	@Override
-	public void loop2(long time, GSstate state) {
+	public void loop2(long time, GadgetState state) {
 		if (startTime < 0)
 			startTime = time;
 
@@ -78,4 +81,13 @@ public class OnOff implements IGadget {
 		}
 
 	}
+
+	@Override
+	public void onBefore(long time) {
+	}
+
+	@Override
+	public void onDone(long time) {
+	}
+
 }

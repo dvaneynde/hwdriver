@@ -19,14 +19,18 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
+import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.controllers.DailyGadgetController;
 import eu.dlvm.domotics.controllers.NewYearBuilder;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
+import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
+import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -91,12 +95,12 @@ class XmlElementHandlers extends DefaultHandler2 {
 				source.registerListener(new Connector(EventType.ON, target, EventType.DELAY_ON, "delayOn"));
 				source.registerListener(new Connector(EventType.OFF, target, EventType.DELAY_OFF, "delayOff"));
 			} else if (localName.equals("wind")) {
-				SunWindController controller = (SunWindController) currentBlock;
 				WindSensor windSensor = (WindSensor) blocksSoFar.get(atts.getValue("sensor"));
-				windSensor.registerListener(controller);
+				Controller controller = (Controller)currentBlock;
+				windSensor.registerListener(controller);					
 			} else if (localName.equals("sun")) {
-				SunWindController controller = (SunWindController) currentBlock;
 				LightSensor lightSensor = (LightSensor) blocksSoFar.get(atts.getValue("sensor"));
+				Controller controller = (Controller)currentBlock;
 				lightSensor.registerListener(controller);
 			} else if (localName.equals("upDown")) {
 				Sensor srcUp = (Sensor) blocksSoFar.get(atts.getValue("srcUp"));
@@ -168,6 +172,13 @@ class XmlElementHandlers extends DefaultHandler2 {
 				Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
 				currentBlock = new NewYearBuilder().build(blocksSoFar, start.getTime(), end.getTime(), ctx);
 
+			} else if (localName.equals("antiBurglar")) {
+				parseBaseBlock(atts);
+				int start = converHourMinToMsOnDay(atts.getValue("start"));
+				int end = converHourMinToMsOnDay(atts.getValue("end"));
+				DailyGadgetController dgc = new DailyGadgetController("antiBurglar", start, end, ctx);
+				currentBlock = dgc;
+				buildAntiBurglar(dgc);
 				// ===== Actuators
 
 			} else if (localName.equals("lamp")) {
@@ -179,7 +190,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 					lamp.setEco(true);
 					lamp.setAutoOffSec(Integer.parseInt(val));
 					val = atts.getValue("blink");
-					if (val !=null)
+					if (val != null)
 						lamp.setBlink(Boolean.parseBoolean(val));
 				}
 				currentBlock = lamp;
@@ -242,6 +253,13 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 	// ===== Helpers =====
 
+	private int converHourMinToMsOnDay(String s) {
+		int idx = s.indexOf(':');
+		int hours = Integer.parseInt(s.substring(0, idx));
+		int minutes = Integer.parseInt(s.substring(idx + 1));
+		return Timer.timeInDayMillis(hours, minutes);
+	}
+
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {
 		ActionEvent ae = parseActionEvent(atts);
 		Connector c = new Connector(ae.srcEvent, (IEventListener) currentBlock, targetEventType,
@@ -262,7 +280,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 			ae.srcBlock = src;
 			ae.srcEvent = EventType.fromAlias(eventAlias);
 			if (ae.srcEvent == null)
-				throw new ConfigurationException("Unknown event '"+eventAlias+"' on block '"+currentBlock.getName()+"'.");
+				throw new ConfigurationException("Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
 		} else {
 			throw new ConfigurationException("Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
 		}
@@ -303,6 +321,25 @@ class XmlElementHandlers extends DefaultHandler2 {
 			return 0;
 		else
 			return Integer.parseInt(atts.getValue(attName));
+	}
+
+	// TODO builder somewhere else
+	private void buildAntiBurglar(DailyGadgetController dg) {
+		// Random aan/uit
+		// TODO meer uit dan aan - nieuwe random maken
+		GadgetSet gs = new GadgetSet();
+		gs.startMs = 0;
+		gs.endMs = Integer.MAX_VALUE;
+		Lamp lamp;
+		lamp = (Lamp) blocksSoFar.get("LichtCircante");
+		gs.gadgets.add(new RandomOnOff(lamp, 120000, 300000));
+		lamp = (Lamp) blocksSoFar.get("LichtKeuken");
+		gs.gadgets.add(new RandomOnOff(lamp, 100000, 360000));
+		lamp = (Lamp) blocksSoFar.get("LichtBureau");
+		gs.gadgets.add(new RandomOnOff(lamp, 240000, 60000));
+		lamp = (Lamp) blocksSoFar.get("LichtGangBoven");
+		gs.gadgets.add(new RandomOnOff(lamp, 30000, 120000));
+		dg.addGadgetSet(gs);
 	}
 
 }

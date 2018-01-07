@@ -32,8 +32,8 @@ public class Timer extends Controller {
 		return timeInDay;
 	}
 
-	public static int timeInDayMillis(int hour, int minute) {
-		return ((hour * 60) + minute) * 60000;
+	public static int timeInDayMillis(int hours, int minutes) {
+		return ((hours * 60) + minutes) * 60000;
 	}
 
 	public static int[] hourMinute(long time) {

@@ -21,7 +21,7 @@ public class Sinus implements IGadget {
 	}
 
 	@Override
-	public void loop2(long time, GSstate state) {
+	public void loop2(long time, GadgetState state) {
 		lamp.on((int) (calcValue(time) * 100));
 	}
 
@@ -31,4 +31,13 @@ public class Sinus implements IGadget {
 			System.out.println(Math.round(100 * s.calcValue(time)));
 		}
 	}
+	
+	@Override
+	public void onBefore(long time) {
+	}
+
+	@Override
+	public void onDone(long time) {
+	}
+
 }

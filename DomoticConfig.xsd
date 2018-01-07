@@ -111,6 +111,24 @@
 					</complexType>
 				</element>
 				<element name="sunWindController" type="tns:SunWindControllerStruct" />
+				<element name="antiBurglar" minOccurs="0" maxOccurs="1">
+					<complexType>
+						<complexContent>
+							<extension base="tns:OnOffToggleActuatorStruct">
+								<sequence>
+									<element name="sun" minOccurs="0">
+										<complexType>
+											<attribute name="sensor" type="IDREF" use="required" />
+										</complexType>
+									</element>
+								</sequence>
+								<attribute name="start" type="string" />
+								<attribute name="end" type="string" />
+							</extension>
+						</complexContent>
+					</complexType>
+
+				</element>
 			</choice>
 		</complexType>
 	</element>
