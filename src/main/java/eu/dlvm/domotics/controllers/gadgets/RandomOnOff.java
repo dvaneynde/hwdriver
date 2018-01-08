@@ -23,7 +23,7 @@ public class RandomOnOff implements IGadget {
 	}
 
 	@Override
-	public void loop2(long time, GadgetState gs) {
+	public void onBusy(long time) {
 		if ((nextToggleTime < 0) || (time >= nextToggleTime)) {
 			lamp.toggle();
 			int rand = (int)(Math.random() * multMs + minMs);
@@ -32,11 +32,11 @@ public class RandomOnOff implements IGadget {
 	}
 	
 	@Override
-	public void onBefore(long time) {
+	public void onBefore() {
 	}
 
 	@Override
-	public void onDone(long time) {
+	public void onDone() {
 	}
 
 }

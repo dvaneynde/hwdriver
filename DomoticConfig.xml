@@ -217,7 +217,7 @@
 	<timer name="TimerTerras">
 		<!-- Uit doen, aan is niet belangrijk. -->
 		<on hour="23" minute="00" />
-		<off hour="0" minute="30" />
+		<off hour="23" minute="30" />
 	</timer>
 	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
@@ -239,10 +239,10 @@
 	</lamp>
 
 	<!--  Burglar -->
-	<antiBurglar name="antiBurglar" start="16:00" end="23:00">
+<!-- 	<antiBurglar name="antiBurglar" start="16:00" end="23:00">
 		<off src="SchakLichtInkom" event="SingleClick"/>
 		<sun sensor="LichtmeterSchemering"/>
 	</antiBurglar>
-
+ -->
 
 </domotic>

@@ -25,7 +25,7 @@ public class NewYearBuilder {
 
 	public GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
 		
-		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs, ctx);
+		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs-startTimeMs, false, ctx);
 
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
@@ -34,28 +34,20 @@ public class NewYearBuilder {
 		 * cycle-start-deg="240" /> <onoff lamp="LichtBureau" /> <random
 		 * lamp="LichtCircante" min-on-ms="500" rand-mult-ms="1000" />
 		 */
-		int gadgetSetStartTime = 0;
-		int gadgetSetEndTime;
 		{
 			// Alles af
-			gadgetSetStartTime = 0;
-			gadgetSetEndTime = gadgetSetStartTime + 100;
 			GadgetSet gs = new GadgetSet();
-			gs.startMs = gadgetSetStartTime;
-			gs.endMs = gadgetSetEndTime;
+			gs.durationMs = 100;
 			ny.addGadgetSet(gs);
 			OnOff oo = new OnOff();
-			oo.add(oo.new TodoEvent(gadgetSetStartTime, false));
+			oo.add(oo.new Command(0, false));
 			addLamps2OnOff(blocks, oo, false);
 			gs.gadgets.add(oo);
 		}
 		{
 			// Aftellen
-			gadgetSetStartTime = gadgetSetEndTime + 50;
-			gadgetSetEndTime = gadgetSetStartTime + 10 * 1000;
 			GadgetSet gs = new GadgetSet();
-			gs.startMs = gadgetSetStartTime;
-			gs.endMs = gadgetSetEndTime;
+			gs.durationMs = 10*1000;
 			ny.addGadgetSet(gs);
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");
@@ -71,16 +63,13 @@ public class NewYearBuilder {
 		}
 		{
 			// Show
-			gadgetSetStartTime = gadgetSetEndTime + 50;
-			gadgetSetEndTime = gadgetSetStartTime + 30 * 1000;
 			GadgetSet gs = new GadgetSet();
-			gs.startMs = gadgetSetStartTime;
-			gs.endMs = gadgetSetEndTime;
+			gs.durationMs = 30*1000;
 			ny.addGadgetSet(gs);
 			// Zet Dimmers terug aan
-			OnOff oo = new OnOff();
-			addLamps2OnOff(blocks, oo, true);
-			gs.gadgets.add(oo);
+//			OnOff oo = new OnOff();
+//			addLamps2OnOff(blocks, oo, true);
+//			gs.gadgets.add(oo);
 			// Start show
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");

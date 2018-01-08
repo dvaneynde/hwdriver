@@ -11,17 +11,12 @@ import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
-import eu.dlvm.domotics.controllers.gadgets.GadgetState;
-import eu.dlvm.domotics.controllers.gadgets.IGadget;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
  * Starts and stops a list of gadgets at given time - or via on-off event.
- * <p>
- * Gadget Sets their active period may overlap, so be careful not to have the
- * same Actuator in multiple sets.
  * 
  * @author dirk
  *
@@ -30,36 +25,51 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 
 	static Logger logger = LoggerFactory.getLogger(GadgetController.class);
 	private long startTimeMs;
-	private long endTimeMs;
-	private boolean running;
-	private long actualStartMs = -1;
-	private List<GadgetSet> gadgetSets;
+	private long durationMs;
+	private boolean repeat;
+	private boolean manualStartRequested, manualStopRequested = false;
+	private long startOfSequenceMs = -1;
+	private int idxInSequence = 0;
+	private long runtimePastGadgets = 0L;
+	private List<GadgetSet> gadgetSets = new ArrayList<>();
+	private States state = States.INACTIF;
 
-	public GadgetController(String name, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
+	/**
+	 * INACTIF: outside actif period and not manually started ACTIF: within
+	 * actif period or manually started, and not manually stoped MANUALSTOP:
+	 * stopped functioning due to manual stop, but still in actif period
+	 * (awaiting its end, only manual start possible)
+	 * 
+	 * @author dirk
+	 *
+	 */
+	public enum States {
+		INACTIF, ACTIF, MANUALSTOP
+	}
+
+	public GadgetController(String name, long startTimeMs, long durationMs, boolean repeat, IDomoticContext ctx) {
 		super(name, name, null, ctx);
 		this.startTimeMs = startTimeMs;
-		this.endTimeMs = endTimeMs;
-		gadgetSets = new ArrayList<>();
+		this.durationMs = durationMs;
+		this.repeat = repeat;
 	}
 
 	public void addGadgetSet(GadgetSet e) {
 		gadgetSets.add(e);
 	}
 
-	public synchronized void start() {
-		logger.info(getName() + " started.");
-		actualStartMs = -1;
-		running = true;
+	public synchronized void requestManualStart() {
+		logger.info(getName() + " manual start requested.");
+		manualStartRequested = true;
 	}
 
-	public synchronized void stop() {
-		logger.info(getName() + " stopped.");
-		running = false;
+	public synchronized void requestManualStop() {
+		logger.info(getName() + " manual stop requested.");
+		manualStopRequested = true;
 	}
 
-	private synchronized boolean needToRun(long currentTime) {
-		running = (currentTime >= startTimeMs && currentTime <= endTimeMs);
-		return running;
+	private boolean withinTimePeriod(long currentTime) {
+		return (currentTime >= startTimeMs && currentTime <= (startTimeMs + durationMs));
 	}
 
 	public void on() {
@@ -72,64 +82,98 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 
 	public boolean toggle() {
 		onEvent(this, EventType.TOGGLE);
-		return running;
+		return (manualStartRequested == true); // isRunning() cannot work, is async
+	}
+
+	public States getState() {
+		return state;
+	}
+	
+	public boolean isRunning() {
+		return (state == States.ACTIF);
 	}
 
 	@Override
 	public void onEvent(Block source, EventType event) {
 		switch (event) {
 		case ON:
-			start();
+			requestManualStart();
 			break;
 		case OFF:
-			stop();
+			requestManualStop();
 			break;
 		case TOGGLE:
-			if (running)
-				stop();
+			if (isRunning())
+				requestManualStop();
 			else
-				start();
+				requestManualStart();
 			break;
 		default:
 			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
 	}
 
-	public long getStartTimeMs() {
-		return startTimeMs;
-	}
-
-	public long getEndTimeMs() {
-		return endTimeMs;
-	}
-
 	@Override
 	public void loop(long currentTime, long sequence) {
-		if (needToRun(currentTime)) {
-			if (actualStartMs == -1)
-				actualStartMs = currentTime;
-			long relativeTimeController = currentTime - actualStartMs;
-			for (GadgetSet gadgetSet : gadgetSets) {
-				long relativeTimeGadgetSet = relativeTimeController - gadgetSet.startMs;
-				if (!gadgetSet.isActive(gadgetSet, relativeTimeController)) {
-					if (gadgetSet.state == GadgetState.BUSY) {
-						gadgetSet.state = GadgetState.DONE;
-						for (IGadget g : gadgetSet.gadgets)
-							g.onDone(relativeTimeGadgetSet);
-					}
+		switch (state) {
+		case ACTIF:
+			if (manualStopRequested || !withinTimePeriod(currentTime)) {
+				gadgetSets.get(idxInSequence).onDone();
+				state = (manualStopRequested ? States.MANUALSTOP : States.INACTIF);
+				logger.info(getName() + " - go from ACTIF to " + state + ".");
+				manualStopRequested = false;
+			}
+			break;
+		case INACTIF:
+			if (manualStartRequested || withinTimePeriod(currentTime)) {
+				state = States.ACTIF;
+				startOfSequenceMs = -1;
+				manualStartRequested = false;
+				logger.info(getName() + " - start running for max. " + durationMs / 1000 + " sec.");
+			}
+			break;
+		case MANUALSTOP:
+			if (!withinTimePeriod(currentTime)) {
+				gadgetSets.get(idxInSequence).onDone();
+				state = States.INACTIF;
+				logger.info(getName() + " - active period passed, go to INACTIF.");
+			}
+			break;
+
+		}
+
+		if (state == States.ACTIF) {
+			if (startOfSequenceMs == -1) {
+				startOfSequenceMs = currentTime;
+				idxInSequence = 0;
+				runtimePastGadgets = 0;
+				logger.info(getName() + " starting set " + idxInSequence + " / " + (gadgetSets.size() - 1) + " at time 0ms.");
+				gadgetSets.get(0).onBefore();
+			}
+			long relativeTimeWithinSequence = currentTime - startOfSequenceMs;
+			GadgetSet gadgetSet = gadgetSets.get(idxInSequence);
+
+			if (relativeTimeWithinSequence > runtimePastGadgets + gadgetSet.durationMs) {
+				gadgetSet.onDone(); // Could be that this one executes without gadget ever have run onBusy().
+				idxInSequence++;
+				if (idxInSequence >= gadgetSets.size()) {
+					gadgetSets.get(idxInSequence - 1).onDone();
+					state = States.INACTIF;
+					logger.info(getName() + " all gadget sets done, go INACTIF at time " + relativeTimeWithinSequence + "ms.");
+					// TODO looping case
 				} else {
-					if (gadgetSet.state == GadgetState.BEFORE) {
-						for (IGadget g : gadgetSet.gadgets)
-							g.onBefore(relativeTimeGadgetSet);
-						gadgetSet.state = GadgetState.BUSY;
-					}
-					for (IGadget g : gadgetSet.gadgets)
-						g.loop2(relativeTimeGadgetSet, gadgetSet.state);
+					runtimePastGadgets += gadgetSet.durationMs;
+					gadgetSet = gadgetSets.get(idxInSequence);
+					gadgetSet.onBefore();
+					logger.info(getName() + " previous gadget set done, now starting set " + idxInSequence + " / " + (gadgetSets.size() - 1) + " at time "
+							+ relativeTimeWithinSequence + "ms.");
 				}
 			}
-		}
-		// TODO if from running to not running anymore need to call onDone on those that are done
 
+			if (state == States.ACTIF) {
+				gadgetSet.onBusy(relativeTimeWithinSequence - runtimePastGadgets);
+			}
+		}
 	}
 
 	@Override

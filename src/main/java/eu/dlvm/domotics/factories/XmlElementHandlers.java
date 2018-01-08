@@ -96,11 +96,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 				source.registerListener(new Connector(EventType.OFF, target, EventType.DELAY_OFF, "delayOff"));
 			} else if (localName.equals("wind")) {
 				WindSensor windSensor = (WindSensor) blocksSoFar.get(atts.getValue("sensor"));
-				Controller controller = (Controller)currentBlock;
-				windSensor.registerListener(controller);					
+				Controller controller = (Controller) currentBlock;
+				windSensor.registerListener(controller);
 			} else if (localName.equals("sun")) {
 				LightSensor lightSensor = (LightSensor) blocksSoFar.get(atts.getValue("sensor"));
-				Controller controller = (Controller)currentBlock;
+				Controller controller = (Controller) currentBlock;
 				lightSensor.registerListener(controller);
 			} else if (localName.equals("upDown")) {
 				Sensor srcUp = (Sensor) blocksSoFar.get(atts.getValue("srcUp"));
@@ -172,14 +172,15 @@ class XmlElementHandlers extends DefaultHandler2 {
 				Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
 				currentBlock = new NewYearBuilder().build(blocksSoFar, start.getTime(), end.getTime(), ctx);
 
-			} else if (localName.equals("antiBurglar")) {
-				parseBaseBlock(atts);
-				int start = converHourMinToMsOnDay(atts.getValue("start"));
-				int end = converHourMinToMsOnDay(atts.getValue("end"));
-				DailyGadgetController dgc = new DailyGadgetController("antiBurglar", start, end, ctx);
-				currentBlock = dgc;
-				buildAntiBurglar(dgc);
-				// ===== Actuators
+				//			} else if (localName.equals("antiBurglar")) {
+				//				parseBaseBlock(atts);
+				//				int start = converHourMinToMsOnDay(atts.getValue("start"));
+				//				int end = converHourMinToMsOnDay(atts.getValue("end"));
+				//				DailyGadgetController dgc = new DailyGadgetController("antiBurglar", start, end, ctx);
+				//				currentBlock = dgc;
+				//				buildAntiBurglar(dgc);
+
+			// ===== Actuators
 
 			} else if (localName.equals("lamp")) {
 				parseBaseBlockWithChannel(atts);
@@ -324,22 +325,22 @@ class XmlElementHandlers extends DefaultHandler2 {
 	}
 
 	// TODO builder somewhere else
-	private void buildAntiBurglar(DailyGadgetController dg) {
-		// Random aan/uit
-		// TODO meer uit dan aan - nieuwe random maken
-		GadgetSet gs = new GadgetSet();
-		gs.startMs = 0;
-		gs.endMs = Integer.MAX_VALUE;
-		Lamp lamp;
-		lamp = (Lamp) blocksSoFar.get("LichtCircante");
-		gs.gadgets.add(new RandomOnOff(lamp, 120000, 300000));
-		lamp = (Lamp) blocksSoFar.get("LichtKeuken");
-		gs.gadgets.add(new RandomOnOff(lamp, 100000, 360000));
-		lamp = (Lamp) blocksSoFar.get("LichtBureau");
-		gs.gadgets.add(new RandomOnOff(lamp, 240000, 60000));
-		lamp = (Lamp) blocksSoFar.get("LichtGangBoven");
-		gs.gadgets.add(new RandomOnOff(lamp, 30000, 120000));
-		dg.addGadgetSet(gs);
-	}
+//	private void buildAntiBurglar(DailyGadgetController dg) {
+//		// Random aan/uit
+//		// TODO meer uit dan aan - nieuwe random maken
+//		GadgetSet gs = new GadgetSet();
+//		gs.startMs = 0;
+//		gs.endMs = Integer.MAX_VALUE;
+//		Lamp lamp;
+//		lamp = (Lamp) blocksSoFar.get("LichtCircante");
+//		gs.gadgets.add(new RandomOnOff(lamp, 120000, 300000));
+//		lamp = (Lamp) blocksSoFar.get("LichtKeuken");
+//		gs.gadgets.add(new RandomOnOff(lamp, 100000, 360000));
+//		lamp = (Lamp) blocksSoFar.get("LichtBureau");
+//		gs.gadgets.add(new RandomOnOff(lamp, 240000, 60000));
+//		lamp = (Lamp) blocksSoFar.get("LichtGangBoven");
+//		gs.gadgets.add(new RandomOnOff(lamp, 30000, 120000));
+//		dg.addGadgetSet(gs);
+//	}
 
 }

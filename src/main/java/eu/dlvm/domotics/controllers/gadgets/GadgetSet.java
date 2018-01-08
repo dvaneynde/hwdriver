@@ -4,25 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Set of {@link IGadget} with a start and end time. Times are relative to
- * {@link GadgetController} start time, so if {@link #startMs} is 1000 then this
- * GadgetSet will start 1 second after the Controller becomes active.
+ * Set of {@link IGadget} that when started should take no longer than {@link #durationMs}
+ * time.
  * 
  * @author dirk
  *
  */
 public class GadgetSet {
-	public int startMs, endMs;
-	public GadgetState state = GadgetState.BEFORE;
+	public int durationMs;
+	//public GadgetState state = GadgetState.BEFORE;
 	public List<IGadget> gadgets = new ArrayList<>();
 
-	public boolean isActive(GadgetSet e, long msSinceStart) {
-		return (e.startMs <= msSinceStart && e.endMs >= msSinceStart);
+	public void onBefore() {
+		for (IGadget g : gadgets)
+			g.onBefore();
 	}
-
-	@Override
-	public String toString() {
-		return "GadgetSet [startMs=" + startMs + ", endMs=" + endMs + ", state=" + state + ", gadgets=" + gadgets + "]";
+	public void onBusy(long relativeTimeGadgetSet) {
+		for (IGadget g : gadgets)
+			g.onBusy(relativeTimeGadgetSet);
 	}
-
+	public void onDone() {
+		for (IGadget g : gadgets)
+			g.onDone();
+	}
 }
