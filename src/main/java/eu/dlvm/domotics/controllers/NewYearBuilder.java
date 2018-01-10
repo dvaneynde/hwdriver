@@ -25,7 +25,7 @@ public class NewYearBuilder {
 
 	public GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
 		
-		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs-startTimeMs, false, ctx);
+		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs-startTimeMs, true,false, ctx);
 
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />

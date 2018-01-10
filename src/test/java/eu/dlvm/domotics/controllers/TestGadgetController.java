@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.IGadget;
 
@@ -56,10 +57,17 @@ public class TestGadgetController {
 		}
 	}
 
+	private void check(TestGadget g, boolean before, boolean busy, boolean after) {
+		Assert.assertEquals("testing before", before, g.getAndResetBefore());
+		Assert.assertEquals("testing busy", busy, g.getAndResetBusy());
+		Assert.assertEquals("testing after", after, g.getAndResetDone());
+
+	}
+
 	@Test
-	public void happyPath() {
+	public void startAndEndWithTiming() {
 		IDomoticContext domoticContext = new DomoContextMock(null);
-		GadgetController gc = new GadgetController("TestGadgetController", 0, 20 * 1000, false, domoticContext);
+		GadgetController gc = new GadgetController("TestGadgetController", 200, 20 * 1000, true, false, domoticContext);
 
 		TestGadget g0 = new TestGadget();
 		TestGadget g1 = new TestGadget();
@@ -82,58 +90,64 @@ public class TestGadgetController {
 		gc.addGadgetSet(gs2);
 
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
+
+		long time = 100L;
+		gc.loop(time, time);
+		check(g0, false, false, false);
+		Assert.assertFalse(gc.isRunning());
+		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 		
 		// gs0 active
-		long time = 0L;
+		 time = 200L;
 		gc.loop(time, time);
 		check(g0, true, true, false);
-		Assert.assertEquals(time, g0.busyTime);
+		Assert.assertEquals(time-200, g0.busyTime);
 		Assert.assertTrue(gc.isRunning());
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
-		
+
 		time += 20;
 		gc.loop(time, time);
 		check(g0, false, true, false);
-		Assert.assertEquals(time, g0.busyTime);
+		Assert.assertEquals(time-200, g0.busyTime);
 
-		time = 100;
+		time = 300;
 		gc.loop(time, time);
 		check(g0, false, true, false);
-		Assert.assertEquals(time, g0.busyTime);
+		Assert.assertEquals(time-200, g0.busyTime);
 		check(g1, false, false, false);
 		check(g2, false, false, false);
 
-		// gs1 active, time > 100
-		time = 120;
+		// gs1 active, time > 300
+		time = 320;
 		gc.loop(time, time);
 		check(g0, false, false, true);
 		check(g1, true, true, false);
-		Assert.assertEquals(time-100, g1.busyTime);
+		Assert.assertEquals(time - 300, g1.busyTime);
 		check(g2, false, false, false);
 
 		time += 20;
-		while (time <= (1000+100)) {
+		while (time <= (1000 + 100+200)) {
 			gc.loop(time, time);
 			check(g0, false, false, false);
 			check(g1, false, true, false);
-			Assert.assertEquals(time-100, g1.busyTime);
+			Assert.assertEquals(time - 300, g1.busyTime);
 			check(g2, false, false, false);
 			time += 20;
 		}
-		// gs2 active, time > 1100
+		// gs2 active, time > 1300
 		gc.loop(time, time);
 		check(g0, false, false, false);
 		check(g1, false, false, true);
 		check(g2, true, true, false);
-		Assert.assertEquals(time-1100, g2.busyTime);
-		
+		Assert.assertEquals(time - 1300, g2.busyTime);
+
 		time += 20;
-		while (time <= (10000+1000+100)) {
+		while (time <= (10000 + 1000 + 100 + 200)) {
 			gc.loop(time, time);
 			check(g0, false, false, false);
 			check(g1, false, false, false);
 			check(g2, false, true, false);
-			Assert.assertEquals(time-1100, g2.busyTime);
+			Assert.assertEquals(time - 1300, g2.busyTime);
 			Assert.assertTrue(gc.isRunning());
 			time += 20;
 		}
@@ -142,9 +156,16 @@ public class TestGadgetController {
 		check(g1, false, false, false);
 		check(g2, false, false, true);
 		Assert.assertFalse(gc.isRunning());
-		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
+		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 
-		gc.loop(20020, 20020);
+		gc.loop(20200, 20200);
+		check(g0, false, false, false);
+		check(g1, false, false, false);
+		check(g2, false, false, false);
+		Assert.assertFalse(gc.isRunning());
+		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
+
+		gc.loop(20220, 20220);
 		check(g0, false, false, false);
 		check(g1, false, false, false);
 		check(g2, false, false, false);
@@ -152,11 +173,9 @@ public class TestGadgetController {
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 	}
 
-	private void check(TestGadget g, boolean before, boolean busy, boolean after) {
-		Assert.assertEquals("testing before", before, g.getAndResetBefore());
-		Assert.assertEquals("testing busy", busy, g.getAndResetBusy());
-		Assert.assertEquals("testing after", after, g.getAndResetDone());
-
+	@Test
+	public void startAndEndWithLowLight() {
+		IDomoticContext domoticContext = new DomoContextMock(null);
+		GadgetController gc = new GadgetController("TestGadgetController", 0, 20 * 1000, false, false, domoticContext);
 	}
-
 }
