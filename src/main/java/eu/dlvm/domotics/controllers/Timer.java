@@ -24,14 +24,22 @@ public class Timer extends Controller {
 	protected int onTime, offTime;
 	protected boolean state;
 
-	// helpers
-	public static int timeInDay(long time) {
+	/**
+	 * ???
+	 */
+	public static int timeInDayMillis(long time) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
 		int timeInDay = timeInDayMillis(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
 		return timeInDay;
 	}
 
+	/**
+	 * 
+	 * @param hours
+	 * @param minutes
+	 * @return time in ms since midnight
+	 */
 	public static int timeInDayMillis(int hours, int minutes) {
 		return ((hours * 60) + minutes) * 60000;
 	}
@@ -50,6 +58,7 @@ public class Timer extends Controller {
 		c.set(Calendar.MINUTE, minute);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
+		logger.info("calendar="+c.toString());
 		return c.getTimeInMillis();
 	}
 
@@ -89,7 +98,7 @@ public class Timer extends Controller {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		long currentTimeInDay = timeInDay(currentTime);
+		long currentTimeInDay = timeInDayMillis(currentTime);
 		boolean state2 = state;
 		if (onTime <= offTime) {
 			state2 = (currentTimeInDay > onTime && currentTimeInDay < offTime);

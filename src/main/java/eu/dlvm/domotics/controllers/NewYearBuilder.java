@@ -13,19 +13,21 @@ import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
 import eu.dlvm.domotics.controllers.gadgets.Sinus;
 
 /**
- * Builds three GadgetSets:<ol>
+ * Builds three GadgetSets:
+ * <ol>
  * <li>switch participating lamps off</li>
  * <li>does a 10 second count down (on-off-on...)</li>
  * <li>then a lot of random effects and sine with dimmers</li>
  * </ol>
+ * 
  * @author dirk
  *
  */
 public class NewYearBuilder {
 
 	public GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
-		
-		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs-startTimeMs, true,false, ctx);
+
+		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, ctx);
 
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
@@ -47,7 +49,7 @@ public class NewYearBuilder {
 		{
 			// Aftellen
 			GadgetSet gs = new GadgetSet();
-			gs.durationMs = 10*1000;
+			gs.durationMs = 10 * 1000;
 			ny.addGadgetSet(gs);
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");
@@ -64,12 +66,12 @@ public class NewYearBuilder {
 		{
 			// Show
 			GadgetSet gs = new GadgetSet();
-			gs.durationMs = 30*1000;
+			gs.durationMs = 30 * 1000;
 			ny.addGadgetSet(gs);
 			// Zet Dimmers terug aan
-//			OnOff oo = new OnOff();
-//			addLamps2OnOff(blocks, oo, true);
-//			gs.gadgets.add(oo);
+			//			OnOff oo = new OnOff();
+			//			addLamps2OnOff(blocks, oo, true);
+			//			gs.gadgets.add(oo);
 			// Start show
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");

@@ -16,39 +16,41 @@ import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
- * Starts and stops a list of gadgets when any of the following holds:
+ * Runs a set of Gadgets sequentially, once or repeatedly.
+ * <p>
+ * Gadgets run in an 'enabled' period [start..start+duration] where start is a
+ * specific date and time, or everyday between [onTime .. offTime] where both
+ * times are ms since midnight.
+ * 
+ * <p>
+ * Actual start of a gadget sequence is dependent of configuration and can be
+ * any of:
  * <ol>
- * <ul>
- * via ON or TOGGLE event, manual on/off
- * </ul>
- * <ul>
- * via TRIGGER event, when in certain time period [start..end]
- * </ul>
- * <ul>
- * when start time has arrived (and triggier is like automatic)
- * </ul>
+ * <li>via TRIGGER event, when it occurs in the enabled period</li>
+ * <li>when start time has arrived of enabled period</li>
+ * <li>via ON or TOGGLE event, manual on/off; this does not take into account
+ * enabled period, though the end time of that period will switch it off</li>
  * </ol>
  * <p>
- * Whenever end time has arrived (startTimeMs + durationMS) the gadgets stop -
- * even with manual ON.
+ * Whenever end time has arrived the gadgets stop (if it did not already stop
+ * because all gadgets played and no repeat is set). Triggering will only work
+ * again when new start period has come.
  * <p>
  * When within [start..end] period and an OFF event is received the TRIGGER will
  * not work unless the END period has passed.
- * <p>
- * <strong>Important</strong>{@link #isRunning()} == true and state ACTIF do not
- * mean that he gadgets (still) run, the gadgets may have run out. Except if
- * repeat of course.
+ * <p>Enabled period is inclusive as in [onTime..offTime], whereas Gadgets are [start..start+duration[.
  * 
  * @author dirk
  *
  */
 public class GadgetController extends Controller implements IEventListener, IUiCapableBlock {
 
+	public static final int MS_IN_DAY = 24 * 60 * 60 * 1000;
+
 	static Logger logger = LoggerFactory.getLogger(GadgetController.class);
-	private long startTimeMs;
-	private long durationMs;
-	private boolean activateOnStartTime;
-	private boolean repeat;
+	private long startTimeMs, durationMs;
+	private int onTime, offTime;
+	private boolean activateOnStartTime, repeat, daily;
 	private boolean manualStartRequested, manualStopRequested, triggerRecorded = false;
 	private long startOfSequenceMs = -1;
 	private int idxInSequence = 0;
@@ -57,24 +59,60 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	private States state = States.INACTIF;
 
 	/**
-	 * INACTIF: outside actif period and not manually started ACTIF: within
-	 * actif period or manually started, and not manually stoped WAITING_END:
-	 * stopped functioning due to manual stop, but still in actif period
-	 * (awaiting its end, only manual start possible)
 	 * 
-	 * @author dirk
 	 * TODO alternatief, extra MANUAL_ACTIF, die los staat van tijden e.d.
+	 * @author dirk 
 	 */
 	public enum States {
 		INACTIF, WAITING_TRIGGER, ACTIF, WAITING_END
 	}
 
-	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IDomoticContext ctx) {
+	private GadgetController(String name, boolean activateOnStartTme, boolean repeat, IDomoticContext ctx) {
 		super(name, name, null, ctx);
-		this.startTimeMs = startTimeMs;
-		this.durationMs = durationMs;
 		this.activateOnStartTime = activateOnStartTme;
 		this.repeat = repeat;
+	}
+
+	/**
+	 * One-shot version.
+	 * @param name
+	 * @param startTimeMs
+	 *            absolute start time when not daily, otherwise ms since
+	 *            midnight to start
+	 * @param durationMs
+	 *            duration, [start .. end] really is [startTimeMs ..
+	 *            (startTimeMs+durationMs)]
+	 * @param activateOnStartTme
+	 *            if true becomes ACTIVE right at start time, otherwise only
+	 *            after TRIGGERED event
+	 * @param repeat
+	 *            whether to repeat changesets indefinitely (until end time that
+	 *            is)
+	 * @param daily
+	 *            true if executes every day, or at absolute time
+	 * @param ctx
+	 */
+	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IDomoticContext ctx) {
+		this(name, activateOnStartTme, repeat, ctx);
+		this.startTimeMs = startTimeMs;
+		this.durationMs = durationMs;
+		this.daily = false;
+	}
+
+	/**
+	 * Every-day-once version.
+	 * @param name
+	 * @param activateOnStartTme
+	 * @param repeat
+	 * @param onTime
+	 * @param offTime
+	 * @param ctx
+	 */
+	public GadgetController(String name, boolean activateOnStartTme, boolean repeat, int onTime, int offTime, IDomoticContext ctx) {
+		this(name, activateOnStartTme, repeat, ctx);
+		this.onTime = onTime;
+		this.offTime = offTime;
+		this.daily = true;
 	}
 
 	public void addGadgetSet(GadgetSet e) {
@@ -92,7 +130,18 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	private boolean withinTimePeriod(long currentTime) {
-		return (currentTime >= startTimeMs && currentTime <= (startTimeMs + durationMs));
+		if (daily) {
+			boolean result;
+			long midnight = Timer.getTimeMsSameDayAtHourMinute(currentTime, 0, 0);
+			long currentTimeInDay = currentTime - midnight;
+			if (onTime <= offTime) {
+				result = (currentTimeInDay >= onTime && currentTimeInDay <= offTime);
+			} else {
+				result = (currentTimeInDay <= offTime || currentTimeInDay >= onTime);
+			}
+			return result;
+		} else
+			return (currentTime >= startTimeMs && currentTime <= (startTimeMs + durationMs));
 	}
 
 	public void on() {
@@ -186,6 +235,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			}
 			break;
 		case WAITING_END:
+			// goes to INACTIVE or ACTIF
 			if (!withinTimePeriod(currentTime)) {
 				state = States.INACTIF;
 				logger.info(getName() + " - go from WAITING_END to " + state + " because of end time reached.");
@@ -212,14 +262,22 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			long relativeTimeWithinSequence = currentTime - startOfSequenceMs;
 			GadgetSet gadgetSet = gadgetSets.get(idxInSequence);
 
-			if (relativeTimeWithinSequence > runtimePastGadgets + gadgetSet.durationMs) {
-				gadgetSet.onDone(); // Could be that this one executes without gadget ever have run onBusy().
+			if (relativeTimeWithinSequence >= runtimePastGadgets + gadgetSet.durationMs) {
+				gadgetSet.onDone();
 				idxInSequence++;
 				if (idxInSequence >= gadgetSets.size()) {
-					gadgetSets.get(idxInSequence - 1).onDone();
-					state = States.WAITING_END;
-					logger.info(getName() + " all gadget sets done, go to " + state + " at time " + relativeTimeWithinSequence + "ms.");
-					// TODO looping case
+					if (repeat) {
+						startOfSequenceMs = currentTime;
+						relativeTimeWithinSequence = currentTime - startOfSequenceMs;
+						idxInSequence = 0;
+						runtimePastGadgets = 0;
+						logger.info(getName() + " repeat set " + idxInSequence + " / " + (gadgetSets.size() - 1) + " at time 0ms.");
+						gadgetSet = gadgetSets.get(idxInSequence);
+						gadgetSet.onBefore();
+					} else {
+						state = States.WAITING_END;
+						logger.info(getName() + " all gadget sets done, go to " + state + " at time " + relativeTimeWithinSequence + "ms.");
+					}
 				} else {
 					runtimePastGadgets += gadgetSet.durationMs;
 					gadgetSet = gadgetSets.get(idxInSequence);
