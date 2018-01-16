@@ -35,7 +35,7 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtKeuken" />
+	<switch name="SchakLichtKeuken" singleClick="true" doubleClick="true" longClick="true"/>
 	<lamp name="LichtKeuken" desc="Keuken" ui="Beneden:0">
 		<toggle src="SchakLichtKeuken" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -239,10 +239,11 @@
 	</lamp>
 
 	<!--  Burglar -->
-<!-- 	<antiBurglar name="antiBurglar" start="16:00" end="23:00">
+ 	<antiBurglar name="inbraakbeveiliging" start="16:00" end="23:00">
 		<off src="SchakLichtInkom" event="SingleClick"/>
+		<on src="SchakLichtKeuken" event="DoubleClick"/>
+		<off src="SchakLichtKeuken" event="LongClick"/>
 		<sun sensor="LichtmeterSchemering"/>
 	</antiBurglar>
- -->
 
 </domotic>

@@ -11,9 +11,20 @@ import java.util.List;
  *
  */
 public class GadgetSet {
-	public int durationMs;
-	//public GadgetState state = GadgetState.BEFORE;
-	public List<IGadget> gadgets = new ArrayList<>();
+	private int durationMs;
+	private List<IGadget> gadgets = new ArrayList<>();
+
+	public GadgetSet(int durationMs) {
+		this.durationMs = durationMs;
+	}
+	
+	public int getDurationMs() {
+		return durationMs;
+	}
+
+	public List<IGadget> getGadgets() {
+		return gadgets;
+	}
 
 	public void onBefore() {
 		for (IGadget g : gadgets)

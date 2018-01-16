@@ -38,35 +38,32 @@ public class NewYearBuilder {
 		 */
 		{
 			// Alles af
-			GadgetSet gs = new GadgetSet();
-			gs.durationMs = 100;
+			GadgetSet gs = new GadgetSet(100);
 			ny.addGadgetSet(gs);
 			OnOff oo = new OnOff();
 			oo.add(oo.new Command(0, false));
 			addLamps2OnOff(blocks, oo, false);
-			gs.gadgets.add(oo);
+			gs.getGadgets().add(oo);
 		}
 		{
 			// Aftellen
-			GadgetSet gs = new GadgetSet();
-			gs.durationMs = 10 * 1000;
+			GadgetSet gs = new GadgetSet(10 * 1000);
 			ny.addGadgetSet(gs);
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");
-			gs.gadgets.add(new Blink(lamp, 1));
+			gs.getGadgets().add(new Blink(lamp, 1));
 			lamp = (Lamp) blocks.get("LichtKeuken");
-			gs.gadgets.add(new Blink(lamp, 1));
+			gs.getGadgets().add(new Blink(lamp, 1));
 			lamp = (Lamp) blocks.get("LichtBureau");
-			gs.gadgets.add(new Blink(lamp, 1));
+			gs.getGadgets().add(new Blink(lamp, 1));
 			lamp = (Lamp) blocks.get("LichtInkom");
-			gs.gadgets.add(new Blink(lamp, 1));
+			gs.getGadgets().add(new Blink(lamp, 1));
 			// lamp = (Lamp) blocks.get("LichtGangBoven");
 			// gs.gadgets.add(new Blink(lamp, 1));
 		}
 		{
 			// Show
-			GadgetSet gs = new GadgetSet();
-			gs.durationMs = 30 * 1000;
+			GadgetSet gs = new GadgetSet(30*1000);
 			ny.addGadgetSet(gs);
 			// Zet Dimmers terug aan
 			//			OnOff oo = new OnOff();
@@ -75,22 +72,22 @@ public class NewYearBuilder {
 			// Start show
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");
-			gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+			gs.getGadgets().add(new RandomOnOff(lamp, 500, 1000));
 			lamp = (Lamp) blocks.get("LichtKeuken");
-			gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+			gs.getGadgets().add(new RandomOnOff(lamp, 500, 1000));
 			lamp = (Lamp) blocks.get("LichtBureau");
-			gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+			gs.getGadgets().add(new RandomOnOff(lamp, 500, 1000));
 			lamp = (Lamp) blocks.get("LichtInkom");
-			gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+			gs.getGadgets().add(new RandomOnOff(lamp, 500, 1000));
 			// lamp = (Lamp) blocks.get("LichtGangBoven");
-			// gs.gadgets.add(new RandomOnOff(lamp, 500, 1000));
+			// gs.getGadgets().add(new RandomOnOff(lamp, 500, 1000));
 			DimmedLamp dl;
 			dl = (DimmedLamp) blocks.get("LichtZithoek");
-			gs.gadgets.add(new Sinus(dl, 3000, 0));
+			gs.getGadgets().add(new Sinus(dl, 3000, 0));
 			dl = (DimmedLamp) blocks.get("LichtCircanteRondom");
-			gs.gadgets.add(new Sinus(dl, 3000, 120));
+			gs.getGadgets().add(new Sinus(dl, 3000, 120));
 			dl = (DimmedLamp) blocks.get("LichtVeranda");
-			gs.gadgets.add(new Sinus(dl, 3000, 240));
+			gs.getGadgets().add(new Sinus(dl, 3000, 240));
 		}
 
 		return ny;

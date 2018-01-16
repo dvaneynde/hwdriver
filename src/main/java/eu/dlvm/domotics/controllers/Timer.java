@@ -58,7 +58,6 @@ public class Timer extends Controller {
 		c.set(Calendar.MINUTE, minute);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		logger.info("calendar="+c.toString());
 		return c.getTimeInMillis();
 	}
 

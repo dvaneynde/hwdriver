@@ -75,17 +75,14 @@ public class TestGadgetController {
 		TestGadget g1 = new TestGadget();
 		TestGadget g2 = new TestGadget();
 
-		GadgetSet gs0 = new GadgetSet();
-		gs0.durationMs = 100;
-		gs0.gadgets.add(g0);
+		GadgetSet gs0 = new GadgetSet(100);
+		gs0.getGadgets().add(g0);
 
-		GadgetSet gs1 = new GadgetSet();
-		gs1.durationMs = 1000;
-		gs1.gadgets.add(g1);
+		GadgetSet gs1 = new GadgetSet(1000);
+		gs1.getGadgets().add(g1);
 
-		GadgetSet gs2 = new GadgetSet();
-		gs2.durationMs = 10000;
-		gs2.gadgets.add(g2);
+		GadgetSet gs2 = new GadgetSet(10000);
+		gs2.getGadgets().add(g2);
 
 		gc.addGadgetSet(gs0);
 		gc.addGadgetSet(gs1);
@@ -182,9 +179,8 @@ public class TestGadgetController {
 
 		TestGadget g0 = new TestGadget();
 
-		GadgetSet gs0 = new GadgetSet();
-		gs0.durationMs = 100;
-		gs0.gadgets.add(g0);
+		GadgetSet gs0 = new GadgetSet(100);
+		gs0.getGadgets().add(g0);
 		gc.addGadgetSet(gs0);
 
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
@@ -231,9 +227,8 @@ public class TestGadgetController {
 
 		TestGadget g0 = new TestGadget();
 
-		GadgetSet gs0 = new GadgetSet();
-		gs0.durationMs = 300;
-		gs0.gadgets.add(g0);
+		GadgetSet gs0 = new GadgetSet(300);
+		gs0.getGadgets().add(g0);
 		gc.addGadgetSet(gs0);
 
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
@@ -279,9 +274,8 @@ public class TestGadgetController {
 
 		TestGadget g0 = new TestGadget();
 
-		GadgetSet gs0 = new GadgetSet();
-		gs0.durationMs = 3600 * 1000;
-		gs0.gadgets.add(g0);
+		GadgetSet gs0 = new GadgetSet(3600 * 1000);
+		gs0.getGadgets().add(g0);
 		gc.addGadgetSet(gs0);
 
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
@@ -300,7 +294,7 @@ public class TestGadgetController {
 		gc.loop(time, time);
 		check(g0, false, true, false);
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
-		time += gs0.durationMs;
+		time += gs0.getDurationMs();
 		gc.loop(time, time);
 		check(g0, false, false, true);
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());

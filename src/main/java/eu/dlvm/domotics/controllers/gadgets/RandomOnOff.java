@@ -1,9 +1,14 @@
 package eu.dlvm.domotics.controllers.gadgets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.dlvm.domotics.actuators.Lamp;
 
 public class RandomOnOff implements IGadget {
 
+	private static Logger logger = LoggerFactory.getLogger(RandomOnOff.class);
+	
 	private Lamp lamp;
 	private int minMs;
 	private int multMs;
@@ -25,6 +30,7 @@ public class RandomOnOff implements IGadget {
 	@Override
 	public void onBusy(long time) {
 		if ((nextToggleTime < 0) || (time >= nextToggleTime)) {
+			logger.info("toggling lamp "+lamp.getName());
 			lamp.toggle();
 			int rand = (int)(Math.random() * multMs + minMs);
 			nextToggleTime = time + rand;	
