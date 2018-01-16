@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.controllers;
+package eu.dlvm.domotics.factories;
 
 import java.util.Map;
 
@@ -6,6 +6,7 @@ import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.gadgets.Blink;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.OnOff;
@@ -25,7 +26,7 @@ import eu.dlvm.domotics.controllers.gadgets.Sinus;
  */
 public class NewYearBuilder {
 
-	public GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
+	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
 
 		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, ctx);
 
@@ -63,7 +64,7 @@ public class NewYearBuilder {
 		}
 		{
 			// Show
-			GadgetSet gs = new GadgetSet(30*1000);
+			GadgetSet gs = new GadgetSet(30 * 1000);
 			ny.addGadgetSet(gs);
 			// Zet Dimmers terug aan
 			//			OnOff oo = new OnOff();
@@ -93,7 +94,7 @@ public class NewYearBuilder {
 		return ny;
 	}
 
-	private void addLamps2OnOff(Map<String, Block> blocks, OnOff oo, boolean dimmersOnly) {
+	private static void addLamps2OnOff(Map<String, Block> blocks, OnOff oo, boolean dimmersOnly) {
 		if (!dimmersOnly) {
 			oo.add((Lamp) blocks.get("LichtCircante"));
 			oo.add((Lamp) blocks.get("LichtKeuken"));

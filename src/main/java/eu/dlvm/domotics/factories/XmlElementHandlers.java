@@ -23,13 +23,10 @@ import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.GadgetController;
-import eu.dlvm.domotics.controllers.NewYearBuilder;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.controllers.TimerDayNight;
-import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
-import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -169,16 +166,15 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("newyear")) {
 				Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 				Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
-				currentBlock = new NewYearBuilder().build(blocksSoFar, start.getTime(), end.getTime(), ctx);
+				currentBlock =  NewYearBuilder.build(blocksSoFar, start.getTime(), end.getTime(), ctx);
 
 			} else if (localName.equals("antiBurglar")) {
 				parseBaseBlock(atts);
 				int start = converHourMinToMsOnDay(atts.getValue("start"));
 				int end = converHourMinToMsOnDay(atts.getValue("end"));
-				GadgetController dgc = new GadgetController(name, true, true, start, end, ctx);
-				currentBlock = dgc;
-				buildAntiBurglar(dgc);
-
+				GadgetController gc = AntiBurglarBuilder.build(blocksSoFar, name, start, end, ctx);
+				currentBlock = gc;
+	
 				// ===== Actuators
 
 			} else if (localName.equals("lamp")) {
@@ -323,21 +319,5 @@ class XmlElementHandlers extends DefaultHandler2 {
 			return Integer.parseInt(atts.getValue(attName));
 	}
 
-	// TODO builder somewhere else
-	private void buildAntiBurglar(GadgetController dg) {
-		// Random aan/uit
-		// TODO meer uit dan aan - nieuwe random maken
-		GadgetSet gs = new GadgetSet(Integer.MAX_VALUE);
-		Lamp lamp;
-		lamp = (Lamp) blocksSoFar.get("LichtCircante");
-		gs.getGadgets().add(new RandomOnOff(lamp, 120000, 300000));
-		lamp = (Lamp) blocksSoFar.get("LichtKeuken");
-		gs.getGadgets().add(new RandomOnOff(lamp, 100000, 360000));
-		lamp = (Lamp) blocksSoFar.get("LichtBureau");
-		gs.getGadgets().add(new RandomOnOff(lamp, 240000, 60000));
-		lamp = (Lamp) blocksSoFar.get("LichtGangBoven");
-		gs.getGadgets().add(new RandomOnOff(lamp, 30000, 120000));
-		dg.addGadgetSet(gs);
-	}
 
 }

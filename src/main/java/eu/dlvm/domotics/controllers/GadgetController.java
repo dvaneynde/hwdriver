@@ -49,7 +49,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 
 	public static final int MS_IN_DAY = 24 * 60 * 60 * 1000;
 
-	static Logger logger = LoggerFactory.getLogger(GadgetController.class);
+	private static Logger logger = LoggerFactory.getLogger(GadgetController.class);
 	private long startTimeMs, durationMs;
 	private int onTime, offTime;
 	private boolean activateOnStartTime, repeat, daily;
@@ -315,6 +315,52 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			off();
 		else
 			logger.warn("update on GadgetController '" + getName() + "' got unsupported action '" + action + ".");
+	}
+
+	// ===== Builder =====
+
+	public static class Builder {
+		private String name;
+		private long startTimeMs, durationMs = -1L;
+		private int onTime, offTime = -1;
+		private boolean activateOnStartTime, repeat, daily;
+		private IDomoticContext ctx;
+
+		public Builder(final String name, final boolean daily, final IDomoticContext ctx) {
+			this.name = name;
+			this.daily = daily;
+			this.ctx = ctx;
+		}
+
+		public Builder repeat() {
+			repeat = true;
+			return this;
+		}
+
+		public Builder activateOnStart() {
+			activateOnStartTime = true;
+			return this;
+		}
+		public Builder setOnOffTime(int onTime, int offTime) {
+			this.onTime = onTime;
+			this.offTime = offTime;
+			return this;
+		}
+		
+		public Builder setStartAndDuration(long startTimeMs, long durationMs) {
+			this.startTimeMs = startTimeMs;
+			this.durationMs = durationMs;
+			return this;
+		}
+		
+		public GadgetController build() {
+			// TODO check juiste dingen gezet
+			if (daily) {
+				return new GadgetController(name, activateOnStartTime, repeat, onTime, offTime, ctx);
+			} else {
+				return new GadgetController(name, startTimeMs, durationMs, activateOnStartTime, repeat, ctx);
+			}
+		}
 	}
 
 }
