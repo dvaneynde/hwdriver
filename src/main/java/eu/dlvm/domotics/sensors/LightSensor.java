@@ -33,11 +33,12 @@ import eu.dlvm.iohardware.IHardwareIO;
 public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	private static final Logger log = LoggerFactory.getLogger(LightSensor.class);
+	private static final Logger loglight = LoggerFactory.getLogger("LIGHT");
 	private int threshold;
 	private long lowToHighDelayMs, highToLowDelayMs;
 	private int measuredLevel;
 	private States state;
-	private long timeCurrentStateStarted;
+	private long timeCurrentStateStarted, timeSinceLastLightLog;
 
 	// ===================
 	// PUBLIC API
@@ -56,7 +57,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		this.lowToHighDelayMs = lowToHighDelaySec * 1000L;
 		this.highToLowDelayMs = highToLowDelaySec * 1000L;
 
-		timeCurrentStateStarted = -1L;
+		timeCurrentStateStarted = timeSinceLastLightLog = -1L;
 		state = States.LOW;
 		log.info("LightSensor '" + getName() + "' configured: high=" + getThreshold() + ", low to high delay=" + getLowToHighDelaySec()
 				+ "sec., high to low delay=" + getHighToLowDelaySec() + " sec., channel=" + getChannel());
@@ -184,6 +185,11 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 			}
 			break;
 		}
+		if (currentTime - timeSinceLastLightLog >= 60* 1000L) {
+			loglight.info("LightSensor " + getName() + ": ana in=" + measuredLevel);
+			timeSinceLastLightLog = currentTime;
+		}
+
 	}
 
 	private void notifyLow() {
