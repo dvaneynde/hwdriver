@@ -26,8 +26,7 @@ public class AntiBurglarBuilder {
 
 	public static GadgetController build(Map<String, Block> blocksSoFar, String name, int onTime, int offTime, IDomoticContext ctx) {
 		GadgetController.Builder builder = new GadgetController.Builder(name, true, ctx);
-		GadgetController ab = builder.activateOnStart().repeat().setOnOffTime(onTime, offTime).build();
-		//ab.addGadgetSet(BuildGadgetSet(blocks));
+		GadgetController ab = builder.activateOnStart(false).repeat(true).setOnOffTime(onTime, offTime).build();
 
 		GadgetSet gs = new GadgetSet(600*1000);
 		{

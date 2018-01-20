@@ -333,26 +333,35 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 		}
 
 		public Builder repeat() {
-			repeat = true;
+			return repeat(true);
+		}
+
+		public Builder repeat(boolean value) {
+			repeat = value;
 			return this;
 		}
 
 		public Builder activateOnStart() {
-			activateOnStartTime = true;
+			return activateOnStart(true);
+		}
+
+		public Builder activateOnStart(boolean value) {
+			activateOnStartTime = value;
 			return this;
 		}
+
 		public Builder setOnOffTime(int onTime, int offTime) {
 			this.onTime = onTime;
 			this.offTime = offTime;
 			return this;
 		}
-		
+
 		public Builder setStartAndDuration(long startTimeMs, long durationMs) {
 			this.startTimeMs = startTimeMs;
 			this.durationMs = durationMs;
 			return this;
 		}
-		
+
 		public GadgetController build() {
 			// TODO check juiste dingen gezet
 			if (daily) {
