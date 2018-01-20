@@ -11,14 +11,15 @@ import eu.dlvm.domotics.events.EventType;
 /**
  * Lamp die op bepaald moment on/off gaat, eventueel meerdere keren.
  * 
+ * TODO test program
  * @author dirkv
  * 
  */
 public class OnOff implements IGadget {
 
 	private List<Actuator> actuators;
-	private long startTime;
 	private SortedSet<Command> commands;
+	private Command lastCommand;
 
 	public class Command implements Comparable<Command> {
 		public boolean state;
@@ -40,10 +41,10 @@ public class OnOff implements IGadget {
 
 	public OnOff() {
 		this.actuators = new ArrayList<>();
-		startTime = -1;
 		commands = new TreeSet<>();
 	}
 
+	// @Deprecated
 	public OnOff(Actuator actuator) {
 		this();
 		actuators.add(actuator);
@@ -57,36 +58,36 @@ public class OnOff implements IGadget {
 		commands.add(e);
 	}
 
-	private Command findLastEntryBefore(long time) {
-		Command lastEntry = null;
+	private Command findCurrentEntry(long time) {
+		Command currentEntry = null;
 		for (Command e : commands) {
-			if ((e.timeSec * 1000 + startTime) <= time)
-				lastEntry = e;
+			if (time >= (e.timeSec * 1000))
+				currentEntry = e;
 			else
 				break;
 		}
-		return lastEntry;
+		return currentEntry;
 	}
 
 	@Override
 	public void onBusy(long time) {
-		if (startTime < 0)
-			startTime = time;
-
-		Command e = findLastEntryBefore(time);
-		if (e != null) {
+		Command currentCommand = findCurrentEntry(time);
+		if (currentCommand != lastCommand) {
 			for (Actuator lamp : actuators)
-				lamp.onEvent(null, e.state ? EventType.ON : EventType.OFF);
+				lamp.onEvent(null, currentCommand.state ? EventType.ON : EventType.OFF);
+			lastCommand = currentCommand;
 		}
-
 	}
 
 	@Override
 	public void onBefore() {
+		lastCommand = null;
+		// TODO save state of actuators
 	}
 
 	@Override
 	public void onDone() {
+		// TODO restore state is waarschijnlijk iets dat gadgetset of gadgetcontroller moet doen?
 	}
 
 }
