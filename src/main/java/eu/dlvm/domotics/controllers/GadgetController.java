@@ -28,12 +28,12 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
  * <ol>
  * <li>via TRIGGER event, when it occurs in the enabled period</li>
  * <li>when start time has arrived of enabled period</li>
- * <li>via ON or TOGGLE event, manual on/off; this does not work outside
- * enabled period</li>
+ * <li>via ON or TOGGLE event, manual on/off; this does not work outside enabled
+ * period</li>
  * </ol>
  * <p>
  * Whenever end time has arrived the gadgets stop (if it did not already stop
- * because all gadgets played and no repeat is set). 
+ * because all gadgets played and no repeat is set).
  * <p>
  * Enabled period is inclusive as in [onTime..offTime], whereas Gadgets are
  * [start..start+duration[.
@@ -121,13 +121,17 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	public synchronized void requestManualStart() {
-		logger.info(getName() + " manual start requested.");
-		manualStartRequested = true;
+		if (state != States.INACTIF) {
+			logger.info(getName() + " manual start requested.");
+			manualStartRequested = true;
+		}
 	}
 
 	public synchronized void requestManualStop() {
-		logger.info(getName() + " manual stop requested.");
-		manualStopRequested = true;
+		if (state != States.INACTIF) {
+			manualStopRequested = true;
+			logger.info(getName() + " manual stop requested.");
+		}
 	}
 
 	private boolean withinTimePeriod(long currentTime) {

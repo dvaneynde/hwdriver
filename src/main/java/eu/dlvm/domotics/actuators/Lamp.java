@@ -124,7 +124,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			logger.info("Lamp '" + getName() + "' goes OFF, toggle() called.");
 			break;
 		case OFF:
-			on();
+			internalOn();
 			logger.info("Lamp '" + getName() + "' goes ON, toggle() called.");
 			break;
 		case GOING_OFF_BLINK:
@@ -139,7 +139,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	public void on() {
 		internalOn();
-		logger.info("Lamp '" + getName() + "' goes on, on() called.");
+		logger.info("Lamp '" + getName() + "' goes ON, on() called.");
 	}
 
 	private void internalOn() {
