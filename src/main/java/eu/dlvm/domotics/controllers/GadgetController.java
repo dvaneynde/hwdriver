@@ -28,16 +28,12 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
  * <ol>
  * <li>via TRIGGER event, when it occurs in the enabled period</li>
  * <li>when start time has arrived of enabled period</li>
- * <li>via ON or TOGGLE event, manual on/off; this does not take into account
- * enabled period, though the end time of that period will switch it off</li>
+ * <li>via ON or TOGGLE event, manual on/off; this does not work outside
+ * enabled period</li>
  * </ol>
  * <p>
  * Whenever end time has arrived the gadgets stop (if it did not already stop
- * because all gadgets played and no repeat is set). Triggering will only work
- * again when new start period has come.
- * <p>
- * When within [start..end] period and an OFF event is received the TRIGGER will
- * not work unless the END period has passed.
+ * because all gadgets played and no repeat is set). 
  * <p>
  * Enabled period is inclusive as in [onTime..offTime], whereas Gadgets are
  * [start..start+duration[.
@@ -198,16 +194,14 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	public void loop(long currentTime, long sequence) {
 		switch (state) {
 		case INACTIF:
-			if (activateOnStartTime && (manualStartRequested || withinTimePeriod(currentTime))) {
-				state = States.ACTIF;
-				startOfSequenceMs = -1;
-				manualStartRequested = false;
-				logger.info(
-						getName() + " - go from INACTIF to " + state + " because of " + (manualStartRequested ? "manual-start" : "start time reached") + ".");
-			} else if (!activateOnStartTime && (manualStartRequested || withinTimePeriod(currentTime))) {
-				state = States.WAITING_TRIGGER;
-				logger.info(
-						getName() + " - go from INACTIF to " + state + " because of " + (manualStartRequested ? "manual-start" : "start time reached") + ".");
+			if (withinTimePeriod(currentTime)) {
+				if (activateOnStartTime) {
+					state = States.ACTIF;
+					startOfSequenceMs = -1;
+				} else {
+					state = States.WAITING_TRIGGER;
+				}
+				logger.info(getName() + " - go from INACTIF to " + state + " because start time reached.");
 			}
 			break;
 		case WAITING_TRIGGER:
@@ -250,7 +244,6 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 				} else {
 					state = States.WAITING_TRIGGER;
 				}
-				startOfSequenceMs = -1;
 				manualStartRequested = false;
 				logger.info(getName() + " - go from WAITING_END to" + state + ", due to manual start request, for max. " + durationMs / 1000 + " sec.");
 			}

@@ -35,7 +35,7 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtKeuken" singleClick="true" doubleClick="true" longClick="true"/>
+	<switch name="SchakLichtKeuken" singleClick="true"/>
 	<lamp name="LichtKeuken" desc="Keuken" ui="Beneden:0">
 		<toggle src="SchakLichtKeuken" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -239,10 +239,17 @@
 	</lamp>
 
 	<!--  Burglar -->
- 	<antiBurglar name="inbraakbeveiliging" start="16:00" end="23:00">
-		<off src="SchakLichtInkom" event="SingleClick"/>
-		<on src="SchakLichtKeuken" event="DoubleClick"/>
-		<off src="SchakLichtKeuken" event="LongClick"/>
+ 	<antiBurglar name="InbraakBeveiliging" start="16:00" end="23:00">
+		<on src="SchakLichtInkom" event="LongClick"/>
+		<off src="SchakLichtKeuken"/>
+		<off src="SchakLichtInkom"/>
+		<off src="SchakLichtGarageTuin"/>
+		<off src="SchakLichtGaragePoort"/>
+		<off src="SchakLichtWC0"/>
+		<off src="SchakLichtBadk0"/>
+		<off src="SchakLichtCircante"/>
+		<off src="SchakLichtBureau"/>
+		<off src="SchakLichtGangBoven"/>
 		<sun sensor="LichtmeterSchemering"/>
 	</antiBurglar>
 
