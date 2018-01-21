@@ -121,14 +121,14 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	public synchronized void requestManualStart() {
-		if (state != States.INACTIF) {
+		if (state != States.INACTIF && state != States.ACTIF) {
 			logger.info(getName() + " manual start requested.");
 			manualStartRequested = true;
 		}
 	}
 
 	public synchronized void requestManualStop() {
-		if (state != States.INACTIF) {
+		if (state != States.INACTIF && state != States.ACTIF) {
 			manualStopRequested = true;
 			logger.info(getName() + " manual stop requested.");
 		}
@@ -185,7 +185,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			else
 				requestManualStart();
 			break;
-		case LIGHT_LOW: // FIXME dit blijkt ontvangen te worden, snap alleen niet hoe...
+		case LIGHT_LOW: // TODO via connector naar TRIGGERED
 		case TRIGGERED:
 			triggerRecorded = true;
 			break;
@@ -218,8 +218,8 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 				logger.info(getName() + " - go from ACTIF to " + state + " because of manual stop request.");
 			} else if (triggerRecorded || manualStartRequested) {
 				state = States.ACTIF;
-				startOfSequenceMs = -1;
 				triggerRecorded = false;
+				startOfSequenceMs = -1;
 				manualStartRequested = false;
 				logger.info(getName() + " - from WAITING_TRIGGER to " + state + " because of " + (triggerRecorded ? "trigger" : "manual start")
 						+ ", start running for max. " + durationMs / 1000 + " sec.");
@@ -245,10 +245,10 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 				if (activateOnStartTime) {
 					state = States.ACTIF;
 					startOfSequenceMs = -1;
+					manualStartRequested = false;
 				} else {
 					state = States.WAITING_TRIGGER;
 				}
-				manualStartRequested = false;
 				logger.info(getName() + " - go from WAITING_END to" + state + ", due to manual start request, for max. " + durationMs / 1000 + " sec.");
 			}
 			break;
