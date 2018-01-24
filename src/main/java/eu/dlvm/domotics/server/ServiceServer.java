@@ -2,6 +2,7 @@ package eu.dlvm.domotics.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,6 +52,8 @@ public class ServiceServer {
 
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
+			log.info("Creating connection, remote address="+remoteAddress.toString());
 			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(domoContext);
 			return uiStateUpdatorSocket;
 		}

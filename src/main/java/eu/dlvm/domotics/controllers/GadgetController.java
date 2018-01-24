@@ -128,7 +128,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	public synchronized void requestManualStop() {
-		if (state != States.INACTIF && state != States.ACTIF) {
+		if (state != States.INACTIF && state != States.WAITING_END) {
 			manualStopRequested = true;
 			logger.info(getName() + " manual stop requested.");
 		}
@@ -187,6 +187,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			break;
 		case LIGHT_LOW: // TODO via connector naar TRIGGERED
 		case TRIGGERED:
+			logger.info("Got " + event + " from " + source.getName() + '.');
 			triggerRecorded = true;
 			break;
 		default:
@@ -214,13 +215,10 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 				logger.info(getName() + " - go from ACTIF to " + state + " because of end time reached.");
 			} else if (manualStopRequested) {
 				state = States.WAITING_END;
-				manualStopRequested = false;
 				logger.info(getName() + " - go from ACTIF to " + state + " because of manual stop request.");
 			} else if (triggerRecorded || manualStartRequested) {
 				state = States.ACTIF;
-				triggerRecorded = false;
 				startOfSequenceMs = -1;
-				manualStartRequested = false;
 				logger.info(getName() + " - from WAITING_TRIGGER to " + state + " because of " + (triggerRecorded ? "trigger" : "manual start")
 						+ ", start running for max. " + durationMs / 1000 + " sec.");
 			}
@@ -233,7 +231,6 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			} else if (manualStopRequested) {
 				gadgetSets.get(idxInSequence).onDone();
 				state = States.WAITING_END;
-				manualStopRequested = false;
 				logger.info(getName() + " - go from ACTIF to " + state + " because of manual stop request.");
 			}
 			break;
@@ -245,7 +242,6 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 				if (activateOnStartTime) {
 					state = States.ACTIF;
 					startOfSequenceMs = -1;
-					manualStartRequested = false;
 				} else {
 					state = States.WAITING_TRIGGER;
 				}
@@ -254,8 +250,8 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			break;
 		default:
 			break;
-
 		}
+		manualStopRequested = manualStartRequested = triggerRecorded = false;
 
 		if (state == States.ACTIF) {
 			if (startOfSequenceMs == -1) {
