@@ -17,6 +17,8 @@ import Material.Icon as Icon
 import Material.Color as Color
 import Material.Toggles as Toggles
 import Material.Slider as Slider
+import Material.Menu as Menu
+
 
 
 -- Domotics user interface
@@ -28,7 +30,7 @@ import Material.Slider as Slider
 
 
 urlBase =
-    --    "localhost:8080"
+    -- "localhost:8080"
     "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
 
 
@@ -43,7 +45,8 @@ wsStatus =
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
-
+lichtmeterName =
+    "LichtmeterZonnewering"
 
 --To disable websockets for test:
 --Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
@@ -428,7 +431,17 @@ lightPercentage level =
 view : Model -> Html Msg
 view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        ([ groupToggleBar "Screens"
+        ([
+        Menu.render Mdl [1000] model.mdl
+          [ Menu.bottomLeft ]
+          [ Menu.item
+              [ Menu.onSelect PutModelInTestAsString ]
+              [ text "English (US)" ]
+          , Menu.item
+              [ Menu.onSelect PutModelInTestAsString ]
+              [ text "français" ]
+          ]
+        , groupToggleBar "Screens"
             100
             model
             (\model ->
@@ -437,9 +450,9 @@ view model =
                         ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Zon: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName "Lichtmeter" model.statuses)) ] []
-                            , text (toString (levelByName "Lichtmeter" model.statuses) ++ " - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
---                            , text (toString (lightPercentage (levelByName "Lichtmeter" model.statuses)) ++ "% - " ++ (toString (statusByName "Lichtmeter" model.statuses).status))
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName lichtmeterName model.statuses)) ] []
+                            , text (toString (levelByName lichtmeterName model.statuses) ++ " - " ++ (toString (statusByName lichtmeterName model.statuses).status))
+--                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
                             ]
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Wind: "
