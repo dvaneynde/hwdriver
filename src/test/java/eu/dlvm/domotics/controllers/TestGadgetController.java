@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticContext;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
@@ -200,7 +201,7 @@ public class TestGadgetController {
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.WAITING_TRIGGER, gc.getState());
 
-		gc.onEvent(null, EventType.TRIGGERED);
+		gc.onEvent(new DummyBlock("dummy"), EventType.TRIGGERED);
 		time = 400;
 		gc.loop(time, time);
 		check(g0, true, true, false);
@@ -238,7 +239,7 @@ public class TestGadgetController {
 		time = 200L;
 		gc.loop(time, time);
 		Assert.assertEquals(GadgetController.States.WAITING_TRIGGER, gc.getState());
-		gc.onEvent(null, EventType.TRIGGERED);
+		gc.onEvent(new DummyBlock("dummy"), EventType.TRIGGERED);
 		time = 400;
 		gc.loop(time, time);
 		check(g0, true, true, false);
@@ -314,4 +315,11 @@ public class TestGadgetController {
 		// TOOD
 	}
 
+	public class DummyBlock extends Block {
+
+		public DummyBlock(String name) {
+			super(name, "", "");
+		}
+
+	}
 }

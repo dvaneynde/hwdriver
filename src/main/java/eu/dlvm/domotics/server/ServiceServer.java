@@ -53,7 +53,7 @@ public class ServiceServer {
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
 			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
-			log.info("Creating connection, remote address="+remoteAddress.toString());
+			log.debug("Creating websocket connection, remote address="+remoteAddress.toString());
 			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(domoContext);
 			return uiStateUpdatorSocket;
 		}
@@ -97,6 +97,10 @@ public class ServiceServer {
 			holderDefault.setInitParameter("dirAllowed", "true");
 			contextHandler.addServlet(holderDefault, "/*");
 
+			// TODO
+			// https://stackoverflow.com/questions/28190198/cross-origin-filter-with-embedded-jetty
+			// Lijkt erop dat ik 9.4 nodig heb ipv 9.3?
+				
 			server.start();
 			//server.join();
 		} catch (Throwable t) {

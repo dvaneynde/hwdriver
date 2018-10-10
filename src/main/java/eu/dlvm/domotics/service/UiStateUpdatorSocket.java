@@ -36,21 +36,21 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 		this.context = context;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;
-		LOG.info("Created UiStateUpdatorSocket, id=" + id);
+		LOG.debug("Created UiStateUpdatorSocket, id=" + id);
 	}
 
 	@OnWebSocketConnect
 	public void onOpen(Session session) {
 		this.savedSession = session;
 		context.addStateChangedListener(this);
-		LOG.info("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
+		LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
 	}
 
 	@OnWebSocketClose
 	public void onClose(int closeCode, String closeReasonPhrase) {
 		this.savedSession = null;
 		context.removeStateChangedListener(this);
-		LOG.info("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
+		LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
 	}
 
 	@Override
