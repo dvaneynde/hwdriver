@@ -4,10 +4,9 @@ import Dict
 import Html exposing (Html, button, div, text, span, input, label, br, meter)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck)
+import Navigation exposing (Location)
 import Http
-import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder, decodeString, int, float, string, bool, field, oneOf, succeed)
-import Json.Encode as Encode
 import WebSocket
 import Material
 import Material.Button as Button
@@ -19,46 +18,65 @@ import Material.Toggles as Toggles
 import Material.Slider as Slider
 import Material.Menu as Menu
 
-
-
+----------------------------------------------------------
 -- Domotics user interface
+----------------------------------------------------------
+
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
    But when on same server no problem.
-   anders: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
+   https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
--- GLOBAL
+
+----------------------------------------------------------
+-- URL's and WebSocket address
 
 {-
-- To run on Mac and access real backend on Linux: "domotica:8080"
-- To run locally on Mac: "localhost:8080"
-- Production: ""
+Set to Nothing for production use, set to backend if using Elm Reactor.
+TODO make parameter of program, so that it is set to Nothing from index.html - see Navigation.programWithFlags
 -}
-urlBase =
-    -- "localhost:8080"
-    "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
-    -- "domotica:8080"
-    -- ""
+fixHost : Maybe String
+fixHost =
+    -- Just "192.168.0.10:8080"
+    Nothing
+
+{-
+Determines host and port to used for backend; see also fixHost
+-}
+getHost : Location -> String
+getHost location =
+    case fixHost of
+        Just hostAndPort -> hostAndPort
+        Nothing -> location.host
 
 
-urlUpdateActuators =
-    "http://" ++ urlBase ++ "/rest/act/"
+urlUpdateActuators : Model -> String
+urlUpdateActuators model =
+    "http://" ++ model.host ++ "/rest/act/"
     --"/rest/act/"
 
-
-wsStatus =
-    "ws://" ++ urlBase ++ "/status/"
+wsStatus : Model -> String
+wsStatus model =
+    "ws://" ++ model.host ++ "/status/"
     --"/status/"
 
-main =
-    Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
+----------------------------------------------------------
+-- GLOBALS
+lichtmeterName : String
 lichtmeterName =
     "LichtmeterZonnewering"
 
---To disable websockets for test:
---Html.program { init = init, view = view, update = update, subscriptions = (\_ -> Sub.none) }
--- MODEL
 
+----------------------------------------------------------
+-- MAIN
+
+main : Program Never Model Msg
+main =
+    Navigation.program LocationChanged { init = init, view = view, update = update, subscriptions = subscriptions }
+
+
+----------------------------------------------------------
+-- MODEL
 
 type alias Group2OpenDict =
     Dict.Dict String Bool
@@ -75,7 +93,7 @@ type alias StatusRecord =
 
 
 type alias Model =
-    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model }
+    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model, host: String }
 
 
 initialStatus : StatusRecord
@@ -83,9 +101,9 @@ initialStatus =
     { name = "", kind = "", group = "", description = "", status = "", extra = None }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model }, Cmd.none )
+init : Location -> ( Model, Cmd Msg )
+init location =
+    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location}, Cmd.none )
 
 
 initGroups : Group2OpenDict
@@ -111,9 +129,8 @@ nameInGroup group =
         Maybe.withDefault group (List.head groupSplit)
 
 
-
+----------------------------------------------------------
 -- UPDATE
-
 
 type Msg
     = PutModelInTestAsString
@@ -126,6 +143,8 @@ type Msg
     | ToggleShowBlock String
     | NewStatusViaWs String
     | NewStatusViaRest (Result Http.Error (List StatusRecord))
+    | LocationChanged Location
+
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -142,7 +161,7 @@ update msg model =
 
         Checked what value ->
             ( model
-            , updateStatusViaRestCmd what
+            , updateStatusViaRestCmd model what
                 (if value then
                     "on"
                  else
@@ -151,13 +170,13 @@ update msg model =
             )
 
         Down what ->
-            ( model, updateStatusViaRestCmd what "down" )
+            ( model, updateStatusViaRestCmd model what "down" )
 
         Up what ->
-            ( model, updateStatusViaRestCmd what "up" )
+            ( model, updateStatusViaRestCmd model what "up" )
 
         SliderMsg what level ->
-            ( model, updateStatusViaRestCmd what (toString level) )
+            ( model, updateStatusViaRestCmd model what (toString level) )
 
         NewStatusViaWs str ->
             let
@@ -174,6 +193,9 @@ update msg model =
 
         NewStatusViaRest (Err message) ->
             ( { model | errorMsg = ("NewStatusViaRest: " ++ (toString message)) }, Cmd.none )
+
+        LocationChanged location ->
+            ( { model | host = getHost location }, Cmd.none )
 
 
 isGroupOpen : Group2OpenDict -> String -> Bool
@@ -248,14 +270,14 @@ toggleBlock what model =
             else
                 "off"
     in
-        updateStatusViaRestCmd what onOffText
+        updateStatusViaRestCmd model what onOffText
 
 
-updateStatusViaRestCmd : String -> String -> Cmd Msg
-updateStatusViaRestCmd name value =
+updateStatusViaRestCmd : Model -> String -> String -> Cmd Msg
+updateStatusViaRestCmd model name value =
     let
         url =
-            urlUpdateActuators ++ name ++ "/" ++ value
+            urlUpdateActuators model ++ name ++ "/" ++ value
 
         request =
             Http.get url statusesDecoder
@@ -264,20 +286,18 @@ updateStatusViaRestCmd name value =
         Http.send NewStatusViaRest request
 
 
-
+----------------------------------------------------------
 -- SUBSCRIPTIONS
-
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    WebSocket.listen wsStatus NewStatusViaWs
+    WebSocket.listen (wsStatus model) NewStatusViaWs
 
 
-
+----------------------------------------------------------
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
 -- https://debois.github.io/elm-mdl/
-
 
 levelByName : String -> List StatusRecord -> Float
 levelByName name statuses =
