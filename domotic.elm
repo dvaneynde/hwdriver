@@ -28,19 +28,26 @@ import Material.Menu as Menu
 -}
 -- GLOBAL
 
-
+{-
+- To run on Mac and access real backend on Linux: "domotica:8080"
+- To run locally on Mac: "localhost:8080"
+- Production: ""
+-}
 urlBase =
     -- "localhost:8080"
     "192.168.0.10:8080" -- must be ip address, otherwise CORS problems
+    -- "domotica:8080"
+    -- ""
 
 
 urlUpdateActuators =
     "http://" ++ urlBase ++ "/rest/act/"
+    --"/rest/act/"
 
 
 wsStatus =
     "ws://" ++ urlBase ++ "/status/"
-
+    --"/status/"
 
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
