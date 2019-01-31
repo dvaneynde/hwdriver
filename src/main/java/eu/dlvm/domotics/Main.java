@@ -154,9 +154,9 @@ public class Main {
 				+ "\t-s simulate hardware driver (domotic only, for testing and development)\n"
 				+ "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms; defaults to "
 				+ DEFAULT_LOOP_TIME_MS + " ms.\n" + "\t-h hostname of hardware driver; incompatible with -d"
-				+ "\t-p port of hardware driver; incompatible with -d" + "\t-w path of directory with webapp (where index.html is located)"
-				+ "\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file\n"
-				+ "To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.\n");
+				+ "\n\t-p port of hardware driver; incompatible with -d" + "\t-w path of directory with webapp (where index.html is located)"
+				+ "\n\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file"
+				+ "\nTo configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.\n");
 		System.exit(2);
 	}
 

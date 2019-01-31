@@ -11,7 +11,7 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOffEco;
 
 /**
  * Lamp - or anything that can go on or off - with optional auto-off.
@@ -207,7 +207,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfoOnOff uiInfo = new UiInfoOnOff(this, getState().toString(), isOn());
+		UiInfo uiInfo = new UiInfoOnOffEco(this, getState().toString(), isOn(), isEco());
 		return uiInfo;
 	}
 
@@ -247,10 +247,12 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 					state = States.GOING_OFF_BLINK;
 					writeOutput(false);
 					blinkCtr = 1;
-					logger.info("Lamp '" + getName() + "' is about to go off because eco mode and it has been on for " + getAutoOffSec() + " sec.");
+					logger.info("Lamp '" + getName() + "' is about to go off because eco mode and it has been on for "
+							+ getAutoOffSec() + " sec.");
 				} else {
 					internalOff();
-					logger.info("Lamp '" + getName() + "' goes OFF because eco is enabled and " + autoOffSec + " sec. have passed.");
+					logger.info("Lamp '" + getName() + "' goes OFF because eco is enabled and " + autoOffSec
+							+ " sec. have passed.");
 				}
 			}
 			break;
@@ -270,7 +272,8 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		case GOING_OFF_UNLESS_CLICK:
 			if ((currentTime - timeStateEntered) >= 5 * 1000L) {
 				internalOff();
-				logger.info("Lamp '" + getName() + "' goes OFF because eco is enabled and " + autoOffSec + " sec. have passed and not interrupted by user.");
+				logger.info("Lamp '" + getName() + "' goes OFF because eco is enabled and " + autoOffSec
+						+ " sec. have passed and not interrupted by user.");
 			}
 		}
 	}
@@ -281,6 +284,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 
 	@Override
 	public String toString() {
-		return "Lamp [name=" + name + ", state=" + state + ", eco=" + eco + ", blinkCtr=" + blinkCtr + ", autoOffSec=" + autoOffSec + "]";
+		return "Lamp [name=" + name + ", state=" + state + ", eco=" + eco + ", blinkCtr=" + blinkCtr + ", autoOffSec="
+				+ autoOffSec + "]";
 	}
 }

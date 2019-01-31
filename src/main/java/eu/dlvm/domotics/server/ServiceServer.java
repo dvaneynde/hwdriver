@@ -3,14 +3,19 @@ package eu.dlvm.domotics.server;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.servlet.DispatcherType;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 import org.eclipse.jetty.websocket.server.pathmap.ServletPathSpec;
@@ -75,6 +80,13 @@ public class ServiceServer {
 			contextHandler.setBaseResource(staticRoot);
 			contextHandler.setWelcomeFiles(new String[] { "index.html" });
 			server.setHandler(contextHandler);
+
+			// Add the filter, and then use the provided FilterHolder to configure it
+			FilterHolder cors = contextHandler.addFilter(CrossOriginFilter.class,"/*",EnumSet.of(DispatcherType.REQUEST));
+			cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+			cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+			cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
+			cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
 
 			// Add the websocket filter
 			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(contextHandler);
