@@ -18,65 +18,79 @@ import Material.Toggles as Toggles
 import Material.Slider as Slider
 import Material.Menu as Menu
 
+
 ----------------------------------------------------------
 -- Domotics user interface
 ----------------------------------------------------------
-
 {- in Safari, Develop, "Disable Cross-Origin Restrictions"
    But when on same server no problem.
    https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Origin
 -}
-
 ----------------------------------------------------------
 -- URL's and WebSocket address
 
 {-
-Set to Nothing for production use, set to backend if using Elm Reactor.
-TODO make parameter of program, so that it is set to Nothing from index.html - see Navigation.programWithFlags
+   Set to Nothing for production use, set to backend if using Elm Reactor.
+   TODO make parameter of program, so that it is set to Nothing from index.html - see Navigation.programWithFlags
 -}
 fixHost : Maybe String
 fixHost =
-    -- Just "192.168.0.10:8080"
+    --Just "192.168.0.10:8080"
+    --Just "127.0.0.1:8080"
     Nothing
 
 {-
-Determines host and port to used for backend; see also fixHost
+   Determines host and port to used for backend; see also fixHost
 -}
 getHost : Location -> String
 getHost location =
     case fixHost of
-        Just hostAndPort -> hostAndPort
-        Nothing -> location.host
+        Just hostAndPort ->
+            hostAndPort
+
+        Nothing ->
+            location.host
 
 
 urlUpdateActuators : Model -> String
 urlUpdateActuators model =
     "http://" ++ model.host ++ "/rest/act/"
-    --"/rest/act/"
+
+
+
+--"/rest/act/"
+
 
 wsStatus : Model -> String
 wsStatus model =
     "ws://" ++ model.host ++ "/status/"
-    --"/status/"
 
 
+
+--"/status/"
 ----------------------------------------------------------
 -- GLOBALS
+
+
 lichtmeterName : String
 lichtmeterName =
     "LichtmeterZonnewering"
 
 
+
 ----------------------------------------------------------
 -- MAIN
+
 
 main : Program Never Model Msg
 main =
     Navigation.program LocationChanged { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
+
 ----------------------------------------------------------
 -- MODEL
+
 
 type alias Group2OpenDict =
     Dict.Dict String Bool
@@ -86,6 +100,7 @@ type ExtraStatus
     = None
     | OnOff Bool
     | OnOffLevel Bool Int
+    | OnOffEco Bool Bool
 
 
 type alias StatusRecord =
@@ -93,7 +108,7 @@ type alias StatusRecord =
 
 
 type alias Model =
-    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model, host: String }
+    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model, host : String }
 
 
 initialStatus : StatusRecord
@@ -103,7 +118,7 @@ initialStatus =
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location}, Cmd.none )
+    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location }, Cmd.none )
 
 
 initGroups : Group2OpenDict
@@ -129,13 +144,16 @@ nameInGroup group =
         Maybe.withDefault group (List.head groupSplit)
 
 
+
 ----------------------------------------------------------
 -- UPDATE
+
 
 type Msg
     = PutModelInTestAsString
     | Mdl (Material.Msg Msg)
     | Clicked String
+    | ClickedEco String
     | Checked String Bool
     | Down String
     | Up String
@@ -144,7 +162,6 @@ type Msg
     | NewStatusViaWs String
     | NewStatusViaRest (Result Http.Error (List StatusRecord))
     | LocationChanged Location
-
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -157,11 +174,31 @@ update msg model =
             Material.update Mdl message_ model
 
         Clicked what ->
-            ( model, toggleBlock what model )
+            ( model
+            , let
+                extra =
+                    (statusByName what model.statuses).extra
+
+                onOff =
+                    not (isOn extra)
+
+                --not (isOnByName what model.statuses)
+                onOffText =
+                    if onOff then
+                        "on"
+                    else
+                        "off"
+              in
+                updateStatusViaRestCmd model what onOffText
+            )
+
+        ClickedEco what ->
+            ( model, updateStatusViaRestCmd model what "ecoToggle" )
 
         Checked what value ->
             ( model
-            , updateStatusViaRestCmd model what
+            , updateStatusViaRestCmd model
+                what
                 (if value then
                     "on"
                  else
@@ -245,7 +282,7 @@ statusDecoder =
         (field "group" string)
         (field "description" string)
         (field "status" string)
-        (oneOf [ decoderExtraOnOffLevel, decoderExtraOnOff, succeed None ])
+        (oneOf [ decoderExtraOnOffLevel, decoderExtraOnOffEco, decoderExtraOnOff, succeed None ])
 
 
 decoderExtraOnOffLevel : Decoder ExtraStatus
@@ -256,6 +293,11 @@ decoderExtraOnOffLevel =
 decoderExtraOnOff : Decoder ExtraStatus
 decoderExtraOnOff =
     Decode.map OnOff (field "on" bool)
+
+
+decoderExtraOnOffEco : Decoder ExtraStatus
+decoderExtraOnOffEco =
+    Decode.map2 OnOffEco (field "on" bool) (field "eco" bool)
 
 
 toggleBlock : String -> Model -> Cmd Msg
@@ -286,18 +328,22 @@ updateStatusViaRestCmd model name value =
         Http.send NewStatusViaRest request
 
 
+
 ----------------------------------------------------------
 -- SUBSCRIPTIONS
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     WebSocket.listen (wsStatus model) NewStatusViaWs
 
 
+
 ----------------------------------------------------------
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
 -- https://debois.github.io/elm-mdl/
+
 
 levelByName : String -> List StatusRecord -> Float
 levelByName name statuses =
@@ -327,7 +373,26 @@ isOn extraStatus =
         OnOffLevel isOn level ->
             isOn
 
-        _ ->
+        OnOffEco isOn eco ->
+            isOn
+
+        None ->
+            False
+
+
+isEco : ExtraStatus -> Bool
+isEco extraStatus =
+    case extraStatus of
+        OnOff isOn ->
+            False
+
+        OnOffLevel isOn level ->
+            False
+
+        OnOffEco isOn eco ->
+            eco
+
+        None ->
             False
 
 
@@ -340,29 +405,49 @@ screenStatus name model =
         (toString status)
 
 
-toggle : String -> Int -> Model -> Html Msg
-toggle name nr model =
-    Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text name ]
+
+-- toggleDiv ( "LichtInkom", "Inkom" ) 1 model
 
 
 toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
-    div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ] ]
+    let
+        record =
+            statusByName name model.statuses
+    in
+        case record.extra of
+            None ->
+                Html.text ("BUG toggleDiv for " ++ name)
+
+            OnOff status ->
+                div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value status ] [ text desc ] ]
+
+            OnOffLevel status level ->
+                toggleWithSliderDiv ( name, desc ) nr model
+
+            OnOffEco status eco ->
+                div [ style [ ( "width", "300px" ) ] ]
+                    [ div [ style [ ( "float", "left" ) ] ] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value status ] [ text desc ] ]
+                    , div [ style [ ( "float", "right" ) ] ] [ Toggles.switch Mdl [ (nr + 100) ] model.mdl [ Options.onToggle (ClickedEco name), Toggles.value eco ] [ text "eco" ] ]
+                    , div [ style [ ( "clear", "both" ) ] ] []
+                    ]
 
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
-    div [ style [ ( "display", "inline-block" ) ] ]
-        -- TODO inline-block helpt niet, want slider zelf is block; hoe aanpassen?
-        [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ]
-        , Slider.view
-            ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.statuses) ]
-                ++ (if (isOnByName name model.statuses) then
-                        []
-                    else
-                        [ Slider.disabled ]
-                   )
-            )
+    div [ style [ ( "width", "300px" ) ] ]
+        [ div [ style [ ( "float", "left" ) ] ] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ] ]
+        , div [ style [ ( "float", "right" ) ] ]
+            [ Slider.view
+                ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.statuses) ]
+                    ++ (if (isOnByName name model.statuses) then
+                            []
+                        else
+                            [ Slider.disabled ]
+                       )
+                )
+            ]
+        , div [ style [ ( "clear", "both" ) ] ] []
         ]
 
 
@@ -458,17 +543,18 @@ lightPercentage level =
 view : Model -> Html Msg
 view model =
     div [ Html.Attributes.style [ ( "padding", "2rem" ), ( "background", "azure" ) ] ]
-        ([
-        Menu.render Mdl [1000] model.mdl
-          [ Menu.bottomLeft ]
-          [ Menu.item
-              [ Menu.onSelect PutModelInTestAsString ]
-              [ text "English (US)" ]
-          , Menu.item
-              [ Menu.onSelect PutModelInTestAsString ]
-              [ text "français" ]
-          ]
-        , groupToggleBar "Screens"
+        ([ Menu.render Mdl
+            [ 1000 ]
+            model.mdl
+            [ Menu.bottomLeft ]
+            [ Menu.item
+                [ Menu.onSelect PutModelInTestAsString ]
+                [ text "English (US)" ]
+            , Menu.item
+                [ Menu.onSelect PutModelInTestAsString ]
+                [ text "français" ]
+            ]
+         , groupToggleBar "Screens"
             100
             model
             (\model ->
@@ -479,7 +565,7 @@ view model =
                             [ text "Zon: "
                             , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName lichtmeterName model.statuses)) ] []
                             , text (toString (levelByName lichtmeterName model.statuses) ++ " - " ++ (toString (statusByName lichtmeterName model.statuses).status))
---                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
+                              --                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
                             ]
                          , div [{- style [ ( "display", "inline-block" ) ] -}]
                             [ text "Wind: "
