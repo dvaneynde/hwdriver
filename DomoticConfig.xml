@@ -23,7 +23,7 @@
 	</fan>
 
 	<switch name="SchakLichtGarageTuin" singleClick="true" longClick="true" doubleClick="true" />
-	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3">
+	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" autoOffSec="600" blink="false">
 		<toggle src="SchakLichtGarageTuin" />
 		<ecoToggle src="SchakLichtGarageTuin" event="DoubleClick" />
 		<off src="SchakLichtInkom" event="LongClick" />

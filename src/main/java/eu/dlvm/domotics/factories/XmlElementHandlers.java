@@ -39,7 +39,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 	static Logger logger = LoggerFactory.getLogger(XmlElementHandlers.class);
 
 	private IDomoticContext ctx;
-	private int depth = -1; // -1 because domotic startelement makes it start and that is really 0
+	private int depth = -1; // -1 because domotic startelement makes it start
+							// and that is really 0
 	private Block currentBlock;
 	private String name, desc, ui;
 	private String channel, channelDown, channelUp;
@@ -65,7 +66,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("on")) {
 				if (currentBlock instanceof Timer) {
-					((Timer) currentBlock).setOnTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
+					((Timer) currentBlock).setOnTime(Integer.parseInt(atts.getValue("hour")),
+							Integer.parseInt(atts.getValue("minute")));
 				} else if (currentBlock instanceof IEventListener) {
 					connectEvent2Action(atts, EventType.ON);
 				} else
@@ -73,7 +75,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("off")) {
 				if (currentBlock instanceof Timer) {
-					((Timer) currentBlock).setOffTime(Integer.parseInt(atts.getValue("hour")), Integer.parseInt(atts.getValue("minute")));
+					((Timer) currentBlock).setOffTime(Integer.parseInt(atts.getValue("hour")),
+							Integer.parseInt(atts.getValue("minute")));
 				} else if (currentBlock instanceof IEventListener) {
 					connectEvent2Action(atts, EventType.OFF);
 				} else
@@ -104,9 +107,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 				String eventName = atts.getValue("event");
 				if (eventName == null)
 					eventName = "SingleClick";
-				srcUp.registerListener(new Connector(EventType.fromAlias(eventName), (Screen) currentBlock, EventType.TOGGLE_UP, "up"));
-				srcDown.registerListener(new Connector(EventType.fromAlias(eventName), (Screen) currentBlock, EventType.TOGGLE_DOWN, "down"));
-				// ===== Sensors 
+				srcUp.registerListener(new Connector(EventType.fromAlias(eventName), (Screen) currentBlock,
+						EventType.TOGGLE_UP, "up"));
+				srcDown.registerListener(new Connector(EventType.fromAlias(eventName), (Screen) currentBlock,
+						EventType.TOGGLE_DOWN, "down"));
+				// ===== Sensors
 
 			} else if (localName.equals("switch")) {
 				parseBaseBlockWithChannel(atts);
@@ -133,9 +138,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 				parseBaseBlockWithChannel(atts);
 				int highFreqThreshold = parseIntAttribute("highFreq", atts);
 				int lowFreqThreshold = parseIntAttribute("lowFreq", atts);
-				//int highTimeBeforeAlert = parseIntAttribute("highTimeBeforeAlert", atts);
+				// int highTimeBeforeAlert =
+				// parseIntAttribute("highTimeBeforeAlert", atts);
 				int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-				currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
+				currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold,
+						lowTimeToResetAlert);
 
 			} else if (localName.equals("lightGauge")) {
 				parseBaseBlockWithChannel(atts);
@@ -144,7 +151,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				int high2lowTime = parseIntAttribute("high2lowTime", atts);
 				currentBlock = new LightSensor(name, desc, ui, channel, ctx, threshold, low2highTime, high2lowTime);
 
-				// ===== Controllers 
+				// ===== Controllers
 
 			} else if (localName.equals("timer")) {
 				parseBaseBlock(atts);
@@ -166,7 +173,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("newyear")) {
 				Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 				Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
-				currentBlock =  NewYearBuilder.build(blocksSoFar, start.getTime(), end.getTime(), ctx);
+				currentBlock = NewYearBuilder.build(blocksSoFar, start.getTime(), end.getTime(), ctx);
 
 			} else if (localName.equals("antiBurglar")) {
 				parseBaseBlock(atts);
@@ -174,18 +181,18 @@ class XmlElementHandlers extends DefaultHandler2 {
 				int end = converHourMinToMsOnDay(atts.getValue("end"));
 				GadgetController gc = AntiBurglarBuilder.build(blocksSoFar, name, start, end, ctx);
 				currentBlock = gc;
-	
+
 				// ===== Actuators
 
 			} else if (localName.equals("lamp")) {
 				parseBaseBlockWithChannel(atts);
-				Lamp lamp = new Lamp(name, desc, ui, channel, ctx);
-				String val;
-				val = atts.getValue("autoOffSec");
-				if (val != null) {
+				String autoOffSec = atts.getValue("autoOffSec");
+				boolean ecoEnabled = autoOffSec != null;
+				Lamp lamp = new Lamp(name, desc, ecoEnabled, ui, channel, ctx);
+				if (ecoEnabled) {
 					lamp.setEco(true);
-					lamp.setAutoOffSec(Integer.parseInt(val));
-					val = atts.getValue("blink");
+					lamp.setAutoOffSec(Integer.parseInt(autoOffSec));
+					String val = atts.getValue("blink");
 					if (val != null)
 						lamp.setBlink(Boolean.parseBoolean(val));
 				}
@@ -234,7 +241,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 			throw e;
 		} catch (Exception e) {
 			throw new SAXException("Error while processing element '" + localName + "', current block is '"
-					+ (currentBlock == null ? "null" : currentBlock.getName()) + "'. Error: '" + e.getMessage() + "'", e);
+					+ (currentBlock == null ? "null" : currentBlock.getName()) + "'. Error: '" + e.getMessage() + "'",
+					e);
 		}
 	}
 
@@ -259,7 +267,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {
 		ActionEvent ae = parseActionEvent(atts);
 		Connector c = new Connector(ae.srcEvent, (IEventListener) currentBlock, targetEventType,
-				"(" + ae.srcBlock.getName() + ',' + ae.srcEvent + ")_TO_(" + currentBlock.getName() + "," + targetEventType.name() + ")");
+				"(" + ae.srcBlock.getName() + ',' + ae.srcEvent + ")_TO_(" + currentBlock.getName() + ","
+						+ targetEventType.name() + ")");
 
 		ae.srcBlock.registerListener(c);
 	}
@@ -276,9 +285,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 			ae.srcBlock = src;
 			ae.srcEvent = EventType.fromAlias(eventAlias);
 			if (ae.srcEvent == null)
-				throw new ConfigurationException("Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
+				throw new ConfigurationException(
+						"Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
 		} else {
-			throw new ConfigurationException("Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
+			throw new ConfigurationException(
+					"Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
 		}
 		return ae;
 	}
@@ -318,6 +329,5 @@ class XmlElementHandlers extends DefaultHandler2 {
 		else
 			return Integer.parseInt(atts.getValue(attName));
 	}
-
 
 }

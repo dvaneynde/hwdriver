@@ -34,7 +34,7 @@ public class TestLampWithAutoOff {
 	public void init() {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
-		lamp = new Lamp("TestLamp", "TestLamp", LAMP_OUT, ctx);
+		lamp = new Lamp("TestLamp", "TestLamp", true, LAMP_OUT, ctx);
 		current = seq = 0L;
 	}
 

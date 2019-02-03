@@ -11,12 +11,14 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.service.uidata.UiInfo;
+import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 import eu.dlvm.domotics.service.uidata.UiInfoOnOffEco;
 
 /**
  * Lamp - or anything that can go on or off - with optional auto-off.
  * <p>
- * If {@link #isEco()}==true, the lamp goes out automatically after
+ * When {@link @isEcoEnabled()} then the eco mode is enabled. If
+ * {@link #isEco()}==true, the lamp goes out automatically after
  * {@link #getAutoOffSec()} seconds.
  * <p>
  * If on top {@link #isBlink()}==true, then the following happens:
@@ -41,6 +43,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	private States state;
 	private long timeStateEntered = -1L;
 	// Eco stuff
+	private boolean ecoEnabled;
 	private boolean eco, blink;
 	private int blinkCtr = 0;
 	private int blinks = DEFAULT_BLINK_COUNT;
@@ -60,20 +63,29 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		ON, OFF, GOING_OFF_BLINK, GOING_OFF_UNLESS_CLICK;
 	}
 
-	public Lamp(String name, String description, String channel, IDomoticContext ctx) {
-		this(name, description, null, channel, ctx);
+	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IDomoticContext ctx) {
+		this(name, description, isEcoEnabled, null, channel, ctx);
 	}
 
-	public Lamp(String name, String description, String ui, String channel, IDomoticContext ctx) {
+	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IDomoticContext ctx) {
 		super(name, description, ui, channel, ctx);
+		ecoEnabled = isEcoEnabled;
 		state = States.OFF;
 	}
 
+	public boolean isEcoEnabled() {
+		return ecoEnabled;
+	}
+
 	public boolean isEco() {
-		return eco;
+		return eco && isEcoEnabled();
 	}
 
 	public void setEco(boolean eco) {
+		if (!isEcoEnabled()){
+			logger.warn("Ignore setting eco since eco is disabled: "+this);
+			return;
+		}
 		this.eco = eco;
 	}
 
@@ -161,6 +173,28 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		notifyListeners(EventType.OFF);
 	}
 
+	private void internalChangeEco(boolean newEco) {
+		if (isEco() == newEco)
+			return;
+		if (newEco)
+			setEco(true);
+		else {
+			switch (state) {
+			case OFF:
+			case ON:
+				setEco(false);
+				break;
+			case GOING_OFF_BLINK:
+			case GOING_OFF_UNLESS_CLICK:
+				writeOutput(true);
+				blinkCtr = 0;
+				state = States.ON;
+				timeStateEntered = -1L;
+				break;
+			}
+		}
+	}
+
 	@Override
 	public void onEvent(Block source, EventType event) {
 		switch (event) {
@@ -176,21 +210,20 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			toggle();
 			break;
 		case ECO_ON:
-			setEco(false);
+			internalChangeEco(true);
 			logger.info("Lamp '" + getName() + "' has set eco mode ON.");
 			break;
 		case ECO_OFF:
-			setEco(false);
+			internalChangeEco(false);
 			logger.info("Lamp '" + getName() + "' has set eco mode OFF.");
 			break;
 		case ECO_TOGGLE:
-			setEco(!isEco());
+			internalChangeEco(!isEco());
 			logger.info("Lamp '" + getName() + "' has toggled eco mode to " + (isEco() ? "ON" : "OFF") + ".");
 			break;
 		default:
 			logger.warn("Ignored event " + event + " from " + source.getName());
 		}
-
 	}
 
 	// ===== UI =====
@@ -201,13 +234,16 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 			on();
 		else if (action.equalsIgnoreCase("off"))
 			off();
+		else if (action.equalsIgnoreCase("ecoToggle"))
+			internalChangeEco(!isEco());
 		else
 			logger.warn("update on Lamp '" + getName() + "' got unsupported action '" + action + ".");
 	}
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfo uiInfo = new UiInfoOnOffEco(this, getState().toString(), isOn(), isEco());
+		UiInfo uiInfo = isEcoEnabled() ? new UiInfoOnOffEco(this, getState().toString(), isOn(), isEco())
+				: new UiInfoOnOff(this, getState().toString(), isOn());
 		return uiInfo;
 	}
 
@@ -288,3 +324,4 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 				+ autoOffSec + "]";
 	}
 }
+

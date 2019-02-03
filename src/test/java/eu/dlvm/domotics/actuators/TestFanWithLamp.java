@@ -43,7 +43,7 @@ public class TestFanWithLamp {
 	public void init() {
 		hw = new Hardware();
 		ctx = new DomoContextMock(hw);
-		lamp = new Lamp("TestLamp", "TestLamp", LAMP_OUT, ctx);
+		lamp = new Lamp("TestLamp", "TestLamp", false, LAMP_OUT, ctx);
 		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, ctx).overrideDelayOff2OnSec(5).overrideDelayOn2OffSec(5)
 				.overrideOnDurationSec(10);
 		lamp.registerListener(new Connector(EventType.ON, fan, EventType.DELAY_ON, "Test_Lamp"));

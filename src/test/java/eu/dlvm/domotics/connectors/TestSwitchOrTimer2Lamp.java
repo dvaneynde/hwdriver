@@ -74,8 +74,8 @@ public class TestSwitchOrTimer2Lamp {
 
 		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), dom);
 		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), dom);
-		o1 = new Lamp("Lamp1", "Lamp1", Integer.toString(10), dom);
-		o2 = new Lamp("Lamp2", "Lamp2", Integer.toString(11), dom);
+		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), dom);
+		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), dom);
 
 		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		//		sct1.registerListener(o1);

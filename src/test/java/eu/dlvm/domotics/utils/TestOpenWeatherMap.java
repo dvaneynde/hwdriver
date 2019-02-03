@@ -3,12 +3,14 @@ package eu.dlvm.domotics.utils;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenWeatherMap {
 
+	@Ignore
 	@Test
-	public void test() {
+	public void testOpenWeatherMap() {
 		OpenWeatherMap owm = new OpenWeatherMap();
 		OpenWeatherMap.Info info = owm.getWeatherReport();
 		long day = 24*60*60;
