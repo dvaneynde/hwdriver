@@ -27,12 +27,18 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	private static final Logger logger = LoggerFactory.getLogger(SunWindController.class);
 
 	private enum LightState {
-		Init, WasDark, WasLight
-	}
+		LowLight, HighLight
+	};
+	private LightState lightState = LightState.LowLight;
 
-	private LightState lightState = LightState.Init;
+	private enum WindState {
+		Safe, Alarm
+	};
+	private WindState windState = WindState.Safe;
+
 	private boolean enabled;
 
+	
 	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui, ctx);
 	}
@@ -40,7 +46,13 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	public void on() {
 		logger.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
-		lightState = LightState.Init;
+		if (lightState == LightState.HighLight && windState==WindState.Safe){
+			notifyListeners(EventType.DOWN);
+			logger.info("Sun high, wind low, so screens Down after going to automatic mode.");
+		} else if (lightState==LightState.LowLight && windState== WindState.Safe){
+			notifyListeners(EventType.UP);
+			logger.info("Sun low, so screens Up after going to automatic mode.");
+		}
 	}
 
 	public void off() {
@@ -73,34 +85,33 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			toggle();
 			break;
 		case SAFE:
+			windState = WindState.Safe;
+			if (enabled && lightState == LightState.HighLight) {
+				notifyListeners(event);
+				notifyListeners(EventType.DOWN);
+				logger.info("Got wind is Safe event, Sun is High and I'm enabled, so screens can go Down.");
+			}
+			break;
 		case ALARM:
-			// TODO these should be generated here, not come from WindSensor or LightGauge ! Goes together with parameters that must be here of course.
+			// TODO these should be generated here, not come from WindSensor or
+			// LightGauge !
+			// Goes together with parameters that must be here of course.
+			windState = WindState.Alarm;
 			notifyListeners(event);
+			logger.info("Got wind Alarm, so screens must go up.");
 			break;
 		case LIGHT_HIGH:
-			if (enabled) {
-				switch (lightState) {
-				case Init:
-				case WasDark:
-					notifyListeners(event);
-					lightState = LightState.WasLight;
-					break;
-				case WasLight:
-					break;
-				}
+			lightState = LightState.HighLight;
+			if (enabled && windState == WindState.Safe) {
+				notifyListeners(EventType.DOWN);
+				logger.info("Got Sun High event, wind is Safe and I'm enabled, so screens go Down.");
 			}
 			break;
 		case LIGHT_LOW:
-			if (enabled) {
-				switch (lightState) {
-				case Init:
-				case WasLight:
-					notifyListeners(event);
-					lightState = LightState.WasDark;
-					break;
-				case WasDark:
-					break;
-				}
+			lightState = LightState.LowLight;
+			if (enabled && windState == WindState.Safe) {
+				notifyListeners(EventType.UP);
+				logger.info("Got Sun Low event, wind is Safe and I'm enabled, so screens go Up.");
 			}
 			break;
 		default:
@@ -111,7 +122,7 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfoOnOff uiInfo = new UiInfoOnOff(this, null, isEnabled());
-		//bi.setStatus(isEnabled() ? "ON" : "OFF");
+		// bi.setStatus(isEnabled() ? "ON" : "OFF");
 		return uiInfo;
 	}
 
@@ -123,11 +134,15 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			off();
 		else
 			logger.warn("update on Lamp '" + getName() + "' got unsupported action '" + action + ".");
-
 	}
 
 	@Override
 	public void loop(long currentTime, long sequence) {
 	}
 
+	@Override
+	public String toString() {
+		return "SunWindController [lightState=" + lightState + ", windState=" + windState + ", enabled=" + enabled
+				+ ", name=" + name + "]";
+	}
 }
