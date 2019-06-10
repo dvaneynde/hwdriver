@@ -15,7 +15,8 @@ import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
  * {@link #getHighFreqThreshold()} the state becomes {@link States#ALARM}. If
  * then it stays for at least {@link #getLowTimeToResetAlertSec()} seconds below
  * {@link #getLowFreqThreshold()} - during which the state is
- * {@link States#ALARM_BUT_LOW} - state goes back to {@link States#NORMAL}.
+ * {@link States#ALARM_BUT_LOW} - state goes back to {@link States#SAFE}.
+ * <p>The current state is sent every {@link #DEFAULT_REPEAT_EVENT_MS} ms. resent - for safety.
  * <p>
  * TODO misschien als N keer boven threshold gedurende M seconden, dan pas
  * alarm?
@@ -39,7 +40,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	// PUBLIC API
 
 	public static enum States {
-		NORMAL, ALARM, ALARM_BUT_LOW,
+		SAFE, ALARM, ALARM_BUT_LOW,
 	};
 
 	/**
@@ -72,7 +73,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		this.gauge = new FrequencyGauge(25);
 
 		timeCurrentStateStarted = timeSinceLastEventSent = 0L;
-		this.state = States.NORMAL;
+		this.state = States.SAFE;
 		// this.lastFrequency = 0L;
 		log.info("Windsensor '" + getName() + "' configured: highFreq=" + getHighFreqThreshold() + ", lowFreq=" + getLowFreqThreshold()
 				+ ", lowTimeToResetAlert=" + getLowTimeToResetAlertSec() / 1000.0 + "(s).");
@@ -147,7 +148,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 		}
 
 		switch (state) {
-		case NORMAL:
+		case SAFE:
 			if (freq >= getHighFreqThreshold()) {
 				state = States.ALARM;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
@@ -169,7 +170,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 				timeCurrentStateStarted = currentTime;
 				log.debug("WindSensor '" + getName() + "': ALARM_BUT_LOW to ALARM: freq=" + freq + " > thresholdHigh=" + getHighFreqThreshold());
 			} else if ((currentTime - timeCurrentStateStarted) > getLowTimeToResetAlertSec()) {
-				state = States.NORMAL;
+				state = States.SAFE;
 				timeCurrentStateStarted = timeSinceLastEventSent = currentTime;
 				log.info("WindSensor '" + getName() + "' notifies LOW event because wind has been low long enough: freq=" + freq + " < thresholdLow="
 						+ getLowFreqThreshold());

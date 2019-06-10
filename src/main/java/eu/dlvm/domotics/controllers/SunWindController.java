@@ -85,6 +85,8 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			toggle();
 			break;
 		case SAFE:
+			if (windState == WindState.Safe)
+				break;
 			windState = WindState.Safe;
 			if (enabled && lightState == LightState.HighLight) {
 				notifyListeners(event);
@@ -93,9 +95,8 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			}
 			break;
 		case ALARM:
-			// TODO these should be generated here, not come from WindSensor or
-			// LightGauge !
-			// Goes together with parameters that must be here of course.
+			if (windState == WindState.Alarm)
+				break;
 			windState = WindState.Alarm;
 			notifyListeners(event);
 			logger.info("Got wind Alarm, so screens must go up.");

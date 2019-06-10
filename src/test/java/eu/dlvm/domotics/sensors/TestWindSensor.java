@@ -98,12 +98,12 @@ public class TestWindSensor implements IEventListener {
 				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 
-		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
+		Assert.assertEquals(WindSensor.States.SAFE, ws.getState());
 
 		log.debug("\n=============\nSTART LOW FREQ " + LOW_FREQ_THRESHOLD + " FOR 5 SEC\n=============");
 		// frequency gauge op snelheid brengen
 		simulateWind(LOW_FREQ_THRESHOLD, 5000);
-		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
+		Assert.assertEquals(WindSensor.States.SAFE, ws.getState());
 
 		log.debug(
 				"\n=============\nMUST GO TO ALARM HIGH FREQ " + HIGH_FREQ_THRESHOLD + "+2 long enough\n=============");
@@ -114,7 +114,7 @@ public class TestWindSensor implements IEventListener {
 		simulateWind(LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT * 1000 - 100);
 		Assert.assertEquals(WindSensor.States.ALARM_BUT_LOW, ws.getState());
 		simulateWind(LOW_FREQ_THRESHOLD, 1000);
-		Assert.assertEquals(WindSensor.States.NORMAL, ws.getState());
+		Assert.assertEquals(WindSensor.States.SAFE, ws.getState());
 	}
 
 	@Test()
@@ -127,7 +127,7 @@ public class TestWindSensor implements IEventListener {
 				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 
-		check(WindSensor.States.NORMAL, null, 0);
+		check(WindSensor.States.SAFE, null, 0);
 
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 1000);
 		log.info("600? "+ ws.getFreqTimesHundred());
@@ -145,7 +145,7 @@ public class TestWindSensor implements IEventListener {
 		check(States.ALARM_BUT_LOW, EventType.ALARM, 31);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 2000);
-		check(States.NORMAL, EventType.SAFE, 34);
+		check(States.SAFE, EventType.SAFE, 34);
 	}
 
 	private void check(WindSensor.States stateExpected, EventType eventExpected, int nrEventsExpected) {
