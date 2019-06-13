@@ -1,12 +1,9 @@
 package eu.dlvm.domotics.controllers;
 
-import static org.junit.Assert.fail;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
@@ -28,6 +25,27 @@ public class TestSunWindController {
 		@Override
 		public void onEvent(Block source, EventType event) {
 			events.add(event);
+		}
+	}
+
+	@Test
+	public void testWindEventsGoThroughWhenDisabled() {
+		IDomoticContext domoticContext = new DomoContextMock(null);
+		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
+		swc.registerListener(new DummyScreen());
+		Assert.assertFalse(swc.isEnabled());
+		Assert.assertTrue(events.isEmpty());
+
+		for (int i = 0; i < 3; i++) {
+			swc.onEvent(null, EventType.ALARM);
+			Assert.assertFalse(swc.isEnabled());
+			Assert.assertEquals(EventType.ALARM, events.poll());
+			Assert.assertTrue(events.isEmpty());
+
+			swc.onEvent(null, EventType.SAFE);
+			Assert.assertFalse(swc.isEnabled());
+			Assert.assertEquals(EventType.SAFE, events.poll());
+			Assert.assertTrue(events.isEmpty());
 		}
 	}
 

@@ -3,6 +3,7 @@ package eu.dlvm.domotics.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dlvm.domotic.sensor.sun.SunHeightAzimuth;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticContext;
@@ -29,16 +30,17 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	private enum LightState {
 		LowLight, HighLight
 	};
+
 	private LightState lightState = LightState.LowLight;
 
 	private enum WindState {
 		Safe, Alarm
 	};
+
 	private WindState windState = WindState.Safe;
 
 	private boolean enabled;
 
-	
 	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
 		super(name, description, ui, ctx);
 	}
@@ -46,10 +48,10 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	public void on() {
 		logger.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
-		if (lightState == LightState.HighLight && windState==WindState.Safe){
+		if (lightState == LightState.HighLight && windState == WindState.Safe) {
 			notifyListeners(EventType.DOWN);
 			logger.info("Sun high, wind low, so screens Down after going to automatic mode.");
-		} else if (lightState==LightState.LowLight && windState== WindState.Safe){
+		} else if (lightState == LightState.LowLight && windState == WindState.Safe) {
 			notifyListeners(EventType.UP);
 			logger.info("Sun low, so screens Up after going to automatic mode.");
 		}
@@ -88,8 +90,8 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			if (windState == WindState.Safe)
 				break;
 			windState = WindState.Safe;
+			notifyListeners(event);
 			if (enabled && lightState == LightState.HighLight) {
-				notifyListeners(event);
 				notifyListeners(EventType.DOWN);
 				logger.info("Got wind is Safe event, Sun is High and I'm enabled, so screens can go Down.");
 			}
@@ -139,6 +141,7 @@ public class SunWindController extends Controller implements IEventListener, IUi
 
 	@Override
 	public void loop(long currentTime, long sequence) {
+		double azimuth = SunHeightAzimuth.azimuth(180, 0);
 	}
 
 	@Override
