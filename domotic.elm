@@ -36,8 +36,8 @@ import Material.Menu as Menu
 fixHost : Maybe String
 fixHost =
     --Just "192.168.0.10:8080"
-    --Just "127.0.0.1:8080"
-    Nothing
+    Just "127.0.0.1:8080"
+    -- Nothing
 
 {-
    Determines host and port to used for backend; see also fixHost
@@ -91,8 +91,8 @@ main =
 ----------------------------------------------------------
 -- MODEL
 
-
-type alias Group2OpenDict =
+-- Which groups are expanded or collapsed
+type alias Group2ExpandedDict =
     Dict.Dict String Bool
 
 
@@ -104,26 +104,28 @@ type ExtraStatus
 
 
 type alias StatusRecord =
-    { name : String, kind : String, group : String, description : String, status : String, extra : ExtraStatus }
+    { name : String, kind : String, groupName : String, groupSeq : Int, description : String, status : String, extra : ExtraStatus }
 
+type alias Groups =
+    Dict.Dict String (List StatusRecord)
 
 type alias Model =
-    { statuses : List StatusRecord, group2Open : Group2OpenDict, errorMsg : String, test : String, mdl : Material.Model, host : String }
+    { statuses : List StatusRecord, groups : Groups, group2Expanded : Group2ExpandedDict, errorMsg : String, test : String, mdl : Material.Model, host : String }
 
 
 initialStatus : StatusRecord
 initialStatus =
-    { name = "", kind = "", group = "", description = "", status = "", extra = None }
+    { name = "", kind = "", groupName = "", groupSeq = 0, description = "", status = "", extra = None }
 
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( { statuses = [], group2Open = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location }, Cmd.none )
+    ( { statuses = [], groups = Dict.empty, group2Expanded = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location }, Cmd.none )
 
 
-initGroups : Group2OpenDict
+initGroups : Group2ExpandedDict
 initGroups =
-    Dict.fromList [ ( "Screens", False ), ( "Beneden", True ), ( "Nutsruimtes", True ), ( "Kinderen", True ), ( "Buiten", False ) ]
+    Dict.fromList [ ( "ScreensZ", False ), ( "ScreensW", False ), ( "Beneden", True ), ( "Nutsruimtes", True ), ( "Kinderen", True ), ( "Buiten", False ) ]
 
 
 statusByName : String -> List StatusRecord -> StatusRecord
@@ -133,15 +135,6 @@ statusByName name listOfRecords =
             List.filter (\rec -> rec.name == name) listOfRecords
     in
         Maybe.withDefault initialStatus (List.head filteredList)
-
-
-nameInGroup : String -> String
-nameInGroup group =
-    let
-        groupSplit =
-            String.split ":" group
-    in
-        Maybe.withDefault group (List.head groupSplit)
 
 
 
@@ -168,6 +161,8 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PutModelInTestAsString ->
+--            ( { model | test = (toString { model | test = "" }.groups) }, Cmd.none )
+--            ( { model | test = (toString (Dict.get "Beneden" { model | test = "" }.groups)) }, Cmd.none )
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
 
         Mdl message_ ->
@@ -220,13 +215,13 @@ update msg model =
                 ( newStatuses, error ) =
                     decodeStatuses str
             in
-                ( { model | statuses = newStatuses, errorMsg = error }, Cmd.none )
+                ( { model | statuses = newStatuses, groups = createGroups newStatuses, errorMsg = error }, Cmd.none )
 
         ToggleShowBlock name ->
-            ( { model | group2Open = (toggleGroup2Open model.group2Open name) }, Cmd.none )
+            ( { model | group2Expanded = (toggleGroup2Open model.group2Expanded name) }, Cmd.none )
 
-        NewStatusViaRest (Ok statuses_) ->
-            ( { model | statuses = statuses_, errorMsg = "OK" }, Cmd.none )
+        NewStatusViaRest (Ok newStatuses) ->
+            ( { model | statuses = newStatuses, groups = createGroups newStatuses, errorMsg = "OK" }, Cmd.none )
 
         NewStatusViaRest (Err message) ->
             ( { model | errorMsg = ("NewStatusViaRest: " ++ (toString message)) }, Cmd.none )
@@ -235,13 +230,24 @@ update msg model =
             ( { model | host = getHost location }, Cmd.none )
 
 
-isGroupOpen : Group2OpenDict -> String -> Bool
+-- Takes list of StatusRecords and creates the Groups
+createGroups : List StatusRecord -> Groups
+createGroups statuses =
+    let
+        -- Gather doet iets raars, lijst van lijst en in inner lijst komt het eerste record en dan de lijst van de rest. Slim eigenlijk.
+        listOfGroups = gatherWith (\a b -> a.groupName == b.groupName) statuses
+        listOfTuplesWithJustGroupNameAndSortedBySeqList = List.map (\(r,l) -> (r.groupName, List.sortBy .groupSeq (r::l))) listOfGroups
+    in
+        Dict.fromList listOfTuplesWithJustGroupNameAndSortedBySeqList
+
+
+isGroupOpen : Group2ExpandedDict -> String -> Bool
 isGroupOpen blocks blockName =
     Maybe.withDefault True (Dict.get blockName blocks)
 
 
-toggleGroup2Open : Group2OpenDict -> String -> Group2OpenDict
-toggleGroup2Open group2Open name =
+toggleGroup2Open : Group2ExpandedDict -> String -> Group2ExpandedDict
+toggleGroup2Open group2Expanded name =
     let
         func =
             \maybe ->
@@ -252,7 +258,7 @@ toggleGroup2Open group2Open name =
                     Nothing ->
                         Just True
     in
-        Dict.update name func group2Open
+        Dict.update name func group2Expanded
 
 
 decodeStatuses : String -> ( List StatusRecord, String )
@@ -276,10 +282,11 @@ statusesDecoder =
 
 statusDecoder : Decoder StatusRecord
 statusDecoder =
-    Decode.map6 StatusRecord
+    Decode.map7 StatusRecord
         (field "name" string)
         (field "type" string)
-        (field "group" string)
+        (field "groupName" string)
+        (field "groupSeq" int)
         (field "description" string)
         (field "status" string)
         (oneOf [ decoderExtraOnOffLevel, decoderExtraOnOffEco, decoderExtraOnOff, succeed None ])
@@ -433,6 +440,17 @@ toggleDiv ( name, desc ) nr model =
                     ]
 
 
+{-
+viewSwitches : String -> Int -> Model -> Html Msg
+viewSwitches groupName nr model =
+    let
+        switchStatuses = Dict.get groupName model.groups |> Maybe.withDefault[]
+    in
+        -- toggleDiv ( "LichtInkom", "Inkom" ) 1 model
+        List.map (\s -> (toggleDiv (s.name, s.description) (nr+s.groupSeq*2) model)) switchStatuses
+-}
+
+
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
     div [ style [ ( "width", "300px" ) ] ]
@@ -461,42 +479,75 @@ screenDiv ( name, desc ) model nr =
         ]
 
 
-chainWidget : (Int -> a) -> ( List a, Int ) -> ( List a, Int )
-chainWidget widgetToAddTakingId ( widgets, seq ) =
+screenWidgets : String -> Int -> Model -> Html Msg
+screenWidgets groupName mdlID model =
     let
-        widgetToAdd =
-            widgetToAddTakingId seq
+        statuses = Dict.get groupName model.groups |> Maybe.withDefault (List.singleton initialStatus)
+
+        auto = List.filter(\s -> s.kind == "SunWindController") statuses
+        autoHtml = case auto of
+            [] ->
+                []
+            first::_ ->
+                [ toggleDiv ( first.name, first.description ) mdlID model ]
+
+        wind = List.filter(\s -> s.kind == "WindSensor") statuses
+        windHtml = case wind of
+            [] ->
+                []
+            first::_ ->
+                let
+                    sensorName = first.name
+                in
+                    [ div [{- style [ ( "display", "inline-block" ) ] -}]
+                        [ text "Wind: "
+                        , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName sensorName model.statuses)) ] []
+                        , text ((toString ((levelByName sensorName model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName sensorName model.statuses).status))
+                        ]
+                    ]
+
+        light = List.filter(\s -> s.kind == "LightSensor") statuses
+        lightHtml = case light of
+            [] ->
+                []
+            first::_ ->
+                let
+                    sensorName = first.name
+                in
+                    [ div [{- style [ ( "display", "inline-block" ) ] -}]
+                            [ text "Zon: "
+                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName sensorName model.statuses)) ] []
+                            , text (toString (levelByName sensorName model.statuses) ++ " - " ++ (toString (statusByName sensorName model.statuses).status))
+                              --                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
+                            ]
+                    ]
+
+        statusToScreen :  StatusRecord -> Html Msg
+        statusToScreen status =
+            screenDiv (status.name, status.description) model status.groupSeq
+
+        screens = List.filter (\s -> s.kind == "Screen") statuses |>  List.map (\s -> (statusToScreen s))
+
     in
-        ( List.append widgets [ widgetToAdd ], seq + 2 )
+        div [] (autoHtml ++ windHtml ++ lightHtml ++ screens)
 
 
-screenWidgets : Model -> List (Html Msg)
-screenWidgets model =
-    let
-        first =
-            screenDiv ( "ScreenKeuken", "Keuken" ) model 0
-
-        ( result, _ ) =
-            ( [ first ], 2 )
-                |> chainWidget (screenDiv ( "ScreenTomas", "Tomas" ) model)
-                |> chainWidget (screenDiv ( "ScreenDriesTuin", "Dries Tuin" ) model)
-                |> chainWidget (screenDiv ( "ScreenDriesOpzij", "Dries Opzij" ) model)
-                |> chainWidget (screenDiv ( "ScreenRoos", "Roos" ) model)
-                |> chainWidget (screenDiv ( "ScreenBreed", "Breed" ) model)
-                |> chainWidget (screenDiv ( "ScreenLang", "Smal" ) model)
-    in
-        result
-
+viewScreens : String -> Int -> Model -> Html Msg
+viewScreens groupName nr model =
+    if (isGroupOpen model.group2Expanded groupName) then
+        div []
+            [screenWidgets groupName nr model]
+    else
+        div [] []
 
 
 -- true iff at least one actuator is on in the given group
-
 
 somethingOn : Model -> String -> Bool
 somethingOn model groupName =
     let
         groupStatuses =
-            List.filter (\status -> ((nameInGroup status.group) == groupName)) model.statuses
+            List.filter (\status -> (status.groupName == groupName)) model.statuses
     in
         List.foldl (\status -> \soFar -> (isOn status.extra) || soFar) False groupStatuses
 
@@ -523,7 +574,7 @@ groupToggleBar groupName nr model content =
                 model.mdl
                 [ Button.raised, Button.colored, Button.ripple, Options.onClick (ToggleShowBlock groupName) ]
                 [ text
-                    (if (isGroupOpen model.group2Open groupName) then
+                    (if (isGroupOpen model.group2Expanded groupName) then
                         "Verberg"
                      else
                         "Toon"
@@ -533,6 +584,11 @@ groupToggleBar groupName nr model content =
             ]
         , content model
         ]
+
+
+viewGroup : (String -> Int -> Model -> Html Msg) -> String -> Int -> Model -> Html Msg
+viewGroup subView groupName nr model =
+    groupToggleBar groupName nr model (\model -> subView groupName nr model)
 
 
 lightPercentage : Float -> Float
@@ -554,35 +610,13 @@ view model =
                 [ Menu.onSelect PutModelInTestAsString ]
                 [ text "français" ]
             ]
-         , groupToggleBar "Screens"
-            100
-            model
-            (\model ->
-                if (isGroupOpen model.group2Open "Screens") then
-                    div []
-                        ([ toggleDiv ( "ZonWindAutomaat", "Zon Wind Automaat" ) 30 model
-                         , div [{- style [ ( "display", "inline-block" ) ] -}]
-                            [ text "Zon: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName lichtmeterName model.statuses)) ] []
-                            , text (toString (levelByName lichtmeterName model.statuses) ++ " - " ++ (toString (statusByName lichtmeterName model.statuses).status))
-                              --                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
-                            ]
-                         , div [{- style [ ( "display", "inline-block" ) ] -}]
-                            [ text "Wind: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName "Windmeter" model.statuses)) ] []
-                            , text ((toString ((levelByName "Windmeter" model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName "Windmeter" model.statuses).status))
-                            ]
-                         ]
-                            ++ screenWidgets model
-                        )
-                else
-                    div [] []
-            )
+         , viewGroup viewScreens "ScreensZ" 100 model
+         , viewGroup viewScreens "ScreensW" 200 model
          , groupToggleBar "Beneden"
             101
             model
             (\model ->
-                if (isGroupOpen model.group2Open "Beneden") then
+                if (isGroupOpen model.group2Expanded "Beneden") then
                     div []
                         [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model.statuses) ] [ text "Keuken" ] ]
                         , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
@@ -595,11 +629,12 @@ view model =
                 else
                     div [] []
             )
+--         , viewGroup viewSwitches "Nutsruimtes" 500 model
          , groupToggleBar "Nutsruimtes"
             101
             model
             (\model ->
-                if (isGroupOpen model.group2Open "Nutsruimtes") then
+                if (isGroupOpen model.group2Expanded "Nutsruimtes") then
                     div []
                         [ toggleDiv ( "LichtInkom", "Inkom" ) 1 model
                         , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
@@ -614,7 +649,7 @@ view model =
             101
             model
             (\model ->
-                if (isGroupOpen model.group2Open "Kinderen") then
+                if (isGroupOpen model.group2Expanded "Kinderen") then
                     div []
                         [ toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
                         , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
@@ -631,7 +666,7 @@ view model =
             101
             model
             (\model ->
-                if (isGroupOpen model.group2Open "Buiten") then
+                if (isGroupOpen model.group2Expanded "Buiten") then
                     div []
                         [ toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
                         , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
@@ -648,3 +683,42 @@ view model =
          ]
         )
         |> Scheme.topWithScheme Color.Green Color.Red
+
+
+-- Copied from List.Extra in Elm Community
+
+{-| Group equal elements together. A function is applied to each element of the list
+and then the equality check is performed against the results of that function evaluation.
+Elements will be grouped in the same order as they appear in the original list. The
+same applies to elements within each group.
+    gatherEqualsBy .age [{age=25},{age=23},{age=25}]
+    --> [({age=25},[{age=25}]),({age=23},[])]
+-}
+gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
+gatherEqualsBy extract list =
+    gatherWith (\a b -> (extract a) == (extract b)) list
+
+
+{-| Group equal elements together using a custom equality function. Elements will be
+grouped in the same order as they appear in the original list. The same applies to
+elements within each group.
+    gatherWith (==) [1,2,1,3,2]
+    --> [(1,[1]),(2,[2]),(3,[])]
+-}
+gatherWith : (a -> a -> Bool) -> List a -> List (a, List a)
+gatherWith testFn list =
+    let
+        helper : List a -> List (a,List a) -> List (a, List a)
+        helper scattered gathered =
+            case scattered of
+                [] ->
+                    List.reverse gathered
+
+                toGather :: population ->
+                    let
+                        ( gathering, remaining ) =
+                            List.partition (testFn toGather) population
+                    in
+                    helper remaining <| (toGather, gathering) :: gathered
+    in
+    helper list []
