@@ -36,8 +36,8 @@ import Material.Menu as Menu
 fixHost : Maybe String
 fixHost =
     --Just "192.168.0.10:8080"
-    Just "127.0.0.1:8080"
-    -- Nothing
+    --Just "127.0.0.1:8080"
+    Nothing
 
 {-
    Determines host and port to used for backend; see also fixHost
@@ -339,7 +339,10 @@ levelByName name statuses =
             statusByName name statuses
     in
         case status.extra of
-            OnOffLevel isOn level ->
+            OnOffLevel _ level ->
+                (toFloat level)
+
+            Level level ->
                 (toFloat level)
 
             _ ->
