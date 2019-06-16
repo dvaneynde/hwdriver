@@ -8,7 +8,7 @@ import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
+import eu.dlvm.domotics.service.uidata.UiInfoLevel;
 
 /**
  * As soon as wind speed (actually rotations per second of a gauge) is above
@@ -113,7 +113,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfoOnOffLevel uiInfo = new UiInfoOnOffLevel(this, getState().toString(), true, getFreqTimesHundred());
+		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getFreqTimesHundred());
 		return uiInfo;
 	}
 

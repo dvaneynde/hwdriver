@@ -12,28 +12,26 @@ public class UiInfo {
 	private String name;
 	private String type;
 	private String description = "";
-	private String group = "";
+	private String groupName = "";
+	private int groupSeq = 0;
 	private String status = "";
 
 	public UiInfo() {
 	}
 
 	public UiInfo(Block block, String status) {
-		// this(block.getName(), block.getClass().getSimpleName(), block.getUiGroup(), block.getDescription());
 		setName(block.getName());
 		setType(block.getClass().getSimpleName());
-		setGroup(block.getUiGroup());
 		setDescription(block.getDescription());
 		setStatus(status);
-	}
 
-//	public UiInfo(String name, String type, String uiGroup, String description) {
-//		this();
-//		setName(name);
-//		setType(type);
-//		setGroup(uiGroup);
-//		setDescription(description);
-//	}
+		String groupSeq = block.getUiGroup();
+		if (groupSeq != null && groupSeq.contains(":")) {
+			String[] groupSeqList = groupSeq.split(":");
+			setGroupName(groupSeqList[0]);
+			setGroupSeq(Integer.valueOf(groupSeqList[1]));
+		}
+}
 
 	public String getName() {
 		return name;
@@ -67,17 +65,26 @@ public class UiInfo {
 		this.status = (status == null ? "" : status);
 	}
 
-	public String getGroup() {
-		return group;
+	public String getGroupName() {
+		return groupName;
 	}
 
-	public void setGroup(String group) {
-		this.group = (group == null ? "" : group);
+	public void setGroupName(String group) {
+		this.groupName = (group == null ? "" : group);
+	}
+
+	public int getGroupSeq() {
+		return groupSeq;
+	}
+
+	public void setGroupSeq(int groupSeq) {
+		this.groupSeq = groupSeq;
 	}
 
 	@Override
 	public String toString() {
-		return "UiInfoOnOff [name=" + name + ", type=" + type + ", description=" + description + ", group=" + group + ", status=" + status + "]";
+		return "UiInfo [name=" + name + ", type=" + type + ", description=" + description + ", groupName=" + groupName
+				+ ", groupSeq=" + groupSeq + ", status=" + status + "]";
 	}
 
 }

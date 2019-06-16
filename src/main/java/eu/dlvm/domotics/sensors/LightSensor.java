@@ -9,7 +9,7 @@ import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOffLevel;
+import eu.dlvm.domotics.service.uidata.UiInfoLevel;
 import eu.dlvm.iohardware.IHardwareIO;
 
 /**
@@ -117,8 +117,8 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfoOnOffLevel ui = new UiInfoOnOffLevel(this, getState().toString(), true, getLevel());
-		return ui;
+		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getLevel());
+		return uiInfo;
 	}
 
 	@Override

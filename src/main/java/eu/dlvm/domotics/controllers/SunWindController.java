@@ -141,7 +141,7 @@ public class SunWindController extends Controller implements IEventListener, IUi
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		double azimuth = SunHeightAzimuth.azimuth(180, 0);
+		//double azimuth = SunHeightAzimuth.azimuth(180, 0);
 	}
 
 	@Override
