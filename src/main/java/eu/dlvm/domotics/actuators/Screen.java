@@ -153,11 +153,10 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 		case TOGGLE_DOWN:
 			toggleDown();
 			break;
-		case LIGHT_LOW:
+		case UP:
 			up();
 			break;
 		case DOWN:
-		case LIGHT_HIGH:
 			down();
 			break;
 		default:

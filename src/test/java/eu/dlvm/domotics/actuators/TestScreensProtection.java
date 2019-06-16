@@ -124,7 +124,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertRestAndOpen();
 
-		sr.onEvent(null, EventType.LIGHT_HIGH);
+		sr.onEvent(null, EventType.DOWN);
 		loop();
 		assertDown();	
 		loop(sr.getMotorDnPeriod() * 1000L+10);
@@ -132,7 +132,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(10);
 		assertRestAndClosed();
 		
-		sr.onEvent(null, EventType.LIGHT_LOW);
+		sr.onEvent(null, EventType.UP);
 		loop();
 		assertUp();
 		loop(sr.getMotorUpPeriod() * 1000L+100);
@@ -144,7 +144,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertRestAndOpen();
 
-		sr.onEvent(null, EventType.LIGHT_HIGH);
+		sr.onEvent(null, EventType.DOWN);
 		loop();
 		assertDown();	
 		loop(sr.getMotorDnPeriod() * 1000L/2);
@@ -159,17 +159,17 @@ public class TestScreensProtection extends TestScreensBase {
 		loop(Screen.MOTOR_SWITCH_DELAY_PROTECTION+10);	
 		assertUpProtected();	
 		
-		sr.onEvent(null, EventType.LIGHT_HIGH);
+		sr.onEvent(null, EventType.DOWN);
 		loop();
 		assertUpProtected();	
 		loop(sr.getMotorUpPeriod() * 1000L+10);
 		assertOpenInRestProtected();	
 		
-		sr.onEvent(null, EventType.LIGHT_HIGH);
+		sr.onEvent(null, EventType.DOWN);
 		loop();
 		assertOpenInRestProtected();			
 
-		sr.onEvent(null, EventType.LIGHT_LOW);
+		sr.onEvent(null, EventType.UP);
 		loop();
 		assertOpenInRestProtected();			
 
@@ -181,7 +181,7 @@ public class TestScreensProtection extends TestScreensBase {
 		loop();
 		assertRestAndOpen();	
 				
-		sr.onEvent(null, EventType.LIGHT_HIGH);
+		sr.onEvent(null, EventType.DOWN);
 		loop();
 		assertDown();	
 	}
