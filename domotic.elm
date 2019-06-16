@@ -67,17 +67,6 @@ wsStatus model =
 
 
 
---"/status/"
-----------------------------------------------------------
--- GLOBALS
-
-
-lichtmeterName : String
-lichtmeterName =
-    "LichtmeterZonnewering"
-
-
-
 ----------------------------------------------------------
 -- MAIN
 
@@ -100,6 +89,7 @@ type ExtraStatus
     = None
     | OnOff Bool
     | OnOffLevel Bool Int
+    | Level Int
     | OnOffEco Bool Bool
 
 
@@ -289,12 +279,17 @@ statusDecoder =
         (field "groupSeq" int)
         (field "description" string)
         (field "status" string)
-        (oneOf [ decoderExtraOnOffLevel, decoderExtraOnOffEco, decoderExtraOnOff, succeed None ])
+        (oneOf [ decoderExtraOnOffLevel, decoderExtraLevel, decoderExtraOnOffEco, decoderExtraOnOff, succeed None ])
 
 
 decoderExtraOnOffLevel : Decoder ExtraStatus
 decoderExtraOnOffLevel =
     Decode.map2 OnOffLevel (field "on" bool) (field "level" int)
+
+
+decoderExtraLevel : Decoder ExtraStatus
+decoderExtraLevel =
+    Decode.map Level (field "level" int)
 
 
 decoderExtraOnOff : Decoder ExtraStatus
@@ -305,21 +300,6 @@ decoderExtraOnOff =
 decoderExtraOnOffEco : Decoder ExtraStatus
 decoderExtraOnOffEco =
     Decode.map2 OnOffEco (field "on" bool) (field "eco" bool)
-
-
-toggleBlock : String -> Model -> Cmd Msg
-toggleBlock what model =
-    let
-        onOff =
-            not (isOnByName what model.statuses)
-
-        onOffText =
-            if onOff then
-                "on"
-            else
-                "off"
-    in
-        updateStatusViaRestCmd model what onOffText
 
 
 updateStatusViaRestCmd : Model -> String -> String -> Cmd Msg
@@ -383,23 +363,7 @@ isOn extraStatus =
         OnOffEco isOn eco ->
             isOn
 
-        None ->
-            False
-
-
-isEco : ExtraStatus -> Bool
-isEco extraStatus =
-    case extraStatus of
-        OnOff isOn ->
-            False
-
-        OnOffLevel isOn level ->
-            False
-
-        OnOffEco isOn eco ->
-            eco
-
-        None ->
+        _ ->
             False
 
 
@@ -423,9 +387,6 @@ toggleDiv ( name, desc ) nr model =
             statusByName name model.statuses
     in
         case record.extra of
-            None ->
-                Html.text ("BUG toggleDiv for " ++ name)
-
             OnOff status ->
                 div [] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value status ] [ text desc ] ]
 
@@ -439,17 +400,31 @@ toggleDiv ( name, desc ) nr model =
                     , div [ style [ ( "clear", "both" ) ] ] []
                     ]
 
+            _ ->
+                Html.text ("BUG toggleDiv for " ++ name)
 
-{-
+
 viewSwitches : String -> Int -> Model -> Html Msg
 viewSwitches groupName nr model =
     let
-        switchStatuses = Dict.get groupName model.groups |> Maybe.withDefault[]
-    in
-        -- toggleDiv ( "LichtInkom", "Inkom" ) 1 model
-        List.map (\s -> (toggleDiv (s.name, s.description) (nr+s.groupSeq*2) model)) switchStatuses
--}
 
+        generateSwitch : StatusRecord -> Html Msg
+        generateSwitch status =
+            case status.kind of
+                "DimmedLamp" ->
+                    toggleWithSliderDiv (status.name, status.description) (nr+status.groupSeq*2) model
+
+                "Lamp" ->
+                    toggleDiv (status.name, status.description) (nr+status.groupSeq*2) model
+
+                _ ->
+                   text "Error"
+
+
+        switchStatuses = Dict.get groupName model.groups |> Maybe.withDefault[]
+        switches = List.map generateSwitch switchStatuses
+    in
+        div [] switches
 
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
@@ -479,8 +454,8 @@ screenDiv ( name, desc ) model nr =
         ]
 
 
-screenWidgets : String -> Int -> Model -> Html Msg
-screenWidgets groupName mdlID model =
+viewScreens : String -> Int -> Model -> Html Msg
+viewScreens groupName mdlID model =
     let
         statuses = Dict.get groupName model.groups |> Maybe.withDefault (List.singleton initialStatus)
 
@@ -532,17 +507,7 @@ screenWidgets groupName mdlID model =
         div [] (autoHtml ++ windHtml ++ lightHtml ++ screens)
 
 
-viewScreens : String -> Int -> Model -> Html Msg
-viewScreens groupName nr model =
-    if (isGroupOpen model.group2Expanded groupName) then
-        div []
-            [screenWidgets groupName nr model]
-    else
-        div [] []
-
-
 -- true iff at least one actuator is on in the given group
-
 somethingOn : Model -> String -> Bool
 somethingOn model groupName =
     let
@@ -552,10 +517,7 @@ somethingOn model groupName =
         List.foldl (\status -> \soFar -> (isOn status.extra) || soFar) False groupStatuses
 
 
-
 -- other color depending on wether something is on or off
-
-
 colorOfBlock : Model -> String -> String
 colorOfBlock model groupName =
     if (somethingOn model groupName) then
@@ -564,31 +526,38 @@ colorOfBlock model groupName =
         "green"
 
 
-groupToggleBar : String -> Int -> Model -> (Model -> Html Msg) -> Html Msg
-groupToggleBar groupName nr model content =
-    div []
-        [ div
-            [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ( "margin", "0px 0px 10px 0px" ), ( "padding", "10px 10px 10px 10px" ) ] ]
-            [ Button.render Mdl
-                [ nr ]
-                model.mdl
-                [ Button.raised, Button.colored, Button.ripple, Options.onClick (ToggleShowBlock groupName) ]
-                [ text
-                    (if (isGroupOpen model.group2Expanded groupName) then
-                        "Verberg"
-                     else
-                        "Toon"
-                    )
-                ]
-            , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "120%" ) ] ] [ text groupName ]
+groupToggleBar : String -> Int -> Model ->  Html Msg
+groupToggleBar groupName nr model =
+    div
+        [ style [ ( "background-color", colorOfBlock model groupName ), ( "width", "250px" ), ( "margin", "0px 0px 10px 0px" ), ( "padding", "10px 10px 10px 10px" ) ] ]
+        [ Button.render Mdl
+            [ nr ]
+            model.mdl
+            [ Button.raised, Button.colored, Button.ripple, Options.onClick (ToggleShowBlock groupName) ]
+            [ text
+                (if (isGroupOpen model.group2Expanded groupName) then
+                    "Verberg"
+                 else
+                    "Toon"
+                )
             ]
-        , content model
+        , Html.span [ style [ ( "padding-left", "20px" ), ( "font-size", "120%" ) ] ] [ text groupName ]
         ]
 
 
 viewGroup : (String -> Int -> Model -> Html Msg) -> String -> Int -> Model -> Html Msg
 viewGroup subView groupName nr model =
-    groupToggleBar groupName nr model (\model -> subView groupName nr model)
+    let
+        toggleBar = groupToggleBar groupName nr model
+
+        content =
+            if (isGroupOpen model.group2Expanded groupName) then
+                div []
+                    [subView groupName nr model]
+            else
+                div [] []
+    in
+        div [] [ toggleBar, content ]
 
 
 lightPercentage : Float -> Float
@@ -612,68 +581,10 @@ view model =
             ]
          , viewGroup viewScreens "ScreensZ" 100 model
          , viewGroup viewScreens "ScreensW" 200 model
-         , groupToggleBar "Beneden"
-            101
-            model
-            (\model ->
-                if (isGroupOpen model.group2Expanded "Beneden") then
-                    div []
-                        [ div [] [ Toggles.switch Mdl [ 8 ] model.mdl [ Options.onToggle (Clicked "LichtKeuken"), Toggles.value (isOnByName "LichtKeuken" model.statuses) ] [ text "Keuken" ] ]
-                        , toggleWithSliderDiv ( "LichtVeranda", "Licht Veranda" ) 9 model
-                        , div [] []
-                        , toggleWithSliderDiv ( "LichtCircanteRondom", "Eetkamer" ) 10 model
-                        , div [] [ Toggles.switch Mdl [ 11 ] model.mdl [ Options.onToggle (Clicked "LichtCircante"), Toggles.value (isOnByName "LichtCircante" model.statuses) ] [ text "Circante Tafel" ] ]
-                        , toggleWithSliderDiv ( "LichtZithoek", "Zithoek" ) 21 model
-                        , div [] [ Toggles.switch Mdl [ 12 ] model.mdl [ Options.onToggle (Clicked "LichtBureau"), Toggles.value (isOnByName "LichtBureau" model.statuses) ] [ text "Bureau" ] ]
-                        ]
-                else
-                    div [] []
-            )
---         , viewGroup viewSwitches "Nutsruimtes" 500 model
-         , groupToggleBar "Nutsruimtes"
-            101
-            model
-            (\model ->
-                if (isGroupOpen model.group2Expanded "Nutsruimtes") then
-                    div []
-                        [ toggleDiv ( "LichtInkom", "Inkom" ) 1 model
-                        , toggleDiv ( "LichtGaragePoort", "Garage Poort" ) 3 model
-                        , toggleDiv ( "LichtGarageTuin", "Garage Tuin" ) 4 model
-                        , toggleDiv ( "LichtBadk0", "Badkamer Beneden" ) 6 model
-                        , toggleDiv ( "LichtWC0", "WC" ) 7 model
-                        ]
-                else
-                    div [] []
-            )
-         , groupToggleBar "Kinderen"
-            101
-            model
-            (\model ->
-                if (isGroupOpen model.group2Expanded "Kinderen") then
-                    div []
-                        [ toggleDiv ( "LichtGangBoven", "Gang Boven" ) 2 model
-                        , toggleDiv ( "LichtBadk1", "Badkamer Boven" ) 5 model
-                        , toggleDiv ( "LichtTomasSpots", "Tomas" ) 13 model
-                        , toggleDiv ( "LichtDriesWand", "Dries Wand" ) 14 model
-                        , toggleDiv ( "LichtDries", "Dries Spots" ) 15 model
-                        , toggleDiv ( "LichtRoosWand", "Roos Wand" ) 16 model
-                        , toggleDiv ( "LichtRoos", "Roos Spots" ) 17 model
-                        ]
-                else
-                    div [] []
-            )
-         , groupToggleBar "Buiten"
-            101
-            model
-            (\model ->
-                if (isGroupOpen model.group2Expanded "Buiten") then
-                    div []
-                        [ toggleDiv ( "LichtTerras", "Licht terras en zijkant" ) 18 model
-                        , toggleDiv ( "StopkBuiten", "Stopcontact buiten" ) 19 model
-                        ]
-                else
-                    div [] []
-            )
+         , viewGroup viewSwitches "Beneden" 400 model
+         , viewGroup viewSwitches "Nutsruimtes" 500 model
+         , viewGroup viewSwitches "Kinderen" 600 model
+         , viewGroup viewSwitches "Buiten" 700 model
          , div [] [ Html.hr [] [] ]
          , div [] [ text "Error: ", text model.errorMsg ]
          , div [ Html.Attributes.style [ ( "background", "DarkSlateGrey" ), ( "color", "white" ) ] ]
@@ -686,18 +597,6 @@ view model =
 
 
 -- Copied from List.Extra in Elm Community
-
-{-| Group equal elements together. A function is applied to each element of the list
-and then the equality check is performed against the results of that function evaluation.
-Elements will be grouped in the same order as they appear in the original list. The
-same applies to elements within each group.
-    gatherEqualsBy .age [{age=25},{age=23},{age=25}]
-    --> [({age=25},[{age=25}]),({age=23},[])]
--}
-gatherEqualsBy : (a -> b) -> List a -> List (a, List a)
-gatherEqualsBy extract list =
-    gatherWith (\a b -> (extract a) == (extract b)) list
-
 
 {-| Group equal elements together using a custom equality function. Elements will be
 grouped in the same order as they appear in the original list. The same applies to
