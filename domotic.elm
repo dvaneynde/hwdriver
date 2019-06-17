@@ -102,7 +102,7 @@ type alias Groups =
     Dict.Dict String (List StatusRecord)
 
 type alias Model =
-    { statuses : List StatusRecord, groups : Groups, group2Expanded : Group2ExpandedDict, errorMsg : String, test : String, mdl : Material.Model, host : String }
+    { groups : Groups, group2Expanded : Group2ExpandedDict, errorMsg : String, test : String, mdl : Material.Model, host : String }
 
 
 initialStatus : StatusRecord
@@ -112,7 +112,7 @@ initialStatus =
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( { statuses = [], groups = Dict.empty, group2Expanded = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location }, Cmd.none )
+    ( { groups = Dict.empty, group2Expanded = initGroups, errorMsg = "No worries...", test = "nothing tested", mdl = Material.model, host = getHost location }, Cmd.none )
 
 
 initGroups : Group2ExpandedDict
@@ -120,9 +120,10 @@ initGroups =
     Dict.fromList [ ( "ScreensZ", False ), ( "ScreensW", False ), ( "Beneden", True ), ( "Nutsruimtes", True ), ( "Kinderen", True ), ( "Buiten", False ) ]
 
 
-statusByName : String -> List StatusRecord -> StatusRecord
-statusByName name listOfRecords =
+statusByName : String -> Groups -> StatusRecord
+statusByName name groups =
     let
+        listOfRecords = List.foldr (++) [] (Dict.values groups)
         filteredList =
             List.filter (\rec -> rec.name == name) listOfRecords
     in
@@ -164,12 +165,11 @@ update msg model =
             ( model
             , let
                 extra =
-                    (statusByName what model.statuses).extra
+                    (statusByName what model.groups).extra
 
                 onOff =
                     not (isOn extra)
 
-                --not (isOnByName what model.statuses)
                 onOffText =
                     if onOff then
                         "on"
@@ -207,13 +207,13 @@ update msg model =
                 ( newStatuses, error ) =
                     decodeStatuses str
             in
-                ( { model | statuses = newStatuses, groups = createGroups newStatuses, errorMsg = error }, Cmd.none )
+                ( { model | groups = createGroups newStatuses, errorMsg = error }, Cmd.none )
 
         ToggleShowBlock name ->
             ( { model | group2Expanded = (toggleGroup2Open model.group2Expanded name) }, Cmd.none )
 
         NewStatusViaRest (Ok newStatuses) ->
-            ( { model | statuses = newStatuses, groups = createGroups newStatuses, errorMsg = "OK" }, Cmd.none )
+            ( { model | groups = createGroups newStatuses, errorMsg = "OK" }, Cmd.none )
 
         NewStatusViaRest (Err message) ->
             ( { model | errorMsg = ("NewStatusViaRest: " ++ (toString message)) }, Cmd.none )
@@ -338,7 +338,7 @@ subscriptions model =
 -- https://debois.github.io/elm-mdl/
 
 
-levelByName : String -> List StatusRecord -> Float
+levelByName : String -> Groups -> Float
 levelByName name statuses =
     let
         status =
@@ -355,7 +355,7 @@ levelByName name statuses =
                 0.0
 
 
-isOnByName : String -> List StatusRecord -> Bool
+isOnByName : String -> Groups -> Bool
 isOnByName name statuses =
     isOn (statusByName name statuses).extra
 
@@ -380,7 +380,7 @@ screenStatus : String -> Model -> String
 screenStatus name model =
     let
         status =
-            (statusByName name model.statuses).status
+            (statusByName name model.groups).status
     in
         (toString status)
 
@@ -393,7 +393,7 @@ toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
     let
         record =
-            statusByName name model.statuses
+            statusByName name model.groups
     in
         case record.extra of
             OnOff status ->
@@ -438,11 +438,11 @@ viewSwitches groupName nr model =
 toggleWithSliderDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleWithSliderDiv ( name, desc ) nr model =
     div [ style [ ( "width", "300px" ) ] ]
-        [ div [ style [ ( "float", "left" ) ] ] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.statuses) ] [ text desc ] ]
+        [ div [ style [ ( "float", "left" ) ] ] [ Toggles.switch Mdl [ nr ] model.mdl [ Options.onToggle (Clicked name), Toggles.value (isOnByName name model.groups) ] [ text desc ] ]
         , div [ style [ ( "float", "right" ) ] ]
             [ Slider.view
-                ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.statuses) ]
-                    ++ (if (isOnByName name model.statuses) then
+                ([ Slider.onChange (SliderMsg name), Slider.value (levelByName name model.groups) ]
+                    ++ (if (isOnByName name model.groups) then
                             []
                         else
                             [ Slider.disabled ]
@@ -548,8 +548,7 @@ viewScreens groupName mdlID model =
 somethingOn : Model -> String -> Bool
 somethingOn model groupName =
     let
-        groupStatuses =
-            List.filter (\status -> (status.groupName == groupName)) model.statuses
+        groupStatuses = Dict.get groupName model.groups |> Maybe.withDefault []
     in
         List.foldl (\status -> \soFar -> (isOn status.extra) || soFar) False groupStatuses
 
