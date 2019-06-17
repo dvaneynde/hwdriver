@@ -36,8 +36,8 @@ import Material.Menu as Menu
 fixHost : Maybe String
 fixHost =
     --Just "192.168.0.10:8080"
-    --Just "127.0.0.1:8080"
-    Nothing
+    Just "127.0.0.1:8080"
+    --Nothing
 
 {-
    Determines host and port to used for backend; see also fixHost
@@ -84,12 +84,14 @@ main =
 type alias Group2ExpandedDict =
     Dict.Dict String Bool
 
+type alias MeterValues =
+    { min:Int, low:Int, high:Int, max:Int}
 
 type ExtraStatus
     = None
     | OnOff Bool
     | OnOffLevel Bool Int
-    | Level Int
+    | Level Int  MeterValues -- level, min, low, high, max
     | OnOffEco Bool Bool
 
 
@@ -289,7 +291,11 @@ decoderExtraOnOffLevel =
 
 decoderExtraLevel : Decoder ExtraStatus
 decoderExtraLevel =
-    Decode.map Level (field "level" int)
+    Decode.map2 Level (field "level" int) decoderMeterValues
+
+decoderMeterValues : Decoder MeterValues
+decoderMeterValues =
+    Decode.map4 MeterValues (field "min" int) (field "low" int) (field "high" int) (field "max" int)
 
 
 decoderExtraOnOff : Decoder ExtraStatus
@@ -342,7 +348,7 @@ levelByName name statuses =
             OnOffLevel _ level ->
                 (toFloat level)
 
-            Level level ->
+            Level level _ ->
                 (toFloat level)
 
             _ ->
@@ -457,6 +463,51 @@ screenDiv ( name, desc ) model nr =
         ]
 
 
+viewWindMeter : StatusRecord -> Html Msg
+viewWindMeter statusRecord =
+    let
+        (level, meterAttrs) = case statusRecord.extra of
+            Level l m -> (l,m)
+            _ -> (0, MeterValues 0 0 0 0)
+    in
+        div [{- style [ ( "display", "inline-block" ) ] -}]
+            [ text "Wind: "
+            , meter
+                [ style [ ( "width", "250px" ), ( "height", "15px" ) ]
+                , Html.Attributes.value (toString level)
+                , (attribute "optimum" "0")
+                , Html.Attributes.min (toString meterAttrs.min)
+                , (attribute "low" (toString meterAttrs.low))
+                , (attribute "high" (toString meterAttrs.high))
+                , Html.Attributes.max (toString meterAttrs.max)
+                ] []
+            , text ((toString ((toFloat level) / 100.0)) ++ "RPM - " ++ statusRecord.status)
+            ]
+
+
+viewLightMeter : StatusRecord -> Html Msg
+viewLightMeter statusRecord =
+    let
+        (level, meterAttrs) = case statusRecord.extra of
+            Level l m -> (l,m)
+            _ -> (0, MeterValues 0 0 0 0)
+    in
+       div [{- style [ ( "display", "inline-block" ) ] -}]
+            [ text "Zon: "
+            , meter
+                [ style [ ( "width", "250px" ), ( "height", "15px" ) ]
+                , Html.Attributes.value (toString level)
+                , (attribute "optimum" "0")
+                , Html.Attributes.min (toString meterAttrs.min)
+                , (attribute "low" (toString meterAttrs.high))
+                , (attribute "high" (toString meterAttrs.max))
+                , Html.Attributes.max (toString meterAttrs.max)
+                ] []
+            , text ((toString level) ++ " - " ++ statusRecord.status)
+              -- , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
+            ]
+
+
 viewScreens : String -> Int -> Model -> Html Msg
 viewScreens groupName mdlID model =
     let
@@ -474,31 +525,14 @@ viewScreens groupName mdlID model =
             [] ->
                 []
             first::_ ->
-                let
-                    sensorName = first.name
-                in
-                    [ div [{- style [ ( "display", "inline-block" ) ] -}]
-                        [ text "Wind: "
-                        , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "0", (attribute "low" "0"), (attribute "high" "900"), Html.Attributes.max "1200", Html.Attributes.value (toString (levelByName sensorName model.statuses)) ] []
-                        , text ((toString ((levelByName sensorName model.statuses) / 100.0)) ++ "RPM - " ++ (toString (statusByName sensorName model.statuses).status))
-                        ]
-                    ]
+                List.singleton (viewWindMeter first)
 
         light = List.filter(\s -> s.kind == "LightSensor") statuses
         lightHtml = case light of
             [] ->
                 []
             first::_ ->
-                let
-                    sensorName = first.name
-                in
-                    [ div [{- style [ ( "display", "inline-block" ) ] -}]
-                            [ text "Zon: "
-                            , meter [ style [ ( "width", "250px" ), ( "height", "15px" ) ], Html.Attributes.min "3000", (attribute "low" "3400"), (attribute "high" "3600"), Html.Attributes.max "4000", Html.Attributes.value (toString (levelByName sensorName model.statuses)) ] []
-                            , text (toString (levelByName sensorName model.statuses) ++ " - " ++ (toString (statusByName sensorName model.statuses).status))
-                              --                            , text (toString (lightPercentage (levelByName lichtmeterName model.statuses)) ++ "% - " ++ (toString (statusByName lichtmeterName model.statuses).status))
-                            ]
-                    ]
+                List.singleton (viewLightMeter first)
 
         statusToScreen :  StatusRecord -> Html Msg
         statusToScreen status =
