@@ -84,14 +84,14 @@ main =
 type alias Group2ExpandedDict =
     Dict.Dict String Bool
 
-type alias MeterValues =
+type alias MeterAttributes =
     { min:Int, low:Int, high:Int, max:Int}
 
 type ExtraStatus
     = None
     | OnOff Bool
     | OnOffLevel Bool Int
-    | Level Int  MeterValues -- level, min, low, high, max
+    | Level Int  MeterAttributes -- level, min, low, high, max
     | OnOffEco Bool Bool
 
 
@@ -291,11 +291,11 @@ decoderExtraOnOffLevel =
 
 decoderExtraLevel : Decoder ExtraStatus
 decoderExtraLevel =
-    Decode.map2 Level (field "level" int) decoderMeterValues
+    Decode.map2 Level (field "level" int) decoderMeterAttributes
 
-decoderMeterValues : Decoder MeterValues
-decoderMeterValues =
-    Decode.map4 MeterValues (field "min" int) (field "low" int) (field "high" int) (field "max" int)
+decoderMeterAttributes : Decoder MeterAttributes
+decoderMeterAttributes =
+    Decode.map4 MeterAttributes (field "min" int) (field "low" int) (field "high" int) (field "max" int)
 
 
 decoderExtraOnOff : Decoder ExtraStatus
@@ -468,7 +468,7 @@ viewWindMeter statusRecord =
     let
         (level, meterAttrs) = case statusRecord.extra of
             Level l m -> (l,m)
-            _ -> (0, MeterValues 0 0 0 0)
+            _ -> (0, MeterAttributes 0 0 0 0)
     in
         div [{- style [ ( "display", "inline-block" ) ] -}]
             [ text "Wind: "
@@ -490,7 +490,7 @@ viewLightMeter statusRecord =
     let
         (level, meterAttrs) = case statusRecord.extra of
             Level l m -> (l,m)
-            _ -> (0, MeterValues 0 0 0 0)
+            _ -> (0, MeterAttributes 0 0 0 0)
     in
        div [{- style [ ( "display", "inline-block" ) ] -}]
             [ text "Zon: "
