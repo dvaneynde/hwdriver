@@ -113,7 +113,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getFreqTimesHundred());
+		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getFreqTimesHundred(), 0, getLowFreqThreshold()*100, getHighFreqThreshold()*100, 2500);
 		return uiInfo;
 	}
 

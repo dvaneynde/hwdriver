@@ -68,9 +68,9 @@
 	</screen>
 
 	<windSensor name="Windmeter" channel="Windmeter" highFreq="5"
-		lowFreq="2" highTimeBeforeAlert="2" lowTimeToResetAlert="60" />
-	<lightGauge name="LichtsensorScreen" channel="AnalogIn" low="1000"
-		high="3000" low2highTime="10" high2lowTime="60" />
+		lowFreq="2" lowTimeToResetAlert="60" />
+	<lightGauge name="LichtsensorScreen" channel="AnalogIn"
+		threshold="3000" low2highTime="10" high2lowTime="60" />
 
 
 	<sunWindController name="ZonWindAutomaat" desc="Zon/Wind Automaat"
@@ -86,7 +86,7 @@
 	</sunWindController>
 
 
-	<lightGauge name="LichtsensorNacht" low="3000" high="4000"
+	<lightGauge name="LichtsensorNacht" threshold="4000"
 		low2highTime="10" high2lowTime="60" channel="AnalogIn" />
 
 	<lamp name="indicator">

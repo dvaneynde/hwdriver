@@ -117,7 +117,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public UiInfo getUiInfo() {
-		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getLevel());
+		UiInfoLevel uiInfo = new UiInfoLevel(this, getState().toString(), getLevel(), 0, getThreshold(), getThreshold(), 4000);
 		return uiInfo;
 	}
 

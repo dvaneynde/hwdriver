@@ -153,6 +153,8 @@
 						</complexType>
 					</element>
 				</sequence>
+				<attribute name="azimuthStart" type="double" use="optional"/>
+				<attribute name="azimuthEnd" type="double" use="optional"/>
 			</extension>
 		</complexContent>
 	</complexType>

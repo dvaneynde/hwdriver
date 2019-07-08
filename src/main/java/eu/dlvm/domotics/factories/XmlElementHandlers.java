@@ -168,7 +168,13 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("sunWindController")) {
 				parseBaseBlock(atts);
-				currentBlock = new SunWindController(name, desc, ui, ctx);
+				desc = atts.getValue("desc");
+				if (atts.getValue("azimuthStart") != null && atts.getValue("azimuthEnd") != null) {
+					Double azimuthStart = Double.parseDouble(atts.getValue("azimuthStart"));
+					Double azimuthEnd = Double.parseDouble(atts.getValue("azimuthEnd"));
+					currentBlock = new SunWindController(name, desc, azimuthStart, azimuthEnd, ui, ctx);
+				} else
+					currentBlock = new SunWindController(name, desc, ui, ctx);
 
 			} else if (localName.equals("newyear")) {
 				Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
@@ -240,6 +246,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 		} catch (SAXException e) {
 			throw e;
 		} catch (Exception e) {
+			logger.error("Unexpected exception parsing domotic xml.", e);
 			throw new SAXException("Error while processing element '" + localName + "', current block is '"
 					+ (currentBlock == null ? "null" : currentBlock.getName()) + "'. Error: '" + e.getMessage() + "'",
 					e);

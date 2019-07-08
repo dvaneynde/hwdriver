@@ -107,7 +107,7 @@ public class Domotic implements IDomoticContext {
 			return;
 		}
 		sensors.add(sensor);
-		log.info("Added sensor " + sensor.getName());
+		//log.info("Add sensor '" + sensor.getName()+"' - "+sensor.toString());
 	}
 
 	/*	public List<Sensor> getSensors() {
@@ -128,7 +128,7 @@ public class Domotic implements IDomoticContext {
 			return;
 		}
 		actuators.add(actuator);
-		log.info("Added actuator " + actuator.getName());
+		//log.info("Add actuator '" + actuator.getName()+"' - "+actuator.toString());
 	}
 
 	public void addController(Controller controller) {
@@ -138,7 +138,7 @@ public class Domotic implements IDomoticContext {
 			return;
 		}
 		controllers.add(controller);
-		log.info("Added controller " + controller.getName());
+		//log.info("Add controller '" + controller.getName()+"' - "+controller.toString());
 	}
 
 	public IUiCapableBlock findUiCapable(String name) {
@@ -161,7 +161,7 @@ public class Domotic implements IDomoticContext {
 	@Override
 	public void addStateChangedListener(IStateChangedListener updator) {
 		stateChangeListeners.add(updator);
-		log.info("Added new UI updator id=" + updator.getId());
+		log.info("Add new UI updator id=" + updator.getId());
 	}
 
 	@Override
@@ -219,7 +219,7 @@ public class Domotic implements IDomoticContext {
 				}
 			}
 			uiblocks.add(uiblock0);
-			log.debug("Added UiCapableBlock " + uiblock0.getUiInfo().getName());
+			log.debug("Add UiCapableBlock " + uiblock0.getUiInfo().getName());
 		}
 	}
 

@@ -1,5 +1,9 @@
 package eu.dlvm.domotics.controllers;
 
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +31,13 @@ import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 public class SunWindController extends Controller implements IEventListener, IUiCapableBlock {
 	private static final Logger logger = LoggerFactory.getLogger(SunWindController.class);
 
+	private double azimuthStart;
+	private double azimuthEnd;
+	private boolean withinAzimuth;
+	private boolean initialisedWithinAzimuth = false;
+
+	private Queue<EventType> unfinishdelayedEventsedEvents = new LinkedList<EventType>();
+
 	private enum LightState {
 		LowLight, HighLight
 	};
@@ -38,22 +49,81 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	};
 
 	private WindState windState = WindState.Safe;
-
 	private boolean enabled;
 
-	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
+	/**
+	 * @param name
+	 * @param description
+	 * @param azimuthStart
+	 *            degrees relative to south to start, positive is to east
+	 *            (counter clockwise)
+	 * @param azimuthEnd
+	 *            degrees relative to south to stop, negative is to west
+	 *            (clockwise)
+	 * @param ui
+	 * @param ctx
+	 */
+	public SunWindController(String name, String description, double azimuthStart, double azimuthEnd, String ui,
+			IDomoticContext ctx) {
 		super(name, description, ui, ctx);
+		if (azimuthStart < azimuthEnd)
+			throw new IllegalArgumentException(
+					"Azimuth start must be larger than azimuth end; goes from say +45 to -45.");
+		this.azimuthStart = azimuthStart;
+		this.azimuthEnd = azimuthEnd;
+		logger.info(
+				"Add Sun Wind Controller '" + getName() + "' azimuth is (" + azimuthStart + ".." + azimuthEnd + ").");
+	}
+
+	public SunWindController(String name, String description, String ui, IDomoticContext ctx) {
+		this(name, description, +180, -180, ui, ctx);
+		logger.info("Sun Wind Controller '" + getName() + "' got default azimuths.");
+	}
+
+	boolean withinAzimuthChanged(long time) {
+		boolean newWithin = SunWindController.withinAzimuth(time, azimuthStart, azimuthEnd, withinAzimuth);
+		boolean changed = (newWithin != withinAzimuth || !initialisedWithinAzimuth);
+		initialisedWithinAzimuth = true;
+		withinAzimuth = newWithin;
+		return changed;
+	}
+
+	public static boolean withinAzimuth(long time, double azimuthStart, double azimuthEnd, boolean currentWithinForLogging) {
+		boolean result = false;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(time);
+		int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minutes = calendar.get(Calendar.MINUTE);
+		double dHour = (double) hour + ((double) minutes / 60);
+
+		double height = SunHeightAzimuth.hoogtehoek(dayOfYear, dHour);
+		if (height > 0) {
+			double azimuth = SunHeightAzimuth.azimuth(180, 0);
+			// is between, say 45 and -45?
+			result = (azimuth <= azimuthStart && azimuth >= azimuthEnd);
+			if (result) {
+				result = true;
+				if (result != currentWithinForLogging)
+					logger.info(result ? "Azimuth is within range"
+							: "Azimuth left range" + " azimuth=" + azimuth + " height=" + height + " startAzimuth="
+									+ azimuthStart + " endAzimuth=" + azimuthEnd);
+			}
+		}
+		return result;
 	}
 
 	public void on() {
 		logger.info("Automatic mode for '" + getName() + "' is set.");
 		enabled = true;
-		if (lightState == LightState.HighLight && windState == WindState.Safe) {
-			notifyListeners(EventType.DOWN);
-			logger.info("Sun high, wind low, so screens Down after going to automatic mode.");
-		} else if (lightState == LightState.LowLight && windState == WindState.Safe) {
-			notifyListeners(EventType.UP);
-			logger.info("Sun low, so screens Up after going to automatic mode.");
+		if (withinAzimuth) {
+			if (lightState == LightState.HighLight && windState == WindState.Safe) {
+				logger.info("Sun high, wind low, so screens Down after going to automatic mode.");
+				notifyListeners(EventType.DOWN);
+			} else if (lightState == LightState.LowLight && windState == WindState.Safe) {
+				logger.info("Sun low, so screens Up after going to automatic mode.");
+				notifyListeners(EventType.UP);
+			}
 		}
 	}
 
@@ -91,30 +161,34 @@ public class SunWindController extends Controller implements IEventListener, IUi
 				break;
 			windState = WindState.Safe;
 			notifyListeners(event);
-			if (enabled && lightState == LightState.HighLight) {
-				notifyListeners(EventType.DOWN);
-				logger.info("Got wind is Safe event, Sun is High and I'm enabled, so screens can go Down.");
+			if (enabled && withinAzimuth && lightState == LightState.HighLight) {
+				unfinishdelayedEventsedEvents.add(EventType.DOWN);
+				/*
+				 * notifyListeners(EventType.DOWN);
+				 */
+				logger.info("Scheduled: Got wind is Safe event, Sun is High and I'm enabled, so screens can go Down.");
 			}
 			break;
 		case ALARM:
 			if (windState == WindState.Alarm)
 				break;
+			unfinishdelayedEventsedEvents.clear();
 			windState = WindState.Alarm;
-			notifyListeners(event);
 			logger.info("Got wind Alarm, so screens must go up.");
+			notifyListeners(event);
 			break;
 		case LIGHT_HIGH:
 			lightState = LightState.HighLight;
-			if (enabled && windState == WindState.Safe) {
-				notifyListeners(EventType.DOWN);
+			if (enabled && withinAzimuth && windState == WindState.Safe) {
 				logger.info("Got Sun High event, wind is Safe and I'm enabled, so screens go Down.");
+				notifyListeners(EventType.DOWN);
 			}
 			break;
 		case LIGHT_LOW:
 			lightState = LightState.LowLight;
 			if (enabled && windState == WindState.Safe) {
-				notifyListeners(EventType.UP);
 				logger.info("Got Sun Low event, wind is Safe and I'm enabled, so screens go Up.");
+				notifyListeners(EventType.UP);
 			}
 			break;
 		default:
@@ -125,7 +199,6 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	@Override
 	public UiInfo getUiInfo() {
 		UiInfoOnOff uiInfo = new UiInfoOnOff(this, null, isEnabled());
-		// bi.setStatus(isEnabled() ? "ON" : "OFF");
 		return uiInfo;
 	}
 
@@ -141,12 +214,25 @@ public class SunWindController extends Controller implements IEventListener, IUi
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		//double azimuth = SunHeightAzimuth.azimuth(180, 0);
+		if (withinAzimuthChanged(currentTime)) {
+			if (withinAzimuth && (lightState == LightState.HighLight) && (windState == WindState.Safe)) {
+				logger.info("Within azimuth range, light is High, wind is Safe and I'm enabled, so screens go Down.");
+				notifyListeners(EventType.DOWN);
+			} else if (!withinAzimuth && (windState == WindState.Safe)) {
+				logger.info("Outside azimuth range, wind is Safe and I'm enabled, so screens go Up.");
+				notifyListeners(EventType.UP);
+			}
+		} else if (!unfinishdelayedEventsedEvents.isEmpty()) {
+			EventType e = unfinishdelayedEventsedEvents.poll();
+			logger.info("Sending delayed event: "+e);
+			notifyListeners(e);
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "SunWindController [lightState=" + lightState + ", windState=" + windState + ", enabled=" + enabled
-				+ ", name=" + name + "]";
+		return "SunWindController [azimuthStart=" + azimuthStart + ", azimuthEnd=" + azimuthEnd + ", withinAzimuth="
+				+ withinAzimuth + ", lightState=" + lightState + ", windState=" + windState + ", enabled=" + enabled
+				+ "]";
 	}
 }
