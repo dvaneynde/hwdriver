@@ -114,6 +114,10 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 		return (int) (motorUpPeriodMs / 1000);
 	}
 
+	public long getMotorUpPeriodMs() {
+		return motorUpPeriodMs;
+	}
+
 	/**
 	 * Time in seconds a screen motor is working, i.e. time to completely open
 	 * or close a screen.
@@ -126,8 +130,12 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 	 * Time in seconds a screen motor is working, i.e. time to completely open
 	 * or close a screen.
 	 */
-	public long getMotorDnPeriod() {
+	public int getMotorDnPeriod() {
 		return (int) (motorDnPeriodMs / 1000);
+	}
+
+	public long getMotorDnPeriodMs() {
+		return motorDnPeriodMs;
 	}
 
 	/**

@@ -160,12 +160,9 @@ public class SunWindController extends Controller implements IEventListener, IUi
 			if (windState == WindState.Safe)
 				break;
 			windState = WindState.Safe;
-			notifyListeners(event);
+			unfinishdelayedEventsedEvents.add(EventType.SAFE);
 			if (enabled && withinAzimuth && lightState == LightState.HighLight) {
 				unfinishdelayedEventsedEvents.add(EventType.DOWN);
-				/*
-				 * notifyListeners(EventType.DOWN);
-				 */
 				logger.info("Scheduled: Got wind is Safe event, Sun is High and I'm enabled, so screens can go Down.");
 			}
 			break;

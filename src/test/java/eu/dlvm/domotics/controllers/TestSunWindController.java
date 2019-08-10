@@ -92,7 +92,7 @@ public class TestSunWindController {
 	}
 
 	@Test
-	public void testAlarmWindScnearios() {
+	public void testAlarmWindScenarios() {
 		IDomoticContext domoticContext = new DomoContextMock(null);
 		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
 		swc.registerListener(new DummyScreen());
