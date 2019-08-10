@@ -11,7 +11,7 @@ import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.iohardware.IHardwareIO;
 
-public class TestSunWindAndScreen {
+public class TestSunWindControllerWithRealScreen {
 
 	public class HardwareMock extends BaseHardwareMock implements IHardwareIO {
 		public boolean dnRelais;
@@ -52,6 +52,8 @@ public class TestSunWindAndScreen {
 		sr.loop(currentTime, 0L);
 	}
 
+	// TODO all tests from TestSunWindController !
+	
 	@Test
 	public void testScreensDownAfterWindSafeAndSunStillHigh() {
 

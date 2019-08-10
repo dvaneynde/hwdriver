@@ -43,7 +43,6 @@ public class TestWindSensor implements IEventListener {
 	private EventType lastEvent;
 	private int nrEvents;
 
-	// private long seq, cur;
 
 	@Override
 	public void onEvent(Block source, EventType event) {
@@ -130,15 +129,15 @@ public class TestWindSensor implements IEventListener {
 		check(WindSensor.States.SAFE, null, 0);
 
 		simulateWind(HIGH_FREQ_THRESHOLD + 1, 1000);
-		log.info("600? "+ ws.getFreqTimesHundred());
+		log.info("600? " + ws.getFreqTimesHundred());
 		check(States.ALARM, EventType.ALARM, 1);
 
 		simulateWind(HIGH_FREQ_THRESHOLD - 1, 1000);
-		log.info("600? "+ ws.getFreqTimesHundred());
+		log.info("600? " + ws.getFreqTimesHundred());
 		check(States.ALARM, EventType.ALARM, 2);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 2000);
-		log.info("600? "+ ws.getFreqTimesHundred());
+		log.info("600? " + ws.getFreqTimesHundred());
 		check(States.ALARM_BUT_LOW, EventType.ALARM, 4);
 
 		simulateWind(LOW_FREQ_THRESHOLD - 1, 27000);

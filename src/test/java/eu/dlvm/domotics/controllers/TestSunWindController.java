@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
@@ -29,11 +30,18 @@ public class TestSunWindController {
 		}
 	}
 
+	SunWindController swc;
+
+	@Before
+	public void init() {
+		IDomoticContext domoticContext = new DomoContextMock(null);
+		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
+		swc.registerListener(new DummyScreen());
+
+	}
+
 	@Test
 	public void testWindEventsGoThroughWhenDisabled() {
-		IDomoticContext domoticContext = new DomoContextMock(null);
-		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
-		swc.registerListener(new DummyScreen());
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 		swc.loop(middayLong, 0L);
@@ -55,9 +63,6 @@ public class TestSunWindController {
 
 	@Test
 	public void testSafeWindScenarios() {
-		IDomoticContext domoticContext = new DomoContextMock(null);
-		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
-		swc.registerListener(new DummyScreen());
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 		swc.loop(middayLong, 0L);
@@ -93,9 +98,6 @@ public class TestSunWindController {
 
 	@Test
 	public void testAlarmWindScenarios() {
-		IDomoticContext domoticContext = new DomoContextMock(null);
-		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
-		swc.registerListener(new DummyScreen());
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 		swc.loop(middayLong, 0L);
@@ -129,9 +131,6 @@ public class TestSunWindController {
 
 	@Test
 	public void testScreensDownAfterWindSafeAndSunStillHigh() {
-		IDomoticContext domoticContext = new DomoContextMock(null);
-		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
-		swc.registerListener(new DummyScreen());
 		swc.loop(middayLong, 0L);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
@@ -155,15 +154,13 @@ public class TestSunWindController {
 		swc.onEvent(null, EventType.SAFE);
 		swc.loop(middayLong, 0L);
 		Assert.assertEquals(EventType.SAFE, events.poll());
+		swc.loop(middayLong, 0L);
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 	}
 
 	@Test
 	public void testPeriodicWindEventsDoesNotMoveScreens() {
-		IDomoticContext domoticContext = new DomoContextMock(null);
-		SunWindController swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
-		swc.registerListener(new DummyScreen());
 		swc.loop(middayLong, 0L);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
