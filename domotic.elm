@@ -339,10 +339,10 @@ subscriptions model =
 
 
 levelByName : String -> Groups -> Float
-levelByName name statuses =
+levelByName name groups =
     let
         status =
-            statusByName name statuses
+            statusByName name groups
     in
         case status.extra of
             OnOffLevel _ level ->
@@ -356,8 +356,8 @@ levelByName name statuses =
 
 
 isOnByName : String -> Groups -> Bool
-isOnByName name statuses =
-    isOn (statusByName name statuses).extra
+isOnByName name groups =
+    isOn (statusByName name groups).extra
 
 
 isOn : ExtraStatus -> Bool
@@ -376,11 +376,11 @@ isOn extraStatus =
             False
 
 
-screenStatus : String -> Model -> String
-screenStatus name model =
+screenStatus : String -> Groups -> String
+screenStatus name groups =
     let
         status =
-            (statusByName name model.groups).status
+            (statusByName name groups).status
     in
         (toString status)
 
@@ -458,7 +458,7 @@ screenDiv ( name, desc ) model nr =
     div []
         [ Button.render Mdl [ nr ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Down name) ] [ Icon.i "arrow_downward" ]
         , Button.render Mdl [ nr + 1 ] model.mdl [ Button.minifab, Button.ripple, Options.onClick (Up name) ] [ Icon.i "arrow_upward" ]
-        , text (screenStatus name model)
+        , text (screenStatus name model.groups)
         , text (" | " ++ desc)
         ]
 
