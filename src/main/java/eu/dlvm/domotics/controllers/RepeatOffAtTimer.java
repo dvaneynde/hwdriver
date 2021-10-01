@@ -37,10 +37,10 @@ public class RepeatOffAtTimer extends Timer {
 	public void loop(long currentTime, long sequence) {
 		long currentTimeInDay = timeInDayMillis(currentTime);
 		// boolean state2 = state;
-		if (onTime <= offTime) {
-			state = (currentTimeInDay > onTime && currentTimeInDay < offTime);
+		if (onTimeMs <= offTimeMs) {
+			state = (currentTimeInDay > onTimeMs && currentTimeInDay < offTimeMs);
 		} else {
-			state = !(currentTimeInDay > offTime && currentTimeInDay < onTime);
+			state = !(currentTimeInDay > offTimeMs && currentTimeInDay < onTimeMs);
 		}
 		if (state) {
 			if (currentTime - timeLastOffSent >= intervalSec * 1000) {
