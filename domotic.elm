@@ -18,6 +18,7 @@ import Material.Toggles as Toggles
 import Material.Slider as Slider
 import Material.Menu as Menu
 
+
 ----------------------------------------------------------
 -- Domotics user interface
 ----------------------------------------------------------
@@ -34,8 +35,8 @@ import Material.Menu as Menu
 -}
 fixHost : Maybe String
 fixHost =
-    --Just "192.168.0.10:8080"
-    Just "127.0.0.1:8080"
+    Just "192.168.0.10:8080"
+    --Just "127.0.0.1:8080"
     --Nothing
 
 {-
@@ -136,12 +137,13 @@ statusByName name groups =
 
 type Msg
     = PutModelInTestAsString
+    | Mdl (Material.Msg Msg)
     | Clicked String
     | ClickedEco String
     | Checked String Bool
     | Down String
     | Up String
-    | SliderMsg String String
+    | SliderMsg String Float
     | ToggleShowBlock String
     | NewStatusViaWs String
     | NewStatusViaRest (Result Http.Error (List StatusRecord))
@@ -155,6 +157,9 @@ update msg model =
 --            ( { model | test = (toString { model | test = "" }.groups) }, Cmd.none )
 --            ( { model | test = (toString (Dict.get "Beneden" { model | test = "" }.groups)) }, Cmd.none )
             ( { model | test = (toString { model | test = "" }) }, Cmd.none )
+
+        Mdl message_ ->
+            Material.update Mdl message_ model
 
         Clicked what ->
             ( model
@@ -330,6 +335,7 @@ subscriptions model =
 ----------------------------------------------------------
 -- VIEW
 -- https://design.google.com/icons/ - klik op icon, en dan onderaan klik op "< > Icon Font"
+-- https://debois.github.io/elm-mdl/
 
 
 levelByName : String -> Groups -> Float
@@ -352,11 +358,6 @@ levelByName name groups =
 isOnByName : String -> Groups -> Bool
 isOnByName name groups =
     isOn (statusByName name groups).extra
-
-
-isOffByName : String -> List StatusRecord -> Bool
-isOffByName name statuses =
-    not (isOnByName name statuses)
 
 
 isOn : ExtraStatus -> Bool
@@ -386,6 +387,8 @@ screenStatus name groups =
 
 
 -- toggleDiv ( "LichtInkom", "Inkom" ) 1 model
+
+
 toggleDiv : ( String, String ) -> Int -> Model -> Html Msg
 toggleDiv ( name, desc ) nr model =
     let
