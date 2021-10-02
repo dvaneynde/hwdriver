@@ -2,7 +2,7 @@
 
 ## Installatie
 
-1. In domotic.elm, zet urlBase naar ip domotica3 host
+1. In domotic.elm, zet urlBase naar ip van domotica host
 1. Voer volgende commandos uit:
 
 ```bash
