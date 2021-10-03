@@ -98,25 +98,25 @@
 	</lamp>
 
 	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" desc="Tomas Wand" ui="Kinderen:0">
+	<lamp name="LichtTomasWand" desc="Dries Wand" ui="Kinderen:0">
 		<toggle src="SchakLichtTomasWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Tomas Spots" ui="Kinderen:1"><!-- TODO nakijken of klopt met relais -->
+	<lamp name="LichtTomasSpots" desc="Dries Spots" ui="Kinderen:1"><!-- TODO nakijken of klopt met relais -->
 		<toggle src="SchakLichtTomasSpots" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" desc="Dries Wand" ui="Kinderen:0">
+	<lamp name="LichtDriesWand" desc="Tomas Wand" ui="Kinderen:0">
 		<toggle src="SchakLichtDriesWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Dries Spots" ui="Kinderen:1">
+	<lamp name="LichtDries" desc="Tomas Spots" ui="Kinderen:1">
 		<toggle src="SchakLichtDries" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
@@ -144,21 +144,21 @@
 
 	<switch name="SchakScreenTomasUp" />
 	<switch name="SchakScreenTomasDown" />
-	<screen name="ScreenTomas" desc="Tomas" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:4">
+	<screen name="ScreenTomas" desc="Dries" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:4">
 		<upDown srcDown="SchakScreenTomasDown" srcUp="SchakScreenTomasUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
 	<switch name="SchakScreenDriesTuinUp" />
 	<switch name="SchakScreenDriesTuinDown" />
-	<screen name="ScreenDriesTuin" desc="Dries (Tuin)" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:5">
+	<screen name="ScreenDriesTuin" desc="Tomas (Tuin)" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:5">
 		<upDown srcDown="SchakScreenDriesTuinDown" srcUp="SchakScreenDriesTuinUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
 	<switch name="SchakScreenDriesOpzijUp" />
 	<switch name="SchakScreenDriesOpzijDown" />
-	<screen name="ScreenDriesOpzij" desc="Dries (Zijkant)" motor-up-time="30" motor-dn-time="30" ui="ScreensW:1">
+	<screen name="ScreenDriesOpzij" desc="Tomas (Zijkant)" motor-up-time="30" motor-dn-time="30" ui="ScreensW:1">
 		<upDown srcDown="SchakScreenDriesOpzijDown" srcUp="SchakScreenDriesOpzijUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
@@ -218,31 +218,40 @@
 		<screen name="ScreenRoos" />
 	</sunWindController>
 
+	<!-- Ter vervanging van schemer sensor -->
+	<timerDayNight name="TimerNacht">
+		<on hour="18" minute="0" />
+		<off hour="6" minute="0" />
+	</timerDayNight>
+
 	<!-- Terras en stopcontacten buiten -->
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
 		<toggle src="SchakBuitenTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
+
+	<!-- Uit doen, aan is niet belangrijk. -->
+	<!--
 	<timer name="TimerTerras">
-		<!-- Uit doen, aan is niet belangrijk. -->
 		<on hour="23" minute="00" />
 		<off hour="23" minute="30" />
 	</timer>
+	-->
+
 	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
-		<!-- <off src="SchakLichtInkom" event="LongClick" /> -->
+		<!--
 		<off src="TimerTerras" event="off" />
 		<off src="LichtmeterSchemering" event="LightHigh" />
 		<on src="LichtmeterSchemering" event="LightLow" />
+		-->
+		<on src="TimerNacht" event="on" />
+		<off src="TimerNacht" event="off" />
 	</lamp>
 
 	<!-- Lampen overhang -->
-	<timerDayNight name="TimerNacht">
-		<on hour="20" minute="30" />
-		<off hour="6" minute="0" />
-	</timerDayNight>
 	<lamp name="LichtNacht" desc="Nachtlichten">
 		<on src="TimerNacht" event="on" />
 		<off src="TimerNacht" event="off" />
