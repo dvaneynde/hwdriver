@@ -87,7 +87,6 @@ ln -s $NEWDIR/domotic*.jar domotic.jar
 ln -s $NEWDIR/hwdriver hwdriver
 ln -s $NEWDIR/DiamondBoardsConfig.xml DiamondBoardsConfig.xml
 ln -s $NEWDIR/DomoticConfig.xml DomoticConfig.xml
-#ln -s $NEWDIR/log4j.properties log4j.properties
 END
 
 popd
