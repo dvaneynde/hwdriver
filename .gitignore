@@ -1,0 +1,9 @@
+target/
+/domotic.pid
+/jersey.log.lck
+/target
+/logs/
+*.log
+/DomoticOutputStates.txt
+/driver.pid
+/doc/
