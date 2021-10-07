@@ -52,13 +52,13 @@ The protocols are as follows:
 | tcp | TCP based interaction protocol between domotic and hwdriver. Protocol is self designed, but simple. |
 
 The corresponding files are:
-|element | description |
-|---|---|
-| domotic | TODO.jar |
+|element | filename | 
+|---|---| 
+| domotic | domotica-1.0-jar-with-dependencies.jar (ignore the 1.0) | 
 | DomoticConfig | DomoticConfig.xml |
 | DiamondBoardsConfig | DiamondBoardsConfig.xml |
-| ui | TODO |
-| hwdriver | TODO |
+| ui | domotic.js, index.html |
+| hwdriver | hwdriver |
 
 Not described here are the Linux service definition and health check. See [deployment](./deployment/README.md) subfolder for more information.
 

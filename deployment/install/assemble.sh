@@ -15,7 +15,6 @@ rm -f work/*mock*
 cp template/* work/
 cp ../../domotic/DomoticConfig* work/
 cp ../../domotic/DiamondBoardsConfig* work/
-cp ../../domotic/log4j.properties work/
 cp ../../domotic/target/domotic*dependencies.jar work/
 
 echo tar into ./domotic.tar
