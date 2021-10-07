@@ -21,7 +21,7 @@ DOMHOST=$1
 set -e
 if [ $(basename $(pwd)) != "install" ]
 then 
-	echo "You must be in domotic-env/install directory to execute this script."
+	echo "You must be in .../deployment/install directory to execute this script."
 	exit 2
 fi
 pushd .

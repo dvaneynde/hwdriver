@@ -9,7 +9,7 @@ rmdir work
 mkdir work
 
 echo copying files into work...
-cp ../../HwDriver/src/*.[ch] ./work/
+cp ../../hwdriver/src/*.[ch] ./work/
 rm -f work/target.h
 rm -f work/*mock*
 cp template/* work/

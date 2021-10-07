@@ -1,8 +1,0 @@
-INSTALL
-In "install" directory, voer "install.sh <hostname-or-ip>" uit.
-
-HERSTART
-Log in op domotica systeem.
-Controleer links.
-Herstart, via:
-	sudo /etc/init.d/domotic.sh restart
