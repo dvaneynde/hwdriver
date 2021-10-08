@@ -148,14 +148,18 @@ public class Main {
 	}
 
 	private static void usage() {
-		System.out.println("Usage:\t" + Main.class.getSimpleName()
-				+ " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file\n"
-				+ "\t" + Main.class.getSimpleName() + " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file\n"
-				+ "\t-s simulate hardware driver (domotic only, for testing and development)\n"
-				+ "\t-d path to driver, if it needs to be started and managed by this program\n" + "\t-t time between loops, in ms; defaults to "
-				+ DEFAULT_LOOP_TIME_MS + " ms.\n" + "\t-h hostname of hardware driver; incompatible with -d"
-				+ "\n\t-p port of hardware driver; incompatible with -d" + "\t-w path of directory with webapp (where index.html is located)"
-				+ "\n\t-b domotic blocks xml configuration file\n" + "\t-c hardware xml configuration file"
+		System.out.println("Usage:\ttwo options:\n\t"
+                + Main.class.getSimpleName() + " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file\n\t"
+				+ Main.class.getSimpleName() + " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file"
+                + "\n\twhere:"
+				+ "\n\t-s simulate hardware driver (domotic only, for testing and development)"
+				+ "\n\t-d path to driver, if it needs to be started and managed by this program"
+                + "\n\t-t time between loops, in ms; defaults to "+ DEFAULT_LOOP_TIME_MS + " ms."
+                + "\n\t-h hostname of hardware driver; incompatible with -d"
+				+ "\n\t-p port of hardware driver; incompatible with -d"
+                + "\n\t-w path of directory with webapp (where index.html is located)"
+				+ "\n\t-b domotic blocks xml configuration file"
+                + "\n\t-c hardware xml configuration file"
 				+ "\nTo configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.\n");
 		System.exit(2);
 	}

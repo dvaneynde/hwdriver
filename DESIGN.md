@@ -1,5 +1,29 @@
 # Design
 
+## Architectural Drivers
+
+This lists these home automation requirements that drive the design.
+
+1. Layout Configurability: Easy to configure when sensors or actuators are added, removed or changed. For example, assigning a switch to another lamp, changing name of a lamp, change the sun sensitivity for automatic screens, change when lights outside go on and off automatically.
+2. UI Configurability: A UI that is generated from the configuration. So no coding work whenever the configuration (see 1) changes.
+3. Reliable: Since I'm sometimes traveling and my wife or children lack knowledge on the system, it must have no bugs.
+4. Safe: hardware like screenmotors must never get signals that make them break.
+5. Available: 99,99% uptime over 1 week, so 1.01 minutes a week. 
+6. HW Change: other hardware could be chosen than the current one, and that should have no or very little (max. 1 man-week work) impact.
+7. A test-bed for new software technologies and a showcase. So some degree of over-engineering is allowed ;-)
+
+So how are these realised?
+
+| Driver | Evaluation |
+| --- | --- |
+| Layout Configurability | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
+| UI Configurability | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
+| Reliable | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
+| Safe | Only Actuators can change outputs (TODO split IHardwareIO?), so the issues is localized in specific code. Further these Actuators in their `loop()` must implement a safeguard that an output does not change too often, e.g. max 1 time per second.|
+| Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected. Also automated tests contribute here.  |
+| HW Change | See Layering View. |
+
+
 ## Deployment View
 
 ```plantuml

@@ -12,7 +12,8 @@ Usage:	Main domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port
 	-d path to driver, if it needs to be started and managed by this program
 	-t time between loops, in ms; defaults to 20 ms.
 	-h hostname of hardware driver; incompatible with -d
-	-p port of hardware driver; incompatible with -d	-w path of directory with webapp (where index.html is located)
+	-p port of hardware driver; incompatible with -d	
+    -w path of directory with webapp (where index.html is located)
 	-b domotic blocks xml configuration file
 	-c hardware xml configuration file
 To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.
