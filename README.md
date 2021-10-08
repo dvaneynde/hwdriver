@@ -3,7 +3,7 @@
 ## Contact & Licensing
 - Author: Dirk Vaneynde
 - Contact: dirk@dlvmechanografie.eu
-- License: TODO
+- License: [MIT License](./LICENSE.txt)
 
 ## Overview
 

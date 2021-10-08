@@ -12,17 +12,10 @@ This lists these home automation requirements that drive the design.
 6. HW Change: other hardware could be chosen than the current one, and that should have no or very little (max. 1 man-week work) impact.
 7. A test-bed for new software technologies and a showcase. So some degree of over-engineering is allowed ;-)
 
-So how are these realised?
+The next chapters describe different views of the archictectural design that explain the structure of the system.
+The final chapter will use these views to explain how the above architectural requirements (drivers) are realized.
 
-| Driver | Evaluation |
-| --- | --- |
-| Layout Configurability | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
-| UI Configurability | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
-| Reliable | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
-| Safe | Only Actuators can change outputs (TODO split IHardwareIO?), so the issues is localized in specific code. Further these Actuators in their `loop()` must implement a safeguard that an output does not change too often, e.g. max 1 time per second.|
-| Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected. Also automated tests contribute here.  |
-| HW Change | See Layering View. |
-
+-----------
 
 ## Deployment View
 
@@ -232,3 +225,19 @@ eu.dlvm.iohardware -> hwdriver : TCP
 
 
 ```
+
+-----------
+
+## Architectural Evaluation
+
+So how does this design realizes the architectural requirements listed in the beginning of this document?
+
+| Driver | Evaluation |
+| --- | --- |
+| Layout Configurability | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
+| UI Configurability | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
+| Reliable | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
+| Safe | Only Actuators can change outputs so the issues is localized in specific code, improving safety by not scattering this functionality around. Further state changes are localized in Actuator's `loop()` and outputs must only change as a consequence of a state change, further localizing this functionality. Lastly in the Actuator's `loop()` a safeguard must be implemented ensuring that an output does not change too often, e.g. max 1 time per second.|
+| Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected (not yet described in any view). Also automated tests contribute here.  |
+| HW Change | See Layering View. |
+
