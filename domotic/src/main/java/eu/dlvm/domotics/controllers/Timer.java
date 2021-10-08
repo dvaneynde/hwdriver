@@ -7,15 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.events.EventType;
 
 /**
- * Has two per-day times, at {@link #setOnTime(int, int)} an on signal is sent,
- * at {@link #setOffTime(int, int)} an off signal is sent.
- * <p>
- * Targets {@link IOnOffToggleCapable} listeners.
- * 
+ * Has two per-day times, at {@link #setOnTime(int, int)} an ON event is sent,
+ * at {@link #setOffTime(int, int)} an OFF event is sent.
+ *
  * @author dirk
  */
 public class Timer extends Controller {
@@ -74,7 +72,7 @@ public class Timer extends Controller {
 	}
 
 	// timer usage interface
-	public Timer(String name, String description, IDomoticContext ctx) {
+	public Timer(String name, String description, IDomoticBuilder ctx) {
 		super(name, description, null, ctx);
 		state = false;
 		onTimeMs = offTimeMs = 0;

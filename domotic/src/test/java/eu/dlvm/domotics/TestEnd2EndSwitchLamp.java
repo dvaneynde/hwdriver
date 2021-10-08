@@ -74,9 +74,9 @@ public class TestEnd2EndSwitchLamp {
 		// Domotic
 		dom = Domotic.createSingleton(hw);
 		s = new Switch(IO.S_KEUKENLICHT.name(), IO.S_KEUKENLICHT.desc(),
-				IO.S_KEUKENLICHT.ch(), dom);
+				IO.S_KEUKENLICHT.ch(), hw, dom);
 		o = new Lamp(IO.L_KEUKEN.name(), IO.L_KEUKEN.desc(), false, IO.L_KEUKEN.ch(),
-				dom);
+                hw, dom);
 		s.registerListener(new Connector(EventType.SINGLE_CLICK, o, EventType.TOGGLE,"switch"));
 	}
 

@@ -28,7 +28,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.service.RestService;
 import eu.dlvm.domotics.service.UiStateUpdatorSocket;
 
@@ -49,9 +49,9 @@ public class ServiceServer {
 	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
-		private IDomoticContext domoContext;
+		private IDomoticBuilder domoContext;
 		
-		public UiSocketCreator(IDomoticContext domoContext) {
+		public UiSocketCreator(IDomoticBuilder domoContext) {
 			this.domoContext = domoContext;
 		}
 
@@ -64,7 +64,7 @@ public class ServiceServer {
 		}
 	}
 
-	public void start(IDomoticContext domoContext) {
+	public void start(IDomoticBuilder domoContext) {
 		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8080);

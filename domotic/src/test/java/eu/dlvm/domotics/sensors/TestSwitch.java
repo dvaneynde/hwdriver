@@ -8,7 +8,6 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
@@ -24,7 +23,7 @@ public class TestSwitch {
 	};
 
 	private Hardware hw = new Hardware();
-	private DomoContextMock ctx = new DomoContextMock(hw);
+	private DomoContextMock builder = new DomoContextMock(hw);
 	private long seq, cur;
 	private Switch sw;
 	private EventType lastClick;
@@ -52,7 +51,7 @@ public class TestSwitch {
 
 	@Before
 	public void init() {
-		sw = new Switch("TestSwitch", "Unit Test Switch", Integer.toString(0), ctx);
+		sw = new Switch("TestSwitch", "Unit Test Switch", Integer.toString(0), hw, builder);
 		sw.registerListener(listener);
 		cur = (seq = 0L);
 	}

@@ -72,10 +72,10 @@ public class TestSwitchOrTimer2Lamp {
 
 		dom = Domotic.createSingleton(hw);
 
-		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), dom);
-		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), dom);
-		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), dom);
-		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), dom);
+		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, dom);
+		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, dom);
+		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw,  dom);
+		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), hw, dom);
 
 		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		//		sct1.registerListener(o1);

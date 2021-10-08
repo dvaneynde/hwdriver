@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
 import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
 
@@ -40,7 +40,7 @@ public class TimerDayNight extends Timer {
 	private OpenWeatherMap openWeatherMap;
 	private Future<Info> asyncCheckWeather;
 
-	public TimerDayNight(String name, String description, IDomoticContext ctx) {
+	public TimerDayNight(String name, String description, IDomoticBuilder ctx) {
 		super(name, description, ctx);
 		setOpenWeatherMap(new OpenWeatherMap());
 	}

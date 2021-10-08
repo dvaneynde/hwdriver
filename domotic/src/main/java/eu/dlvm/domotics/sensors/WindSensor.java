@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.sensors;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -49,22 +50,20 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 * @param name
 	 * @param description
 	 * @param channel
-	 * @param ctx
+	 * @param builder
 	 * @param highFreqThreshold
 	 * @param lowFreqThreshold
-	 * @param highTimeBeforeAlert
-	 *            Unit is seconds.
 	 * @param lowTimeToResetAlert
 	 *            Unit is seconds.
 	 */
-	public WindSensor(String name, String description, String channel, IDomoticContext ctx, int highFreqThreshold,
-			int lowFreqThreshold, int lowTimeToResetAlert) {
-		this(name, description, null, channel, ctx, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
+	public WindSensor(String name, String description, String channel, IHardwareReader reader, IDomoticBuilder builder, int highFreqThreshold,
+                      int lowFreqThreshold, int lowTimeToResetAlert) {
+		this(name, description, null, channel, reader, builder, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
 	}
 
-	public WindSensor(String name, String description, String ui, String channel, IDomoticContext ctx,
-			int highFreqThreshold, int lowFreqThreshold, int lowTimeToResetAlert) {
-		super(name, description, ui, channel, ctx);
+	public WindSensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticBuilder builder,
+                      int highFreqThreshold, int lowFreqThreshold, int lowTimeToResetAlert) {
+		super(name, description, ui, channel, reader, builder);
 		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far'
 													// below 1/(2 xlooptime)
 			throw new RuntimeException("Configuration error: highSpeedThreshold must be lower than lowSpeedThreshold.");
@@ -140,7 +139,7 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInput = getHw().readDigitalInput(getChannel());
+		boolean newInput = getHwReader().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		freq = gauge.getMeasurement();
 

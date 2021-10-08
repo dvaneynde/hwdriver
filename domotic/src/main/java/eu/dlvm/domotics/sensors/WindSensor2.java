@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.sensors;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -14,7 +15,7 @@ import eu.dlvm.domotics.service.uidata.UiInfoLevel;
  * As soon as wind speed (actually rotations per second of a gauge) is above
  * {@link #getFreqThreshold()} the state becomes {@link States#ALARM}. If then
  * it stays for at least {@link #getWaittimeToResetAlarmMs()} seconds below
- * {@link #getLowFreqThreshold()} - during which the state is
+ * {@link #getFreqThreshold()} - during which the state is
  * {@link States#WAIT2SAFE} - state goes back to {@link States#SAFE}.
  * <p>
  * The current state is sent every {@link #DEFAULT_REPEAT_EVENT_MS} ms. resent -
@@ -46,22 +47,19 @@ public class WindSensor2 extends Sensor implements IUiCapableBlock {
 	 * @param name
 	 * @param description
 	 * @param channel
-	 * @param ctx
+	 * @param builder
 	 * @param freqThreshold
-	 * @param lowFreqThreshold
-	 * @param highTimeBeforeAlert
-	 *            Unit is seconds.
-	 * @param waitimeToResetAlarm
+	 * @param waitTimeToResetAlarm
 	 *            Unit is seconds.
 	 */
-	public WindSensor2(String name, String description, String channel, IDomoticContext ctx, int freqThreshold,
-			int waitimeToResetAlarm, int waittimeToRaiseAlarm) {
-		this(name, description, null, channel, ctx, freqThreshold, waitimeToResetAlarm, waittimeToRaiseAlarm);
+	public WindSensor2(String name, String description, String channel, IHardwareReader reader, IDomoticBuilder builder, int freqThreshold,
+                       int waitTimeToResetAlarm, int waitTimeToRaiseAlarm) {
+		this(name, description, null, channel, reader, builder, freqThreshold, waitTimeToResetAlarm, waitTimeToRaiseAlarm);
 	}
 
-	public WindSensor2(String name, String description, String ui, String channel, IDomoticContext ctx,
+	public WindSensor2(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticBuilder builder,
 			int freqThreshold, int waittimeToResetAlarm, int waittimeToRaiseAlarm) {
-		super(name, description, ui, channel, ctx);
+		super(name, description, ui,  channel, reader, builder);
 		this.freqThreshold = freqThreshold;
 		this.waittimeToResetAlarmMs = waittimeToResetAlarm * 1000L;
 
@@ -132,7 +130,7 @@ public class WindSensor2 extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInput = getHw().readDigitalInput(getChannel());
+		boolean newInput = getHwReader().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		freq = gauge.getMeasurement();
 

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.events.EventType;
@@ -66,7 +66,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 		INACTIF, WAITING_TRIGGER, ACTIF, WAITING_END
 	}
 
-	private GadgetController(String name, boolean activateOnStartTme, boolean repeat, IDomoticContext ctx) {
+	private GadgetController(String name, boolean activateOnStartTme, boolean repeat, IDomoticBuilder ctx) {
 		super(name, name, null, ctx);
 		this.activateOnStartTime = activateOnStartTme;
 		this.repeat = repeat;
@@ -88,11 +88,9 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	 * @param repeat
 	 *            whether to repeat changesets indefinitely (until end time that
 	 *            is)
-	 * @param daily
-	 *            true if executes every day, or at absolute time
 	 * @param ctx
 	 */
-	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IDomoticContext ctx) {
+	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IDomoticBuilder ctx) {
 		this(name, activateOnStartTme, repeat, ctx);
 		this.startTimeMs = startTimeMs;
 		this.durationMs = durationMs;
@@ -109,7 +107,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	 * @param offTime
 	 * @param ctx
 	 */
-	public GadgetController(String name, boolean activateOnStartTme, boolean repeat, int onTime, int offTime, IDomoticContext ctx) {
+	public GadgetController(String name, boolean activateOnStartTme, boolean repeat, int onTime, int offTime, IDomoticBuilder ctx) {
 		this(name, activateOnStartTme, repeat, ctx);
 		this.onTime = onTime;
 		this.offTime = offTime;
@@ -317,9 +315,9 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 		private long startTimeMs, durationMs = -1L;
 		private int onTime, offTime = -1;
 		private boolean activateOnStartTime, repeat, daily;
-		private IDomoticContext ctx;
+		private IDomoticBuilder ctx;
 
-		public Builder(final String name, final boolean daily, final IDomoticContext ctx) {
+		public Builder(final String name, final boolean daily, final IDomoticBuilder ctx) {
 			this.name = name;
 			this.daily = daily;
 			this.ctx = ctx;

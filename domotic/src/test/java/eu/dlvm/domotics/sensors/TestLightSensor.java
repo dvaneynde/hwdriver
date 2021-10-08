@@ -7,12 +7,11 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.iohardware.IHardwareIO;
 
 public class TestLightSensor implements IEventListener {
@@ -30,7 +29,7 @@ public class TestLightSensor implements IEventListener {
 	private static final long SAMPLE_TIME = 500;
 	private static final String LIGHTSENSOR_CH = Integer.toString(10);
 	private Hardware hw = new Hardware();
-	private IDomoticContext ctx = new DomoContextMock(hw);
+	private IDomoticBuilder builder = new DomoContextMock(hw);
 	private LightSensor ls;
 	private EventType lastEvent;
 	private int nrEvents;
@@ -61,7 +60,7 @@ public class TestLightSensor implements IEventListener {
 	@Test
 	public final void testInitWrong() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, -1000, 500, 500);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, -1000, 500, 500);
 			fail("Should fail");
 		} catch (ConfigurationException e) {
 			;
@@ -70,7 +69,7 @@ public class TestLightSensor implements IEventListener {
 
 	@Test
 	public final void initLow() {
-		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 2, 3);
+		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 		ls.registerListener(this);
 		seq = 0L;
 		cur = -SAMPLE_TIME;
@@ -84,7 +83,7 @@ public class TestLightSensor implements IEventListener {
 
 	@Test
 	public final void initHigh() {
-		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 2, 3);
+		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 		ls.registerListener(this);
 		seq = 0L;
 		cur = -SAMPLE_TIME;
@@ -99,7 +98,7 @@ public class TestLightSensor implements IEventListener {
 	@Test
 	public final void testLowHighLow() {
 		try {
-			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, ctx, 1000, 2, 3);
+			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 			ls.registerListener(this);
 
 			seq = 0L;

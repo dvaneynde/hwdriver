@@ -5,7 +5,7 @@ import java.util.Map;
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.gadgets.Blink;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
@@ -26,7 +26,7 @@ import eu.dlvm.domotics.controllers.gadgets.Sinus;
  */
 public class NewYearBuilder {
 
-	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticContext ctx) {
+	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IDomoticBuilder ctx) {
 
 		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, ctx);
 

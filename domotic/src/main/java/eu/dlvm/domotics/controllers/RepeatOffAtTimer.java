@@ -3,11 +3,11 @@ package eu.dlvm.domotics.controllers;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.events.EventType;
 
 /**
- * Sends {@link EventType.OFF} every {@link #intervalSec} seconds.
+ * Sends {@link EventType#OFF} every {@link #intervalSec} seconds.
  * 
  * @author dirk
  *
@@ -18,7 +18,7 @@ public class RepeatOffAtTimer extends Timer {
 	private long timeLastOffSent;
 
 	// public user api
-	public RepeatOffAtTimer(String name, String description, IDomoticContext ctx, int intervalSec) {
+	public RepeatOffAtTimer(String name, String description, IDomoticBuilder ctx, int intervalSec) {
 		super(name, description, ctx);
 		timeLastOffSent = 0;
 		setIntervalSec(intervalSec);

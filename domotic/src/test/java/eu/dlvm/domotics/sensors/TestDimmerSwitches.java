@@ -4,12 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
@@ -24,7 +23,7 @@ public class TestDimmerSwitches {
 	};
 
 	private Hardware hw = new Hardware();
-	private IDomoticContext ctx = new DomoContextMock(hw);
+	private IDomoticBuilder builder = new DomoContextMock(hw);
 	private long seq, cur;
 	private DimmerSwitch ds;
 	private EventType lastEvent;
@@ -44,7 +43,7 @@ public class TestDimmerSwitches {
 	@Before
 	public void init() {
 		ds = new DimmerSwitch("TestDimmerSwitches", "Unit Test DimmerSwitches", Integer.toString(0),
-				Integer.toString(1), ctx);
+				Integer.toString(1), hw, builder);
 		lastEvent = null;
 		ds.registerListener(dsListener);
 		seq = (cur = 0L);

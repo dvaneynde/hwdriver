@@ -87,12 +87,12 @@ public class TestSwitchBoardScreens {
 		hw.out(REL_UP_2, false);
 
 		dom = Domotic.createSingleton(hw);
-		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", Integer.toString(SW_DN_1), dom);
-		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen", Integer.toString(SW_UP_1), dom);
-		sr1 = new Screen("Screen1", "Screen Kitchen", null, Integer.toString(REL_DN_1), Integer.toString(REL_UP_1), dom);
-		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", Integer.toString(SW_DN_2), dom);
-		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", Integer.toString(SW_UP_2), dom);
-		sr2 = new Screen("Screen2", "Screen Bathroom", null, Integer.toString(REL_DN_2), Integer.toString(REL_UP_2), dom);
+		swDn1 = new Switch("Down1", "Down-Switch Screen Kitchen", Integer.toString(SW_DN_1), hw, dom);
+		swUp1 = new Switch("Up1", "Up-Switch Screen Kitchen", Integer.toString(SW_UP_1), hw, dom);
+		sr1 = new Screen("Screen1", "Screen Kitchen", null, Integer.toString(REL_DN_1), Integer.toString(REL_UP_1), hw, dom);
+		swDn2 = new Switch("Down2", "Down-Switch Screen Bathroom", Integer.toString(SW_DN_2), hw, dom);
+		swUp2 = new Switch("Up2", "Up-Switch Screen Bathroom", Integer.toString(SW_UP_2), hw, dom);
+		sr2 = new Screen("Screen2", "Screen Bathroom", null, Integer.toString(REL_DN_2), Integer.toString(REL_UP_2), hw, dom);
 
 		//		s2s1 = new Switch2Screen("s2s1", "s2s1", null, swDn1, swUp1, ISwitchListener.ClickType.SINGLE);
 		//		s2s1.registerListener(sr1);

@@ -28,20 +28,20 @@ import eu.dlvm.iohardware.IHardwareIO;
  * construct the domotic system</li>
  * <li>{@link #initialize(Map)} should then be called to do some one-time
  * initialization</li>
- * <li>{@link #runDomotic(int, String, boolean)} will then start the system by
+ * <li>{@link #runDomotic(int, String, File)} will then start the system by
  * calling {@link #loopOnce(long)} regularly, and monitor everything</li>
  * </ol>
  * <p>
  * {@link #requestStop()} will halt domotic system.
  * <p>
- * {@link #loopOnce()} is the key method that drives every input to an output.
+ * {@link #loopOnce(long)} is the key method that drives every input to an output.
  * 
  * @author dirk vaneynde
  * 
  *         TODO veel te veel methodes, opsplitsen - maar hoe? TODO monitoring en
  *         restart werkte niet, weggooien?
  */
-public class Domotic implements IDomoticContext {
+public class Domotic implements IDomoticBuilder {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
 
@@ -88,13 +88,12 @@ public class Domotic implements IDomoticContext {
 		this.hw = hw;
 	}
 
-	@Override
 	public IHardwareIO getHw() {
 		return hw;
 	}
 
 	/**
-	 * Add Sensor to loop set (see {@link #loopOnce()}.
+	 * Add Sensor to loop set (see {@link #loopOnce(long)}.
 	 * 
 	 * @param sensor
 	 *            Added, if not already present. Each Sensor can be present no
@@ -115,9 +114,9 @@ public class Domotic implements IDomoticContext {
 		}
 	*/
 	/**
-	 * Add Actuator to loop set (see {@link #loopOnce()}.
+	 * Add Actuator to loop set (see {@link #loopOnce(long)}.
 	 * 
-	 * @param s
+	 * @param actuator
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
@@ -176,7 +175,7 @@ public class Domotic implements IDomoticContext {
 	 * Specifically, hardware outputs are set correctly, and UI blocks are
 	 * gathered from allready registered blocks.
 	 * <p>
-	 * Must be called before {@link #loopOnce(long)} or {@link #stop}.
+	 * Must be called before {@link #loopOnce(long)} or {@link IHardwareIO#stop()}.
 	 * 
 	 * @param prevOuts
 	 *            Map of actuator names and previous outputs. If not used must
@@ -349,10 +348,10 @@ public class Domotic implements IDomoticContext {
 	 * <ol>
 	 * <li>{@link IHardwareIO#refreshInputs()} is called, so that hardware layer
 	 * inputs are refreshed.</li>
-	 * <li>All registered Sensors have their {@link Sensor#loop()} run to read
+	 * <li>All registered Sensors have their {@link Sensor#loop(long, long)} run to read
 	 * input and/or check timeouts etc. This typically triggers Actuators. Same
 	 * happens for Controllers.</li>
-	 * <li>Then any registered Actuators have their {@link Actuator#loop()}
+	 * <li>Then any registered Actuators have their {@link Actuator#loop(long,long)}
 	 * executed, so they can update hardware output state.</li>
 	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>

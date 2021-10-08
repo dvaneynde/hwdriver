@@ -7,12 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.sensors.WindSensor;
 import eu.dlvm.domotics.sensors.WindSensor.States;
 import eu.dlvm.iohardware.IHardwareIO;
 
@@ -37,7 +36,7 @@ public class TestWindSensor implements IEventListener {
 
 	private static final Logger log = LoggerFactory.getLogger(TestWindSensor.class);
 	private Hardware hw;
-	private IDomoticContext dom;
+	private IDomoticBuilder dom;
 	private WindSensor ws;
 	private long time;
 	private EventType lastEvent;
@@ -55,9 +54,6 @@ public class TestWindSensor implements IEventListener {
 	 *            frequency to simulate
 	 * @param durationMs
 	 *            duration of this frequency
-	 * @param currentTime
-	 *            start time
-	 * @return end time
 	 */
 	void simulateWind(double freq, double durationMs) {
 		double transitionPeriodMs = 1000 / (2.0 * freq);
@@ -93,7 +89,7 @@ public class TestWindSensor implements IEventListener {
 		int HIGH_TIME_BEFORE_ALERT = 1;
 		int LOW_TIME_TO_RESET_ALERT = 2;
 
-		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, dom, HIGH_FREQ_THRESHOLD,
+		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, hw, dom, HIGH_FREQ_THRESHOLD,
 				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 
@@ -122,7 +118,7 @@ public class TestWindSensor implements IEventListener {
 		int LOW_FREQ_THRESHOLD = 1;
 		int LOW_TIME_TO_RESET_ALERT = 30;
 
-		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, dom, HIGH_FREQ_THRESHOLD,
+		ws = new WindSensor("MyWindSensor", "WindSensor Desciption", WINDSENSOR_CH, hw, dom, HIGH_FREQ_THRESHOLD,
 				LOW_FREQ_THRESHOLD, LOW_TIME_TO_RESET_ALERT);
 		ws.registerListener(this);
 

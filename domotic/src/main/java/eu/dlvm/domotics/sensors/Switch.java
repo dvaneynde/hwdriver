@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.sensors;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -46,13 +47,13 @@ public class Switch extends Sensor {
 		return state;
 	}
 
-	public Switch(String name, String description, String channel, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+	public Switch(String name, String description, String channel, IHardwareReader reader, IDomoticBuilder builder) {
+		super(name, description, channel, reader, builder);
 	}
 
 	public Switch(String name, String description, String channel, boolean singleClickEnabled, boolean longClickEnabled,
-			boolean doubleClickEnabled, IDomoticContext ctx) {
-		super(name, description, channel, ctx);
+			boolean doubleClickEnabled, IHardwareReader reader, IDomoticBuilder builder) {
+		super(name, description, channel, reader, builder);
 		this.singleClickEnabled = singleClickEnabled;
 		this.longClickEnabled = longClickEnabled;
 		this.doubleClickEnabled = doubleClickEnabled;
@@ -65,7 +66,7 @@ public class Switch extends Sensor {
 	 */
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInputState = getHw().readDigitalInput(getChannel());
+		boolean newInputState = getHwReader().readDigitalInput(getChannel());
 
 		switch (state) {
 		case REST:

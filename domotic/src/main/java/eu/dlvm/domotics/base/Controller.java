@@ -10,9 +10,9 @@ import eu.dlvm.domotics.events.IEventListener;
  */
 public abstract class Controller extends Block implements IDomoticLoop, IEventListener {
 
-	public Controller(String name, String description, String ui, IDomoticContext ctx) {
+	public Controller(String name, String description, String ui, IDomoticBuilder builder) {
 		super(name, description, ui);
-		ctx.addController(this);
+		builder.addController(this);
 	}
 
 }

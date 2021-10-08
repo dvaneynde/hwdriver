@@ -6,6 +6,9 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardwareReader;
+import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -19,7 +22,7 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.GadgetController;
@@ -38,7 +41,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 	static Logger logger = LoggerFactory.getLogger(XmlElementHandlers.class);
 
-	private IDomoticContext ctx;
+	private IDomoticBuilder builder;
+	private IHardwareIO hw;
 	private int depth = -1; // -1 because domotic startelement makes it start
 							// and that is really 0
 	private Block currentBlock;
@@ -51,9 +55,18 @@ class XmlElementHandlers extends DefaultHandler2 {
 		public EventType srcEvent;;
 	}
 
-	public XmlElementHandlers(IDomoticContext ctx) {
+	private IHardwareReader getReader() {
+	    return hw;
+	}
+
+    private IHardwareWriter getWriter() {
+        return hw;
+    }
+
+    public XmlElementHandlers(IDomoticBuilder builder, IHardwareIO hardware) {
 		super();
-		this.ctx = ctx;
+		this.builder = builder;
+		this.hw = hardware;
 	}
 
 	public void startElement(String uri, String localName, String qqName, Attributes atts) throws SAXException {
@@ -118,7 +131,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				boolean singleClick = parseBoolAttribute("singleClick", true, atts);
 				boolean longClick = parseBoolAttribute("longClick", false, atts);
 				boolean doubleClick = parseBoolAttribute("doubleClick", false, atts);
-				currentBlock = new Switch(name, desc, channel, singleClick, longClick, doubleClick, ctx);
+				currentBlock = new Switch(name, desc, channel, singleClick, longClick, doubleClick, getReader(), builder);
 
 			} else if (localName.equals("dimmerSwitches")) {
 				if (currentBlock instanceof DimmedLamp) {
@@ -131,7 +144,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 					String channelDown = (s == null ? new String(name + "Down") : new String(s));
 					s = atts.getValue("channelUp");
 					String channelUp = (s == null ? new String(name + "Up") : new String(s));
-					currentBlock = new DimmerSwitch(name, desc, channelDown, channelUp, ctx);
+					currentBlock = new DimmerSwitch(name, desc, channelDown, channelUp, getReader(), builder);
 				}
 
 			} else if (localName.equals("windSensor")) {
@@ -141,7 +154,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				// int highTimeBeforeAlert =
 				// parseIntAttribute("highTimeBeforeAlert", atts);
 				int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-				currentBlock = new WindSensor(name, desc, ui, channel, ctx, highFreqThreshold, lowFreqThreshold,
+				currentBlock = new WindSensor(name, desc, ui, channel, getReader(), builder, highFreqThreshold, lowFreqThreshold,
 						lowTimeToResetAlert);
 
 			} else if (localName.equals("lightGauge")) {
@@ -149,22 +162,22 @@ class XmlElementHandlers extends DefaultHandler2 {
 				int threshold = parseIntAttribute("threshold", atts);
 				int low2highTime = parseIntAttribute("low2highTime", atts);
 				int high2lowTime = parseIntAttribute("high2lowTime", atts);
-				currentBlock = new LightSensor(name, desc, ui, channel, ctx, threshold, low2highTime, high2lowTime);
+				currentBlock = new LightSensor(name, desc, ui, channel, getReader(), builder, threshold, low2highTime, high2lowTime);
 
 				// ===== Controllers
 
 			} else if (localName.equals("timer")) {
 				parseBaseBlock(atts);
-				currentBlock = new Timer(name, desc, ctx);
+				currentBlock = new Timer(name, desc, builder);
 
 			} else if (localName.equals("timerDayNight")) {
 				parseBaseBlock(atts);
-				currentBlock = new TimerDayNight(name, desc, ctx);
+				currentBlock = new TimerDayNight(name, desc, builder);
 
 			} else if (localName.equals("repeatOff")) {
 				parseBaseBlock(atts);
 				int intervalSec = parseIntAttribute("intervalSec", atts);
-				currentBlock = new RepeatOffAtTimer(name, desc, ctx, intervalSec);
+				currentBlock = new RepeatOffAtTimer(name, desc, builder, intervalSec);
 
 			} else if (localName.equals("sunWindController")) {
 				parseBaseBlock(atts);
@@ -172,20 +185,20 @@ class XmlElementHandlers extends DefaultHandler2 {
 				if (atts.getValue("azimuthStart") != null && atts.getValue("azimuthEnd") != null) {
 					Double azimuthStart = Double.parseDouble(atts.getValue("azimuthStart"));
 					Double azimuthEnd = Double.parseDouble(atts.getValue("azimuthEnd"));
-					currentBlock = new SunWindController(name, desc, azimuthStart, azimuthEnd, ui, ctx);
+					currentBlock = new SunWindController(name, desc, azimuthStart, azimuthEnd, ui, builder);
 				} else
-					currentBlock = new SunWindController(name, desc, ui, ctx);
+					currentBlock = new SunWindController(name, desc, ui, builder);
 
 			} else if (localName.equals("newyear")) {
 				Date start = DatatypeConverter.parseDateTime(atts.getValue("start")).getTime();
 				Date end = DatatypeConverter.parseDateTime(atts.getValue("end")).getTime();
-				currentBlock = NewYearBuilder.build(blocksSoFar, start.getTime(), end.getTime(), ctx);
+				currentBlock = NewYearBuilder.build(blocksSoFar, start.getTime(), end.getTime(), builder);
 
 			} else if (localName.equals("antiBurglar")) {
 				parseBaseBlock(atts);
 				int start = converHourMinToMsOnDay(atts.getValue("start"));
 				int end = converHourMinToMsOnDay(atts.getValue("end"));
-				GadgetController gc = AntiBurglarBuilder.build(blocksSoFar, name, start, end, ctx);
+				GadgetController gc = AntiBurglarBuilder.build(blocksSoFar, name, start, end, builder);
 				currentBlock = gc;
 
 				// ===== Actuators
@@ -194,7 +207,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				parseBaseBlockWithChannel(atts);
 				String autoOffSec = atts.getValue("autoOffSec");
 				boolean ecoEnabled = autoOffSec != null;
-				Lamp lamp = new Lamp(name, desc, ecoEnabled, ui, channel, ctx);
+				Lamp lamp = new Lamp(name, desc, ecoEnabled, ui, channel, getWriter(), builder);
 				if (ecoEnabled) {
 					lamp.setEco(true);
 					lamp.setAutoOffSec(Integer.parseInt(autoOffSec));
@@ -209,12 +222,12 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("dimmedLamp")) {
 				parseBaseBlockWithChannel(atts);
 				int fullOn = Integer.parseInt(atts.getValue("fullOnHwOutput"));
-				DimmedLamp dimmedLamp = new DimmedLamp(name, desc, ui, fullOn, channel, ctx);
+				DimmedLamp dimmedLamp = new DimmedLamp(name, desc, ui, fullOn, channel, getWriter(), builder);
 				currentBlock = dimmedLamp;
 
 			} else if (localName.equals("fan")) {
 				parseBaseBlockWithChannel(atts);
-				Fan fan = new Fan(name, desc, channel, ctx);
+				Fan fan = new Fan(name, desc, channel, getWriter(), builder);
 				String val;
 				val = atts.getValue("onSec");
 				if (val != null)
@@ -234,7 +247,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 					swc.registerListener(screen);
 				} else {
 					parseBaseBlockWithUpDownChannel(atts);
-					currentBlock = new Screen(name, desc, ui, channelDown, channelUp, ctx);
+					currentBlock = new Screen(name, desc, ui, channelDown, channelUp, getWriter(), builder);
 					if (atts.getValue("motor-up-time") != null)
 						((Screen) currentBlock).setMotorUpPeriod(Integer.parseInt(atts.getValue("motor-up-time")));
 					if (atts.getValue("motor-dn-time") != null)

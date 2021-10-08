@@ -1,11 +1,12 @@
 package eu.dlvm.domotics.actuators;
 
+import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -63,12 +64,12 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		ON, OFF, GOING_OFF_BLINK, GOING_OFF_UNLESS_CLICK;
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IDomoticContext ctx) {
-		this(name, description, isEcoEnabled, null, channel, ctx);
+	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		this(name, description, isEcoEnabled, null, channel, writer, builder);
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IDomoticContext ctx) {
-		super(name, description, ui, channel, ctx);
+	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		super(name, description, ui, channel, writer, builder);
 		ecoEnabled = isEcoEnabled;
 		state = States.OFF;
 	}
@@ -315,7 +316,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	}
 
 	private void writeOutput(boolean val) {
-		getHw().writeDigitalOutput(getChannel(), val);
+		getHwWriter().writeDigitalOutput(getChannel(), val);
 	}
 
 	@Override

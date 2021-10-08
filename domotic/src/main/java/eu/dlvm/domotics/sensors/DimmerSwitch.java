@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.sensors;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
 
@@ -39,8 +40,8 @@ public class DimmerSwitch extends Sensor {
 	}
 
 	/**  */
-	public DimmerSwitch(String name, String description, String channelLeft, String channelRight, IDomoticContext ctx) {
-		super(name, description, channelLeft, ctx);
+	public DimmerSwitch(String name, String description, String channelLeft, String channelRight, IHardwareReader reader, IDomoticBuilder builder) {
+		super(name, description, channelLeft, reader, builder);
 		this.channelR = channelRight;
 	}
 
@@ -51,11 +52,10 @@ public class DimmerSwitch extends Sensor {
 	 * @param description
 	 * @param channelLeft
 	 * @param channelRight
-	 * @param hw
 	 * @deprecated
 	 */
-	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IDomoticContext ctx) {
-		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), ctx);
+	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IHardwareReader reader, IDomoticBuilder builder) {
+		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), reader, builder);
 	}
 
 	@Override
@@ -66,8 +66,8 @@ public class DimmerSwitch extends Sensor {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		boolean newInputLeft = getHw().readDigitalInput(getChannel());
-		boolean newInputRight = getHw().readDigitalInput(getChannelRight());
+		boolean newInputLeft = getHwReader().readDigitalInput(getChannel());
+		boolean newInputRight = getHwReader().readDigitalInput(getChannelRight());
 
 		switch (state) {
 		case REST:

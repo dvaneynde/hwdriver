@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IStateChangedListener;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.uidata.UiInfo;
@@ -29,10 +29,10 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	private static int COUNT = 0;
 	private ObjectMapper objectMapper;
 	private int id;
-	private IDomoticContext context;
+	private IDomoticBuilder context;
 	private Session savedSession;
 
-	public UiStateUpdatorSocket(IDomoticContext context) {
+	public UiStateUpdatorSocket(IDomoticBuilder context) {
 		this.context = context;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;

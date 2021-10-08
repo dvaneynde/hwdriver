@@ -33,9 +33,9 @@ public class TestSwitchDedicatedAllOff {
 		hw.out(10, false);
 
 		dom = Domotic.createSingleton(hw);
-		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), dom);
-		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), dom);
-		lamp = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), dom);
+		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), hw, dom);
+		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), hw, dom);
+		lamp = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw, dom);
 
 		//		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
 		//		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);

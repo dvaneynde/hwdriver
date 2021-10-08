@@ -1,11 +1,12 @@
 package eu.dlvm.domotics.actuators;
 
+import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -67,8 +68,8 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	/**
 	 * Constructor.
 	 */
-	public Fan(String name, String description, String channel, IDomoticContext ctx) {
-		super(name, description, null, channel, ctx);
+	public Fan(String name, String description, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		super(name, description, null, channel, writer, builder);
 		statemachine = new FanStatemachine(this);
 	}
 
@@ -136,7 +137,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 
 	// ========== Queries
 	/**
-	 * @return State of fan. See {@link States}.
+	 * @return State of fan.
 	 */
 	public FanStatemachine.States getState() {
 		return statemachine.getState();
@@ -148,8 +149,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	// ========== Events
 	
 	/**
-	 * Toggle between immediately turning and stopping. If started, it runs for
-	 * {@link #getDelayPeriodSec()} seconds.
+	 * Toggle between immediately turning and stopping.
 	 */
 	public boolean toggle() {
 		return statemachine.toggle();
@@ -248,7 +248,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 
 
 	void writeOutput(boolean val) {
-		getHw().writeDigitalOutput(getChannel(), val);
+		getHwWriter().writeDigitalOutput(getChannel(), val);
 	}
 
 	@Override

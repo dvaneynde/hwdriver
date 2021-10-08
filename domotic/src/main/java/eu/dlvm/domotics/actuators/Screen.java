@@ -1,11 +1,12 @@
 package eu.dlvm.domotics.actuators;
 
+import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -54,8 +55,8 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 	/*
 	 * Public API
 	 */
-	public Screen(String name, String description, String ui, String chDown, String chUp, IDomoticContext ctx) {
-		super(name, description, ui, chDown, ctx);
+	public Screen(String name, String description, String ui, String chDown, String chUp, IHardwareWriter writer, IDomoticBuilder builder) {
+		super(name, description, ui, chDown, writer, builder);
 		this.chUp = chUp;
 	}
 
@@ -338,24 +339,24 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 		timeStateStart = current;
 		ratioClosedAtStateStart = ratioClosed;
 		state = States.UP;
-		getHw().writeDigitalOutput(chUp, true);
+		getHwWriter().writeDigitalOutput(chUp, true);
 	}
 
 	private void exitUp(long current) {
 		timeStateStart = current;
-		getHw().writeDigitalOutput(chUp, false);
+		getHwWriter().writeDigitalOutput(chUp, false);
 	}
 
 	private void setStateAndEntryDown(long current) {
 		timeStateStart = current;
 		ratioClosedAtStateStart = ratioClosed;
 		state = States.DOWN;
-		getHw().writeDigitalOutput(getChannel(), true);
+		getHwWriter().writeDigitalOutput(getChannel(), true);
 	}
 
 	private void exitDown(long current) {
 		timeStateStart = current;
-		getHw().writeDigitalOutput(getChannel(), false);
+		getHwWriter().writeDigitalOutput(getChannel(), false);
 	}
 
 	@Override

@@ -57,8 +57,8 @@ public class TestEnd2EndDimmer {
 		hw = new HardwareIO(new TestConfigurator(), drv);
 		// Domotic
 		dom = Domotic.createSingleton(hw);
-		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
-		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, dom);
+		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, dom);
+		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, hw, dom);
 		dsw.registerListener(dl);
 	}
 

@@ -1,9 +1,8 @@
 package eu.dlvm.domotics.base;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.dlvm.iohardware.IHardwareIO;
 
 /**
  * Sensors sense input from hardware.
@@ -20,25 +19,23 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 
 	static Logger log = LoggerFactory.getLogger(Sensor.class);
 
-	private IDomoticContext ctx;
 	private String channel;
+	private IHardwareReader reader;
 
 	/**
 	 * Create a Sensor as a Block, and add it to the Control of Blocks.
-	 * 
-	 * @param ctrl
 	 * @param name
 	 * @param description
 	 */
-	public Sensor(String name, String description, String channel, IDomoticContext ctx) {
-		this(name, description, null, channel, ctx);
+	public Sensor(String name, String description, String channel, IHardwareReader reader, IDomoticBuilder builder) {
+		this(name, description, null, channel, reader, builder);
 	}
 
-	public Sensor(String name, String description, String ui, String channel, IDomoticContext ctx) {
+	public Sensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticBuilder builder) {
 		super(name, description, ui);
-		this.ctx = ctx;
+		this.reader = reader;
 		this.channel = channel;
-		ctx.addSensor(this);
+		builder.addSensor(this);
 	}
 
 	/**
@@ -52,8 +49,8 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	/**
 	 * @return Underlying hardware.
 	 */
-	public IHardwareIO getHw() {
-		return ctx.getHw();
+	public IHardwareReader getHwReader() {
+		return reader;
 	}
 
 	@Override

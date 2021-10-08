@@ -1,9 +1,10 @@
 package eu.dlvm.domotics.sensors;
 
+import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
@@ -47,9 +48,9 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
 	};
 
-	public LightSensor(String name, String description, String ui, String channel, IDomoticContext ctx, int threshold, int lowToHighDelaySec,
-			int highToLowDelaySec) throws ConfigurationException {
-		super(name, description, ui, channel, ctx);
+	public LightSensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticBuilder builder, int threshold, int lowToHighDelaySec,
+                       int highToLowDelaySec) throws ConfigurationException {
+		super(name, description, ui, channel, reader, builder);
 		if (threshold < 0 || lowToHighDelaySec < 0 || highToLowDelaySec < 0) {
 			throw new ConfigurationException("Threshold and/or delays cannot be negative.");
 		}
@@ -84,7 +85,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	}
 
 	/**
-	 * Time that input must remain below {@link #getLowThreshold()} before
+	 * Time that input must remain below {@link #getThreshold()} before
 	 * actually going {@link States#LOW}.
 	 * 
 	 * @return time in seconds
@@ -136,7 +137,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	@Override
 	public void loop(long currentTime, long sequence) {
-		measuredLevel = getHw().readAnalogInput(getChannel());
+		measuredLevel = getHwReader().readAnalogInput(getChannel());
 
 		if (timeCurrentStateStarted < 0L) {
 			// initialization

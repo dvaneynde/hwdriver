@@ -70,15 +70,15 @@ public class TestSwitchBoardDimmers {
 
 		dom = Domotic.createSingleton(hw);
 
-		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, dom);
-		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, dom);
+		dsw1 = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, dom);
+		dl1 = new DimmedLamp("dl1", "Dimmed Lamp 1", FULL_OUT_VAL, DIMMER1, hw, dom);
 		dl1.setMsTimeFullDim(3000);
 		//		ds2d = new DimmerSwitch2Dimmer("ds2d", "ds2d");
 		//		ds2d.setLamp(dl1);
 		//		dsw1.registerListener(ds2d);
 		dsw1.registerListener(dl1);
 
-		swAllOnOff = new Switch("swAll", "Switch All On/Off", SW_ALL, dom);
+		swAllOnOff = new Switch("swAll", "Switch All On/Off", SW_ALL, hw, dom);
 		swAllOnOff.setDoubleClickEnabled(true);
 		swAllOnOff.setDoubleClickTimeout(400L);
 		swAllOnOff.setLongClickEnabled(true);

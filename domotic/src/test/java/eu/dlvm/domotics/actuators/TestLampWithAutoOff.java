@@ -3,7 +3,7 @@ package eu.dlvm.domotics.actuators;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoContextMock;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -27,14 +27,14 @@ public class TestLampWithAutoOff {
 	private static final String LAMP_OUT = Integer.toString(10);
 	private Lamp lamp;
 	private Hardware hw;
-	private IDomoticContext ctx;
+	private IDomoticBuilder dom;
 	private long current, seq;
 
 	@Before
 	public void init() {
 		hw = new Hardware();
-		ctx = new DomoContextMock(hw);
-		lamp = new Lamp("TestLamp", "TestLamp", true, LAMP_OUT, ctx);
+		dom = new DomoContextMock(hw);
+		lamp = new Lamp("TestLamp", "TestLamp", true, LAMP_OUT, hw, dom);
 		current = seq = 0L;
 	}
 

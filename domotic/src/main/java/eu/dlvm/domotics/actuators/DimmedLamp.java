@@ -1,11 +1,12 @@
 package eu.dlvm.domotics.actuators;
 
+import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticContext;
+import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -49,19 +50,19 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 *            Byte or word value put on the analog channel when full.
 	 * @param channel
 	 *            Logical id of analog output channel.
-	 * @param hardware
+	 * @param writer
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel, IDomoticContext ctx) {
-		super(name, description, ui, channel, ctx);
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		super(name, description, ui, channel, writer, builder);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
 		level = 0;
 		prevOnLevel = 100;
 	}
 
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel, IDomoticContext ctx) {
-		this(name, description, null, outputValueHardwareIfFull, channel, ctx);
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		this(name, description, null, outputValueHardwareIfFull, channel, writer, builder);
 	}
 
 	/**
@@ -75,12 +76,12 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 *            Byte or word value put on the analog channel when full.
 	 * @param channel
 	 *            Logical id of analog output channel.
-	 * @param hardware
+	 * @param writer
 	 *            Link to underlying hardware layer.
 	 * @deprecated
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IDomoticContext ctx) {
-		this(name, description, null, outputValueHardwareIfFull, Integer.toString(channel), ctx);
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IHardwareWriter writer, IDomoticBuilder builder) {
+		this(name, description, null, outputValueHardwareIfFull, Integer.toString(channel), writer, builder);
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	}
 
 	/**
-	 * @param The
+	 * @param msTimeFullDim
 	 *            time to dim between 0% and 100%, in milliseconds.
 	 */
 	public void setMsTimeFullDim(int msTimeFullDim) {
@@ -306,8 +307,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	}
 
 	/**
-	 * For the dimmers, depending on the input (see
-	 * {@link IDimmerSwitchListener.ClickType} ), the following happens (only
+	 * For the dimmers, depending on the input the following happens (only
 	 * describing the LEFT part):
 	 * <ul>
 	 * <li>LEFT_CLICK - switch on/off</li>
@@ -394,7 +394,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	}
 
 	private void writeAnalogOutput() {
-		getHw().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
+		getHwWriter().writeAnalogOutput(getChannel(), (int) (level * factorHwOut / 100));
 	}
 
 	@Override
