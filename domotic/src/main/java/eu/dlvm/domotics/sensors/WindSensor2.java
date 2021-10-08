@@ -129,7 +129,7 @@ public class WindSensor2 extends Sensor implements IUiCapableBlock {
 	private int infoCounter = 0;
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		boolean newInput = getHwReader().readDigitalInput(getChannel());
 		gauge.sample(currentTime, newInput);
 		freq = gauge.getMeasurement();

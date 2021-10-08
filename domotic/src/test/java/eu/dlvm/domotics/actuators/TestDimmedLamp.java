@@ -28,7 +28,7 @@ public class TestDimmedLamp {
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
 	private IDomoticBuilder builder = new DomoContextMock(hw);
-	private long seq;
+
 
 	@Before
 	public void init() {
@@ -39,61 +39,61 @@ public class TestDimmedLamp {
 	@Test
 	public void testToggleAndOnAndOff() {
 		int cur = 0;
-		lamp.loop(cur, seq++);
+		lamp.loop(cur);
 		assertOff(100);
 
 		lamp.on(50);
-		lamp.loop(cur += 100, seq++);
+		lamp.loop(cur += 100);
 		assertOn(50);
 
 		lamp.toggle();
-		lamp.loop(cur += 100, seq++);
+		lamp.loop(cur += 100);
 		assertOff(50);
 
 		lamp.toggle();
-		lamp.loop(cur += 100, seq++);
+		lamp.loop(cur += 100);
 		assertOn(50);
 
 		lamp.off();
-		lamp.loop(cur += 100, seq++);
+		lamp.loop(cur += 100);
 		assertOff(50);
 
 		lamp.on();
-		lamp.loop(cur += 100, seq++);
+		lamp.loop(cur += 100);
 		assertOn(50);
 	}
 
 	@Test
 	public void dimUpAndDown() {
 		int cur = 0;
-		lamp.loop(cur += 1, seq++);
+		lamp.loop(cur += 1);
 		assertOff(100);
 
 		lamp.up(true);
-		lamp.loop(cur += 1000, seq++);
+		lamp.loop(cur += 1000);
 		assertUp(0);
-		lamp.loop(cur += 1000, seq++);
+		lamp.loop(cur += 1000);
 		assertUp(100 / 3);
-		lamp.loop(cur += 1000, seq++);
+		lamp.loop(cur += 1000);
 		assertUp(200 / 3);
 		// Next one is 1023 instead of 1000, because each time 33, 3 times is only 99...
-		lamp.loop(cur += 1023, seq++);
+		lamp.loop(cur += 1023);
 		assertUp(100);
-		lamp.loop(cur += 1000, seq++);
+		lamp.loop(cur += 1000);
 		assertUp(100);
 		lamp.up(false);
-		lamp.loop(cur += 1, seq++);
+		lamp.loop(cur += 1);
 		assertOn(100);
 
 		lamp.down(true);
-		lamp.loop(cur += 1, seq++);
+		lamp.loop(cur += 1);
 		assertDown();
 		for (int i = 0; i < 3; i++) {
-			lamp.loop(cur += 1000, seq++);
+			lamp.loop(cur += 1000);
 			assertDown();
 		}
 		lamp.down(false);
-		lamp.loop(cur += 1, seq++);
+		lamp.loop(cur += 1);
 		assertOn(0);
 	}
 

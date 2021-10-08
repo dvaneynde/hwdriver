@@ -194,7 +194,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		switch (state) {
 		case INACTIF:
 			if (withinTimePeriod(currentTime)) {

@@ -40,7 +40,7 @@ public class TestLampWithLightSensor {
 	private LightSensor lightSensor;
 	private Hardware hw;
 	private IDomoticBuilder builder;
-	private long current, seq;
+	private long current;
 
 	@Before
 	public void init() {
@@ -53,7 +53,6 @@ public class TestLampWithLightSensor {
 		lightSensor.registerListener(c0);
 		lightSensor.registerListener(c1);
 		current = -500L;
-		seq = 0L;
 	}
 
 	private void assertLampOn() {
@@ -75,9 +74,8 @@ public class TestLampWithLightSensor {
 	private void loop(int n) {
 		for (int i = 0; i < n; i++) {
 			current += 500;
-			seq++;
-			lightSensor.loop(current, seq);
-			lamp.loop(current, seq);
+			lightSensor.loop(current);
+			lamp.loop(current);
 		}
 	}
 

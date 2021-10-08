@@ -92,26 +92,26 @@ public class TestGadgetController {
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		long time = 100L;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertFalse(gc.isRunning());
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		// gs0 active, time >= 200
 		time = 200L;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, true, true, false);
 		Assert.assertEquals(time - 200, g0.busyTime);
 		Assert.assertTrue(gc.isRunning());
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 
 		time += 20;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, true, false);
 		Assert.assertEquals(time - 200, g0.busyTime);
 
 		time = 280;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, true, false);
 		Assert.assertEquals(time - 200, g0.busyTime);
 		check(g1, false, false, false);
@@ -119,7 +119,7 @@ public class TestGadgetController {
 
 		// gs1 active, time >= 300
 		time = 300;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, true);
 		check(g1, true, true, false);
 		Assert.assertEquals(time - 300, g1.busyTime);
@@ -127,7 +127,7 @@ public class TestGadgetController {
 
 		time += 20;
 		while (time < (1000 + 100 + 200)) {
-			gc.loop(time, time);
+			gc.loop(time);
 			check(g0, false, false, false);
 			check(g1, false, true, false);
 			Assert.assertEquals(time - 300, g1.busyTime);
@@ -135,7 +135,7 @@ public class TestGadgetController {
 			time += 20;
 		}
 		// gs2 active, time >= 1300
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		check(g1, false, false, true);
 		check(g2, true, true, false);
@@ -143,7 +143,7 @@ public class TestGadgetController {
 
 		time += 20;
 		while (time < (10000 + 1000 + 100 + 200)) {
-			gc.loop(time, time);
+			gc.loop(time);
 			check(g0, false, false, false);
 			check(g1, false, false, false);
 			check(g2, false, true, false);
@@ -151,21 +151,21 @@ public class TestGadgetController {
 			Assert.assertTrue(gc.isRunning());
 			time += 20;
 		}
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		check(g1, false, false, false);
 		check(g2, false, false, true);
 		Assert.assertFalse(gc.isRunning());
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 
-		gc.loop(20200, 20200);
+		gc.loop(20200);
 		check(g0, false, false, false);
 		check(g1, false, false, false);
 		check(g2, false, false, false);
 		Assert.assertFalse(gc.isRunning());
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 
-		gc.loop(20220, 20220);
+		gc.loop(20220);
 		check(g0, false, false, false);
 		check(g1, false, false, false);
 		check(g2, false, false, false);
@@ -187,36 +187,36 @@ public class TestGadgetController {
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		long time = 100L;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		// gs0 active
 		time = 200L;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.WAITING_TRIGGER, gc.getState());
 		time += 100L;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.WAITING_TRIGGER, gc.getState());
 
 		gc.onEvent(new DummyBlock("dummy"), EventType.TRIGGERED);
 		time = 400;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, true, true, false);
 		Assert.assertEquals(time - 400, g0.busyTime);
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 
 		time += 50;
 		while (time < 400 + 100) {
-			gc.loop(time, time);
+			gc.loop(time);
 			check(g0, false, true, false);
 			Assert.assertEquals(time - 400, g0.busyTime);
 			Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 			time += 50;
 		}
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, true);
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 	}
@@ -235,13 +235,13 @@ public class TestGadgetController {
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		long time = 100L;
-		gc.loop(time, time);
+		gc.loop(time);
 		time = 200L;
-		gc.loop(time, time);
+		gc.loop(time);
 		Assert.assertEquals(GadgetController.States.WAITING_TRIGGER, gc.getState());
 		gc.onEvent(new DummyBlock("dummy"), EventType.TRIGGERED);
 		time = 400;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, true, true, false);
 		Assert.assertEquals(time - 400, g0.busyTime);
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
@@ -249,7 +249,7 @@ public class TestGadgetController {
 		time += 50;
 		while (time <= 200 + 2000) {
 			System.out.println("time=" + time);
-			gc.loop(time, time);
+			gc.loop(time);
 			//long relativeTime = time - 400;
 			//			if (relativeTime > 450 && ((relativeTime - 50) % 200 == 0))
 			//				check(g0, true, true, true);
@@ -261,7 +261,7 @@ public class TestGadgetController {
 			Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 			time += 50;
 		}
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, true);
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 	}
@@ -282,30 +282,30 @@ public class TestGadgetController {
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		long time = new GregorianCalendar(2018, 0, 1, 6, 0, 0).getTime().getTime();
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 
 		time += 11 * 3600 * 1000;
 		long timeEnd = time + 5 * 3600 * 1000;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, true, true, false);
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 		time += 50;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, true, false);
 		Assert.assertEquals(GadgetController.States.ACTIF, gc.getState());
 		time += gs0.getDurationMs();
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, true);
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 
 		time = timeEnd;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.WAITING_END, gc.getState());
 		time += 50;
-		gc.loop(time, time);
+		gc.loop(time);
 		check(g0, false, false, false);
 		Assert.assertEquals(GadgetController.States.INACTIF, gc.getState());
 	}

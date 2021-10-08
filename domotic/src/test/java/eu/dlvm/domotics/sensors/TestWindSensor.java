@@ -69,7 +69,7 @@ public class TestWindSensor implements IEventListener {
 				nextTransitionTime = beginTime + nrTransitions * transitionPeriodMs;
 				hw.writeDigitalOutput(WINDSENSOR_CH, val);
 			}
-			ws.loop(time, 0);
+			ws.loop(time);
 		}
 	}
 

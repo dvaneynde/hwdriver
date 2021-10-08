@@ -242,8 +242,8 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	// ===== Internal =====
 
 	@Override
-	public void loop(long current, long sequence) {
-		statemachine.loop(current, sequence);
+	public void loop(long current) {
+		statemachine.loop(current);
 	}
 
 

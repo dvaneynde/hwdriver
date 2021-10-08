@@ -268,7 +268,7 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 	// ===== Internal =====
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		if (timeStateEntered == -1L)
 			timeStateEntered = currentTime;
 		if (!eco)

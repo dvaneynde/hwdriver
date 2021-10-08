@@ -32,24 +32,24 @@ public class TestSunWindControllerWithRealScreen {
 	protected Screen sr;
 	SunWindController swc;
 	protected HardwareMock hw;
-	protected IDomoticBuilder ctx;
+	protected IDomoticBuilder builder;
 
 	@Before
 	public void init() {
 		hw = new HardwareMock();
-		ctx = new DomoContextMock(hw);
+		builder = new DomoContextMock(hw);
 
-		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, ctx);
+		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, builder);
 		sr.setMotorUpPeriod(30);
 		sr.setMotorDnPeriod(30);
 
-		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", ctx);
+		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", builder);
 		swc.registerListener(sr);
 	}
 
 	public void loop(long currentTime) {
-		swc.loop(currentTime, 0L);
-		sr.loop(currentTime, 0L);
+		swc.loop(currentTime);
+		sr.loop(currentTime);
 	}
 
 	// TODO all tests from TestSunWindController !

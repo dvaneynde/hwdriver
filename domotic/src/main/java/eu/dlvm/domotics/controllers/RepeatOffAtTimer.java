@@ -34,7 +34,7 @@ public class RepeatOffAtTimer extends Timer {
 
 	// internal
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		long currentTimeInDay = timeInDayMillis(currentTime);
 		// boolean state2 = state;
 		if (onTimeMs <= offTimeMs) {

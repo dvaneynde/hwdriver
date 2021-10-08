@@ -211,7 +211,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 * up-switch.
 	 * <p>
 	 * One call <code>up(true)</code> will cause an increase of the lamp level
-	 * at each {@link #loop(long, long)}, until <code>up(false)</code> is called
+	 * at each {@link #loop(long)}, until <code>up(false)</code> is called
 	 * or any other state-changing call.
 	 * <p>
 	 * If state was off, lamp will first go to remembered level and then start
@@ -261,7 +261,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 * down-switch.
 	 * <p>
 	 * One call <code>down(true)</code> will cause a decrease of the lamp level
-	 * at each {@link #loop(long, long)}, until <code>down(false)</code> is
+	 * at each {@link #loop(long)}, until <code>down(false)</code> is
 	 * called or any other state-changing call.
 	 * <p>
 	 * If state was off, lamp will first go to remembered level and then start
@@ -355,7 +355,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	}
 
 	@Override
-	public void loop(long current, long sequence) {
+	public void loop(long current) {
 		switch (state) {
 		case OFF:
 		case ON:

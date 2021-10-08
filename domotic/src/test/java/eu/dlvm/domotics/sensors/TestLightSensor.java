@@ -33,11 +33,11 @@ public class TestLightSensor implements IEventListener {
 	private LightSensor ls;
 	private EventType lastEvent;
 	private int nrEvents;
-	private long seq, cur;
+	private long cur;
 
 	private void loopTo(long targetTime) {
 		for (long time = cur + SAMPLE_TIME; time <= targetTime; time += SAMPLE_TIME) {
-			ls.loop(time, seq++);
+			ls.loop(time);
 		}
 		cur = targetTime;
 	}
@@ -71,7 +71,6 @@ public class TestLightSensor implements IEventListener {
 	public final void initLow() {
 		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 		ls.registerListener(this);
-		seq = 0L;
 		cur = -SAMPLE_TIME;
 
 		hw.level = 100;
@@ -85,7 +84,6 @@ public class TestLightSensor implements IEventListener {
 	public final void initHigh() {
 		ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 		ls.registerListener(this);
-		seq = 0L;
 		cur = -SAMPLE_TIME;
 
 		hw.level = 1100;
@@ -101,7 +99,6 @@ public class TestLightSensor implements IEventListener {
 			ls = new LightSensor("MyLightSensor", "LightSensor Description", null, LIGHTSENSOR_CH, hw, builder, 1000, 2, 3);
 			ls.registerListener(this);
 
-			seq = 0L;
 			cur = -SAMPLE_TIME;
 			loopTo(0);
 			// Init, should be low

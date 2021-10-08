@@ -24,7 +24,7 @@ public class TestSwitch {
 
 	private Hardware hw = new Hardware();
 	private DomoContextMock builder = new DomoContextMock(hw);
-	private long seq, cur;
+	private long cur;
 	private Switch sw;
 	private EventType lastClick;
 	private IEventListener listener = new IEventListener() {
@@ -42,7 +42,7 @@ public class TestSwitch {
 
 	private void loop(long inc) {
 		cur += inc;
-		sw.loop(cur, seq++);
+		sw.loop(cur);
 	}
 
 	private void loop() {
@@ -53,7 +53,7 @@ public class TestSwitch {
 	public void init() {
 		sw = new Switch("TestSwitch", "Unit Test Switch", Integer.toString(0), hw, builder);
 		sw.registerListener(listener);
-		cur = (seq = 0L);
+		cur = 0L;
 	}
 
 	@Test

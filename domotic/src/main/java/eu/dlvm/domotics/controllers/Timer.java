@@ -114,7 +114,7 @@ public class Timer extends Controller {
 	}
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		long currentTimeInDay = timeInDayMillis(currentTime);
 		boolean state2;
 		boolean onTimeBeforeOffTime = (onTimeMs <= offTimeMs);

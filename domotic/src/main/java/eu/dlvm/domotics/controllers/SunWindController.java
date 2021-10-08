@@ -210,7 +210,7 @@ public class SunWindController extends Controller implements IEventListener, IUi
 	}
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		if (withinAzimuthChanged(currentTime)) {
 			if (withinAzimuth && (lightState == LightState.HighLight) && (windState == WindState.Safe)) {
 				logger.info("Within azimuth range, light is High, wind is Safe and I'm enabled, so screens go Down.");

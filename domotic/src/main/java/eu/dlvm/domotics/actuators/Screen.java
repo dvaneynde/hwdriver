@@ -229,7 +229,7 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 	}
 
 	@Override
-	public void loop(long current, long sequence) {
+	public void loop(long current) {
 		switch (state) {
 		case REST:
 			// TODO safety time, door hier ook te checken op timeStateStart,

@@ -24,7 +24,7 @@ public class TestDimmerSwitches {
 
 	private Hardware hw = new Hardware();
 	private IDomoticBuilder builder = new DomoContextMock(hw);
-	private long seq, cur;
+	private long cur;
 	private DimmerSwitch ds;
 	private EventType lastEvent;
 	private IEventListener dsListener = new IEventListener() {
@@ -46,12 +46,12 @@ public class TestDimmerSwitches {
 				Integer.toString(1), hw, builder);
 		lastEvent = null;
 		ds.registerListener(dsListener);
-		seq = (cur = 0L);
+		cur = 0L;
 	}
 
 	private void loop(long inc) {
 		cur += inc;
-		ds.loop(cur, seq++);
+		ds.loop(cur);
 	}
 
 	private void loop() {

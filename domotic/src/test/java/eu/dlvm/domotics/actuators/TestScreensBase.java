@@ -27,7 +27,6 @@ public class TestScreensBase {
 	protected Screen sr;
 	protected Hardware hw;
 	protected IDomoticBuilder dom;
-	protected long seq;
 	protected long cur;
 
 	public TestScreensBase() {
@@ -36,7 +35,7 @@ public class TestScreensBase {
 
 	protected void loop(long inc) {
 		cur += inc;
-		sr.loop(cur, seq++);
+		sr.loop(cur);
 	}
 
 	protected void loop() {
@@ -50,7 +49,7 @@ public class TestScreensBase {
 		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, dom);
 		sr.setMotorUpPeriod(30);
 		sr.setMotorDnPeriod(30);
-		seq = cur = 0L;
+		cur = 0L;
 	}
 
 }

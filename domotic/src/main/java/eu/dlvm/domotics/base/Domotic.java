@@ -348,10 +348,10 @@ public class Domotic implements IDomoticBuilder {
 	 * <ol>
 	 * <li>{@link IHardwareIO#refreshInputs()} is called, so that hardware layer
 	 * inputs are refreshed.</li>
-	 * <li>All registered Sensors have their {@link Sensor#loop(long, long)} run to read
+	 * <li>All registered Sensors have their {@link Sensor#loop(long)} run to read
 	 * input and/or check timeouts etc. This typically triggers Actuators. Same
 	 * happens for Controllers.</li>
-	 * <li>Then any registered Actuators have their {@link Actuator#loop(long,long)}
+	 * <li>Then any registered Actuators have their {@link Actuator#loop(long)}
 	 * executed, so they can update hardware output state.</li>
 	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>
@@ -368,13 +368,13 @@ public class Domotic implements IDomoticBuilder {
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
-			s.loop(currentTime, loopSequence);
+			s.loop(currentTime);
 		}
 		for (Controller c : controllers) {
-			c.loop(currentTime, loopSequence);
+			c.loop(currentTime);
 		}
 		for (Actuator a : actuators) {
-			a.loop(currentTime, loopSequence);
+			a.loop(currentTime);
 		}
 		hw.refreshOutputs();
 

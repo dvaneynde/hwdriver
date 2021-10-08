@@ -44,17 +44,17 @@ public class TestSunWindController {
 	public void testWindEventsGoThroughWhenDisabled() {
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 
 		for (int i = 0; i < 3; i++) {
 			swc.onEvent(null, EventType.ALARM);
-			swc.loop(middayLong, 0L);
+			swc.loop(middayLong);
 			Assert.assertFalse(swc.isEnabled());
 			Assert.assertEquals(EventType.ALARM, events.poll());
 			Assert.assertTrue(events.isEmpty());
 
 			swc.onEvent(null, EventType.SAFE);
-			swc.loop(middayLong, 0L);
+			swc.loop(middayLong);
 			Assert.assertFalse(swc.isEnabled());
 			Assert.assertEquals(EventType.SAFE, events.poll());
 			Assert.assertTrue(events.isEmpty());
@@ -65,32 +65,32 @@ public class TestSunWindController {
 	public void testSafeWindScenarios() {
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 
 		swc.onEvent(null, EventType.LIGHT_HIGH);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.on();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.off();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.on();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.LIGHT_LOW);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.UP, events.poll());
 		Assert.assertTrue(events.isEmpty());
@@ -100,100 +100,100 @@ public class TestSunWindController {
 	public void testAlarmWindScenarios() {
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 
 		swc.onEvent(null, EventType.LIGHT_HIGH);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.ALARM);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertEquals(EventType.ALARM, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.on();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.LIGHT_LOW);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.LIGHT_HIGH);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 	}
 
 	@Test
 	public void testScreensDownAfterWindSafeAndSunStillHigh() {
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.on();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.UP, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.LIGHT_HIGH);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.ALARM);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertEquals(EventType.ALARM, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.SAFE);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertEquals(EventType.SAFE, events.poll());
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 	}
 
 	@Test
 	public void testPeriodicWindEventsDoesNotMoveScreens() {
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.LIGHT_HIGH);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertFalse(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.on();
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.DOWN, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.SAFE);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.SAFE);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.ALARM);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertEquals(EventType.ALARM, events.poll());
 		Assert.assertTrue(events.isEmpty());
 
 		swc.onEvent(null, EventType.ALARM);
-		swc.loop(middayLong, 0L);
+		swc.loop(middayLong);
 		Assert.assertTrue(swc.isEnabled());
 		Assert.assertTrue(events.isEmpty());
 	}

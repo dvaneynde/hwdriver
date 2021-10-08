@@ -65,7 +65,7 @@ public class DimmerSwitch extends Sensor {
 	}
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		boolean newInputLeft = getHwReader().readDigitalInput(getChannel());
 		boolean newInputRight = getHwReader().readDigitalInput(getChannelRight());
 

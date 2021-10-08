@@ -197,19 +197,19 @@ public class TestSwitchOrTimer2Lamp {
 
 		Calendar c = GregorianCalendar.getInstance();
 		c.set(2013, 8, 2, 0, 0); // 2 september 2013, toen geschreven ;-)
-		t.loop(c.getTimeInMillis(), 0);
+		t.loop(c.getTimeInMillis());
 		assertTrue(t.isOn());
 		assertTrue(hw.out(10));
 
 		c.set(Calendar.HOUR_OF_DAY, 8);
 		c.set(Calendar.MINUTE, 0);
-		t.loop(c.getTimeInMillis(), 0);
+		t.loop(c.getTimeInMillis());
 		assertFalse(t.isOn());
 		assertFalse(hw.out(10));
 
 		c.set(Calendar.HOUR_OF_DAY, 22);
 		c.set(Calendar.MINUTE, 30);
-		t.loop(c.getTimeInMillis(), 0);
+		t.loop(c.getTimeInMillis());
 		assertTrue(t.isOn());
 		assertTrue(hw.out(10));
 	}

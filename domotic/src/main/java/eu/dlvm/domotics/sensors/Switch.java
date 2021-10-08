@@ -17,7 +17,7 @@ import eu.dlvm.domotics.events.EventType;
  * <li>long: on-for-m-secs > off, if enabled</li>
  * </ol>
  * <p>
- * Note that you may need multiple {@link #loop(long, long)} executions before
+ * Note that you may need multiple {@link #loop(long)} executions before
  * the proper event is sent.
  * 
  * @author dirk vaneynde
@@ -65,7 +65,7 @@ public class Switch extends Sensor {
 	 * Houdt voorlopig geen rekening met dender !
 	 */
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		boolean newInputState = getHwReader().readDigitalInput(getChannel());
 
 		switch (state) {
@@ -78,7 +78,7 @@ public class Switch extends Sensor {
 		case FIRST_PRESS:
 			if (isLongClickEnabled()) {
 				if ((currentTime - leftRESTtime) > getLongClickTimeout()) {
-					logger.info("Switch '" + getName() + "' notifies LONG click event (seq=" + sequence + ").");
+					logger.info("Switch '" + getName() + "' notifies LONG click event.");
 					notifyListeners(EventType.LONG_CLICK);
 					state = States.WAIT_RELEASE;
 					break;
@@ -88,7 +88,7 @@ public class Switch extends Sensor {
 				if (isDoubleClickEnabled()) {
 					state = States.WAIT_2ND_PRESS;
 				} else if (isSingleClickEnabled()) {
-					logger.info("Switch '" + getName() + "' notifies SINGLE click event (seq=" + sequence + ").");
+					logger.info("Switch '" + getName() + "' notifies SINGLE click event.");
 					notifyListeners(EventType.SINGLE_CLICK);
 					state = States.REST;
 				} else if (isLongClickEnabled()) {
@@ -104,12 +104,12 @@ public class Switch extends Sensor {
 		case WAIT_2ND_PRESS:
 			if ((currentTime - leftRESTtime) > getDoubleClickTimeout()) {
 				if (isSingleClickEnabled()) {
-					logger.info("Switch '" + getName() + "' notifies SINGLE click event (seq=" + sequence + ").");
+					logger.info("Switch '" + getName() + "' notifies SINGLE click event.");
 					notifyListeners(EventType.SINGLE_CLICK);
 				}
 				state = States.REST;
 			} else if (newInputState) {
-				logger.info("Switch '" + getName() + "' notifies DOUBLE click event (seq=" + sequence + ").");
+				logger.info("Switch '" + getName() + "' notifies DOUBLE click event.");
 				notifyListeners(EventType.DOUBLE_CLICK);
 				state = States.REST;
 			}

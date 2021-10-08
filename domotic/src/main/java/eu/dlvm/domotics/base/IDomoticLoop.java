@@ -8,11 +8,8 @@ public interface IDomoticLoop {
 	 * @param currentTime
 	 *            Timestamp at which this loop is called. The same for each
 	 *            loop.
-	 * @param sequence
-	 *            A number that increments with each loop. Useful to detect
-	 *            being called twice - which is forbidden.
-		 */
-	public abstract void loop(long currentTime, long sequence);
+	 */
+	public abstract void loop(long currentTime);
 
 
 }

@@ -112,11 +112,15 @@ class Actuator {
     string channel
 }
 
-interface IHardwareIO {
+interface IHardwareReader {
     void refreshInputs()
-    void refreshOutputs()
     boolean readDigitalInput(String channel)
     int readAnalogInput(String channel)
+
+}
+
+interface IHardwareWriter {
+    void refreshOutputs()
     void writeDigitalOutput(String channel, boolean value)
     void writeAnalogOutput(String channel, int value)
 
@@ -128,14 +132,16 @@ IEventListener <|.. Controller
 IDomoticLoop <|.. Actuator
 IEventListener <|.. Actuator
 
+Sensor ..> IHardwareReader
+
 Sensor --|> Block
 Controller --|> Block
 Actuator --|> Block
 
+Actuator ..> IHardwareWriter
+
 IEventListener "*" <-- Block  : listeners <
 
-Sensor ..> IHardwareIO
-Actuator ..> IHardwareIO
 
 @enduml
 ```
@@ -144,11 +150,11 @@ Actuator ..> IHardwareIO
 |---|---|
 | Block | Supertype that just has a unique name and information for the UI (1). |
 | Sensor | Sensors sense input from hardware. They have at least one input channel, sometimes more. They transform simple hardware inputs into higher level events, such as DoubleClick or SingleClick or WindHigh.<br/> Only Sensors can read data from hardware. <br/>Sensors send events to Controllers or directly to Actuators.| 
-| Actuator | Actuators actuate output. They have at least one output channel like a switch, or multiple like up/down for screens. <br/>Only Actuators change outputs of hardware. <br/> Actuators do not send events to other Blocks.
+| Actuator | Actuators actuate output. They have at least one output channel like a switch, or multiple like up/down for screens. <br/>Only Actuators can change outputs of hardware. <br/> Actuators do not send events to other Blocks.
 | Controller | Controller typically contain functionally complex logic.<br/>Controllers have no access to hardware.<br/>Controllers send events to  Actuators or other Controllers. |
 | IDomoticLoop | All Blocks implement the `loop()` function called from `loopOnce()` described later. State changes of a Block, like 'on' or 'off' in an Actuator, must only occur from within a `loop()` function (not from an event). |
 | IEventListener | Blocks can send events to other Blocks, e.g. when a switch is pressed (Sensor) a lamp is switched on (Actuator). For safety event propagation is limited (see previous rows, from Sensor to Controller (optional) to Actuator, never reverse) and state changes can only happen in `loop()`|
-| IHardwareIO | Sensors and Actuators talk to the hardware via an implementation of this interface. This abstracts away the actual hardware used.|
+| IHardwareReader IHardwareWriter | Sensors and Actuators respectively read from and write to the hardware via an implementation of this interface. This abstracts away the actual hardware used.|
 
 (1) The UI is completely dynamic, as it is built up from information in the configuration files. So no programming required when domotic configuration changes.
 
@@ -156,22 +162,20 @@ Below code is the core driver of the domotic system.
 
 ```java
 	public synchronized void loopOnce(long currentTime) {
-		loopSequence++;
 		hw.refreshInputs();
 		for (Sensor s : sensors) {
-			s.loop(currentTime, loopSequence);
+			s.loop(currentTime);
 		}
 		for (Controller c : controllers) {
-			c.loop(currentTime, loopSequence);
+			c.loop(currentTime);
 		}
 		for (Actuator a : actuators) {
-			a.loop(currentTime, loopSequence);
+			a.loop(currentTime);
 		}
 		hw.refreshOutputs();
 
-        if (loopSequence % 10 == 0) {
-            for (IStateChangedListener uiUpdator : stateChangeListeners)
-                uiUpdator.updateUi();
+        for (IStateChangedListener uiUpdator : stateChangeListeners)
+            uiUpdator.updateUi();
 	}
 
 ```
@@ -179,14 +183,16 @@ Below code is the core driver of the domotic system.
 This is what happens every 20 ms (configurable):
 
 - `IHardwareIO.refreshInputs()` is called, so that actual hardware inputs are read.
-- All Sensors have their `Sensor.loop()` run to process these inputs and update any state machines. State changes may lead to events being sent to Controllers, which are just registered there.
-- Next `Controller.loop()` is run on all Controllers. Some data might have changed, which may update state of the Controller, and which might send events to other Controllers or Actuators. Again these events are noted by the event targets, not yet processed.
+- All Sensors have their `Sensor.loop()` run to process these inputs and update any state machines. State changes may lead to events being sent to Controllers or Actuators that are registered in the Sensor. These Controllers and Actuators must not yet change their state or send events themselves - they just have to 'remember' the event received.
+- Next `Controller.loop()` is run on all Controllers. Now it is the time to process any event information received and noted before, in the `loop()`. This may lead to a state change of the Controller, which in turn may lead to an event to another Controller or Actuator - which again just notes the information down sent by the event.
 - Finally Actuators have their `Actuator.loop()` executed, so they can update state and if applicable update hardware outputs. To actually update hardware output `IHardwareIO.refreshOutputs()` is called.
 - Finally any `IStateChangedListener`'s are called to update the modelstate of connected client UIs. _This is for UI only, not further explained in this document._
 
-The `currentTime` is a parameter - it is forbidden in any Block to use `System.currentTimeMillis()` to get actual time. The reason for this is automated testing: the time is a parameter that can be manipulated at will, including in testing or - later - replay.
+The `currentTime` is a parameter passed on to each Block's `loop()` - it is forbidden in any Block to use `System.currentTimeMillis()` to get actual time. The reason for this is automated testing: the time is a parameter that can be manipulated at will, including in testing or - later - replay.
 
-_**TODO** not sure it is still used, isn't this handled differently now, see higher?_ The `loopSequence` is used to detect and prevent infinite loops. Using events and badly written code it can happen that code calls itself infinitely. This can be catastrophic for the hardware (e.g. screens). 
+The separation of event notification and handling its' state changes in `loop()` ensures orderly execution of changes in that outputs are only changed when all sensor and intermediate logic has executed. It also helps the time simulation. 
+
+Safety is further improved by separating hardware access for Sensor, Controller and Actuator, and the fact that Sensors cannot be the target of events.
 
 ## Layers View
 

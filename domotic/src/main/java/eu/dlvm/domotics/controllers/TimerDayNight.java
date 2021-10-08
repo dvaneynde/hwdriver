@@ -70,7 +70,7 @@ public class TimerDayNight extends Timer {
 	}
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		checktTimesUpdatedForToday(currentTime);
 		if (!timesUpdatedForToday) {
 			if (asyncCheckWeather != null) {
@@ -100,7 +100,7 @@ public class TimerDayNight extends Timer {
 				asyncCheckWeather = Executors.newSingleThreadExecutor().submit(worker);
 			}
 		}
-		super.loop(currentTime, sequence);
+		super.loop(currentTime);
 	}
 
 	private void setOnOffTimes(OpenWeatherMap.Info info) {

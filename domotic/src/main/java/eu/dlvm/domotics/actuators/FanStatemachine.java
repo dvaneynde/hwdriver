@@ -48,8 +48,7 @@ public class FanStatemachine {
 	}
 
 	/**
-	 * Toggle between immediately turning and stopping. If started, it runs for
-	 * {@link #getDelayPeriodSec()} seconds.
+	 * Toggle between immediately turning and stopping.
 	 */
 	public boolean toggle() {
 		States oldState = state;
@@ -136,7 +135,7 @@ public class FanStatemachine {
 		logger.info("Fan {} - time of {} sec. passed [ {} -> {} ].", fan.getName(), time, oldState.name(), getState().name());
 	}
 
-	public void loop(long current, long sequence) {
+	public void loop(long current) {
 		States oldState = state;
 		if (timeStateEntered == -1L)
 			timeStateEntered = current;

@@ -136,7 +136,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 	// PRIVATE API
 
 	@Override
-	public void loop(long currentTime, long sequence) {
+	public void loop(long currentTime) {
 		measuredLevel = getHwReader().readAnalogInput(getChannel());
 
 		if (timeCurrentStateStarted < 0L) {
