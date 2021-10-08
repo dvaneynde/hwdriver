@@ -5,14 +5,12 @@ package eu.dlvm.iohardware;
  * It abstracts hardware input and output channels, a channel being digital
  * (0/1) or analog (0..n).
  * <p>
- * Because communication with the real hardware often happens via TCP/IP and C
- * code, inputs and outputs are buffered here. Only when calling
+ * To optimize use of hardware inputs and outputs are buffered. Only when calling
  * {@link #refreshInputs()} and {@link #refreshOutputs()} the inputs and outputs
- * will be in line with the real hardware.
+ * are synchronized with the hardware.
  * <p>
- * A channel is identified by {@link String}, essentially an integer number.
- * Channel numbering needs not be consecutive. Input channels and output
- * (logical) channels are different; so channel '0' can be used twice, once for
+ * A channel is identified by {@link String}. Input channels and output
+ * channels are different; so channel 'ABC' can be used twice, once for
  * input and once for output.
  * <p>
  * Typical sequence:

@@ -1,7 +1,8 @@
 package eu.dlvm.iohardware;
 
 /**
-
+ * Hardware inputs.
+ *
  * @author Dirk Vaneynde
  */
 

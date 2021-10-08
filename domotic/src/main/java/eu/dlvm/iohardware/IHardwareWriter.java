@@ -1,6 +1,8 @@
 package eu.dlvm.iohardware;
 
 /**
+ * Hardware outputs.
+ *
  * @author Dirk Vaneynde
  */
 

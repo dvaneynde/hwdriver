@@ -93,7 +93,7 @@ abstract class Block {
 }
 
 interface IDomoticLoop {
-    void loop(long time, long seq)
+    void loop(long timeMs)
 }
 
 interface IEventListener {
@@ -199,7 +199,7 @@ Safety is further improved by separating hardware access for Sensor, Controller 
 There are 4 major parts:
 1. UI
 2. eu.dlvm.domotics: namespace of all Java classes that are independent of the hardware, and contains all functional logic; this also has the `main()` routine
-3. eu.dlmv.iohardware: namespace of hardware specific classes, abstracted away behind `IHardwareIO` interface described earlier.
+3. eu.dlmv.iohardware: namespace of hardware specific classes, abstracted away behind 'IHardwareBuilder' and `IHardwareIO` interfaces.
 4. hwdriver is a small C executable
 
 Note that parts 2 and 3 are inside one Java executable (.jar file).
@@ -214,13 +214,16 @@ package domotic <<java exe>> {
     package eu.dlvm.domotics {
         file DomoticConfig <<xml>>   
     }
-    RestAPI <|. eu.dlvm.domotics
+    RestAPI <|.. eu.dlvm.domotics
+    interface IHardwareBuilder
     interface IHardwareIO
     package eu.dlvm.iohardware {
         file DiamondBoardsConfig <<xml>>
 
     }
+    eu.dlvm.domotics --> IHardwareBuilder
     eu.dlvm.domotics --> IHardwareIO
+    IHardwareBuilder <|.. eu.dlvm.iohardware
     IHardwareIO <|.. eu.dlvm.iohardware
 }
 package hwdriver <<c exe>>{
@@ -228,9 +231,18 @@ package hwdriver <<c exe>>{
 }
 
 eu.dlvm.iohardware -> hwdriver : TCP
-
-
 ```
+
+Interface `IHardwareIO` includes interfaces `IHardwareReader` and `IHardwareWriter`. 
+
+Interface `IHardwareBuilder` is used at initialization to get an instance of `IHardwareIO`. The idea is to be hardware independent. This is not fully implemented yet, for that to happen:
+1. Hardware specific code must in separate .jar file, loaded at startup by domotic system.
+2. Parameters for the hardware must be passed as opaque key-value lists to the domotic command line and just passed on as a list.
+
+But since we do not need this (yet? ever?) it has not been implemented.
+
+Note that hwdriver is also specific to the hardware we've chosen.
+
 
 -----------
 

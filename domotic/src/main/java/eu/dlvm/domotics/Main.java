@@ -2,17 +2,13 @@ package eu.dlvm.domotics;
 
 import java.io.File;
 
+import eu.dlvm.iohardware.diamondsys.HardwareBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
 import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
-import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
-import eu.dlvm.iohardware.diamondsys.messaging.HwDriverChannelSimulator;
-import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
-import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
 
 /**
  * Domotic system main entry point.
@@ -26,17 +22,6 @@ public class Main {
 	public static final Logger logDriver = LoggerFactory.getLogger("DRIVER");
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
-
-	public IHardwareIO setupHardware(String cfgFile, String host, int port, int readTimeout, boolean simulated) {
-		XmlHwConfigurator xhc = new XmlHwConfigurator(cfgFile);
-		IHwDriverChannel hdc;
-		if (simulated)
-			hdc = new HwDriverChannelSimulator();
-		else
-			hdc = new HwDriverTcpChannel(host, port, readTimeout);
-		HardwareIO hw = new HardwareIO(xhc, hdc);
-		return hw;
-	}
 
 	public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
 		try {
@@ -56,7 +41,8 @@ public class Main {
 		log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "ms\n\thardware cfg:\t" + hwCfgFile
 				+ "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + pid);
 
-		IHardwareIO hw = setupHardware(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
+		// See coments in IHardwareBuilder, this is not yet generic enough
+		IHardwareIO hw = (new HardwareBuilder()).build(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
 		Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
 
 		dom.runDomotic(looptime, path2Driver, htmlRootFile);
@@ -74,7 +60,7 @@ public class Main {
 		String blocksCfgFile = null;
 		String hwCfgFile = null;
 		String hostname = "localhost";
-		int port = HwDriverTcpChannel.DEFAULT_DRIVER_PORT;
+		int port = 4444;
 		File htmlRootFile = null;
 		if (args.length == 0) {
 			System.err.println("No arguments given.");
