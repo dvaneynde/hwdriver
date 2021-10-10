@@ -3,9 +3,8 @@ package eu.dlvm.domotics.actuators;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
@@ -27,12 +26,12 @@ public class TestDimmedLamp {
 	private static final String LAMP_CH = Integer.toString(10);
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
-	private IDomoticBuilder builder = new DomoContextMock(hw);
+	private DomoticMock dom = new DomoticMock();
 
 
 	@Before
 	public void init() {
-		lamp = new DimmedLamp("TestDimmedLamp", "TestDimmedLamp", MAX_OUT, LAMP_CH, hw, builder);
+		lamp = new DimmedLamp("TestDimmedLamp", "TestDimmedLamp", MAX_OUT, LAMP_CH, hw, dom);
 		lamp.setMsTimeFullDim(3000);
 	}
 

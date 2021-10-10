@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticBuilder;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.IGadget;
 import eu.dlvm.domotics.events.EventType;
@@ -69,8 +69,8 @@ public class TestGadgetController {
 
 	@Test
 	public void startAndEndWithTiming() {
-		IDomoticBuilder domoticContext = new DomoContextMock(null);
-		GadgetController gc = new GadgetController("TestGadgetController", 200, 20 * 1000, true, false, domoticContext);
+        DomoticMock dom = new DomoticMock();
+		GadgetController gc = new GadgetController("TestGadgetController", 200, 20 * 1000, true, false, dom);
 
 		TestGadget g0 = new TestGadget();
 		TestGadget g1 = new TestGadget();
@@ -175,8 +175,8 @@ public class TestGadgetController {
 
 	@Test
 	public void startWithLowLight() {
-		IDomoticBuilder domoticContext = new DomoContextMock(null);
-		GadgetController gc = new GadgetController("TestGadgetController", 200, 20 * 1000, false, false, domoticContext);
+        DomoticMock dom = new DomoticMock();
+		GadgetController gc = new GadgetController("TestGadgetController", 200, 20 * 1000, false, false, dom);
 
 		TestGadget g0 = new TestGadget();
 
@@ -223,8 +223,8 @@ public class TestGadgetController {
 
 	@Test
 	public void startWithLowLightAndEndRepeat() {
-		IDomoticBuilder domoticContext = new DomoContextMock(null);
-		GadgetController gc = new GadgetController("TestGadgetController", 200, 2 * 1000, false, true, domoticContext);
+        DomoticMock dom = new DomoticMock();
+		GadgetController gc = new GadgetController("TestGadgetController", 200, 2 * 1000, false, true, dom);
 
 		TestGadget g0 = new TestGadget();
 
@@ -268,10 +268,10 @@ public class TestGadgetController {
 
 	@Test
 	public void dailyStartBeforeEndOnSameDay() {
-		IDomoticBuilder domoticContext = new DomoContextMock(null);
+        DomoticMock dom = new DomoticMock();
 		//GadgetController gc = new GadgetController("TestGadgetController", 17 * 3600 * 1000, 5 * 3600 * 1000, true, true, true, domoticContext);
 		GadgetController gc = new GadgetController("TestGadgetController", true, false, Timer.timeInDayMillis(17, 0), Timer.timeInDayMillis(22, 0),
-				domoticContext);
+				dom);
 
 		TestGadget g0 = new TestGadget();
 

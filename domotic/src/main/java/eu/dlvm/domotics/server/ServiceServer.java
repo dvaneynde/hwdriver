@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
+import eu.dlvm.domotics.base.IStateChangeRegistrar;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -28,7 +29,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.service.RestService;
 import eu.dlvm.domotics.service.UiStateUpdatorSocket;
 
@@ -49,22 +49,22 @@ public class ServiceServer {
 	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
-		private IDomoticBuilder domoContext;
+		private IStateChangeRegistrar registrar;
 		
-		public UiSocketCreator(IDomoticBuilder domoContext) {
-			this.domoContext = domoContext;
+		public UiSocketCreator(IStateChangeRegistrar registrar) {
+			this.registrar = registrar;
 		}
 
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
 			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
 			log.debug("Creating websocket connection, remote address="+remoteAddress.toString());
-			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(domoContext);
+			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(registrar);
 			return uiStateUpdatorSocket;
 		}
 	}
 
-	public void start(IDomoticBuilder domoContext) {
+	public void start(IStateChangeRegistrar stateChangeRegistrar) {
 		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8080);
@@ -93,7 +93,7 @@ public class ServiceServer {
 			// Configure websocket behavior
 			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(domoContext));
+			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeRegistrar));
 
 			// Add REST interface handler
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey

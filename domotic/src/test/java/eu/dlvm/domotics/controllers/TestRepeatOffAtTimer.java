@@ -13,7 +13,7 @@ import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 
 public class TestRepeatOffAtTimer {
@@ -21,7 +21,7 @@ public class TestRepeatOffAtTimer {
 
 	@Test
 	public void testTypicalDay() {
-		IDomoticBuilder domoticContext = new DomoContextMock(null);
+        DomoticMock domoticContext = new DomoticMock();
 		RepeatOffAtTimer t = new RepeatOffAtTimer("timer", "timer test", domoticContext, 60);
 		t.registerListener(new Actuator("test", "test", null, null, null, domoticContext) {
 

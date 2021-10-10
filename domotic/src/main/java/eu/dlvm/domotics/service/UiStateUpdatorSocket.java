@@ -3,6 +3,10 @@ package eu.dlvm.domotics.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.IStateChangeRegistrar;
+import eu.dlvm.domotics.base.IStateChangedListener;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -12,10 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IDomoticBuilder;
-import eu.dlvm.domotics.base.IStateChangedListener;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 
 /**
@@ -29,11 +29,11 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	private static int COUNT = 0;
 	private ObjectMapper objectMapper;
 	private int id;
-	private IDomoticBuilder context;
+	private IStateChangeRegistrar registrar;
 	private Session savedSession;
 
-	public UiStateUpdatorSocket(IDomoticBuilder context) {
-		this.context = context;
+	public UiStateUpdatorSocket(IStateChangeRegistrar registrar) {
+		this.registrar = registrar;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;
 		LOG.debug("Created UiStateUpdatorSocket, id=" + id);
@@ -42,14 +42,14 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	@OnWebSocketConnect
 	public void onOpen(Session session) {
 		this.savedSession = session;
-		context.addStateChangedListener(this);
+		registrar.addStateChangedListener(this);
 		LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
 	}
 
 	@OnWebSocketClose
 	public void onClose(int closeCode, String closeReasonPhrase) {
 		this.savedSession = null;
-		context.removeStateChangedListener(this);
+		registrar.removeStateChangedListener(this);
 		LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
 	}
 

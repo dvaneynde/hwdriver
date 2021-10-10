@@ -41,7 +41,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  *         TODO veel te veel methodes, opsplitsen - maar hoe? TODO monitoring en
  *         restart werkte niet, weggooien?
  */
-public class Domotic implements IDomoticBuilder {
+public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
 
@@ -276,7 +276,8 @@ public class Domotic implements IDomoticBuilder {
 		if (htmlRootFile != null) {
 			server = new ServiceServer(htmlRootFile);
 			server.start(this);
-		}
+		} else
+		    log.warn("HTTP server not started as there is no html root file given.");
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4

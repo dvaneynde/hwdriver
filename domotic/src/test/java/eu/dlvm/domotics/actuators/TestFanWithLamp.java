@@ -3,9 +3,8 @@ package eu.dlvm.domotics.actuators;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.iohardware.IHardwareIO;
@@ -34,15 +33,15 @@ public class TestFanWithLamp {
 	private Fan fan;
 	private Lamp lamp;
 	private Hardware hw;
-	private IDomoticBuilder builder;
+	private DomoticMock dom;
 	private long current;
 
 	@Before
 	public void init() {
 		hw = new Hardware();
-		builder = new DomoContextMock(hw);
-		lamp = new Lamp("TestLamp", "TestLamp", false, LAMP_OUT, hw, builder);
-		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, hw, builder).overrideDelayOff2OnSec(5).overrideDelayOn2OffSec(5)
+		dom = new DomoticMock();
+		lamp = new Lamp("TestLamp", "TestLamp", false, LAMP_OUT, hw, dom);
+		fan = new Fan("TestFanWithLamp", "TestFanWithLamp", FAN_OUT, hw, dom).overrideDelayOff2OnSec(5).overrideDelayOn2OffSec(5)
 				.overrideOnDurationSec(10);
 		lamp.registerListener(new Connector(EventType.ON, fan, EventType.DELAY_ON, "Test_Lamp"));
 		lamp.registerListener(new Connector(EventType.OFF, fan, EventType.DELAY_OFF, "Test_Lamp"));

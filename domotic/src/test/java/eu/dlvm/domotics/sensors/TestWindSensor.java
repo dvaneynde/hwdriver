@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.WindSensor.States;
@@ -75,8 +75,8 @@ public class TestWindSensor implements IEventListener {
 
 	@Before
 	public void init() {
-		hw = new Hardware();
-		dom = new DomoContextMock(hw);
+        hw = new Hardware();
+        dom = new DomoticMock();
 	}
 
 	// ===============

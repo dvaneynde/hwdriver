@@ -5,9 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.actuators.Screen;
-import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.iohardware.IHardwareIO;
 
@@ -32,18 +31,18 @@ public class TestSunWindControllerWithRealScreen {
 	protected Screen sr;
 	SunWindController swc;
 	protected HardwareMock hw;
-	protected IDomoticBuilder builder;
+	protected DomoticMock dom;
 
 	@Before
 	public void init() {
 		hw = new HardwareMock();
-		builder = new DomoContextMock(hw);
+		dom = new DomoticMock();
 
-		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, builder);
+		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, dom);
 		sr.setMotorUpPeriod(30);
 		sr.setMotorDnPeriod(30);
 
-		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", builder);
+		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", dom);
 		swc.registerListener(sr);
 	}
 

@@ -3,22 +3,15 @@ package eu.dlvm.domotics.blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.dlvm.domotics.base.Actuator;
-import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticBuilder;
-import eu.dlvm.domotics.base.IStateChangedListener;
-import eu.dlvm.domotics.base.Sensor;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.domotics.base.*;
 
-public class DomoContextMock implements IDomoticBuilder {
+public class DomoticMock implements IDomoticBuilder {
 
-	//public IHardwareIO hw;
 	public List<Sensor> sensors = new ArrayList<Sensor>(64);
 	public List<Actuator> actuators = new ArrayList<Actuator>(32);
 	public List<Controller> controllers = new ArrayList<Controller>(32);
 
-	public DomoContextMock(IHardwareIO hw) {
-		//this.hw = hw;
+	public DomoticMock() {
 	}
 
 	@Override
@@ -52,17 +45,5 @@ public class DomoContextMock implements IDomoticBuilder {
 			}
 		}
 		controllers.add(a);
-	}
-
-	public long getLoopSequence() {
-		return 0;
-	}
-
-	@Override
-	public void addStateChangedListener(IStateChangedListener updator) {
-	}
-
-	@Override
-	public void removeStateChangedListener(IStateChangedListener updator) {
 	}
 }

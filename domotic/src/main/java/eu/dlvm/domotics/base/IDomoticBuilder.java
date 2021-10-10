@@ -18,7 +18,7 @@ public interface IDomoticBuilder {
 	 *            Added, if not already present. Each Sensor can be present no
 	 *            more than once.
 	 */
-	public void addSensor(Sensor s);
+	void addSensor(Sensor s);
 
 	/**
 	 * Add Actuator. Not essential, just to make code more robust by registering
@@ -28,7 +28,7 @@ public interface IDomoticBuilder {
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
-	public void addActuator(Actuator a);
+	void addActuator(Actuator a);
 
 	/**
 	 * Add Controller. Not essential, just to make code more robust by
@@ -38,9 +38,5 @@ public interface IDomoticBuilder {
 	 *            Added, if not already present. Each Actuator can be present no
 	 *            more than once.
 	 */
-	public void addController(Controller a);
-
-	public void addStateChangedListener(IStateChangedListener updator);
-
-	public void removeStateChangedListener(IStateChangedListener updator);
+	void addController(Controller a);
 }

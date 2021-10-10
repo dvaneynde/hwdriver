@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardwareIO;
 import junit.framework.Assert;
 
@@ -33,7 +33,7 @@ public class TestLampWithAutoOff {
 	@Before
 	public void init() {
 		hw = new Hardware();
-		dom = new DomoContextMock(hw);
+		dom = new DomoticMock();
 		lamp = new Lamp("TestLamp", "TestLamp", true, LAMP_OUT, hw, dom);
 		current = 0L;
 	}

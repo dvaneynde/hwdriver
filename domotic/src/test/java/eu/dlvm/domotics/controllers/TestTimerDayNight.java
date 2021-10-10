@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.utils.OpenWeatherMap;
 
 public class TestTimerDayNight {
@@ -47,7 +47,7 @@ public class TestTimerDayNight {
 		long day0 = new GregorianCalendar(2014, 0, 1, 0, 1, 0).getTime().getTime();
 		long day1 = new GregorianCalendar(2014, 0, 2, 0, 0, 10).getTime().getTime();
 
-		TimerDayNight t = new TimerDayNight("test", "test", new DomoContextMock(null));
+		TimerDayNight t = new TimerDayNight("test", "test", new DomoticMock());
 		t.checktTimesUpdatedForToday(day0);
 		assertFalse(t.isTimesUpdatedForToday());
 
@@ -76,7 +76,7 @@ public class TestTimerDayNight {
 	public void testAllOk() {
 		// long basetime = System.currentTimeMillis();
 		long basetime = 0L;
-		TimerDayNight t = new TimerDayNight("timerDayNigth", "timer day and night", new DomoContextMock(null));
+		TimerDayNight t = new TimerDayNight("timerDayNigth", "timer day and night", new DomoticMock());
 		TestTimerDayNight.OwmTest owmt = new TestTimerDayNight.OwmTest(basetime);
 		t.setOpenWeatherMap(owmt);
 		t.setOffTime(8, 0);

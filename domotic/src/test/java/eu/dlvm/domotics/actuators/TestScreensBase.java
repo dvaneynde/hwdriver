@@ -4,7 +4,7 @@ import org.junit.Before;
 
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoContextMock;
+import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardwareIO;
 
 public class TestScreensBase {
@@ -26,7 +26,7 @@ public class TestScreensBase {
 	protected static int UP = 1;
 	protected Screen sr;
 	protected Hardware hw;
-	protected IDomoticBuilder dom;
+	protected DomoticMock dom;
 	protected long cur;
 
 	public TestScreensBase() {
@@ -45,7 +45,7 @@ public class TestScreensBase {
 	@Before
 	public void init() {
 		hw = new Hardware();
-		dom = new DomoContextMock(hw);
+		dom = new DomoticMock();
 		sr = new Screen("TestScreens", "TestScreens", null, Integer.toString(DN), Integer.toString(UP), hw, dom);
 		sr.setMotorUpPeriod(30);
 		sr.setMotorDnPeriod(30);
