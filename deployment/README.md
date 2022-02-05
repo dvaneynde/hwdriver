@@ -1,5 +1,7 @@
 # Deployment
 
+> Setup domotic machine for the first time, including Ubuntu and everything else, see [First-Setup](FIRST-SETUP.md).
+
 ## Build & deploy
 
 On development machine:
@@ -19,19 +21,11 @@ sudo /etc/init.d/domotic.sh restart
 
 For the UI, see [UI README](../elm-ui/README.md).
 
-## Set up Services & Health
+## Backup
+https://ubuntuforums.org/showthread.php?t=35087
 
-See `scripts` folder, these scripts must be installed on the Ubuntu server.
+sudo su -
+cd /
+tar cvpzf backup.tgz --exclude=/proc --exclude=/lost+found --exclude=/backup.tgz --exclude=/mnt --exclude=/sys /
 
-- `domotic.sh` : copy into /etc/init.d/domotic.sh
-- `watchdog.sh` : copy into ~/domotic
 
-
-`watchdog.sh` will check domotic.pid, and if process is not there but domotic.pid is, it will restart via 'domotic.sh restart'. For this to work you need to define a cron job.
-
-```bash
-$ sudo crontab -l
-# m h  dom mon dow   command
-# Every minute run watchdog for domotic
-* * * * *	/home/dirk/domotic/watchdog.sh >/home/dirk/domotic/cron.out
-```
