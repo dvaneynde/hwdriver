@@ -30,7 +30,7 @@ Each project is in a sub-folder, with its own README:
 1. [domotic](./domoti/../../README.md) : the main program, java based
 2. [hwdriver](./hwdriver/dscud5/README.txt) : the C program talking to the hardware
 3. [elm-ui](./elm-ui/README.md) : the web UI
-4. [deployment](deployment/install/instructions.txt) : automated deployment and also Linux service definition and health scripts
+4. [deployment](deployment/install/instructions.txt) : automated deployment and also first time setup
 5. azimuth : library to calculated azimuth, scala based
 
 ## Build and Deploy
